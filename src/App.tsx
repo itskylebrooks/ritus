@@ -1,35 +1,84 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import HeaderStats from './components/HeaderStats'
+import AddHabit from './components/AddHabit'
+import HabitCard from './components/HabitCard'
+import { useHabitStore } from './store/useHabitStore'
+import { fromISO, isSameCalendarWeek, isSameDay } from './utils/date'
+import { hasCompletionInWeek, hasCompletionOnDay } from './utils/scoring'
+import React from "react";
 
-function App() {
-  const [count, setCount] = useState(0)
-
+function EmptyState() {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div className="rounded-2xl border p-10 text-center text-neutral-600 dark:text-neutral-300">
+      <p className="text-lg font-medium">No habits yet</p>
+      <p className="mt-1 text-sm">Create your first habit to get started.</p>
+    </div>
   )
 }
 
-export default App
+function FooterControls() {
+  const clearAll = useHabitStore((s) => s.clearAll)
+  const [confirm, setConfirm] = React.useState(false)
+  return (
+    <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
+      <div className="text-xs text-neutral-500 dark:text-neutral-400">
+        Data is stored locally in your browser (localStorage). Switch on system dark mode for dark theme.
+      </div>
+      <div className="flex items-center gap-2">
+        {confirm ? (
+          <>
+            <button onClick={() => setConfirm(false)} className="rounded-xl border px-3 py-2 text-sm">Cancel</button>
+            <button
+              onClick={() => { clearAll(); setConfirm(false) }}
+              className="rounded-xl bg-red-600 px-3 py-2 text-sm text-white"
+            >
+              Reset all data
+            </button>
+          </>
+        ) : (
+          <button onClick={() => setConfirm(true)} className="rounded-xl border px-3 py-2 text-sm">Reset data…</button>
+        )}
+      </div>
+    </div>
+  )
+}
+
+export default function App() {
+  const habits = useHabitStore((s) => s.habits)
+
+  const sorted = React.useMemo(() => {
+    const today = new Date()
+    return [...habits].sort((a, b) => {
+      const aDone = a.frequency === 'daily' ? hasCompletionOnDay(a.completions, today) : hasCompletionInWeek(a.completions, today)
+      const bDone = b.frequency === 'daily' ? hasCompletionOnDay(b.completions, today) : hasCompletionInWeek(b.completions, today)
+      if (aDone !== bDone) return aDone ? 1 : -1
+      return fromISO(b.createdAt).getTime() - fromISO(a.createdAt).getTime()
+    })
+  }, [habits])
+
+  return (
+    <div className="mx-auto max-w-3xl px-4 py-8">
+      <header className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Ritus · Habit Tracker</h1>
+          <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">Minimal, fast, and local-first.</p>
+        </div>
+      </header>
+
+      <HeaderStats />
+
+      <div className="mt-6">
+        <AddHabit />
+      </div>
+
+      <main className="mt-6 grid gap-4">
+        {sorted.length === 0 ? <EmptyState /> : sorted.map((h) => <HabitCard key={h.id} habit={h} />)}
+      </main>
+
+      <FooterControls />
+
+      <footer className="mt-8 text-center text-xs text-neutral-500 dark:text-neutral-400">
+        Built with React + TypeScript · Zustand · date-fns · Recharts
+      </footer>
+    </div>
+  )
+}
