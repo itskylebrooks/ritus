@@ -7,6 +7,7 @@ import { useHabitStore } from './store/useHabitStore'
 import { fromISO, isSameCalendarWeek, isSameDay, daysThisWeek } from './utils/date'
 import { hasCompletionInWeek, hasCompletionOnDay } from './utils/scoring'
 import React from "react";
+import { motion, AnimatePresence } from 'framer-motion';
 
 function EmptyState() {
   return (
@@ -71,7 +72,24 @@ export default function App() {
       </div>
 
       <main className="mt-6 grid gap-4">
-        {sorted.length === 0 ? <EmptyState /> : sorted.map((h) => <HabitCard key={h.id} habit={h} />)}
+        <AnimatePresence>
+          {sorted.length === 0 ? (
+            <EmptyState />
+          ) : (
+            sorted.map((h) => (
+              <motion.div
+                key={h.id}
+                layout
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.3 }}
+              >
+                <HabitCard habit={h} />
+              </motion.div>
+            ))
+          )}
+        </AnimatePresence>
       </main>
 
       <FooterControls />
