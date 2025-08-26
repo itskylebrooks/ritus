@@ -4,3 +4,47 @@
 
 /* Smooth fonts */
 html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+/* Motion tokens: centralize page-switch timing and easing so transitions are consistent */
+:root {
+	--motion-page-duration: .32s; /* standard duration for page switching */
+	--motion-page-ease: cubic-bezier(.4,0,.2,1);
+}
+
+/* Page & element transition helpers */
+@keyframes fadeInMove {
+	from { opacity: 0; transform: translateY(8px); }
+	to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeSwap {
+	from { opacity: 0; transform: translateX(6px); }
+	to { opacity: 1; transform: translateX(0); }
+}
+.animate-fadeInMove { animation: fadeInMove var(--motion-page-duration) var(--motion-page-ease) both; }
+.animate-fadeSwap { animation: fadeSwap var(--motion-page-duration) var(--motion-page-ease) both; }
+
+@keyframes fadeOut { from { opacity:1; } to { opacity:0; } }
+
+/* Guide step transitions */
+@keyframes guideEnterForward { from { opacity:0; transform:translateX(26px) scale(.985); } to { opacity:1; transform:translateX(0) scale(1); } }
+@keyframes guideExitForward { from { opacity:1; transform:translateX(0) scale(1); } to { opacity:0; transform:translateX(-24px) scale(.985); } }
+@keyframes guideEnterBack { from { opacity:0; transform:translateX(-26px) scale(.985); } to { opacity:1; transform:translateX(0) scale(1); } }
+@keyframes guideExitBack { from { opacity:1; transform:translateX(0) scale(1); } to { opacity:0; transform:translateX(24px) scale(.985); } }
+.guide-step-layer { position:absolute; inset:0; }
+.guide-step-enter-forward { animation: guideEnterForward .28s cubic-bezier(.4,0,.2,1); }
+.guide-step-exit-forward { animation: guideExitForward .22s cubic-bezier(.4,0,.55,1) forwards; }
+.guide-step-enter-back { animation: guideEnterBack .28s cubic-bezier(.4,0,.2,1); }
+.guide-step-exit-back { animation: guideExitBack .22s cubic-bezier(.4,0,.55,1) forwards; }
+
+/* Settings modal animations (overlay + panel) */
+@keyframes settingsIn { from { opacity:0; transform:translateY(24px) scale(.96);} to { opacity:1; transform:translateY(0) scale(1);} }
+@keyframes settingsOut { from { opacity:1; transform:translateY(0) scale(1);} to { opacity:0; transform:translateY(26px) scale(.95);} }
+.settings-overlay { animation: fadeInMove var(--motion-page-duration) var(--motion-page-ease) both; }
+.settings-overlay.closing { animation: fadeOut .28s cubic-bezier(.4,0,.6,1) forwards; }
+.settings-panel { animation: settingsIn .42s cubic-bezier(.4,0,.2,1); }
+.settings-panel.closing { animation: settingsOut .28s cubic-bezier(.4,0,.6,1) forwards; }
+
+/* Small utility for fade/slide used elsewhere */
+@keyframes fadeSlide { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
+.fade-slide { animation: fadeSlide .35s ease both; }
+

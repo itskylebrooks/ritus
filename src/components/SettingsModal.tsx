@@ -15,6 +15,7 @@ function importAllData(_txt: string, _opts: any) { return { ok: true, added: 0, 
 export default function SettingsModal({ open, onClose, entries, onShowGuide, isTG, onOpenPrivacy }: { open: boolean; onClose: () => void; entries: Entry[]; onShowGuide?: () => void; isTG?: boolean; onOpenPrivacy?: () => void }) {
   const [closing, setClosing] = useState(false)
   const timeoutRef = useRef<number | null>(null)
+  const pendingRef = useRef<'none' | 'guide'>('none')
   const [username, setUsername] = useState(() => loadUser().username || '')
   const [dirty, setDirty] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -29,7 +30,22 @@ export default function SettingsModal({ open, onClose, entries, onShowGuide, isT
   useEffect(()=>{ if(!open) setClosing(false); }, [open])
   useEffect(()=>()=>{ if(timeoutRef.current) window.clearTimeout(timeoutRef.current); },[])
   const CLOSE_DURATION = 280
-  function beginClose(){ if (closing) return; setClosing(true); timeoutRef.current = window.setTimeout(()=> onClose(), CLOSE_DURATION + 40); }
+  function beginClose(){ if (closing) return; setClosing(true); timeoutRef.current = window.setTimeout(()=> {
+      try { onClose() } catch {}
+      if (pendingRef.current === 'guide') {
+        // little buffer so the settings overlay/panel fully finishes animating
+        window.setTimeout(()=> { try { onShowGuide && onShowGuide() } catch {} ; pendingRef.current = 'none' }, 80)
+      } else {
+        pendingRef.current = 'none'
+      }
+    }, CLOSE_DURATION + 40); }
+
+  function handleShowGuide() {
+    if (!onShowGuide) return
+    pendingRef.current = 'guide'
+    // start the close animation; onClose will be called after CLOSE_DURATION, then we'll trigger guide from the parent via pendingRef in beginClose
+    beginClose()
+  }
 
   useEffect(()=>{
     if (open) {
@@ -77,7 +93,7 @@ export default function SettingsModal({ open, onClose, entries, onShowGuide, isT
           <div className="relative h-12 flex items-center justify-center">
             {onShowGuide && (
               <div className="absolute left-0 top-1/2 -translate-y-1/2" style={{ width:48, height:48 }}>
-                <button type="button" aria-label="Open guide" onClick={onShowGuide} className="w-12 h-12 flex items-center justify-center rounded-full bg-gray-100/40 ring-1 ring-black/6 text-black/60 hover:text-black hover:bg-gray-100/60 transition">
+                <button type="button" aria-label="Open guide" onClick={handleShowGuide} className="w-12 h-12 flex items-center justify-center rounded-full bg-gray-100/40 ring-1 ring-black/6 text-black/60 hover:text-black hover:bg-gray-100/60 transition">
                   <span className="text-xl font-semibold">?</span>
                 </button>
                 <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 translate-y-full text-[10px] text-black/40 font-medium whitespace-nowrap pointer-events-none select-none">App guide</div>

@@ -83,15 +83,16 @@ export default function GuideModal({ open, onClose }: GuideModalProps) {
     setRenderedSteps(prev => prev.map(p => ({ ...p, phase: 'exit' as const, dir })))
     // after exit animation, insert new entering layer
     if (stepAnimTimer.current) clearTimeout(stepAnimTimer.current)
-    const EXIT_MS = 320
+    // make transitions snappier: short exit, then insert new entering layer
+    const EXIT_MS = 200
     stepAnimTimer.current = window.setTimeout(()=> {
       stepKeyRef.current++
       setRenderedSteps([{ key: stepKeyRef.current, idx: next, phase: 'enter', dir }])
       setStep(next)
-      // cleanup any stray timers later if needed
+      // cleanup after enter animation completes
       stepAnimTimer.current = window.setTimeout(()=> {
         setRenderedSteps(curr => curr.filter(layer => layer.phase === 'enter'))
-      }, 400)
+      }, 260)
     }, EXIT_MS)
   }
 
