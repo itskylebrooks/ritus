@@ -1,69 +1,66 @@
-# React + TypeScript + Vite
+# Ritus — Minimal Habit Tracker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A clean, local-first habit tracker built with React + TypeScript. Daily/weekly habits, streaks, points, and a tiny sparkline — all stored in your browser.
 
-Currently, two official plugins are available:
+## Features (MVP)
+- Create, edit, delete habits (daily or weekly)
+- One-tap **Done today** and a Mon–Sun strip to toggle any day
+- Live streaks, weekly progress, and a points system (+10 per completion, milestone bonuses)
+- Local persistence via `localStorage`
+- Responsive UI with dark-mode support (follows system)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Tech
+- React + TypeScript + Vite
+- Tailwind CSS
+- Zustand (with persistence middleware)
+- date-fns
+- Recharts (tiny sparkline)
+- lucide-react (icons)
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Quickstart
+```bash
+pnpm i   # or npm i / yarn
+pnpm dev # start dev server
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Scripts
+- `dev` — run Vite dev server
+- `build` — type-check + production build
+- `preview` — preview the production build
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Project Structure
+```text
+/src
+ ├─ components/         # Reusable pieces
+ │   ├─ AddHabit.tsx
+ │   ├─ Badge.tsx
+ │   ├─ HabitCard.tsx
+ │   ├─ HeaderStats.tsx
+ │   ├─ MiniChart.tsx
+ │   └─ WeekStrip.tsx
+ ├─ store/
+ │   └─ useHabitStore.ts
+ ├─ utils/
+ │   ├─ date.ts
+ │   └─ scoring.ts
+ ├─ types.ts
+ ├─ App.tsx
+ ├─ main.tsx
+ └─ styles.css          # Tailwind entry
 ```
+
+## Design Notes
+- Minimal UI; most styling via Tailwind utilities
+- Dark mode uses your OS setting
+- Points: +10 per completion, +50 bonus for 7-day (daily) or 4-week (weekly) streaks
+- Sorting: unfinished habits for today/this week float to the top
+
+## Roadmap
+- [ ] Settings: theme toggle, custom point values
+- [ ] Heatmap + trends
+- [ ] Reminders (web push), optional auth + cloud sync
+- [ ] Unit tests (Jest + RTL)
+
+---
+
+Built for learning and everyday use. PRs welcome.
