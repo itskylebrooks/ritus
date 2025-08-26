@@ -8,9 +8,9 @@ export default function WeekStrip({ habit, onToggle }: { habit: Habit; onToggle:
   return (
     <div className="flex gap-1.5">
       {week.map((d) => {
-        const done = habit.frequency === 'daily'
-          ? hasCompletionOnDay(habit.completions, d)
-          : hasCompletionInWeek(habit.completions, d)
+        // For daily habits we mark days with exact matches.
+        // For weekly habits we also mark the exact day so users can choose multiple days in a week.
+        const done = hasCompletionOnDay(habit.completions, d)
         const label = format(d, 'EE')
         return (
           <button
