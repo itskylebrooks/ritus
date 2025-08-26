@@ -80,6 +80,24 @@ export default function SettingsModal({ open, onClose, entries, onShowGuide, isT
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) { setUsername(e.target.value); setDirty(true) }
   async function handleSave(e?: React.FormEvent) { if (e) e.preventDefault(); if (!dirty || saving) return; setSaving(true); if (username.trim().length < 4) { setSaving(false); alert('Username must be at least 4 characters.'); return; } const stored = saveUser({ username: username.trim(), updatedAt: Date.now() }); setUsername(stored.username); setSaving(false); setDirty(false); setSavedFlash(true); setTimeout(()=> setSavedFlash(false), 1400) }
 
+  function handleDeleteAllLocal() {
+    const ok = window.confirm('Delete all local data? This will clear localStorage and cannot be undone. Are you sure?')
+    if (!ok) return
+    try {
+      clearAllData()
+      // inform the user and reload so the app reflects cleared data
+      window.alert('All local data cleared. The app will reload now.')
+      window.location.reload()
+    } catch (e) {
+      console.error('Failed to clear local data', e)
+      window.alert('Failed to clear local data')
+    }
+  }
+
+  function handlePrivacyPolicy() {
+    // intentionally non-functional in this build; left as a placeholder
+  }
+
   const topEmoji = '🙂'
   const gradientCSS = 'linear-gradient(135deg,#111,#0b1220)'
 
@@ -126,6 +144,10 @@ export default function SettingsModal({ open, onClose, entries, onShowGuide, isT
                   <button type="submit" disabled={!dirty || saving || !username.trim()} className="rounded-md px-3 py-2 text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed bg-black text-white">{saving ? 'Saving…' : savedFlash ? 'Saved' : 'Save'}</button>
                 </div>
                 <p className="mt-2 text-[11px] text-black/40">Lowercase, 24 chars max. Placeholder only.</p>
+                <div className="mt-3 flex items-center justify-between gap-3">
+                  <button type="button" onClick={handleDeleteAllLocal} className="text-sm font-medium text-red-600 hover:underline">Delete all local data</button>
+                  <button type="button" disabled onClick={handlePrivacyPolicy} className="text-sm text-black/50 underline disabled:opacity-50 disabled:cursor-not-allowed">Privacy policy</button>
+                </div>
               </div>
             </form>
           </div>
