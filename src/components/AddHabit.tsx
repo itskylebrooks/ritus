@@ -35,7 +35,7 @@ export default function AddHabit() {
         <label className="block text-sm text-neutral-600 dark:text-neutral-300">Habit name</label>
         <input
           className="mt-1 w-full rounded-xl border bg-white px-3 py-2 outline-none ring-0 placeholder:text-neutral-400 focus:border-black/40 dark:bg-neutral-950 dark:border-neutral-800 dark:focus:border-white/50"
-          placeholder="e.g., Morning Run"
+          placeholder={mode === 'build' ? 'e.g., Morning Run' : 'e.g., No Alcohol'}
           value={name}
           onChange={(e) => setName(e.target.value)}
         />

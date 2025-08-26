@@ -18,30 +18,7 @@ function EmptyState() {
 }
 
 function FooterControls() {
-  const clearAll = useHabitStore((s) => s.clearAll)
-  const [confirm, setConfirm] = React.useState(false)
-  return (
-    <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
-      <div className="text-xs text-neutral-500 dark:text-neutral-400">
-        Data is stored locally in your browser (localStorage). Switch on system dark mode for dark theme.
-      </div>
-      <div className="flex items-center gap-2">
-        {confirm ? (
-          <>
-            <button onClick={() => setConfirm(false)} className="rounded-xl border px-3 py-2 text-sm">Cancel</button>
-            <button
-              onClick={() => { clearAll(); setConfirm(false) }}
-              className="rounded-xl bg-red-600 px-3 py-2 text-sm text-white"
-            >
-              Reset all data
-            </button>
-          </>
-        ) : (
-          <button onClick={() => setConfirm(true)} className="rounded-xl border px-3 py-2 text-sm">Reset data…</button>
-        )}
-      </div>
-    </div>
-  )
+  return null
 }
 
 export default function App() {
@@ -99,7 +76,7 @@ export default function App() {
       <FooterControls />
 
       <footer className="mt-8 text-center text-xs text-neutral-500 dark:text-neutral-400">
-        Built with React + TypeScript · Zustand · date-fns · Recharts
+        Keep moving forward
       </footer>
     </div>
   )
