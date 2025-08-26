@@ -1,0 +1,73 @@
+import { Habit } from '../types'
+import { addDays, fromISO, isSameCalendarWeek, isSameDay } from './date'
+
+export const POINTS_PER_COMPLETION = 10
+export const DAILY_MILESTONE = 7   // 7-day streak bonus
+export const WEEKLY_MILESTONE = 4  // 4-week streak bonus
+export const MILESTONE_BONUS = 50
+
+export function hasCompletionOnDay(completions: string[], day: Date) {
+  return completions.some((c) => isSameDay(fromISO(c), day))
+}
+
+export function hasCompletionInWeek(completions: string[], dayInWeek: Date) {
+  return completions.some((c) => isSameCalendarWeek(fromISO(c), dayInWeek))
+}
+
+export function calcDailyStreak(h: Habit, ref: Date = new Date()) {
+  let s = 0
+  let cur = new Date(ref)
+  while (hasCompletionOnDay(h.completions, cur)) {
+    s += 1
+    cur = addDays(cur, -1)
+  }
+  return s
+}
+
+export function calcWeeklyStreak(h: Habit, ref: Date = new Date()) {
+  // Count consecutive weeks with a completion, backwards from current week
+  let s = 0
+  let cursor = new Date(ref)
+  while (hasCompletionInWeek(h.completions, cursor)) {
+    s += 1
+    cursor = addDays(cursor, -7)
+  }
+  return s
+}
+
+export function calcPoints(h: Habit): number {
+  let pts = h.completions.length * POINTS_PER_COMPLETION
+  const dates = [...h.completions]
+    .map(fromISO)
+    .sort((a, b) => a.getTime() - b.getTime())
+
+  if (h.frequency === 'daily') {
+    let streak = 0
+    let prev: Date | null = null
+    for (const d of dates) {
+      if (!prev || isSameDay(d, addDays(prev, 1))) streak += 1
+      else if (isSameDay(d, prev)) continue
+      else streak = 1
+      if (streak % DAILY_MILESTONE === 0) pts += MILESTONE_BONUS
+      prev = d
+    }
+  } else {
+    let streak = 0
+    let prev: Date | null = null
+    for (const d of dates) {
+      if (!prev || isSameCalendarWeek(d, addDays(prev, 7))) streak += 1
+      else if (isSameCalendarWeek(d, prev)) continue
+      else streak = 1
+      if (streak % WEEKLY_MILESTONE === 0) pts += MILESTONE_BONUS
+      prev = d
+    }
+  }
+  return pts
+}
+
+export function recalc(h: Habit): Habit {
+  const base = { ...h }
+  base.streak = h.frequency === 'daily' ? calcDailyStreak(h) : calcWeeklyStreak(h)
+  base.points = calcPoints(h)
+  return base
+}
