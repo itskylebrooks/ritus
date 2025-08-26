@@ -106,22 +106,22 @@ export default function SettingsModal({ open, onClose, entries, onShowGuide, isT
   if (!open && !closing) return null
   return (
     <div className={"fixed inset-0 z-50 flex items-stretch sm:items-center justify-center settings-overlay backdrop-blur-sm " + (closing? 'closing':'')} onClick={beginClose}>
-      <div className={"w-full h-full sm:h-auto max-w-none sm:max-w-sm rounded-none sm:rounded-2xl bg-white p-6 pt-7 pb-8 ring-1 ring-black/5 overflow-y-auto settings-panel " + (closing? 'closing':'')} style={{ WebkitOverflowScrolling: 'touch', paddingBottom: 'max(env(safe-area-inset-bottom), 32px)' }} onClick={(e)=>e.stopPropagation()}>
+  <div className={"w-full h-full sm:h-auto max-w-none sm:max-w-sm rounded-none sm:rounded-2xl bg-white dark:bg-neutral-950 p-6 pt-7 pb-8 ring-1 ring-black/5 dark:ring-white/5 overflow-y-auto settings-panel " + (closing? 'closing':'')} style={{ WebkitOverflowScrolling: 'touch', paddingBottom: 'max(env(safe-area-inset-bottom), 32px)' }} onClick={(e)=>e.stopPropagation()}>
         <div className="mb-8">
           <div className="relative h-12 flex items-center justify-center">
             {onShowGuide && (
               <div className="absolute left-0 top-1/2 -translate-y-1/2" style={{ width:48, height:48 }}>
-                <button type="button" aria-label="Open guide" onClick={handleShowGuide} className="w-12 h-12 flex items-center justify-center rounded-full bg-gray-100/40 ring-1 ring-black/6 text-black/60 hover:text-black hover:bg-gray-100/60 transition">
+                <button type="button" aria-label="Open guide" onClick={handleShowGuide} className="w-12 h-12 flex items-center justify-center rounded-full bg-gray-100/40 dark:bg-neutral-800/30 border border-neutral-200 dark:border-white text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-100 hover:bg-gray-100/60 dark:hover:bg-neutral-800/40 transition">
                   <span className="text-xl font-semibold">?</span>
                 </button>
                 <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 translate-y-full text-[10px] text-black/40 font-medium whitespace-nowrap pointer-events-none select-none">App guide</div>
               </div>
             )}
-            <span className="text-lg font-semibold tracking-wide">Settings</span>
+            <span className="text-lg font-semibold tracking-wide text-neutral-900 dark:text-neutral-100">Settings</span>
             <div className="absolute right-0 top-1/2 -translate-y-1/2" title="Your avatar">
               <div className="relative" style={{ width:48, height:48 }}>
-                <div className="w-full h-full rounded-full ring-1 ring-black/8 shadow-inner overflow-hidden" style={{ backgroundImage: gradientCSS }}>
-                  <div className="flex items-center justify-center w-full h-full text-[24px] select-none">{topEmoji}</div>
+                <div className="w-full h-full rounded-full border border-neutral-200 dark:border-white shadow-inner overflow-hidden bg-blue-500">
+                  <div className="flex items-center justify-center w-full h-full text-[24px] select-none text-white">{topEmoji}</div>
                 </div>
               </div>
             </div>
@@ -129,7 +129,7 @@ export default function SettingsModal({ open, onClose, entries, onShowGuide, isT
         </div>
 
         <div className="space-y-4">
-          <div className="bg-gray-50 p-4 rounded-2xl shadow-sm text-sm">
+          <div className="p-4 rounded-2xl border shadow-sm text-sm">
             <div className="flex items-start justify-between">
               <div>
                 <div className="text-sm font-semibold mb-0.5">Account</div>
@@ -138,35 +138,35 @@ export default function SettingsModal({ open, onClose, entries, onShowGuide, isT
             <hr className="border-t border-black/6 my-3" />
             <form onSubmit={handleSave} className="mt-1 space-y-3">
               <div>
-                <label className="block text-[10px] uppercase tracking-wide text-black/40 mb-2">Username</label>
+                <label className="block text-[10px] uppercase tracking-wide text-neutral-600 dark:text-neutral-400 mb-2">Username</label>
                 <div className="flex items-center gap-3">
-                  <input value={username} onChange={handleChange} maxLength={24} className="flex-1 rounded-md bg-white px-3 py-2 text-sm outline-none ring-1 ring-black/6 focus:ring-2 focus:ring-emerald-400 placeholder:text-black/30" placeholder="user" />
-                  <button type="submit" disabled={!dirty || saving || !username.trim()} className="rounded-md px-3 py-2 text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed bg-black text-white">{saving ? 'Saving…' : savedFlash ? 'Saved' : 'Save'}</button>
+                  <input value={username} onChange={handleChange} maxLength={24} className="flex-1 rounded-md bg-white dark:bg-neutral-950 px-3 py-2 text-sm outline-none ring-1 ring-black/6 dark:ring-white/6 focus:ring-2 focus:ring-emerald-400 placeholder:text-neutral-400" placeholder="user" />
+                  <button type="submit" disabled={!dirty || saving || !username.trim()} className="rounded-md px-3 py-2 text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed bg-black text-white dark:bg-white dark:text-black">{saving ? 'Saving…' : savedFlash ? 'Saved' : 'Save'}</button>
                 </div>
-                <p className="mt-2 text-[11px] text-black/40">Lowercase, 24 chars max. Placeholder only.</p>
+                <p className="mt-2 text-[11px] text-neutral-600 dark:text-neutral-400">Lowercase, 24 chars max. Placeholder only.</p>
                 <div className="mt-3 flex items-center justify-between gap-3">
                   <button type="button" onClick={handleDeleteAllLocal} className="text-sm font-medium text-red-600 hover:underline">Delete all local data</button>
-                  <button type="button" disabled onClick={handlePrivacyPolicy} className="text-sm text-black/50 underline disabled:opacity-50 disabled:cursor-not-allowed">Privacy policy</button>
+                  <button type="button" disabled onClick={handlePrivacyPolicy} className="text-sm text-neutral-600 dark:text-neutral-300 underline disabled:opacity-50 disabled:cursor-not-allowed">Privacy policy</button>
                 </div>
               </div>
             </form>
           </div>
 
-          <div className="bg-gray-50 p-4 rounded-2xl shadow-sm text-sm">
+          <div className="p-4 rounded-2xl border shadow-sm text-sm">
             <div className="text-sm font-semibold mb-2">Data transfer</div>
-            <div className="text-[11px] text-black/50">Export or import JSON (placeholder).</div>
+            <div className="text-[11px] text-neutral-600 dark:text-neutral-400">Export or import JSON (placeholder).</div>
             <div className="mt-3 grid gap-2">
-              <button onClick={handleExport} disabled={exporting} className="w-full rounded-md bg-black text-white px-3 py-2">{exporting ? 'Exporting…' : 'Export all data (JSON)'}</button>
+              <button onClick={handleExport} disabled={exporting} className="w-full rounded-md bg-black text-white px-3 py-2 dark:bg-white dark:text-black">{exporting ? 'Exporting…' : 'Export all data (JSON)'}</button>
               <div className="flex gap-2">
-                <button type="button" onClick={triggerFilePick} className="flex-1 rounded-md bg-white border px-3 py-2">{importing ? 'Importing…' : 'Import from file'}</button>
+                <button type="button" onClick={triggerFilePick} className="flex-1 rounded-md bg-black text-white px-3 py-2 dark:bg-white dark:text-black">{importing ? 'Importing…' : 'Import from file'}</button>
                 <input ref={fileRef} type="file" accept="application/json" onChange={handleFileChosen} className="hidden" />
               </div>
               <div className="flex items-center justify-center gap-2 text-[11px]">
-                <label onClick={() => setMode('merge')} className={"px-2 py-1 rounded-md cursor-pointer " + (mode==='merge' ? 'bg-emerald-100' : 'bg-white') }>
+                <label onClick={() => setMode('merge')} className={"px-2 py-1 rounded-md cursor-pointer " + (mode==='merge' ? 'bg-emerald-100 dark:bg-emerald-600 text-black dark:text-white' : 'bg-white dark:bg-neutral-800') }>
                   <input aria-hidden className="sr-only" type="radio" checked={mode==='merge'} readOnly />
                   <span>Merge</span>
                 </label>
-                <label onClick={() => setMode('replace')} className={"px-2 py-1 rounded-md cursor-pointer " + (mode==='replace' ? 'bg-red-100' : 'bg-white') }>
+                <label onClick={() => setMode('replace')} className={"px-2 py-1 rounded-md cursor-pointer " + (mode==='replace' ? 'bg-red-100 dark:bg-red-600 text-black dark:text-white' : 'bg-white dark:bg-neutral-800') }>
                   <input aria-hidden className="sr-only" type="radio" checked={mode==='replace'} readOnly />
                   <span>Replace</span>
                 </label>
@@ -174,14 +174,14 @@ export default function SettingsModal({ open, onClose, entries, onShowGuide, isT
             </div>
           </div>
 
-          <div className="bg-gray-50 p-4 rounded-2xl shadow-sm text-sm">
+          <div className="p-4 rounded-2xl border shadow-sm text-sm">
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-sm font-semibold">Daily reminder</div>
-                <div className="text-[12px] text-black/40 mt-1">Placeholder reminder settings</div>
+                <div className="text-[12px] text-neutral-600 dark:text-neutral-400 mt-1">Placeholder reminder settings</div>
               </div>
               <div>
-                <button type="button" role="switch" aria-checked={dailyEnabled} onClick={()=>{ const v={...reminders,dailyEnabled: !dailyEnabled}; setReminders(v); saveReminders(v); }} className={"inline-flex items-center px-3 py-2 rounded-full " + (dailyEnabled ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-black') }>
+                <button type="button" role="switch" aria-checked={dailyEnabled} onClick={()=>{ const v={...reminders,dailyEnabled: !dailyEnabled}; setReminders(v); saveReminders(v); }} className={"inline-flex items-center px-3 py-2 rounded-full " + (dailyEnabled ? 'bg-emerald-500 text-white' : 'bg-gray-200 dark:bg-neutral-800 text-black dark:text-neutral-200') }>
                   <span className="mr-3 text-sm">{dailyEnabled ? 'On' : 'Off'}</span>
                   <span className={"relative inline-block w-11 h-6 rounded-full " + (dailyEnabled ? 'bg-emerald-500' : 'bg-gray-300') }>
                     <span className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transform" style={{ transform: dailyEnabled ? 'translateX(1.4rem)' : 'translateX(0)' }} />
@@ -189,16 +189,16 @@ export default function SettingsModal({ open, onClose, entries, onShowGuide, isT
                 </button>
               </div>
             </div>
-            <div className="text-[11px] text-black/40 mt-3">Reminders are placeholders in this build.</div>
+            <div className="text-[11px] text-neutral-600 dark:text-neutral-400 mt-3">Reminders are placeholders in this build.</div>
           </div>
 
         </div>
 
         <div className="mt-5">
-          <button onClick={beginClose} className="w-full rounded-2xl px-4 py-3 text-sm font-semibold text-white bg-black">Done</button>
+          <button onClick={beginClose} className="w-full rounded-2xl px-4 py-3 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition dark:bg-emerald-600 dark:hover:bg-emerald-700">Done</button>
         </div>
 
-        <div className="mt-6 text-center text-[10px] text-black/40 relative">
+  <div className="mt-6 text-center text-[10px] text-neutral-600 dark:text-neutral-400 relative">
           <a
             href="https://www.linkedin.com/in/itskylebrooks/"
             target="_blank"
@@ -219,7 +219,7 @@ export default function SettingsModal({ open, onClose, entries, onShowGuide, isT
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12.001 2C6.47598 2 2.00098 6.475 2.00098 12C2.00098 16.425 4.86348 20.1625 8.83848 21.4875C9.33848 21.575 9.52598 21.275 9.52598 21.0125C9.52598 20.775 9.51348 19.9875 9.51348 19.15C7.00098 19.6125 6.35098 18.5375 6.15098 17.975C6.03848 17.6875 5.55098 16.8 5.12598 16.5625C4.77598 16.375 4.27598 15.9125 5.11348 15.9C5.90098 15.8875 6.46348 16.625 6.65098 16.925C7.55098 18.4375 8.98848 18.0125 9.56348 17.75C9.65098 17.1 9.91348 16.6625 10.201 16.4125C7.97598 16.1625 5.65098 15.3 5.65098 11.475C5.65098 10.3875 6.03848 9.4875 6.67598 8.7875C6.57598 8.5375 6.22598 7.5125 6.77598 6.1375C6.77598 6.1375 7.61348 5.875 9.52598 7.1625C10.326 6.9375 11.176 6.825 12.026 6.825C12.876 6.825 13.726 6.9375 14.526 7.1625C16.4385 5.8625 17.276 6.1375 17.276 6.1375C17.826 7.5125 17.476 8.5375 17.376 8.7875C18.0135 9.4875 18.401 10.375 18.401 11.475C18.401 15.3125 16.0635 16.1625 13.8385 16.4125C14.201 16.725 14.5135 17.325 14.5135 18.2625C14.5135 19.6 14.501 20.675 14.501 21.0125C14.501 21.275 14.6885 21.5875 15.1885 21.4875C19.259 20.1133 21.9999 16.2963 22.001 12C22.001 6.475 17.526 2 12.001 2Z"></path></svg>
           </a>
 
-          <div className="font-medium text-black/55">Ritus {pkg.version}</div>
+          <div className="font-medium text-neutral-900 dark:text-neutral-200">Ritus {pkg.version}</div>
           <div className="mt-1">© {new Date().getFullYear()} Kyle Brooks. All rights reserved.</div>
           <div className="mt-0.5">Icons by Remix Design.</div>
         </div>

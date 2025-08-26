@@ -43,11 +43,11 @@ export default function AddHabit() {
       <div>
         <label className="block text-sm text-neutral-600 dark:text-neutral-300">I want to</label>
         <div className="mt-1 flex gap-2">
-          <label className={"px-3 py-2 rounded-xl border cursor-pointer " + (mode==='build' ? 'bg-black text-white' : 'bg-white') }>
+          <label className={"px-3 py-2 rounded-xl border cursor-pointer " + (mode==='build' ? 'bg-black text-white' : 'bg-white text-black') }>
             <input className="sr-only" type="radio" name="mode" checked={mode==='build'} onChange={()=>setMode('build')} />
             Build
           </label>
-          <label className={"px-3 py-2 rounded-xl border cursor-pointer " + (mode==='break' ? 'bg-black text-white' : 'bg-white') }>
+          <label className={"px-3 py-2 rounded-xl border cursor-pointer " + (mode==='break' ? 'bg-black text-white' : 'bg-white text-black') }>
             <input className="sr-only" type="radio" name="mode" checked={mode==='break'} onChange={()=>setMode('break')} />
             Break
           </label>

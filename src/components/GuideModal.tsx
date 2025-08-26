@@ -100,9 +100,9 @@ export default function GuideModal({ open, onClose }: GuideModalProps) {
   const last = step === STEPS.length - 1
   return (
     <div className={`fixed inset-0 z-[60] flex items-center justify-center p-5 transition-colors duration-250 ${closing || entering ? 'bg-black/0' : 'bg-black/70 backdrop-blur-sm'}`} onClick={()=>{ if(!closing) onClose(); }}>
-      <div className={`w-full max-w-sm rounded-2xl ring-1 ring-white/10 p-6 relative transition-all duration-250 ${closing || entering ? 'opacity-0 scale-[0.94] -translate-y-2' : 'opacity-100 scale-100 translate-y-0'} bg-white` } onClick={(e)=> { e.stopPropagation(); }}>
+      <div className={`w-full max-w-sm rounded-2xl ring-1 ring-black/5 dark:ring-white/5 p-6 relative transition-all duration-250 ${closing || entering ? 'opacity-0 scale-[0.94] -translate-y-2' : 'opacity-100 scale-100 translate-y-0'} bg-white dark:bg-neutral-950` } onClick={(e)=> { e.stopPropagation(); }}>
         <div className="absolute top-2 right-2">
-          <button aria-label="Close guide" onClick={()=>{ if(!closing) onClose(); }} className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-black/70 transition">
+          <button aria-label="Close guide" onClick={()=>{ if(!closing) onClose(); }} className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-100 hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-black/70 dark:text-neutral-300 transition">
             ✕
           </button>
         </div>
@@ -115,23 +115,23 @@ export default function GuideModal({ open, onClose }: GuideModalProps) {
               : (layer.dir === 'forward' ? 'guide-step-exit-forward' : 'guide-step-exit-back')
             return (
               <div key={layer.key} className={`guide-step-layer ${stateClass}`}>
-                <h2 className="text-lg font-semibold mb-3 text-black/90">{data.title}</h2>
-                <p className="text-sm text-black/65 leading-relaxed">{data.body}</p>
+        <h2 className="text-lg font-semibold mb-3 text-neutral-900 dark:text-neutral-100">{data.title}</h2>
+        <p className="text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed">{data.body}</p>
               </div>
             )
           })}
         </div>
-        <div className="mt-5 flex items-center justify-between text-xs text-black/45">
+    <div className="mt-5 flex items-center justify-between text-xs text-neutral-600 dark:text-neutral-400">
           <div>Step {step+1} / {STEPS.length}</div>
           <div className="flex gap-1">
-            {STEPS.map((_,i)=> <span key={i} className={`h-1.5 w-1.5 rounded-full ${i===step? 'bg-black':'bg-black/25'}`}/>) }
+      {STEPS.map((_,i)=> <span key={i} className={`h-1.5 w-1.5 rounded-full ${i===step? 'bg-neutral-900 dark:bg-neutral-100':'bg-neutral-300 dark:bg-neutral-700'}`}/>) }
           </div>
         </div>
-        <div className="mt-6 flex gap-3">
+    <div className="mt-6 flex gap-3">
           {step>0 && (
-            <button onClick={()=> queueStep(Math.max(0, step-1))} className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-gray-100 hover:bg-gray-200 text-black/80 transition">Back</button>
+      <button onClick={()=> queueStep(Math.max(0, step-1))} className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-gray-100 hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-black/80 dark:text-neutral-300 transition">Back</button>
           )}
-          <button onClick={()=> { if(last) onClose(); else queueStep(Math.min(STEPS.length-1, step+1)); }} className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-black text-white">{last? 'Finish':'Next'}</button>
+      <button onClick={()=> { if(last) onClose(); else queueStep(Math.min(STEPS.length-1, step+1)); }} className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-black text-white dark:bg-white dark:text-black">{last? 'Finish':'Next'}</button>
         </div>
       </div>
     </div>
