@@ -6,6 +6,8 @@ export interface Habit {
   frequency: Frequency;
   createdAt: string;    // ISO date
   completions: string[];// ISO dates
+  // For weekly habits: how many days per calendar week are required to count as a completion
+  weeklyTarget?: number;
   streak: number;
   points: number;
 }

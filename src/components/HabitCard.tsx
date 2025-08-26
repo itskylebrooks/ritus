@@ -23,11 +23,11 @@ export default function HabitCard({ habit }: { habit: Habit }) {
   }, [habit.name, habit.frequency])
 
   const thisWeekDays = daysThisWeek()
-  const weeklyMax = habit.frequency === 'daily' ? 7 : 1
+  const weeklyMax = habit.frequency === 'daily' ? 7 : habit.weeklyTarget ?? 1
   const weeklyVal = useMemo(() => {
     if (habit.frequency === 'daily') return thisWeekDays.filter((d) => hasCompletionOnDay(habit.completions, d)).length
-    return thisWeekDays.some((d) => hasCompletionInWeek(habit.completions, d)) ? 1 : 0
-  }, [habit.completions, habit.frequency])
+    return thisWeekDays.filter((d) => hasCompletionOnDay(habit.completions, d)).length
+  }, [habit.completions, habit.frequency, habit.weeklyTarget])
 
   function saveEdit() {
     const trimmed = name.trim()

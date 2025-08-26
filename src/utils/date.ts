@@ -28,4 +28,4 @@ export function lastNDays(n: number, ref: Date = new Date()) {
   return eachDayOfInterval({ start, end: startOfDay(ref) })
 }
 
-export { addDays, isSameDay, startOfDay }
+export { addDays, isSameDay, startOfDay, startOfWeek }

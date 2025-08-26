@@ -7,12 +7,13 @@ export default function AddHabit() {
   const addHabit = useHabitStore((s) => s.addHabit)
   const [name, setName] = useState('')
   const [frequency, setFrequency] = useState<Frequency>('daily')
+  const [weeklyTarget, setWeeklyTarget] = useState<number>(1)
 
   function submit(e: React.FormEvent) {
     e.preventDefault()
     if (!name.trim()) return
     try {
-      addHabit(name.trim(), frequency)
+      addHabit(name.trim(), frequency, weeklyTarget)
     } catch (err) {
       // on some mobile browsers/storage modes this can throw (e.g., blocked storage or missing APIs)
       // surface to console and avoid crashing the UI
@@ -23,6 +24,7 @@ export default function AddHabit() {
     }
     setName('')
     setFrequency('daily')
+  setWeeklyTarget(1)
   }
 
   return (
@@ -47,6 +49,20 @@ export default function AddHabit() {
           <option value="weekly">Weekly</option>
         </select>
       </div>
+      {frequency === 'weekly' && (
+        <div>
+          <label className="block text-sm text-neutral-600 dark:text-neutral-300">Days / week</label>
+          <select
+            className="mt-1 w-full rounded-xl border bg-white px-3 py-2 dark:bg-neutral-950 dark:border-neutral-800"
+            value={weeklyTarget}
+            onChange={(e) => setWeeklyTarget(Number(e.target.value))}
+          >
+            {[1, 2, 3, 4, 5, 6, 7].map((n) => (
+              <option key={n} value={n}>{n} day{n > 1 ? 's' : ''}</option>
+            ))}
+          </select>
+        </div>
+      )}
       <button
         type="submit"
         className="inline-flex items-center justify-center gap-2 rounded-xl bg-black px-4 py-2 text-white transition active:scale-[.98] dark:bg-white dark:text-black"

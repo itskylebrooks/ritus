@@ -1,5 +1,5 @@
 import { Habit } from '../types'
-import { addDays, fromISO, isSameCalendarWeek, isSameDay } from './date'
+import { addDays, fromISO, isSameCalendarWeek, isSameDay, startOfWeek, WSO } from './date'
 
 export const POINTS_PER_COMPLETION = 10
 export const DAILY_MILESTONE = 7   // 7-day streak bonus
@@ -25,12 +25,17 @@ export function calcDailyStreak(h: Habit, ref: Date = new Date()) {
 }
 
 export function calcWeeklyStreak(h: Habit, ref: Date = new Date()) {
-  // Count consecutive weeks with a completion, backwards from current week
+  // Count consecutive weeks with at least `weeklyTarget` completions, backwards from current week
+  const target = h.weeklyTarget ?? 1
   let s = 0
   let cursor = new Date(ref)
-  while (hasCompletionInWeek(h.completions, cursor)) {
-    s += 1
-    cursor = addDays(cursor, -7)
+  while (true) {
+    // count completions in the week of cursor
+    const weekCount = h.completions.filter((c) => isSameCalendarWeek(fromISO(c), cursor)).length
+    if (weekCount >= target) {
+      s += 1
+      cursor = addDays(cursor, -7)
+    } else break
   }
   return s
 }
@@ -52,14 +57,27 @@ export function calcPoints(h: Habit): number {
       prev = d
     }
   } else {
+    // Weekly scoring: consider a week a 'hit' if completions in that calendar week >= weeklyTarget
+    const target = h.weeklyTarget ?? 1
+    // build list of week-start dates representing weeks with at least target completions
+    const weeks: Date[] = []
+    let lastWeek: Date | null = null
+    for (const d of dates) {
+      // find week of this date
+      const wk = startOfWeek(d, WSO)
+      if (lastWeek && isSameCalendarWeek(wk, lastWeek)) continue
+      const count = h.completions.filter((c) => isSameCalendarWeek(fromISO(c), wk)).length
+      if (count >= target) weeks.push(wk)
+      lastWeek = wk
+    }
+
     let streak = 0
     let prev: Date | null = null
-    for (const d of dates) {
-      if (!prev || isSameCalendarWeek(d, addDays(prev, 7))) streak += 1
-      else if (isSameCalendarWeek(d, prev)) continue
+    for (const wk of weeks) {
+      if (!prev || isSameCalendarWeek(wk, addDays(prev, 7))) streak += 1
       else streak = 1
       if (streak % WEEKLY_MILESTONE === 0) pts += MILESTONE_BONUS
-      prev = d
+      prev = wk
     }
   }
   return pts

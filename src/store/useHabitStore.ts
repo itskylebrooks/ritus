@@ -6,8 +6,8 @@ import { recalc } from '../utils/scoring'
 
 interface HabitState {
   habits: Habit[]
-  addHabit: (name: string, frequency: Frequency) => void
-  editHabit: (id: string, patch: Partial<Pick<Habit, 'name' | 'frequency'>>) => void
+  addHabit: (name: string, frequency: Frequency, weeklyTarget?: number) => void
+  editHabit: (id: string, patch: Partial<Pick<Habit, 'name' | 'frequency' | 'weeklyTarget'>>) => void
   deleteHabit: (id: string) => void
   toggleCompletion: (id: string, date: Date) => void
   clearAll: () => void
@@ -17,8 +17,8 @@ export const useHabitStore = create<HabitState>()(
   persist(
     (set, get) => ({
       habits: [],
-      // safe id generation: crypto.randomUUID may not exist on some older mobile browsers
-      addHabit: (name, frequency) =>
+  // safe id generation: crypto.randomUUID may not exist on some older mobile browsers
+  addHabit: (name, frequency, weeklyTarget = 1) =>
         set((s) => {
           const genId = () => {
             try {
@@ -42,6 +42,7 @@ export const useHabitStore = create<HabitState>()(
             frequency,
             createdAt: iso(new Date()),
             completions: [],
+            weeklyTarget: frequency === 'weekly' ? weeklyTarget : undefined,
             streak: 0,
             points: 0,
           }
