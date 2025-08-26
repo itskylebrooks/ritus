@@ -6,8 +6,8 @@ import { recalc } from '../utils/scoring'
 
 interface HabitState {
   habits: Habit[]
-  addHabit: (name: string, frequency: Frequency, weeklyTarget?: number) => void
-  editHabit: (id: string, patch: Partial<Pick<Habit, 'name' | 'frequency' | 'weeklyTarget'>>) => void
+  addHabit: (name: string, frequency: Frequency, weeklyTarget?: number, mode?: 'build' | 'break') => void
+  editHabit: (id: string, patch: Partial<Pick<Habit, 'name' | 'frequency' | 'weeklyTarget' | 'mode'>>) => void
   deleteHabit: (id: string) => void
   toggleCompletion: (id: string, date: Date) => void
   clearAll: () => void
@@ -18,7 +18,7 @@ export const useHabitStore = create<HabitState>()(
     (set, get) => ({
       habits: [],
   // safe id generation: crypto.randomUUID may not exist on some older mobile browsers
-  addHabit: (name, frequency, weeklyTarget = 1) =>
+  addHabit: (name, frequency, weeklyTarget = 1, mode: 'build' | 'break' = 'build') =>
         set((s) => {
           const genId = () => {
             try {
@@ -40,6 +40,7 @@ export const useHabitStore = create<HabitState>()(
             id: genId(),
             name: name.trim(),
             frequency,
+            mode,
             createdAt: iso(new Date()),
             completions: [],
             weeklyTarget: frequency === 'weekly' ? weeklyTarget : undefined,
@@ -52,12 +53,15 @@ export const useHabitStore = create<HabitState>()(
         set((s) => ({
           habits: s.habits.map((h) => (h.id === id ? recalc({ ...h, ...patch }) : h)),
         })),
+      
       deleteHabit: (id) => set((s) => ({ habits: s.habits.filter((h) => h.id !== id) })),
       toggleCompletion: (id, date) =>
         set((s) => {
           const day = new Date(date)
           const updated = s.habits.map((h) => {
             if (h.id !== id) return h
+            // Toggle completion for both build and break habits: for break mode a completion = successful clean day
+
             let completions = [...h.completions]
 
             if (h.frequency === 'daily') {

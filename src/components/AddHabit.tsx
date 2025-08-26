@@ -8,12 +8,13 @@ export default function AddHabit() {
   const [name, setName] = useState('')
   const [frequency, setFrequency] = useState<Frequency>('daily')
   const [weeklyTarget, setWeeklyTarget] = useState<number>(1)
+  const [mode, setMode] = useState<'build' | 'break'>('build')
 
   function submit(e: React.FormEvent) {
     e.preventDefault()
     if (!name.trim()) return
     try {
-      addHabit(name.trim(), frequency, weeklyTarget)
+  addHabit(name.trim(), frequency, weeklyTarget, mode)
     } catch (err) {
       // on some mobile browsers/storage modes this can throw (e.g., blocked storage or missing APIs)
       // surface to console and avoid crashing the UI
@@ -25,6 +26,7 @@ export default function AddHabit() {
     setName('')
     setFrequency('daily')
   setWeeklyTarget(1)
+  setMode('build')
   }
 
   return (
@@ -38,6 +40,20 @@ export default function AddHabit() {
           onChange={(e) => setName(e.target.value)}
         />
       </div>
+      <div>
+        <label className="block text-sm text-neutral-600 dark:text-neutral-300">I want to</label>
+        <div className="mt-1 flex gap-2">
+          <label className={"px-3 py-2 rounded-xl border cursor-pointer " + (mode==='build' ? 'bg-black text-white' : 'bg-white') }>
+            <input className="sr-only" type="radio" name="mode" checked={mode==='build'} onChange={()=>setMode('build')} />
+            Build
+          </label>
+          <label className={"px-3 py-2 rounded-xl border cursor-pointer " + (mode==='break' ? 'bg-black text-white' : 'bg-white') }>
+            <input className="sr-only" type="radio" name="mode" checked={mode==='break'} onChange={()=>setMode('break')} />
+            Break
+          </label>
+        </div>
+      </div>
+
       <div>
         <label className="block text-sm text-neutral-600 dark:text-neutral-300">Frequency</label>
         <select

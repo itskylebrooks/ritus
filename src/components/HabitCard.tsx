@@ -91,17 +91,26 @@ export default function HabitCard({ habit }: { habit: Habit }) {
 
       <div className="mt-4 grid gap-3 md:grid-cols-[1fr_auto] md:items-center">
         <WeekStrip habit={habit} onToggle={(d) => toggleCompletion(habit.id, d)} />
-        <button
-          onClick={() => toggleCompletion(habit.id, new Date())}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-black px-3 py-2 text-sm text-white transition active:scale-[.98] md:justify-self-end dark:bg-white dark:text-black"
-        >
-          <Check className="h-4 w-4" /> Done today
-        </button>
+        {habit.mode === 'break' ? (
+          <button
+            onClick={() => toggleCompletion(habit.id, new Date())}
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-3 py-2 text-sm text-white transition active:scale-[.98] md:justify-self-end"
+          >
+            <span className="text-sm font-semibold">Mark clean</span>
+          </button>
+        ) : (
+          <button
+            onClick={() => toggleCompletion(habit.id, new Date())}
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-black px-3 py-2 text-sm text-white transition active:scale-[.98] md:justify-self-end dark:bg-white dark:text-black"
+          >
+            <Check className="h-4 w-4" /> Done today
+          </button>
+        )}
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div>
-          <div className="text-sm text-neutral-600 dark:text-neutral-300">Streak</div>
+          <div className="text-sm text-neutral-600 dark:text-neutral-300">{habit.mode === 'break' ? 'Clean streak' : 'Streak'}</div>
           <div className="mt-1 flex items-center gap-1 text-xl font-semibold">
             <Flame className="h-5 w-5" /> {habit.streak}
           </div>
