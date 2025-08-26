@@ -17,10 +17,27 @@ export const useHabitStore = create<HabitState>()(
   persist(
     (set, get) => ({
       habits: [],
+      // safe id generation: crypto.randomUUID may not exist on some older mobile browsers
       addHabit: (name, frequency) =>
         set((s) => {
+          const genId = () => {
+            try {
+              // prefer native UUID when available
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+                // @ts-ignore
+                return crypto.randomUUID()
+              }
+            } catch (e) {
+              // ignore and fallback
+            }
+            // fallback: reasonably-unique id for local-only storage
+            return `id-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`
+          }
+
           const habit: Habit = {
-            id: crypto.randomUUID(),
+            id: genId(),
             name: name.trim(),
             frequency,
             createdAt: iso(new Date()),
@@ -50,11 +67,12 @@ export const useHabitStore = create<HabitState>()(
                 completions.push(iso(day))
               }
             } else {
-              // weekly: allow at most one completion per calendar week
-              const rest = completions.filter((c) => !isSameCalendarWeek(fromISO(c), day))
-              const inWeek = completions.length - rest.length
-              if (inWeek > 0) completions = rest
-              else completions = [...rest, iso(day)]
+              // weekly: toggle the exact day. We allow multiple selected days in a week.
+              if (completions.some((c) => isSameDay(fromISO(c), day))) {
+                completions = completions.filter((c) => !isSameDay(fromISO(c), day))
+              } else {
+                completions.push(iso(day))
+              }
             }
 
             return recalc({ ...h, completions })

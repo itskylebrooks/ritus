@@ -11,7 +11,16 @@ export default function AddHabit() {
   function submit(e: React.FormEvent) {
     e.preventDefault()
     if (!name.trim()) return
-    addHabit(name.trim(), frequency)
+    try {
+      addHabit(name.trim(), frequency)
+    } catch (err) {
+      // on some mobile browsers/storage modes this can throw (e.g., blocked storage or missing APIs)
+      // surface to console and avoid crashing the UI
+      // keep reset of inputs only if add succeeded; here we still reset so user can retry
+      // developer can inspect errors via remote debugging
+      // eslint-disable-next-line no-console
+      console.error('Failed to add habit', err)
+    }
     setName('')
     setFrequency('daily')
   }
