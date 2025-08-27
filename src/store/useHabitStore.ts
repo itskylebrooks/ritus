@@ -1,0 +1,135 @@
+import { create } from 'zustand'
+import { persist, createJSONStorage } from 'zustand/middleware'
+import { Habit, Frequency } from '../types'
+import { iso, fromISO, isSameCalendarWeek, isSameDay } from '../utils/date'
+import { recalc } from '../utils/scoring'
+
+interface HabitState {
+  habits: Habit[]
+  username: string
+  setUsername: (u: string) => void
+  reminders: { dailyEnabled: boolean; dailyTime: string }
+  setReminders: (r: { dailyEnabled: boolean; dailyTime: string }) => void
+  totalPoints: number
+  longestStreak: number
+  resetStats: () => void
+  addHabit: (name: string, frequency: Frequency, weeklyTarget?: number, mode?: 'build' | 'break') => void
+  editHabit: (id: string, patch: Partial<Pick<Habit, 'name' | 'frequency' | 'weeklyTarget' | 'mode'>>) => void
+  deleteHabit: (id: string) => void
+  toggleCompletion: (id: string, date: Date) => void
+  clearAll: () => void
+}
+
+export const useHabitStore = create<HabitState>()(
+  persist(
+    (set, get) => ({
+      habits: [],
+      // user / preferences
+      username: '',
+      setUsername: (u: string) => set({ username: u }),
+      reminders: { dailyEnabled: false, dailyTime: '21:00' },
+      setReminders: (r: { dailyEnabled: boolean; dailyTime: string }) => set({ reminders: r }),
+      // cumulative stats that persist even if habits are deleted
+      totalPoints: 0,
+      longestStreak: 0,
+      resetStats: () => set({ totalPoints: 0, longestStreak: 0 }),
+  // safe id generation: crypto.randomUUID may not exist on some older mobile browsers
+  addHabit: (name, frequency, weeklyTarget = 1, mode: 'build' | 'break' = 'build') =>
+        set((s) => {
+          const genId = () => {
+            try {
+              // prefer native UUID when available
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+                // @ts-ignore
+                return crypto.randomUUID()
+              }
+            } catch (e) {
+              // ignore and fallback
+            }
+            // fallback: reasonably-unique id for local-only storage
+            return `id-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`
+          }
+
+          const habit: Habit = {
+            id: genId(),
+            name: name.trim(),
+            frequency,
+            mode,
+            createdAt: iso(new Date()),
+            completions: [],
+            weeklyTarget: frequency === 'weekly' ? weeklyTarget : undefined,
+            streak: 0,
+            points: 0,
+          }
+          const newHabit = recalc(habit)
+          // ensure cumulative longestStreak persists if this new habit starts with a streak
+          const newLongest = Math.max(s.longestStreak, newHabit.streak)
+          return { habits: [newHabit, ...s.habits], longestStreak: newLongest }
+        }),
+      editHabit: (id, patch) =>
+        set((s) => {
+          const updated = s.habits.map((h) => (h.id === id ? recalc({ ...h, ...patch }) : h))
+          // update longestStreak if any habit's streak exceeds stored longest
+          const maxStreak = Math.max(s.longestStreak, ...updated.map((h) => h.streak))
+          return { habits: updated, longestStreak: maxStreak }
+        }),
+      
+      // deleting a habit should not decrease cumulative stats like totalPoints or longestStreak
+      deleteHabit: (id) => set((s) => ({ habits: s.habits.filter((h) => h.id !== id) })),
+      toggleCompletion: (id, date) =>
+        set((s) => {
+          const day = new Date(date)
+          let totalIncrement = 0
+          const updated = s.habits.map((h) => {
+            if (h.id !== id) return h
+            // Toggle completion for both build and break habits: for break mode a completion = successful clean day
+
+            let completions = [...h.completions]
+
+            if (h.frequency === 'daily') {
+              // toggle by exact day
+              if (completions.some((c) => isSameDay(fromISO(c), day))) {
+                completions = completions.filter((c) => !isSameDay(fromISO(c), day))
+              } else {
+                completions.push(iso(day))
+              }
+            } else {
+              // weekly: toggle the exact day. We allow multiple selected days in a week.
+              if (completions.some((c) => isSameDay(fromISO(c), day))) {
+                completions = completions.filter((c) => !isSameDay(fromISO(c), day))
+              } else {
+                completions.push(iso(day))
+              }
+            }
+
+            const prevPoints = h.points || 0
+            const newHabit = recalc({ ...h, completions })
+            const delta = newHabit.points - prevPoints
+            // totalPoints is cumulative and only increases; do not decrement on undo/deletes
+            if (delta > 0) totalIncrement += delta
+            return newHabit
+          })
+
+          // compute new longest streak if any updated habit exceeded it
+          const newLongest = Math.max(s.longestStreak, ...updated.map((h) => h.streak))
+
+          return { habits: updated, totalPoints: s.totalPoints + totalIncrement, longestStreak: newLongest }
+        }),
+      clearAll: () => set({ habits: [] }),
+    }),
+    {
+      name: 'ritus-habits',
+      storage: createJSONStorage(() => localStorage),
+      version: 1,
+      partialize: (state) => ({
+        habits: state.habits,
+        username: state.username,
+        reminders: state.reminders,
+        totalPoints: state.totalPoints,
+        longestStreak: state.longestStreak,
+      }),
+    }
+  )
+)

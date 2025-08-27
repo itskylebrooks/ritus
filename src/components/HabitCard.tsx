@@ -129,7 +129,8 @@ export default function HabitCard({ habit }: { habit: Habit }) {
             onClick={() => toggleCompletion(habit.id, new Date())}
             className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-3 py-2 text-sm text-white transition active:scale-[.98] md:justify-self-end"
           >
-            <span className="text-sm font-semibold">Mark clean</span>
+            <Check className="h-4 w-4" />
+            <span className="text-sm">Mark clean</span>
           </button>
         ) : (
           <button
