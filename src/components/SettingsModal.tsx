@@ -21,7 +21,7 @@ export default function SettingsModal({ open, onClose, entries, onShowGuide, isT
   const [saving, setSaving] = useState(false)
   const [savedFlash, setSavedFlash] = useState(false)
   const [reminders, setReminders] = useState(()=> loadReminders())
-  const [mode, setMode] = useState<'merge'|'replace'>('merge')
+  
   const [exporting, setExporting] = useState(false)
   const [importing, setImporting] = useState(false)
   const [preview, setPreview] = useState<string | null>(null)
@@ -66,7 +66,7 @@ export default function SettingsModal({ open, onClose, entries, onShowGuide, isT
     const txt = await f.text()
     setImporting(true)
     try {
-      const res = importAllData(txt, { merge: mode === 'merge' })
+      const res = importAllData(txt, { merge: true })
       if (!res.ok) alert('Import failed')
       else { alert('Import completed'); window.location.reload() }
     } catch {
@@ -161,16 +161,7 @@ export default function SettingsModal({ open, onClose, entries, onShowGuide, isT
                 <button type="button" onClick={triggerFilePick} className="flex-1 rounded-md bg-black text-white px-3 py-2 dark:bg-white dark:text-black">{importing ? 'Importing…' : 'Import from file'}</button>
                 <input ref={fileRef} type="file" accept="application/json" onChange={handleFileChosen} className="hidden" />
               </div>
-              <div className="flex items-center justify-center gap-2 text-[11px]">
-                <label onClick={() => setMode('merge')} className={"px-2 py-1 rounded-md cursor-pointer " + (mode==='merge' ? 'bg-emerald-100 dark:bg-emerald-600 text-black dark:text-white' : 'bg-white dark:bg-neutral-800') }>
-                  <input aria-hidden className="sr-only" type="radio" checked={mode==='merge'} readOnly />
-                  <span>Merge</span>
-                </label>
-                <label onClick={() => setMode('replace')} className={"px-2 py-1 rounded-md cursor-pointer " + (mode==='replace' ? 'bg-red-100 dark:bg-red-600 text-black dark:text-white' : 'bg-white dark:bg-neutral-800') }>
-                  <input aria-hidden className="sr-only" type="radio" checked={mode==='replace'} readOnly />
-                  <span>Replace</span>
-                </label>
-              </div>
+              {/* Merge/Replace options removed */}
             </div>
           </div>
 
