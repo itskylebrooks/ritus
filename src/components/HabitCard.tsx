@@ -107,7 +107,10 @@ export default function HabitCard({ habit }: { habit: Habit }) {
                   <Pencil className="h-4 w-4" />
                 </motion.button>
                 <motion.button
-                  onClick={deleteHabitWithAnimation}
+                  onClick={() => {
+                    const ok = window.confirm(`Delete habit "${habit.name}"? This cannot be undone.`)
+                    if (ok) deleteHabitWithAnimation()
+                  }}
                   className="rounded-xl border p-2 hover:bg-neutral-50 text-red-600 dark:hover:bg-neutral-900"
                   aria-label="Delete habit"
                   title="Delete"
