@@ -46,11 +46,12 @@ export default function HabitCard({ habit }: { habit: Habit }) {
       className={`rounded-2xl border p-4 shadow-sm ${isRemoving ? 'habit-remove' : 'habit-add'}`}
     >
       <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0 flex-1">
+  <div className="min-w-0 flex-1 min-h-[48px]">
           <AnimatePresence mode="wait">
             {editing ? (
               <motion.div
                 key="edit-mode"
+                layout
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
@@ -70,6 +71,7 @@ export default function HabitCard({ habit }: { habit: Habit }) {
             ) : (
               <motion.div
                 key="normal-mode"
+                layout
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
@@ -82,15 +84,16 @@ export default function HabitCard({ habit }: { habit: Habit }) {
             )}
           </AnimatePresence>
         </div>
-        <div className="flex shrink-0 items-center gap-2 w-[80px]">
+        <div className="flex shrink-0 items-center gap-2">
           <AnimatePresence mode="wait">
             {!editing && (
               <motion.div
                 key="buttons"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.3 }}
+                layout
+                initial={{ opacity: 0, x: 6 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 6 }}
+                transition={{ duration: 0.25 }}
                 className="flex items-center gap-2"
               >
                 <motion.button
@@ -119,7 +122,7 @@ export default function HabitCard({ habit }: { habit: Habit }) {
         </div>
       </div>
 
-      <div className="mt-4 grid gap-3 md:grid-cols-[1fr_auto] md:items-center">
+  <div className="mt-3 grid gap-3 md:grid-cols-[1fr_auto] md:items-center">
         <WeekStrip habit={habit} onToggle={(d) => toggleCompletion(habit.id, d)} />
         {habit.mode === 'break' ? (
           <button
