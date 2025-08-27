@@ -78,7 +78,7 @@ export default function AddHabit() {
             value={weeklyTarget}
             onChange={(e) => setWeeklyTarget(Number(e.target.value))}
           >
-            {[1, 2, 3, 4, 5, 6, 7].map((n) => (
+            {[1, 2, 3, 4, 5, 6].map((n) => (
               <option key={n} value={n}>{n} day{n > 1 ? 's' : ''}</option>
             ))}
           </select>
