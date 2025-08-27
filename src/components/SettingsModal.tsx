@@ -186,7 +186,7 @@ export default function SettingsModal({ open, onClose, entries, onShowGuide, isT
         </div>
 
         <div className="mt-5">
-          <button onClick={beginClose} className="w-full rounded-2xl px-4 py-3 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition dark:bg-emerald-600 dark:hover:bg-emerald-700">Done</button>
+          <button onClick={beginClose} className="w-full rounded-2xl px-4 py-3 text-sm font-semibold bg-black text-white hover:bg-neutral-800 transition dark:bg-white dark:text-black dark:hover:bg-neutral-200">Done</button>
         </div>
 
   <div className="mt-6 text-center text-[10px] text-neutral-600 dark:text-neutral-400 relative">

@@ -11,16 +11,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 function EmptyState() {
   return (
-    <div className="rounded-2xl border p-10 text-center text-neutral-600 dark:text-neutral-300">
+    <motion.div layout key="empty" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.28 }} className="rounded-2xl border p-10 text-center text-neutral-600 dark:text-neutral-300">
       <p className="text-lg font-medium">No habits yet</p>
       <p className="mt-1 text-sm">Create your first habit to get started.</p>
-    </div>
+    </motion.div>
   )
 }
 
-function FooterControls() {
-  return null
-}
+// Footer controls removed
 
 export default function App() {
   const [settingsOpen, setSettingsOpen] = React.useState(false)
@@ -72,7 +70,7 @@ export default function App() {
       </div>
 
       <main className="mt-6 grid gap-4">
-        <AnimatePresence>
+  <AnimatePresence>
           {sorted.length === 0 ? (
             <EmptyState />
           ) : (
@@ -92,11 +90,7 @@ export default function App() {
         </AnimatePresence>
       </main>
 
-      <FooterControls />
-
-      <footer className="mt-8 text-center text-xs text-neutral-500 dark:text-neutral-400">
-        Keep moving forward
-      </footer>
+  {/* Footer removed */}
     </div>
   )
 }
