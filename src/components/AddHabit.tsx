@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Plus } from 'lucide-react'
 import { useHabitStore } from '../store/useHabitStore'
 import type { Frequency } from '../types'
@@ -30,8 +31,8 @@ export default function AddHabit() {
   }
 
   return (
-    <form onSubmit={submit} className="flex flex-col gap-3 rounded-2xl border p-4 shadow-sm sm:flex-row sm:items-end">
-      <div className="flex-1">
+    <motion.form layout onSubmit={submit} className="flex flex-col gap-3 rounded-2xl border p-4 shadow-sm sm:flex-row sm:items-end">
+  <motion.div className="flex-1" layout transition={{ layout: { type: 'spring', stiffness: 300, damping: 30 } }} style={{ minWidth: 0 }}>
         <label className="block text-sm text-neutral-600 dark:text-neutral-300">Habit name</label>
         <input
           className="mt-1 w-full rounded-xl border bg-white px-3 py-2 outline-none ring-0 placeholder:text-neutral-400 focus:border-black/40 dark:bg-neutral-950 dark:border-neutral-800 dark:focus:border-white/50"
@@ -39,8 +40,8 @@ export default function AddHabit() {
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
-      </div>
-      <div>
+      </motion.div>
+  <motion.div layout transition={{ layout: { type: 'spring', stiffness: 300, damping: 30 } }} style={{ minWidth: 0 }}>
         <label className="block text-sm text-neutral-600 dark:text-neutral-300">I want to</label>
         <div className="mt-1 flex gap-2">
           <label
@@ -57,9 +58,9 @@ export default function AddHabit() {
             Break
           </label>
         </div>
-      </div>
+  </motion.div>
 
-      <div>
+  <motion.div layout transition={{ layout: { type: 'spring', stiffness: 300, damping: 30 } }} style={{ minWidth: 0 }}>
         <label className="block text-sm text-neutral-600 dark:text-neutral-300">Frequency</label>
         <select
           className="mt-1 w-full rounded-xl border bg-white px-3 py-2 dark:bg-neutral-950 dark:border-neutral-800"
@@ -69,28 +70,41 @@ export default function AddHabit() {
           <option value="daily">Daily</option>
           <option value="weekly">Weekly</option>
         </select>
-      </div>
-      {frequency === 'weekly' && (
-        <div>
-          <label className="block text-sm text-neutral-600 dark:text-neutral-300">Days / week</label>
-          <select
-            className="mt-1 w-full rounded-xl border bg-white px-3 py-2 dark:bg-neutral-950 dark:border-neutral-800"
-            value={weeklyTarget}
-            onChange={(e) => setWeeklyTarget(Number(e.target.value))}
+  </motion.div>
+  <AnimatePresence initial={false} mode="popLayout">
+        {frequency === 'weekly' && (
+          <motion.div
+            key="days-week"
+            initial={{ opacity: 0, x: 12 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 12 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            layout
+            style={{ minWidth: 0 }}
           >
-            {[1, 2, 3, 4, 5, 6].map((n) => (
-              <option key={n} value={n}>{n} day{n > 1 ? 's' : ''}</option>
-            ))}
-          </select>
-        </div>
-      )}
-      <button
+            <label className="block text-sm text-neutral-600 dark:text-neutral-300">Days / week</label>
+            <select
+              className="mt-1 w-full rounded-xl border bg-white px-3 py-2 dark:bg-neutral-950 dark:border-neutral-800"
+              value={weeklyTarget}
+              onChange={(e) => setWeeklyTarget(Number(e.target.value))}
+            >
+              {[1, 2, 3, 4, 5, 6].map((n) => (
+                <option key={n} value={n}>{n} day{n > 1 ? 's' : ''}</option>
+              ))}
+            </select>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <motion.button
+        layout
+        transition={{ layout: { type: 'spring', stiffness: 300, damping: 30 } }}
+        style={{ minWidth: 0 }}
         type="submit"
         className="inline-flex items-center justify-center gap-2 rounded-xl bg-black px-4 py-2 text-white transition active:scale-[.98] dark:bg-white dark:text-black"
         aria-label="Add habit"
       >
         <Plus className="h-4 w-4" /> Add
-      </button>
-    </form>
+      </motion.button>
+  </motion.form>
   )
 }
