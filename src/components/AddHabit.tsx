@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus } from 'lucide-react'
 import { useHabitStore } from '../store/useHabitStore'
@@ -10,6 +10,11 @@ export default function AddHabit() {
   const [frequency, setFrequency] = useState<Frequency>('daily')
   const [weeklyTarget, setWeeklyTarget] = useState<number>(1)
   const [mode, setMode] = useState<'build' | 'break'>('build')
+  const buildPlaceholder = 'e.g., Morning Run'
+  const breakPlaceholder = 'e.g., No Alcohol'
+  const [displayedPlaceholder, setDisplayedPlaceholder] = useState<string>(mode === 'build' ? buildPlaceholder : breakPlaceholder)
+  const typingTimer = useRef<number | null>(null)
+  const firstMount = useRef(true)
 
   function submit(e: React.FormEvent) {
     e.preventDefault()
@@ -30,15 +35,67 @@ export default function AddHabit() {
   setMode('build')
   }
 
+  useEffect(() => {
+    // Don't animate on first mount
+    if (firstMount.current) {
+      firstMount.current = false
+      return
+    }
+
+    // Only animate if input is empty
+    if (name.trim()) return
+
+    const target = mode === 'build' ? buildPlaceholder : breakPlaceholder
+    // clear any existing timer
+    if (typingTimer.current) {
+      clearTimeout(typingTimer.current)
+      typingTimer.current = null
+    }
+
+    setDisplayedPlaceholder('')
+    let i = 0
+    const step = () => {
+      i += 1
+      setDisplayedPlaceholder(target.slice(0, i))
+      if (i < target.length) {
+        typingTimer.current = window.setTimeout(step, 28)
+      } else {
+        typingTimer.current = null
+      }
+    }
+
+    // small initial delay then start typing
+    typingTimer.current = window.setTimeout(step, 120)
+
+    return () => {
+      if (typingTimer.current) {
+        clearTimeout(typingTimer.current)
+        typingTimer.current = null
+      }
+    }
+  }, [mode, name])
+
   return (
     <motion.form layout onSubmit={submit} className="flex flex-col gap-3 rounded-2xl border p-4 shadow-sm sm:flex-row sm:items-end">
   <motion.div className="flex-1" layout transition={{ layout: { type: 'spring', stiffness: 300, damping: 30 } }} style={{ minWidth: 0 }}>
         <label className="block text-sm text-neutral-600 dark:text-neutral-300">Habit name</label>
         <input
           className="mt-1 w-full rounded-xl border bg-white px-3 py-2 outline-none ring-0 placeholder:text-neutral-400 focus:border-black/40 dark:bg-neutral-950 dark:border-neutral-800 dark:focus:border-white/50"
-          placeholder={mode === 'build' ? 'e.g., Morning Run' : 'e.g., No Alcohol'}
+          placeholder={displayedPlaceholder}
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => {
+            if (typingTimer.current) {
+              clearTimeout(typingTimer.current)
+              typingTimer.current = null
+            }
+            setName(e.target.value)
+          }}
+          onFocus={() => {
+            if (typingTimer.current) {
+              clearTimeout(typingTimer.current)
+              typingTimer.current = null
+            }
+          }}
         />
       </motion.div>
   <motion.div layout transition={{ layout: { type: 'spring', stiffness: 300, damping: 30 } }} style={{ minWidth: 0 }}>
