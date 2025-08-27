@@ -76,6 +76,14 @@ export default function GuideModal({ open, onClose }: GuideModalProps) {
     if (stepAnimTimer.current) clearTimeout(stepAnimTimer.current)
   }, [])
 
+  // Prevent background scrolling while guide is visible
+  useEffect(() => {
+    if (!visible) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = prev }
+  }, [visible])
+
   const queueStep = (next: number) => {
     if (next === step) return
     const dir: 'forward'|'back' = next > step ? 'forward' : 'back'

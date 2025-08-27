@@ -29,6 +29,15 @@ export default function SettingsModal({ open, onClose, entries, onShowGuide, isT
 
   useEffect(()=>{ if(!open) setClosing(false); }, [open])
   useEffect(()=>()=>{ if(timeoutRef.current) window.clearTimeout(timeoutRef.current); },[])
+  // Prevent background scrolling while settings modal is open
+  useEffect(() => {
+    if (!open) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = prev
+    }
+  }, [open])
   const CLOSE_DURATION = 280
   function beginClose(){ if (closing) return; setClosing(true); timeoutRef.current = window.setTimeout(()=> {
       try { onClose() } catch {}
