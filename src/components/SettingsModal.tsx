@@ -204,7 +204,7 @@ export default function SettingsModal({ open, onClose, entries, onShowGuide, isT
             <span className="text-lg font-semibold tracking-wide text-neutral-900 dark:text-neutral-100">Settings</span>
             <div className="absolute right-0 top-1/2 -translate-y-1/2" title="Your avatar">
               <div className="relative" style={{ width:48, height:48 }}>
-                <div className="w-full h-full rounded-full border border-neutral-200 dark:border-white shadow-inner overflow-hidden bg-blue-500">
+                <div className="w-full h-full rounded-full border border-neutral-200 dark:border-white shadow-inner overflow-hidden bg-black">
                   <div className="flex items-center justify-center w-full h-full text-[24px] select-none text-white">{topEmoji}</div>
                 </div>
               </div>
