@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useEffect, useMemo, useState } from 'react'
 import { Check, Flame, Pencil, Trash2 } from 'lucide-react'
-import { useHabitStore } from '../store/useHabitStore'
+import { useHabitStore } from '../store/store'
 import type { Habit, Frequency } from '../types'
 import WeekStrip from './WeekStrip'
 import ProgressBar from './ProgressBar'

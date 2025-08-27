@@ -1,13 +1,7 @@
 import { useEffect, useState, useRef, useMemo, useCallback } from 'react'
 import pkg from '../../package.json'
+import { useHabitStore } from '../store/store'
 type Entry = any
-
-// Simple local storage placeholders
-function loadUser() { try { return JSON.parse(localStorage.getItem('ritus-user') || '{}') } catch { return {} } }
-function saveUser(u: any) { localStorage.setItem('ritus-user', JSON.stringify(u)); return u }
-function loadReminders() { try { return JSON.parse(localStorage.getItem('ritus-reminders') || JSON.stringify({ dailyEnabled: false, dailyTime: '21:00' })) } catch { return { dailyEnabled: false, dailyTime: '21:00' } }
-}
-function saveReminders(r: any) { localStorage.setItem('ritus-reminders', JSON.stringify(r)); return r }
 function clearAllData() { localStorage.clear() }
 function exportAllData() { return { notes: [], version: pkg.version } }
 function importAllData(_txt: string, _opts: any) { return { ok: true, added: 0, merged: 0, total: 0 } }
@@ -16,11 +10,16 @@ export default function SettingsModal({ open, onClose, entries, onShowGuide, isT
   const [closing, setClosing] = useState(false)
   const timeoutRef = useRef<number | null>(null)
   const pendingRef = useRef<'none' | 'guide'>('none')
-  const [username, setUsername] = useState(() => loadUser().username || '')
+  const storeUsername = useHabitStore((s) => s.username)
+  const storeSetUsername = useHabitStore((s) => s.setUsername)
+  const storeReminders = useHabitStore((s) => s.reminders)
+  const storeSetReminders = useHabitStore((s) => s.setReminders)
+
+  const [username, setUsername] = useState(() => storeUsername || '')
   const [dirty, setDirty] = useState(false)
   const [saving, setSaving] = useState(false)
   const [savedFlash, setSavedFlash] = useState(false)
-  const [reminders, setReminders] = useState(()=> loadReminders())
+  const [reminders, setReminders] = useState(()=> storeReminders || { dailyEnabled: false, dailyTime: '21:00' })
   
   const [exporting, setExporting] = useState(false)
   const [importing, setImporting] = useState(false)
@@ -58,9 +57,9 @@ export default function SettingsModal({ open, onClose, entries, onShowGuide, isT
 
   useEffect(()=>{
     if (open) {
-      const current = loadUser(); setUsername(current.username || '')
+  setUsername(storeUsername || '')
       setDirty(false); setSaving(false); setSavedFlash(false)
-      setReminders(loadReminders())
+  setReminders(storeReminders || { dailyEnabled: false, dailyTime: '21:00' })
     }
   }, [open])
 
@@ -87,7 +86,7 @@ export default function SettingsModal({ open, onClose, entries, onShowGuide, isT
   }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) { setUsername(e.target.value); setDirty(true) }
-  async function handleSave(e?: React.FormEvent) { if (e) e.preventDefault(); if (!dirty || saving) return; setSaving(true); if (username.trim().length < 4) { setSaving(false); alert('Username must be at least 4 characters.'); return; } const stored = saveUser({ username: username.trim(), updatedAt: Date.now() }); setUsername(stored.username); setSaving(false); setDirty(false); setSavedFlash(true); setTimeout(()=> setSavedFlash(false), 1400) }
+  async function handleSave(e?: React.FormEvent) { if (e) e.preventDefault(); if (!dirty || saving) return; setSaving(true); if (username.trim().length < 4) { setSaving(false); alert('Username must be at least 4 characters.'); return; } try { storeSetUsername(username.trim()); setSaving(false); setDirty(false); setSavedFlash(true); setTimeout(()=> setSavedFlash(false), 1400) } catch (err) { setSaving(false); alert('Failed to save username') } }
 
   function handleDeleteAllLocal() {
     const ok = window.confirm('Delete all local data? This will clear localStorage and cannot be undone. Are you sure?')
@@ -181,7 +180,7 @@ export default function SettingsModal({ open, onClose, entries, onShowGuide, isT
                 <div className="text-[12px] text-neutral-600 dark:text-neutral-400 mt-1">Placeholder reminder settings</div>
               </div>
               <div>
-                <button type="button" role="switch" aria-checked={dailyEnabled} onClick={()=>{ const v={...reminders,dailyEnabled: !dailyEnabled}; setReminders(v); saveReminders(v); }} className={"inline-flex items-center px-3 py-2 rounded-full " + (dailyEnabled ? 'bg-emerald-500 text-white' : 'bg-gray-200 dark:bg-neutral-800 text-black dark:text-neutral-200') }>
+                <button type="button" role="switch" aria-checked={dailyEnabled} onClick={()=>{ const v={...reminders,dailyEnabled: !dailyEnabled}; setReminders(v); try { storeSetReminders(v) } catch {} }} className={"inline-flex items-center px-3 py-2 rounded-full " + (dailyEnabled ? 'bg-emerald-500 text-white' : 'bg-gray-200 dark:bg-neutral-800 text-black dark:text-neutral-200') }>
                   <span className="mr-3 text-sm">{dailyEnabled ? 'On' : 'Off'}</span>
                   <span className={"relative inline-block w-11 h-6 rounded-full " + (dailyEnabled ? 'bg-emerald-500' : 'bg-gray-300') }>
                     <span className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transform" style={{ transform: dailyEnabled ? 'translateX(1.4rem)' : 'translateX(0)' }} />
@@ -204,7 +203,7 @@ export default function SettingsModal({ open, onClose, entries, onShowGuide, isT
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Kyle Brooks on LinkedIn"
-            className="absolute left-4 top-1/2 -translate-y-1/2 opacity-90 hover:opacity-75 transition-opacity"
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-black dark:text-white opacity-90 hover:opacity-75 transition-opacity"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-file-user-icon lucide-file-user w-6 h-6"><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M15 18a3 3 0 1 0-6 0"/><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><circle cx="12" cy="13" r="2"/></svg>
           </a>
@@ -214,7 +213,7 @@ export default function SettingsModal({ open, onClose, entries, onShowGuide, isT
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Kyle Brooks on GitHub"
-            className="absolute right-4 top-1/2 -translate-y-1/2 opacity-90 hover:opacity-75 transition-opacity"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-black dark:text-white opacity-90 hover:opacity-75 transition-opacity"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-github-icon lucide-github w-6 h-6"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
           </a>

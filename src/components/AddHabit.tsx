@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus } from 'lucide-react'
-import { useHabitStore } from '../store/useHabitStore'
+import { useHabitStore } from '../store/store'
 import type { Frequency } from '../types'
 
 export default function AddHabit() {

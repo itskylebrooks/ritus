@@ -3,7 +3,7 @@ import AddHabit from './components/AddHabit'
 import HabitCard from './components/HabitCard'
 import SettingsModal from './components/SettingsModal'
 import GuideModal from './components/GuideModal'
-import { useHabitStore } from './store/useHabitStore'
+import { useHabitStore } from './store/store'
 import { fromISO, isSameCalendarWeek, isSameDay, daysThisWeek } from './utils/date'
 import { hasCompletionInWeek, hasCompletionOnDay } from './utils/scoring'
 import React from "react";

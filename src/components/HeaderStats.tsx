@@ -1,13 +1,14 @@
 import { Trophy, Flame, Info } from 'lucide-react'
-import { useHabitStore } from '../store/useHabitStore'
+import { useHabitStore } from '../store/store'
 import { daysThisWeek } from '../utils/date'
 import { hasCompletionInWeek, hasCompletionOnDay } from '../utils/scoring'
 import ProgressBar from './ProgressBar'
 
 export default function HeaderStats() {
   const habits = useHabitStore((s) => s.habits)
-  const totalPoints = habits.reduce((a, h) => a + h.points, 0)
-  const longestStreak = habits.length ? Math.max(...habits.map((h) => h.streak)) : 0
+  // use cumulative totals from the store so they persist across deletions
+  const totalPoints = useHabitStore((s) => s.totalPoints)
+  const longestStreak = useHabitStore((s) => s.longestStreak)
 
   const thisWeek = daysThisWeek()
   const [done, total] = habits.reduce<[number, number]>((acc, h) => {
