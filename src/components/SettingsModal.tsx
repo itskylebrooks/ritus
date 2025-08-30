@@ -237,15 +237,43 @@ export default function SettingsModal({ open, onClose, entries, onShowGuide, isT
           </div>
 
           <div className="p-4 rounded-2xl border shadow-sm text-sm">
-            <div className="text-sm font-semibold mb-2">Data transfer</div>
-            <div className="text-[11px] text-neutral-600 dark:text-neutral-400">Export or import JSON (placeholder).</div>
-            <div className="mt-3 grid gap-2">
-              <button onClick={handleExport} disabled={exporting} className="w-full rounded-md bg-black text-white px-3 py-2 dark:bg-white dark:text-black">{exporting ? 'Exporting…' : 'Export all data (JSON)'}</button>
-              <div className="flex gap-2">
-                <button type="button" onClick={triggerFilePick} className="flex-1 rounded-md bg-black text-white px-3 py-2 dark:bg-white dark:text-black">{importing ? 'Importing…' : 'Import from file'}</button>
-                <input ref={fileRef} type="file" accept="application/json" onChange={handleFileChosen} className="hidden" />
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <div className="text-sm font-semibold mb-0.5">Data transfer</div>
+                <div className="text-[11px] text-neutral-600 dark:text-neutral-400">Import or export JSON.</div>
               </div>
-              {/* Merge/Replace options removed */}
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={triggerFilePick}
+                  disabled={importing || exporting}
+                  aria-label="Import from file"
+                  title="Import from file"
+                  className="grid h-10 w-10 place-items-center rounded-lg border text-black dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-folder-input-icon lucide-folder-input">
+                    <path d="M2 9V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-1"/>
+                    <path d="M2 13h10"/>
+                    <path d="m9 16 3-3-3-3"/>
+                  </svg>
+                </button>
+                <input ref={fileRef} type="file" accept="application/json" onChange={handleFileChosen} className="hidden" />
+
+                <button
+                  type="button"
+                  onClick={handleExport}
+                  disabled={exporting}
+                  aria-label="Export all data"
+                  title="Export all data"
+                  className="grid h-10 w-10 place-items-center rounded-lg border text-black dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-folder-output-icon lucide-folder-output">
+                    <path d="M2 7.5V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-1.5"/>
+                    <path d="M2 13h10"/>
+                    <path d="m5 10-3 3 3 3"/>
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -253,7 +281,7 @@ export default function SettingsModal({ open, onClose, entries, onShowGuide, isT
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-sm font-semibold">Daily reminder</div>
-                <div className="text-[12px] text-neutral-600 dark:text-neutral-400 mt-1">Placeholder reminder settings</div>
+                <div className="text-[12px] text-neutral-600 dark:text-neutral-400 mt-1">Will be implemented in a future update.</div>
               </div>
               <div>
                 <button type="button" role="switch" aria-checked={dailyEnabled} onClick={()=>{ const v={...reminders,dailyEnabled: !dailyEnabled}; setReminders(v); try { storeSetReminders(v) } catch {} }} className={"inline-flex items-center px-3 py-2 rounded-full " + (dailyEnabled ? 'bg-emerald-500 text-white' : 'bg-gray-200 dark:bg-neutral-800 text-black dark:text-neutral-200') }>
@@ -264,7 +292,6 @@ export default function SettingsModal({ open, onClose, entries, onShowGuide, isT
                 </button>
               </div>
             </div>
-            <div className="text-[11px] text-neutral-600 dark:text-neutral-400 mt-3">Reminders are placeholders in this build.</div>
           </div>
 
         </div>
