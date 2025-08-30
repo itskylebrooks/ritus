@@ -70,7 +70,7 @@ export default function App() {
       </div>
 
       <main className="mt-6 grid gap-4">
-  <AnimatePresence>
+  <AnimatePresence initial={false}>
           {sorted.length === 0 ? (
             <EmptyState />
           ) : (

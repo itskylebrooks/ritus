@@ -8,3 +8,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <App />
   </React.StrictMode>
 )
+
+// Re-enable animations after initial paint
+// Use rAF to wait until the first frame renders
+requestAnimationFrame(() => {
+  document.body.classList.remove('preload')
+})

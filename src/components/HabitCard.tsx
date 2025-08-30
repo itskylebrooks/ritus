@@ -47,7 +47,7 @@ export default function HabitCard({ habit }: { habit: Habit }) {
     >
       <div className="flex items-start justify-between gap-3">
   <div className="min-w-0 flex-1 min-h-[48px]">
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait" initial={false}>
             {editing ? (
               <motion.div
                 key="edit-mode"
@@ -85,7 +85,7 @@ export default function HabitCard({ habit }: { habit: Habit }) {
           </AnimatePresence>
         </div>
         <div className="flex shrink-0 items-center gap-2">
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait" initial={false}>
             {!editing && (
               <motion.div
                 key="buttons"

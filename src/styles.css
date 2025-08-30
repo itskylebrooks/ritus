@@ -5,6 +5,12 @@
 /* Smooth fonts */
 html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 
+/* Disable all CSS animations/transitions on initial load; removed after mount */
+.preload *, .preload *::before, .preload *::after { 
+  transition: none !important; 
+  animation: none !important; 
+}
+
 /* Motion tokens: centralize page-switch timing and easing so transitions are consistent */
 :root {
 	--motion-page-duration: .32s; /* standard duration for page switching */
@@ -66,4 +72,3 @@ html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 .habit-remove {
   animation: habitRemove 0.3s ease-in forwards;
 }
-

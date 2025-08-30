@@ -15,6 +15,7 @@ export default function AddHabit() {
   const [displayedPlaceholder, setDisplayedPlaceholder] = useState<string>(mode === 'build' ? buildPlaceholder : breakPlaceholder)
   const typingTimer = useRef<number | null>(null)
   const firstMount = useRef(true)
+  const [isReady, setIsReady] = useState(false)
 
   function submit(e: React.FormEvent) {
     e.preventDefault()
@@ -35,9 +36,12 @@ export default function AddHabit() {
   setMode('build')
   }
 
+  // Mark app ready after first mount to avoid initial load animations in dev StrictMode
+  useEffect(() => { setIsReady(true) }, [])
+
   useEffect(() => {
     // Don't animate on first mount
-    if (firstMount.current) {
+    if (firstMount.current || !isReady) {
       firstMount.current = false
       return
     }
