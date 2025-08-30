@@ -8,7 +8,7 @@ import ProgressBar from './ProgressBar'
 import Badge from './Badge'
 import { DAILY_MILESTONE, MILESTONE_BONUS, POINTS_PER_COMPLETION, WEEKLY_MILESTONE, countCompletionsInWeek } from '../utils/scoring'
 
-export default function HabitCard({ habit }: { habit: Habit }) {
+export default function HabitCard({ habit, disableEntryAnim = false }: { habit: Habit; disableEntryAnim?: boolean }) {
   const toggleCompletion = useHabitStore((s) => s.toggleCompletion)
   const editHabit = useHabitStore((s) => s.editHabit)
   const deleteHabit = useHabitStore((s) => s.deleteHabit)
@@ -38,7 +38,7 @@ export default function HabitCard({ habit }: { habit: Habit }) {
 
   return (
     <div
-      className={`rounded-2xl border p-4 shadow-sm ${isRemoving ? 'habit-remove' : 'habit-add'}`}
+      className={`rounded-2xl border p-4 shadow-sm ${isRemoving ? 'habit-remove' : (disableEntryAnim ? '' : 'habit-add')}`}
     >
       <div className="flex items-start justify-between gap-3">
   <div className="min-w-0 flex-1 min-h-[48px]">

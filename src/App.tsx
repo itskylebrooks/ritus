@@ -6,12 +6,12 @@ import GuideModal from './components/GuideModal'
 import { useHabitStore } from './store/store'
 import { fromISO } from './utils/date'
 import { hasCompletionOnDay, countCompletionsInWeek } from './utils/scoring'
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-function EmptyState() {
+function EmptyState({ disableAnim = false }: { disableAnim?: boolean }) {
   return (
-    <motion.div layout key="empty" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.28 }} className="rounded-2xl border p-10 text-center text-neutral-600 dark:text-neutral-300">
+    <motion.div layout key="empty" initial={disableAnim ? false : { opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.28 }} className="rounded-2xl border p-10 text-center text-neutral-600 dark:text-neutral-300">
       <p className="text-lg font-medium">No habits yet</p>
       <p className="mt-1 text-sm">Create your first habit to get started.</p>
     </motion.div>
@@ -24,6 +24,8 @@ export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [guideOpen, setGuideOpen] = useState(false)
   const habits = useHabitStore((s) => s.habits)
+  const initialListRender = useRef(true)
+  useEffect(() => { initialListRender.current = false }, [])
 
   const sortedHabits = useMemo(() => {
     const today = new Date()
@@ -70,18 +72,18 @@ export default function App() {
       <main className="mt-6 grid gap-4">
   <AnimatePresence initial={false}>
           {sortedHabits.length === 0 ? (
-            <EmptyState />
+            <EmptyState disableAnim={true} />
           ) : (
             sortedHabits.map((h) => (
               <motion.div
                 key={h.id}
                 layout
-                initial={{ opacity: 0, scale: 0.9 }}
+                initial={initialListRender.current ? false : { opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.3 }}
               >
-                <HabitCard habit={h} />
+                <HabitCard habit={h} disableEntryAnim={initialListRender.current} />
               </motion.div>
             ))
           )}
