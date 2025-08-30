@@ -1,8 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
-import pkg from '../../package.json'
 import { useHabitStore } from '../store/store'
-import type { Habit } from '../types'
-import { recalc } from '../utils/scoring'
+import { exportAllData, importAllData } from '../utils/dataTransfer'
+import pkg from '../../package.json'
 function clearAllData() { localStorage.clear() }
 
 interface SettingsModalProps {
@@ -30,104 +29,8 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
   const [importing, setImporting] = useState(false)
   // export preview not shown in UI; omitted to keep UI minimal
   const fileRef = useRef<HTMLInputElement | null>(null)
-  // helper to access current store snapshot
-  const storeGet = useHabitStore.getState
 
-  function exportAllData() {
-    const s = storeGet()
-    return {
-      version: pkg.version,
-      exportedAt: new Date().toISOString(),
-      habits: s.habits,
-      username: s.username,
-      reminders: s.reminders,
-      totalPoints: s.totalPoints,
-      longestStreak: s.longestStreak,
-    }
-  }
-
-  function importAllData(txt: string, opts: { merge?: boolean } = { merge: true }) {
-    try {
-      const parsed = JSON.parse(txt)
-      if (!parsed || typeof parsed !== 'object') return { ok: false }
-      const incomingHabits: Partial<Habit>[] = Array.isArray(parsed.habits) ? parsed.habits : []
-      const incomingUsername = typeof parsed.username === 'string' ? parsed.username : undefined
-      const incomingReminders = parsed.reminders && typeof parsed.reminders === 'object' ? parsed.reminders : undefined
-      const incomingTotal = typeof parsed.totalPoints === 'number' ? parsed.totalPoints : 0
-      const incomingLongest = typeof parsed.longestStreak === 'number' ? parsed.longestStreak : 0
-
-      const cur = storeGet()
-      if (opts.merge) {
-        // merge habits by id (append new ones, skip duplicates)
-        const existingIds = new Set(cur.habits.map((h) => h.id))
-        const toAdd = incomingHabits.filter((h) => h && (h as Habit).id && !existingIds.has((h as Habit).id as string))
-        // sanitize and recalc
-        const normalized = toAdd.map((h) => recalc({
-          id: String((h as Habit).id),
-          name: String(h.name ?? ''),
-          frequency: (h as Habit).frequency ?? 'daily',
-          createdAt: String((h as Habit).createdAt ?? new Date().toISOString()),
-          completions: Array.isArray(h.completions) ? (h.completions as string[]) : [],
-          mode: (h as Habit).mode ?? 'build',
-          weeklyTarget: (h as Habit).weeklyTarget,
-          streak: Number((h as Habit).streak ?? 0),
-          points: Number((h as Habit).points ?? 0),
-        }))
-        const mergedHabits = [...cur.habits, ...normalized]
-        // merge username/reminders if present
-        const newUsername = incomingUsername ?? cur.username
-        const newReminders = incomingReminders ?? cur.reminders
-        // stats: keep max values
-        const newTotal = Math.max(cur.totalPoints || 0, incomingTotal || 0)
-        const newLongest = Math.max(cur.longestStreak || 0, incomingLongest || 0)
-
-        // apply to store
-        storeSetReminders(newReminders)
-        if (newUsername && newUsername !== cur.username) storeSetUsername(newUsername)
-        // direct set via setState not exposed; use resetStats and add incremental points via toggle? We'll set via localStorage patch: rely on direct mutation via persisted storage
-        // For simplicity, update totals by calling resetStats then set via localStorage write (since store API doesn't expose a setter for totals)
-        const updated = { ...cur, habits: mergedHabits, reminders: newReminders, username: newUsername, totalPoints: newTotal, longestStreak: newLongest }
-        // write directly to localStorage key used by zustand (ritus-habits)
-        try {
-          const key = 'ritus-habits'
-          localStorage.setItem(key, JSON.stringify({ state: updated, version: 1 }))
-        } catch (e) {
-          // fallback: apply what we can via exposed setters
-          // set habits by emulating clear and re-adding (not ideal); inform caller
-        }
-
-        return { ok: true, added: normalized.length, merged: normalized.length, total: mergedHabits.length }
-      } else {
-        // replace: overwrite entire persisted state
-        const newState = {
-          habits: (incomingHabits || []).map((h) => recalc({
-            id: String((h as Habit).id),
-            name: String(h.name ?? ''),
-            frequency: (h as Habit).frequency ?? 'daily',
-            createdAt: String((h as Habit).createdAt ?? new Date().toISOString()),
-            completions: Array.isArray(h.completions) ? (h.completions as string[]) : [],
-            mode: (h as Habit).mode ?? 'build',
-            weeklyTarget: (h as Habit).weeklyTarget,
-            streak: Number((h as Habit).streak ?? 0),
-            points: Number((h as Habit).points ?? 0),
-          })),
-          username: incomingUsername || '',
-          reminders: incomingReminders || { dailyEnabled: false, dailyTime: '21:00' },
-          totalPoints: incomingTotal || 0,
-          longestStreak: incomingLongest || 0,
-        }
-        try {
-          localStorage.setItem('ritus-habits', JSON.stringify({ state: newState, version: 1 }))
-          // reload so app picks up new persisted state
-          return { ok: true, added: newState.habits.length, merged: 0, total: newState.habits.length }
-        } catch (e) {
-          return { ok: false }
-        }
-      }
-    } catch (e) {
-      return { ok: false }
-    }
-  }
+  // import/export handled via utils/dataTransfer
 
   useEffect(()=>{ if(!open) setClosing(false); }, [open])
   useEffect(()=>()=>{ if(timeoutRef.current) window.clearTimeout(timeoutRef.current); },[])
@@ -177,9 +80,39 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
     const txt = await f.text()
     setImporting(true)
     try {
-      const res = importAllData(txt, { merge: true })
-      if (!res.ok) alert('Import failed')
-      else { alert('Import completed'); window.location.reload() }
+      const res = importAllData(txt)
+      if (!res.ok) {
+        if (res.reason === 'not_ritus') {
+          alert('This file is not a Ritus export. Please export from Ritus and try again.')
+        } else {
+          alert('Import failed')
+        }
+      } else {
+        const changes: string[] = []
+        const anyHabitsInfo = res.addedHabits > 0 || res.duplicateHabits > 0 || res.invalidHabits > 0
+        if (anyHabitsInfo) {
+          if (res.addedHabits > 0) changes.push(`Added ${res.addedHabits} new habit${res.addedHabits === 1 ? '' : 's'}`)
+          if (res.duplicateHabits > 0) changes.push(`Skipped ${res.duplicateHabits} duplicate${res.duplicateHabits === 1 ? '' : 's'}`)
+          if (res.invalidHabits > 0) changes.push(`Ignored ${res.invalidHabits} invalid item${res.invalidHabits === 1 ? '' : 's'}`)
+        }
+        if (res.usernameChanged) changes.push('Updated username')
+        if (res.totalPointsNew !== res.totalPointsPrev) changes.push(`Total points: ${res.totalPointsPrev} → ${res.totalPointsNew}`)
+        if (res.longestStreakNew !== res.longestStreakPrev) changes.push(`Longest streak: ${res.longestStreakPrev} → ${res.longestStreakNew}`)
+        changes.push(`Now tracking ${res.totalHabits} habit${res.totalHabits === 1 ? '' : 's'}`)
+
+        const changed =
+          res.addedHabits > 0 ||
+          res.usernameChanged ||
+          res.totalPointsNew !== res.totalPointsPrev ||
+          res.longestStreakNew !== res.longestStreakPrev
+
+        if (!changed) {
+          alert('No changes imported. All items were duplicates or invalid.')
+        } else {
+          alert(`Import summary:\n- ${changes.join('\n- ')}`)
+          window.location.reload()
+        }
+      }
     } catch {
       alert('Import failed')
     } finally {
