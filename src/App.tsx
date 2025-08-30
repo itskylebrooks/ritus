@@ -4,10 +4,10 @@ import HabitCard from './components/HabitCard'
 import SettingsModal from './components/SettingsModal'
 import GuideModal from './components/GuideModal'
 import { useHabitStore } from './store/store'
-import { fromISO, isSameCalendarWeek, isSameDay, daysThisWeek } from './utils/date'
-import { hasCompletionInWeek, hasCompletionOnDay } from './utils/scoring'
-import React from "react";
-import { motion, AnimatePresence } from 'framer-motion';
+import { fromISO } from './utils/date'
+import { hasCompletionOnDay, countCompletionsInWeek } from './utils/scoring'
+import { useMemo, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 function EmptyState() {
   return (
@@ -21,22 +21,20 @@ function EmptyState() {
 // Footer controls removed
 
 export default function App() {
-  const [settingsOpen, setSettingsOpen] = React.useState(false)
-  const [guideOpen, setGuideOpen] = React.useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [guideOpen, setGuideOpen] = useState(false)
   const habits = useHabitStore((s) => s.habits)
 
-  const sorted = React.useMemo(() => {
+  const sortedHabits = useMemo(() => {
     const today = new Date()
-    const weekDays = daysThisWeek(today)
     return [...habits].sort((a, b) => {
       const aDone = a.frequency === 'daily'
         ? hasCompletionOnDay(a.completions, today)
-        : // weekly: only mark done when completions this week >= weeklyTarget
-          weekDays.filter((d) => hasCompletionOnDay(a.completions, d)).length >= (a.weeklyTarget ?? 1)
+        : countCompletionsInWeek(a.completions, today) >= (a.weeklyTarget ?? 1)
 
       const bDone = b.frequency === 'daily'
         ? hasCompletionOnDay(b.completions, today)
-        : weekDays.filter((d) => hasCompletionOnDay(b.completions, d)).length >= (b.weeklyTarget ?? 1)
+        : countCompletionsInWeek(b.completions, today) >= (b.weeklyTarget ?? 1)
 
       if (aDone !== bDone) return aDone ? 1 : -1
       return fromISO(b.createdAt).getTime() - fromISO(a.createdAt).getTime()
@@ -60,7 +58,7 @@ export default function App() {
         </div>
       </header>
 
-  <SettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} entries={[]} onShowGuide={() => { setGuideOpen(true); setSettingsOpen(false); }} />
+  <SettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} onShowGuide={() => { setGuideOpen(true); setSettingsOpen(false); }} />
   <GuideModal open={guideOpen} onClose={() => setGuideOpen(false)} />
 
       <HeaderStats />
@@ -71,10 +69,10 @@ export default function App() {
 
       <main className="mt-6 grid gap-4">
   <AnimatePresence initial={false}>
-          {sorted.length === 0 ? (
+          {sortedHabits.length === 0 ? (
             <EmptyState />
           ) : (
-            sorted.map((h) => (
+            sortedHabits.map((h) => (
               <motion.div
                 key={h.id}
                 layout

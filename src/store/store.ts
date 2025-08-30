@@ -1,10 +1,10 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { Habit, Frequency } from '../types'
-import { iso, fromISO, isSameCalendarWeek, isSameDay } from '../utils/date'
+import { iso, fromISO, isSameDay } from '../utils/date'
 import { recalc } from '../utils/scoring'
 
-interface HabitState {
+export interface HabitState {
   habits: Habit[]
   username: string
   setUsername: (u: string) => void
@@ -39,13 +39,9 @@ export const useHabitStore = create<HabitState>()(
           const genId = () => {
             try {
               // prefer native UUID when available
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore
-              if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-                // @ts-ignore
-                return crypto.randomUUID()
-              }
-            } catch (e) {
+              const g = globalThis as unknown as { crypto?: { randomUUID?: () => string } }
+              if (g.crypto?.randomUUID) return g.crypto.randomUUID()
+            } catch {
               // ignore and fallback
             }
             // fallback: reasonably-unique id for local-only storage
@@ -86,22 +82,12 @@ export const useHabitStore = create<HabitState>()(
             if (h.id !== id) return h
             // Toggle completion for both build and break habits: for break mode a completion = successful clean day
 
+            // Toggle by exact day (same behavior for daily/weekly; weekly allows multiple days per week)
             let completions = [...h.completions]
-
-            if (h.frequency === 'daily') {
-              // toggle by exact day
-              if (completions.some((c) => isSameDay(fromISO(c), day))) {
-                completions = completions.filter((c) => !isSameDay(fromISO(c), day))
-              } else {
-                completions.push(iso(day))
-              }
+            if (completions.some((c) => isSameDay(fromISO(c), day))) {
+              completions = completions.filter((c) => !isSameDay(fromISO(c), day))
             } else {
-              // weekly: toggle the exact day. We allow multiple selected days in a week.
-              if (completions.some((c) => isSameDay(fromISO(c), day))) {
-                completions = completions.filter((c) => !isSameDay(fromISO(c), day))
-              } else {
-                completions.push(iso(day))
-              }
+              completions.push(iso(day))
             }
 
             const prevPoints = h.points || 0

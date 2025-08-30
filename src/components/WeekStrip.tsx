@@ -1,6 +1,6 @@
 import { format } from 'date-fns'
-import { daysThisWeek, isSameDay, fromISO } from '../utils/date'
-import { hasCompletionInWeek, hasCompletionOnDay } from '../utils/scoring'
+import { daysThisWeek } from '../utils/date'
+import { hasCompletionOnDay } from '../utils/scoring'
 import type { Habit } from '../types'
 
 export default function WeekStrip({ habit, onToggle }: { habit: Habit; onToggle: (d: Date) => void }) {
@@ -30,6 +30,7 @@ export default function WeekStrip({ habit, onToggle }: { habit: Habit; onToggle:
               key={d.toISOString()}
               onClick={() => { if (!isFuture) onToggle(d) }}
               disabled={isFuture}
+              aria-label={`${format(d, 'EEEE, d MMM')}: ${isMarked ? 'Marked clean' : isPast ? 'Missed' : 'Not set'}`}
               className={`grid h-8 w-8 place-items-center rounded-full border text-xs font-medium transition ${cls} ${isFuture ? 'opacity-60 cursor-not-allowed' : ''}`}
               title={`${label} ${format(d, 'd MMM')}`}
             >
@@ -48,6 +49,7 @@ export default function WeekStrip({ habit, onToggle }: { habit: Habit; onToggle:
                 ? 'border-transparent bg-black text-white dark:bg-white dark:text-black'
                 : 'border-neutral-300 text-neutral-700 hover:bg-neutral-100 dark:border-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-900'
             } ${isFuture ? 'opacity-60 cursor-not-allowed' : ''}`}
+            aria-label={`${format(d, 'EEEE, d MMM')}: ${done ? 'Completed' : isFuture ? 'In future' : 'Not completed'}`}
             title={`${label} ${format(d, 'd MMM')}`}
           >
             {label[0]}

@@ -5,7 +5,8 @@ interface GuideModalProps {
   onClose: () => void
 }
 
-const STEPS: { title: string; body: string }[] = [
+type GuideStep = { title: string; body: string }
+const STEPS: GuideStep[] = [
   {
     title: 'Welcome to Ritus',
     body: 'Ritus helps you build small habits. Create a habit, pick its frequency, and track progress with a single tap.'
@@ -40,9 +41,13 @@ const STEPS: { title: string; body: string }[] = [
   }
 ]
 
+type LayerPhase = 'enter' | 'exit'
+type LayerDir = 'forward' | 'back'
+interface StepLayer { key: number; idx: number; phase: LayerPhase; dir: LayerDir }
+
 export default function GuideModal({ open, onClose }: GuideModalProps) {
   const [step, setStep] = useState(0)
-  const [renderedSteps, setRenderedSteps] = useState([{ key: 0, idx: 0, phase: 'enter' as 'enter'|'exit', dir: 'forward' as 'forward'|'back' }])
+  const [renderedSteps, setRenderedSteps] = useState<StepLayer[]>([{ key: 0, idx: 0, phase: 'enter', dir: 'forward' }])
   const [visible, setVisible] = useState(open)
   const [closing, setClosing] = useState(false)
   const [entering, setEntering] = useState(false)
@@ -86,7 +91,7 @@ export default function GuideModal({ open, onClose }: GuideModalProps) {
 
   const queueStep = (next: number) => {
     if (next === step) return
-    const dir: 'forward'|'back' = next > step ? 'forward' : 'back'
+    const dir: LayerDir = next > step ? 'forward' : 'back'
     // mark existing layers as exiting first
     setRenderedSteps(prev => prev.map(p => ({ ...p, phase: 'exit' as const, dir })))
     // after exit animation, insert new entering layer
@@ -108,13 +113,21 @@ export default function GuideModal({ open, onClose }: GuideModalProps) {
   const last = step === STEPS.length - 1
   return (
     <div className={`fixed inset-0 z-[60] flex items-center justify-center p-5 transition-colors duration-250 ${closing || entering ? 'bg-black/0' : 'bg-black/70 backdrop-blur-sm'}`} onClick={()=>{ if(!closing) onClose(); }}>
-      <div className={`w-full max-w-sm rounded-2xl ring-1 ring-black/5 dark:ring-white/5 p-6 relative transition-all duration-250 ${closing || entering ? 'opacity-0 scale-[0.94] -translate-y-2' : 'opacity-100 scale-100 translate-y-0'} bg-white dark:bg-neutral-950` } onClick={(e)=> { e.stopPropagation(); }}>
+      <div
+        className={`w-full max-w-sm rounded-2xl ring-1 ring-black/5 dark:ring-white/5 p-6 relative transition-all duration-250 ${closing || entering ? 'opacity-0 scale-[0.94] -translate-y-2' : 'opacity-100 scale-100 translate-y-0'} bg-white dark:bg-neutral-950` }
+        onClick={(e)=> { e.stopPropagation(); }}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="guide-title"
+      >
         <div className="absolute top-2 right-2">
           <button aria-label="Close guide" onClick={()=>{ if(!closing) onClose(); }} className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-100 hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-black/70 dark:text-neutral-300 transition">
             ✕
           </button>
         </div>
         <div className="text-[11px] tracking-wide uppercase text-black/40 mb-2">Quick guide</div>
+        {/* Hidden heading for accessibility to label the dialog */}
+        <h2 id="guide-title" className="sr-only">{STEPS[step].title}</h2>
         <div className="relative min-h-[120px]">
           {renderedSteps.map(layer => {
             const data = STEPS[layer.idx]
@@ -123,7 +136,7 @@ export default function GuideModal({ open, onClose }: GuideModalProps) {
               : (layer.dir === 'forward' ? 'guide-step-exit-forward' : 'guide-step-exit-back')
             return (
               <div key={layer.key} className={`guide-step-layer ${stateClass}`}>
-        <h2 className="text-lg font-semibold mb-3 text-neutral-900 dark:text-neutral-100">{data.title}</h2>
+        <h3 className="text-lg font-semibold mb-3 text-neutral-900 dark:text-neutral-100">{data.title}</h3>
         <p className="text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed">{data.body}</p>
               </div>
             )

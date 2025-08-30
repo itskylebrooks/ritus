@@ -1,10 +1,17 @@
-import { useEffect, useState, useRef, useMemo, useCallback } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import pkg from '../../package.json'
 import { useHabitStore } from '../store/store'
-type Entry = any
+import type { Habit } from '../types'
+import { recalc } from '../utils/scoring'
 function clearAllData() { localStorage.clear() }
 
-export default function SettingsModal({ open, onClose, entries, onShowGuide, isTG, onOpenPrivacy }: { open: boolean; onClose: () => void; entries: Entry[]; onShowGuide?: () => void; isTG?: boolean; onOpenPrivacy?: () => void }) {
+interface SettingsModalProps {
+  open: boolean
+  onClose: () => void
+  onShowGuide?: () => void
+}
+
+export default function SettingsModal({ open, onClose, onShowGuide }: SettingsModalProps) {
   const [closing, setClosing] = useState(false)
   const timeoutRef = useRef<number | null>(null)
   const pendingRef = useRef<'none' | 'guide'>('none')
@@ -21,7 +28,7 @@ export default function SettingsModal({ open, onClose, entries, onShowGuide, isT
   
   const [exporting, setExporting] = useState(false)
   const [importing, setImporting] = useState(false)
-  const [preview, setPreview] = useState<string | null>(null)
+  // export preview not shown in UI; omitted to keep UI minimal
   const fileRef = useRef<HTMLInputElement | null>(null)
   // helper to access current store snapshot
   const storeGet = useHabitStore.getState
@@ -43,7 +50,7 @@ export default function SettingsModal({ open, onClose, entries, onShowGuide, isT
     try {
       const parsed = JSON.parse(txt)
       if (!parsed || typeof parsed !== 'object') return { ok: false }
-      const incomingHabits: any[] = Array.isArray(parsed.habits) ? parsed.habits : []
+      const incomingHabits: Partial<Habit>[] = Array.isArray(parsed.habits) ? parsed.habits : []
       const incomingUsername = typeof parsed.username === 'string' ? parsed.username : undefined
       const incomingReminders = parsed.reminders && typeof parsed.reminders === 'object' ? parsed.reminders : undefined
       const incomingTotal = typeof parsed.totalPoints === 'number' ? parsed.totalPoints : 0
@@ -53,9 +60,19 @@ export default function SettingsModal({ open, onClose, entries, onShowGuide, isT
       if (opts.merge) {
         // merge habits by id (append new ones, skip duplicates)
         const existingIds = new Set(cur.habits.map((h) => h.id))
-        const toAdd = incomingHabits.filter((h) => h && h.id && !existingIds.has(h.id))
-        // sanitize: ensure basics exist
-        const normalized = toAdd.map((h) => ({ ...h }))
+        const toAdd = incomingHabits.filter((h) => h && (h as Habit).id && !existingIds.has((h as Habit).id as string))
+        // sanitize and recalc
+        const normalized = toAdd.map((h) => recalc({
+          id: String((h as Habit).id),
+          name: String(h.name ?? ''),
+          frequency: (h as Habit).frequency ?? 'daily',
+          createdAt: String((h as Habit).createdAt ?? new Date().toISOString()),
+          completions: Array.isArray(h.completions) ? (h.completions as string[]) : [],
+          mode: (h as Habit).mode ?? 'build',
+          weeklyTarget: (h as Habit).weeklyTarget,
+          streak: Number((h as Habit).streak ?? 0),
+          points: Number((h as Habit).points ?? 0),
+        }))
         const mergedHabits = [...cur.habits, ...normalized]
         // merge username/reminders if present
         const newUsername = incomingUsername ?? cur.username
@@ -73,7 +90,7 @@ export default function SettingsModal({ open, onClose, entries, onShowGuide, isT
         // write directly to localStorage key used by zustand (ritus-habits)
         try {
           const key = 'ritus-habits'
-          localStorage.setItem(key, JSON.stringify({ state: updated }))
+          localStorage.setItem(key, JSON.stringify({ state: updated, version: 1 }))
         } catch (e) {
           // fallback: apply what we can via exposed setters
           // set habits by emulating clear and re-adding (not ideal); inform caller
@@ -83,14 +100,24 @@ export default function SettingsModal({ open, onClose, entries, onShowGuide, isT
       } else {
         // replace: overwrite entire persisted state
         const newState = {
-          habits: incomingHabits || [],
+          habits: (incomingHabits || []).map((h) => recalc({
+            id: String((h as Habit).id),
+            name: String(h.name ?? ''),
+            frequency: (h as Habit).frequency ?? 'daily',
+            createdAt: String((h as Habit).createdAt ?? new Date().toISOString()),
+            completions: Array.isArray(h.completions) ? (h.completions as string[]) : [],
+            mode: (h as Habit).mode ?? 'build',
+            weeklyTarget: (h as Habit).weeklyTarget,
+            streak: Number((h as Habit).streak ?? 0),
+            points: Number((h as Habit).points ?? 0),
+          })),
           username: incomingUsername || '',
           reminders: incomingReminders || { dailyEnabled: false, dailyTime: '21:00' },
           totalPoints: incomingTotal || 0,
           longestStreak: incomingLongest || 0,
         }
         try {
-          localStorage.setItem('ritus-habits', JSON.stringify({ state: newState }))
+          localStorage.setItem('ritus-habits', JSON.stringify({ state: newState, version: 1 }))
           // reload so app picks up new persisted state
           return { ok: true, added: newState.habits.length, merged: 0, total: newState.habits.length }
         } catch (e) {
@@ -140,7 +167,7 @@ export default function SettingsModal({ open, onClose, entries, onShowGuide, isT
   }, [open])
 
   async function handleExport() {
-    try { setExporting(true); const payload = exportAllData(); const json = JSON.stringify(payload, null, 2); setPreview(json); const blob = new Blob([json], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); const now = new Date().toISOString().slice(0,10); a.href = url; a.download = `ritus-export-${now}.json`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    try { setExporting(true); const payload = exportAllData(); const json = JSON.stringify(payload, null, 2); const blob = new Blob([json], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); const now = new Date().toISOString().slice(0,10); a.href = url; a.download = `ritus-export-${now}.json`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
     } catch { alert('Export failed') } finally { setExporting(false) }
   }
   function triggerFilePick() { fileRef.current?.click() }
@@ -183,14 +210,22 @@ export default function SettingsModal({ open, onClose, entries, onShowGuide, isT
   }
 
   const topEmoji = '🙂'
-  const gradientCSS = 'linear-gradient(135deg,#111,#0b1220)'
+  // reserved for potential future design accents
+  // const gradientCSS = 'linear-gradient(135deg,#111,#0b1220)'
 
   const dailyEnabled = reminders.dailyEnabled
 
   if (!open && !closing) return null
   return (
     <div className={"fixed inset-0 z-50 flex items-stretch sm:items-center justify-center settings-overlay backdrop-blur-sm " + (closing? 'closing':'')} onClick={beginClose}>
-  <div className={"w-full h-full sm:h-auto max-w-none sm:max-w-sm rounded-none sm:rounded-2xl bg-white dark:bg-neutral-950 p-6 pt-7 pb-8 ring-1 ring-black/5 dark:ring-white/5 overflow-y-auto settings-panel " + (closing? 'closing':'')} style={{ WebkitOverflowScrolling: 'touch', paddingBottom: 'max(env(safe-area-inset-bottom), 32px)' }} onClick={(e)=>e.stopPropagation()}>
+  <div
+        className={"w-full h-full sm:h-auto max-w-none sm:max-w-sm rounded-none sm:rounded-2xl bg-white dark:bg-neutral-950 p-6 pt-7 pb-8 ring-1 ring-black/5 dark:ring-white/5 overflow-y-auto settings-panel " + (closing? 'closing':'')}
+        style={{ WebkitOverflowScrolling: 'touch', paddingBottom: 'max(env(safe-area-inset-bottom), 32px)' }}
+        onClick={(e)=>e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="settings-title"
+      >
         <div className="mb-8">
           <div className="relative h-12 flex items-center justify-center">
             {onShowGuide && (
@@ -201,7 +236,7 @@ export default function SettingsModal({ open, onClose, entries, onShowGuide, isT
                 <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 translate-y-full text-[10px] text-black/40 font-medium whitespace-nowrap pointer-events-none select-none">App guide</div>
               </div>
             )}
-            <span className="text-lg font-semibold tracking-wide text-neutral-900 dark:text-neutral-100">Settings</span>
+            <span id="settings-title" className="text-lg font-semibold tracking-wide text-neutral-900 dark:text-neutral-100">Settings</span>
             <div className="absolute right-0 top-1/2 -translate-y-1/2" title="Your avatar">
               <div className="relative" style={{ width:48, height:48 }}>
                 <div className="w-full h-full rounded-full border border-neutral-200 dark:border-white shadow-inner overflow-hidden bg-black">

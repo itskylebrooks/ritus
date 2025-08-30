@@ -1,5 +1,6 @@
 import { Habit } from '../types'
 import { addDays, fromISO, isSameCalendarWeek, isSameDay, startOfWeek, WSO } from './date'
+import { daysThisWeek } from './date'
 
 export const POINTS_PER_COMPLETION = 10
 export const DAILY_MILESTONE = 7   // 7-day streak bonus
@@ -14,20 +15,19 @@ export function hasCompletionInWeek(completions: string[], dayInWeek: Date) {
   return completions.some((c) => isSameCalendarWeek(fromISO(c), dayInWeek))
 }
 
+export function countCompletionsInWeek(completions: string[], ref: Date = new Date()): number {
+  const week = daysThisWeek(ref)
+  return week.filter((d) => hasCompletionOnDay(completions, d)).length
+}
+
 export function calcDailyStreak(h: Habit, ref: Date = new Date()) {
   let s = 0
   let cur = new Date(ref)
-  if (h.mode === 'break') {
-    // For break habits, streak is consecutive days with a completion (user-marked clean days)
-    while (hasCompletionOnDay(h.completions, cur)) {
-      s += 1
-      cur = addDays(cur, -1)
-    }
-  } else {
-    while (hasCompletionOnDay(h.completions, cur)) {
-      s += 1
-      cur = addDays(cur, -1)
-    }
+  // For both 'build' and 'break' modes, daily streak counts consecutive
+  // days with a completion (clean day for 'break', done for 'build').
+  while (hasCompletionOnDay(h.completions, cur)) {
+    s += 1
+    cur = addDays(cur, -1)
   }
   return s
 }

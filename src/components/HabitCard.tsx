@@ -2,12 +2,11 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useEffect, useMemo, useState } from 'react'
 import { Check, Flame, Pencil, Trash2 } from 'lucide-react'
 import { useHabitStore } from '../store/store'
-import type { Habit, Frequency } from '../types'
+import type { Habit } from '../types'
 import WeekStrip from './WeekStrip'
 import ProgressBar from './ProgressBar'
 import Badge from './Badge'
-import { daysThisWeek } from '../utils/date'
-import { hasCompletionInWeek, hasCompletionOnDay, DAILY_MILESTONE, MILESTONE_BONUS, POINTS_PER_COMPLETION, WEEKLY_MILESTONE } from '../utils/scoring'
+import { DAILY_MILESTONE, MILESTONE_BONUS, POINTS_PER_COMPLETION, WEEKLY_MILESTONE, countCompletionsInWeek } from '../utils/scoring'
 
 export default function HabitCard({ habit }: { habit: Habit }) {
   const toggleCompletion = useHabitStore((s) => s.toggleCompletion)
@@ -22,12 +21,8 @@ export default function HabitCard({ habit }: { habit: Habit }) {
     setName(habit.name)
   }, [habit.name])
 
-  const thisWeekDays = daysThisWeek()
   const weeklyMax = habit.frequency === 'daily' ? 7 : habit.weeklyTarget ?? 1
-  const weeklyVal = useMemo(() => {
-    if (habit.frequency === 'daily') return thisWeekDays.filter((d) => hasCompletionOnDay(habit.completions, d)).length
-    return thisWeekDays.filter((d) => hasCompletionOnDay(habit.completions, d)).length
-  }, [habit.completions, habit.frequency, habit.weeklyTarget])
+  const weeklyVal = useMemo(() => countCompletionsInWeek(habit.completions), [habit.completions])
 
   function saveEdit() {
     const trimmed = name.trim()

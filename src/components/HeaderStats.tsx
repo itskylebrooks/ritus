@@ -1,7 +1,7 @@
 import { Trophy, Flame, Info } from 'lucide-react'
 import { useHabitStore } from '../store/store'
 import { daysThisWeek } from '../utils/date'
-import { hasCompletionInWeek, hasCompletionOnDay } from '../utils/scoring'
+import { hasCompletionOnDay, countCompletionsInWeek } from '../utils/scoring'
 import ProgressBar from './ProgressBar'
 
 export default function HeaderStats() {
@@ -16,7 +16,8 @@ export default function HeaderStats() {
       const hits = thisWeek.filter((d) => hasCompletionOnDay(h.completions, d)).length
       return [acc[0] + hits, acc[1] + thisWeek.length]
     } else {
-      const doneWeek = thisWeek.some((d) => hasCompletionInWeek(h.completions, d)) ? 1 : 0
+      const target = h.weeklyTarget ?? 1
+      const doneWeek = countCompletionsInWeek(h.completions) >= target ? 1 : 0
       return [acc[0] + doneWeek, acc[1] + 1]
     }
   }, [0, 0])
