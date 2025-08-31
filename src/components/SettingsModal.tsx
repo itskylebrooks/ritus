@@ -8,12 +8,13 @@ interface SettingsModalProps {
   open: boolean
   onClose: () => void
   onShowGuide?: () => void
+  onShowPrivacy?: () => void
 }
 
-export default function SettingsModal({ open, onClose, onShowGuide }: SettingsModalProps) {
+export default function SettingsModal({ open, onClose, onShowGuide, onShowPrivacy }: SettingsModalProps) {
   const [closing, setClosing] = useState(false)
   const timeoutRef = useRef<number | null>(null)
-  const pendingRef = useRef<'none' | 'guide'>('none')
+  const pendingRef = useRef<'none' | 'guide' | 'privacy'>('none')
   const storeUsername = useHabitStore((s) => s.username)
   const storeSetUsername = useHabitStore((s) => s.setUsername)
   const storeReminders = useHabitStore((s) => s.reminders)
@@ -49,6 +50,8 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
       if (pendingRef.current === 'guide') {
         // little buffer so the settings overlay/panel fully finishes animating
         window.setTimeout(()=> { try { onShowGuide && onShowGuide() } catch {} ; pendingRef.current = 'none' }, 80)
+      } else if (pendingRef.current === 'privacy') {
+        window.setTimeout(()=> { try { onShowPrivacy && onShowPrivacy() } catch {} ; pendingRef.current = 'none' }, 80)
       } else {
         pendingRef.current = 'none'
       }
@@ -58,6 +61,12 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
     if (!onShowGuide) return
     pendingRef.current = 'guide'
     // start the close animation; onClose will be called after CLOSE_DURATION, then we'll trigger guide from the parent via pendingRef in beginClose
+    beginClose()
+  }
+
+  function handleShowPrivacy() {
+    if (!onShowPrivacy) return
+    pendingRef.current = 'privacy'
     beginClose()
   }
 
@@ -138,9 +147,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
     }
   }
 
-  function handlePrivacyPolicy() {
-    // intentionally non-functional in this build; left as a placeholder
-  }
+  function handlePrivacyPolicy() { handleShowPrivacy() }
 
   const topEmoji = '🙂'
   // reserved for potential future design accents
