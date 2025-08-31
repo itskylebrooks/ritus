@@ -11,7 +11,15 @@ import { motion, AnimatePresence } from 'framer-motion'
 
 function EmptyState({ disableAnim = false }: { disableAnim?: boolean }) {
   return (
-    <motion.div layout key="empty" initial={disableAnim ? false : { opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.28 }} className="rounded-2xl border p-10 text-center text-neutral-600 dark:text-neutral-300">
+    <motion.div
+      layout
+      key="empty"
+      initial={disableAnim ? false : { opacity: 0, y: 8, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -6, scale: 0.98 }}
+      transition={{ duration: 0.24, ease: [0.4, 0, 0.2, 1] }}
+      className="rounded-2xl border p-10 text-center text-neutral-600 dark:text-neutral-300"
+    >
       <p className="text-lg font-medium">No habits yet</p>
       <p className="mt-1 text-sm">Create your first habit to get started.</p>
     </motion.div>
@@ -26,6 +34,34 @@ export default function App() {
   const habits = useHabitStore((s) => s.habits)
   const initialListRender = useRef(true)
   useEffect(() => { initialListRender.current = false }, [])
+  const [emptyReady, setEmptyReady] = useState(habits.length === 0)
+  const emptyTimer = useRef<number | null>(null)
+  const prevCount = useRef(habits.length)
+
+  // Ensure empty state appears smoothly after deleting the last habit
+  useEffect(() => {
+    const cur = habits.length
+    const prev = prevCount.current
+    prevCount.current = cur
+    if (cur === 0) {
+      // If transitioning from some items to none, wait for exit animation
+      if (prev > 0) {
+        setEmptyReady(false)
+        if (emptyTimer.current) window.clearTimeout(emptyTimer.current)
+        emptyTimer.current = window.setTimeout(() => { setEmptyReady(true); emptyTimer.current = null }, 300)
+      } else {
+        // Initial load with no habits: show immediately (but with animations disabled)
+        setEmptyReady(true)
+      }
+    } else {
+      // When we have items, hide empty state immediately
+      if (emptyTimer.current) { window.clearTimeout(emptyTimer.current); emptyTimer.current = null }
+      setEmptyReady(false)
+    }
+    return () => {
+      if (emptyTimer.current) { window.clearTimeout(emptyTimer.current); emptyTimer.current = null }
+    }
+  }, [habits.length])
 
   const sortedHabits = useMemo(() => {
     const today = new Date()
@@ -69,18 +105,18 @@ export default function App() {
         <AddHabit />
       </div>
 
-      <main className="mt-6 grid gap-4">
-  <AnimatePresence initial={false}>
+      <motion.main layout className="mt-6 grid gap-4">
+        <AnimatePresence initial={false} mode="popLayout">
           {sortedHabits.length === 0 ? (
-            <EmptyState disableAnim={true} />
+            emptyReady ? <EmptyState disableAnim={initialListRender.current} /> : null
           ) : (
             sortedHabits.map((h) => (
               <motion.div
                 key={h.id}
                 layout
-                initial={initialListRender.current ? false : { opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
+                // Keep exit so only the removed card animates out.
+                // Rely on layout for siblings to smoothly shift with no fade.
+                exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.3 }}
               >
                 <HabitCard habit={h} disableEntryAnim={initialListRender.current} />
@@ -88,7 +124,7 @@ export default function App() {
             ))
           )}
         </AnimatePresence>
-      </main>
+      </motion.main>
 
   {/* Footer removed */}
     </div>

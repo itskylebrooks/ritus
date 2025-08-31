@@ -81,7 +81,7 @@ export default function AddHabit() {
 
   return (
     <motion.form layout onSubmit={submit} className="flex flex-col gap-3 rounded-2xl border p-4 shadow-sm sm:flex-row sm:items-end">
-  <motion.div className="flex-1" layout transition={{ layout: { type: 'spring', stiffness: 300, damping: 30 } }} style={{ minWidth: 0 }}>
+  <motion.div className="flex-1" layout="position" transition={{ layout: { type: 'spring', stiffness: 300, damping: 30 } }} style={{ minWidth: 0 }}>
         <label className="block text-sm text-neutral-600 dark:text-neutral-300">Habit name</label>
         <input
           className="mt-1 w-full rounded-xl border bg-white px-3 py-2 outline-none ring-0 placeholder:text-neutral-400 focus:border-black/40 dark:bg-neutral-950 dark:border-neutral-800 dark:focus:border-white/50"
