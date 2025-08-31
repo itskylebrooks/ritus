@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { useHabitStore } from '../store/store'
 import { exportAllData, importAllData } from '../utils/dataTransfer'
+import ConfirmModal from './ConfirmModal'
 import pkg from '../../package.json'
 function clearAllData() { localStorage.clear() }
 
@@ -28,6 +29,7 @@ export default function SettingsModal({ open, onClose, onShowGuide, onShowPrivac
   
   const [exporting, setExporting] = useState(false)
   const [importing, setImporting] = useState(false)
+  const [confirmClearOpen, setConfirmClearOpen] = useState(false)
   // export preview not shown in UI; omitted to keep UI minimal
   const fileRef = useRef<HTMLInputElement | null>(null)
 
@@ -133,19 +135,7 @@ export default function SettingsModal({ open, onClose, onShowGuide, onShowPrivac
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) { setUsername(e.target.value); setDirty(true) }
   async function handleSave(e?: React.FormEvent) { if (e) e.preventDefault(); if (!dirty || saving) return; setSaving(true); if (username.trim().length < 4) { setSaving(false); alert('Username must be at least 4 characters.'); return; } try { storeSetUsername(username.trim()); setSaving(false); setDirty(false); setSavedFlash(true); setTimeout(()=> setSavedFlash(false), 1400) } catch (err) { setSaving(false); alert('Failed to save username') } }
 
-  function handleDeleteAllLocal() {
-    const ok = window.confirm('Delete all local data? This will clear localStorage and cannot be undone. Are you sure?')
-    if (!ok) return
-    try {
-      clearAllData()
-      // inform the user and reload so the app reflects cleared data
-      window.alert('All local data cleared. The app will reload now.')
-      window.location.reload()
-    } catch (e) {
-      console.error('Failed to clear local data', e)
-      window.alert('Failed to clear local data')
-    }
-  }
+  function handleDeleteAllLocal() { setConfirmClearOpen(true) }
 
   function handlePrivacyPolicy() { handleShowPrivacy() }
 
@@ -294,6 +284,34 @@ export default function SettingsModal({ open, onClose, onShowGuide, onShowPrivac
         <div className="mt-5">
           <button onClick={beginClose} className="w-full rounded-2xl px-4 py-3 text-sm font-semibold bg-black text-white hover:bg-neutral-800 transition dark:bg-white dark:text-black dark:hover:bg-neutral-200">Done</button>
         </div>
+
+        <ConfirmModal
+          open={confirmClearOpen}
+          onClose={() => setConfirmClearOpen(false)}
+          onConfirm={() => {
+            try {
+              // Clear persisted storage and reset in-memory store to defaults
+              clearAllData()
+              try {
+                const st = useHabitStore.getState()
+                st.clearAll()
+                st.resetStats()
+                storeSetUsername('')
+                storeSetReminders({ dailyEnabled: false, dailyTime: '21:00' })
+              } catch {}
+              setConfirmClearOpen(false)
+              // Smoothly close settings so main page shows updated empty state
+              beginClose()
+            } catch (e) {
+              console.error('Failed to clear local data', e)
+              setConfirmClearOpen(false)
+            }
+          }}
+          title="Delete all local data?"
+          message="This will clear all Ritus data stored in this browser. This cannot be undone."
+          confirmLabel="Delete"
+          destructive
+        />
 
   <div className="mt-6 text-center text-[10px] text-neutral-600 dark:text-neutral-400 relative">
           <a

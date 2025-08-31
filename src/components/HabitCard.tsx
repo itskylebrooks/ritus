@@ -7,6 +7,7 @@ import WeekStrip from './WeekStrip'
 import ProgressBar from './ProgressBar'
 import Badge from './Badge'
 import { DAILY_MILESTONE, MILESTONE_BONUS, POINTS_PER_COMPLETION, WEEKLY_MILESTONE, countCompletionsInWeek } from '../utils/scoring'
+import ConfirmModal from './ConfirmModal'
 
 export default function HabitCard({ habit, disableEntryAnim = false }: { habit: Habit; disableEntryAnim?: boolean }) {
   const toggleCompletion = useHabitStore((s) => s.toggleCompletion)
@@ -16,6 +17,7 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
   const [editing, setEditing] = useState(false)
   const [name, setName] = useState(habit.name)
   const [isRemoving, setIsRemoving] = useState(false)
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
 
   useEffect(() => {
     setName(habit.name)
@@ -102,10 +104,7 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
                   <Pencil className="h-4 w-4" />
                 </motion.button>
                 <motion.button
-                  onClick={() => {
-                    const ok = window.confirm(`Delete habit "${habit.name}"? This cannot be undone.`)
-                    if (ok) deleteHabitWithAnimation()
-                  }}
+                  onClick={() => setConfirmDeleteOpen(true)}
                   className="rounded-xl border p-2 hover:bg-neutral-50 text-red-600 dark:hover:bg-neutral-900"
                   aria-label="Delete habit"
                   title="Delete"
@@ -163,6 +162,15 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
       <p className="mt-3 text-xs text-neutral-500 dark:text-neutral-400">
         +{POINTS_PER_COMPLETION} pts per completion. Milestone bonus: {MILESTONE_BONUS} pts every {habit.frequency === 'daily' ? DAILY_MILESTONE + '-day' : WEEKLY_MILESTONE + '-week'} streak.
       </p>
+      <ConfirmModal
+        open={confirmDeleteOpen}
+        onClose={() => setConfirmDeleteOpen(false)}
+        onConfirm={() => { setConfirmDeleteOpen(false); deleteHabitWithAnimation() }}
+        title="Delete habit?"
+        message={`Delete "${habit.name}"? This cannot be undone.`}
+        confirmLabel="Delete"
+        destructive
+      />
     </div>
   )
 }
