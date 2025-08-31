@@ -192,13 +192,31 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
               <div>
                 <label className="block text-[10px] uppercase tracking-wide text-neutral-600 dark:text-neutral-400 mb-2">Username</label>
                 <div className="flex items-center gap-3">
-                  <input value={username} onChange={handleChange} maxLength={24} className="flex-1 rounded-md bg-white dark:bg-neutral-950 px-3 py-2 text-sm outline-none ring-1 ring-black/6 dark:ring-white/6 focus:ring-2 focus:ring-emerald-400 placeholder:text-neutral-400" placeholder="user" />
-                  <button type="submit" disabled={!dirty || saving || !username.trim()} className="rounded-md px-3 py-2 text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed bg-black text-white dark:bg-white dark:text-black">{saving ? 'Saving…' : savedFlash ? 'Saved' : 'Save'}</button>
+                  <input
+                    value={username}
+                    onChange={handleChange}
+                    maxLength={24}
+                    className="flex-1 rounded-md bg-white dark:bg-neutral-950 px-3 py-2 text-sm appearance-none outline-none focus:outline-none focus-visible:outline-none border border-black/10 dark:border-white/10 focus:border-black/20 dark:focus:border-white/20 placeholder:text-neutral-400 text-black dark:text-white transition-colors"
+                    placeholder="user"
+                  />
+                  <button type="submit" disabled={!dirty || saving || username.trim().length < 4} className="rounded-md px-3 py-2 text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed bg-black text-white dark:bg-white dark:text-black">{saving ? 'Saving…' : savedFlash ? 'Saved' : 'Save'}</button>
                 </div>
-                <p className="mt-2 text-[11px] text-neutral-600 dark:text-neutral-400">Lowercase, 24 chars max. Placeholder only.</p>
-                <div className="mt-3 flex items-center justify-between gap-3">
-                  <button type="button" onClick={handleDeleteAllLocal} className="text-sm font-medium text-red-600 hover:underline">Delete all local data</button>
-                  <button type="button" disabled onClick={handlePrivacyPolicy} className="text-sm text-neutral-600 dark:text-neutral-300 underline disabled:opacity-50 disabled:cursor-not-allowed">Privacy policy</button>
+                <p className="mt-2 text-[11px] text-neutral-600 dark:text-neutral-400">Lowercase, 4-24 chars, currently local only.</p>
+                <div className="mt-3 grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={handleDeleteAllLocal}
+                    className="w-full rounded-md px-3 py-2 text-sm font-medium bg-white dark:bg-black border border-red-500 text-red-600 dark:text-red-400"
+                  >
+                    Delete local data
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handlePrivacyPolicy}
+                    className="w-full rounded-md px-3 py-2 text-sm font-medium bg-white dark:bg-black border border-emerald-500 text-emerald-700 dark:text-emerald-400"
+                  >
+                    Privacy policy
+                  </button>
                 </div>
               </div>
             </form>
@@ -245,22 +263,24 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
             </div>
           </div>
 
-          <div className="p-4 rounded-2xl border shadow-sm text-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-sm font-semibold">Daily reminder</div>
-                <div className="text-[12px] text-neutral-600 dark:text-neutral-400 mt-1">Will be implemented in a future update.</div>
-              </div>
-              <div>
-                <button type="button" role="switch" aria-checked={dailyEnabled} onClick={()=>{ const v={...reminders,dailyEnabled: !dailyEnabled}; setReminders(v); try { storeSetReminders(v) } catch {} }} className={"inline-flex items-center px-3 py-2 rounded-full " + (dailyEnabled ? 'bg-emerald-500 text-white' : 'bg-gray-200 dark:bg-neutral-800 text-black dark:text-neutral-200') }>
-                  <span className="mr-3 text-sm">{dailyEnabled ? 'On' : 'Off'}</span>
-                  <span className={"relative inline-block w-11 h-6 rounded-full " + (dailyEnabled ? 'bg-emerald-500' : 'bg-gray-300') }>
-                    <span className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transform" style={{ transform: dailyEnabled ? 'translateX(1.4rem)' : 'translateX(0)' }} />
-                  </span>
-                </button>
+          {false && (
+            <div className="p-4 rounded-2xl border shadow-sm text-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-sm font-semibold">Daily reminder</div>
+                  <div className="text-[12px] text-neutral-600 dark:text-neutral-400 mt-1">Will be implemented in a future update.</div>
+                </div>
+                <div>
+                  <button type="button" role="switch" aria-checked={dailyEnabled} onClick={()=>{ const v={...reminders,dailyEnabled: !dailyEnabled}; setReminders(v); try { storeSetReminders(v) } catch {} }} className={"inline-flex items-center px-3 py-2 rounded-full " + (dailyEnabled ? 'bg-emerald-500 text-white' : 'bg-gray-200 dark:bg-neutral-800 text-black dark:text-neutral-200') }>
+                    <span className="mr-3 text-sm">{dailyEnabled ? 'On' : 'Off'}</span>
+                    <span className={"relative inline-block w-11 h-6 rounded-full " + (dailyEnabled ? 'bg-emerald-500' : 'bg-gray-300') }>
+                      <span className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transform" style={{ transform: dailyEnabled ? 'translateX(1.4rem)' : 'translateX(0)' }} />
+                    </span>
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
         </div>
 
