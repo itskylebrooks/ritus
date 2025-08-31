@@ -60,24 +60,31 @@ export const useHabitStore = create<HabitState>()(
             points: 0,
           }
           const newHabit = recalc(habit)
-          // ensure cumulative longestStreak persists if this new habit starts with a streak
+          const newHabits = [newHabit, ...s.habits]
+          // update longest streak to the max observed
           const newLongest = Math.max(s.longestStreak, newHabit.streak)
-          return { habits: [newHabit, ...s.habits], longestStreak: newLongest }
+          const sumPoints = newHabits.reduce((acc, h) => acc + (h.points || 0), 0)
+          return { habits: newHabits, longestStreak: newLongest, totalPoints: sumPoints }
         }),
       editHabit: (id, patch) =>
         set((s) => {
           const updated = s.habits.map((h) => (h.id === id ? recalc({ ...h, ...patch }) : h))
           // update longestStreak if any habit's streak exceeds stored longest
           const maxStreak = Math.max(s.longestStreak, ...updated.map((h) => h.streak))
-          return { habits: updated, longestStreak: maxStreak }
+          const sumPoints = updated.reduce((acc, h) => acc + (h.points || 0), 0)
+          return { habits: updated, longestStreak: maxStreak, totalPoints: sumPoints }
         }),
       
-      // deleting a habit should not decrease cumulative stats like totalPoints or longestStreak
-      deleteHabit: (id) => set((s) => ({ habits: s.habits.filter((h) => h.id !== id) })),
+      // deleting a habit updates derived totals
+      deleteHabit: (id) => set((s) => {
+        const remaining = s.habits.filter((h) => h.id !== id)
+        const sumPoints = remaining.reduce((acc, h) => acc + (h.points || 0), 0)
+        // longestStreak remains cumulative max historically achieved
+        return { habits: remaining, totalPoints: sumPoints }
+      }),
       toggleCompletion: (id, date) =>
         set((s) => {
           const day = new Date(date)
-          let totalIncrement = 0
           const updated = s.habits.map((h) => {
             if (h.id !== id) return h
             // Toggle completion for both build and break habits: for break mode a completion = successful clean day
@@ -90,25 +97,31 @@ export const useHabitStore = create<HabitState>()(
               completions.push(iso(day))
             }
 
-            const prevPoints = h.points || 0
             const newHabit = recalc({ ...h, completions })
-            const delta = newHabit.points - prevPoints
-            // totalPoints is cumulative and only increases; do not decrement on undo/deletes
-            if (delta > 0) totalIncrement += delta
             return newHabit
           })
 
           // compute new longest streak if any updated habit exceeded it
           const newLongest = Math.max(s.longestStreak, ...updated.map((h) => h.streak))
 
-          return { habits: updated, totalPoints: s.totalPoints + totalIncrement, longestStreak: newLongest }
+          const sumPoints = updated.reduce((acc, h) => acc + (h.points || 0), 0)
+          return { habits: updated, totalPoints: sumPoints, longestStreak: newLongest }
         }),
       clearAll: () => set({ habits: [] }),
     }),
     {
       name: 'ritus-habits',
       storage: createJSONStorage(() => localStorage),
-      version: 1,
+      version: 2,
+      migrate: (persisted: any, prevVersion: number) => {
+        // Normalize from previous versions: recompute totalPoints from habits
+        if (prevVersion < 2 && persisted && typeof persisted === 'object') {
+          const habits: Habit[] = Array.isArray(persisted.habits) ? persisted.habits : []
+          const sumPoints = habits.reduce((acc, h) => acc + (h.points || 0), 0)
+          return { ...persisted, totalPoints: sumPoints }
+        }
+        return persisted as any
+      },
       partialize: (state) => ({
         habits: state.habits,
         username: state.username,

@@ -65,8 +65,8 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
     const mergedHabits = [...cur.habits, ...normalized]
 
     const newUsername = incomingUsername ?? cur.username
-    // stats: keep max values
-    const newTotal = Math.max(cur.totalPoints || 0, incomingTotal || 0)
+    // stats: recompute totalPoints from merged habits; keep max for longestStreak
+    const newTotal = mergedHabits.reduce((acc, h) => acc + (h.points || 0), 0)
     const newLongest = Math.max(cur.longestStreak || 0, incomingLongest || 0)
 
     // apply to store/persisted state
