@@ -84,8 +84,7 @@ export default function App() {
     <div className="mx-auto max-w-3xl px-4 py-8">
       <header className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Ritus · Habit Tracker</h1>
-          <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">Minimal, fast, and local-first.</p>
+          <h1 className="text-2xl font-semibold tracking-tight">Ritus</h1>
         </div>
         <div>
           <button onClick={() => setSettingsOpen(true)} className="rounded-lg border dark:border-neutral-700 px-3 py-2 text-sm" aria-label="Open settings">
