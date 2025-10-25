@@ -6,7 +6,12 @@ export default {
     "./src/**/*.{ts,tsx,js,jsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        // Override the default sans stack to use the locally-hosted IBM Plex Sans
+        sans: ['"IBM Plex Sans"', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'Noto Sans', 'sans-serif'],
+      },
+    },
   },
   plugins: [],
 }
