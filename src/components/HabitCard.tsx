@@ -164,9 +164,7 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
         </div>
       </div>
 
-      <p className="mt-3 text-xs text-neutral-500 dark:text-neutral-400">
-        +{POINTS_PER_COMPLETION} pts per completion. Milestone bonus: {MILESTONE_BONUS} pts every {habit.frequency === 'daily' ? DAILY_MILESTONE + '-day' : WEEKLY_MILESTONE + '-week'} streak.
-      </p>
+      {/* Points text moved to the quick guide modal per UX request */}
       <ConfirmModal
         open={confirmDeleteOpen}
         onClose={() => setConfirmDeleteOpen(false)}

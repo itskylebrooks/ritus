@@ -21,7 +21,7 @@ const STEPS: GuideStep[] = [
   },
   {
     title: 'Streaks & points',
-    body: 'Ritus awards points per completion and tracks streaks. Weekly streaks count when you reach your chosen days/week target.'
+    body: 'Ritus awards points per completion and tracks streaks. Weekly streaks count when you reach your chosen days/week target. +5 pts per completion. Milestone bonus: 10 pts every 4-week streak.'
   },
   {
     title: 'Edit & manage',
