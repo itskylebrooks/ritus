@@ -6,6 +6,34 @@
     <link rel="icon" type="image/png" href="/icon.png" />
     <link rel="apple-touch-icon" href="/icon.png" />
     <title>Ritus · Habit Tracker</title>
+    <script>
+      // Minimal system dark/light mode detection.
+      // Runs early to reduce flash of wrong theme on first paint.
+      (function () {
+        try {
+          var mq = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+          if (mq && mq.matches) {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+          // Keep in sync if user changes system preference while the page is open
+          if (mq && mq.addEventListener) {
+            mq.addEventListener('change', function (e) {
+              if (e.matches) document.documentElement.classList.add('dark');
+              else document.documentElement.classList.remove('dark');
+            });
+          } else if (mq && mq.addListener) {
+            mq.addListener(function (e) {
+              if (e.matches) document.documentElement.classList.add('dark');
+              else document.documentElement.classList.remove('dark');
+            });
+          }
+        } catch (err) {
+          // noop on older browsers
+        }
+      })();
+    </script>
   </head>
   <body class="preload bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
     <div id="root"></div>
