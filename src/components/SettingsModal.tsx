@@ -223,7 +223,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
                   <button
                     type="button"
                     onClick={() => setDateFormat('MDY')}
-                    className={"relative rounded-lg px-3 py-2 border dark:border-neutral-700 text-sm " + (dateFormat === 'MDY' ? 'bg-black text-white dark:bg-white dark:text-black' : 'text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-900')}
+                    className={"relative rounded-lg w-20 px-3 py-2 border dark:border-neutral-700 text-sm text-center " + (dateFormat === 'MDY' ? 'bg-black text-white dark:bg-white dark:text-black' : 'text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-900')}
                     aria-pressed={dateFormat === 'MDY'}
                     title="Month/Day/Year"
                   >
@@ -232,7 +232,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
                   <button
                     type="button"
                     onClick={() => setDateFormat('DMY')}
-                    className={"relative rounded-lg px-3 py-2 border dark:border-neutral-700 text-sm " + (dateFormat === 'DMY' ? 'bg-black text-white dark:bg-white dark:text-black' : 'text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-900')}
+                    className={"relative rounded-lg w-20 px-3 py-2 border dark:border-neutral-700 text-sm text-center " + (dateFormat === 'DMY' ? 'bg-black text-white dark:bg-white dark:text-black' : 'text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-900')}
                     aria-pressed={dateFormat === 'DMY'}
                     title="Day/Month/Year"
                   >
@@ -244,7 +244,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
                   <button
                     type="button"
                     onClick={() => setWeekStart('sunday')}
-                    className={"relative rounded-lg px-3 py-2 border dark:border-neutral-700 text-sm " + (weekStart === 'sunday' ? 'bg-black text-white dark:bg-white dark:text-black' : 'text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-900')}
+                    className={"relative rounded-lg w-20 px-3 py-2 border dark:border-neutral-700 text-sm text-center " + (weekStart === 'sunday' ? 'bg-black text-white dark:bg-white dark:text-black' : 'text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-900')}
                     aria-pressed={weekStart === 'sunday'}
                     title="Week starts on Sunday"
                   >
@@ -253,7 +253,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
                   <button
                     type="button"
                     onClick={() => setWeekStart('monday')}
-                    className={"relative rounded-lg px-3 py-2 border dark:border-neutral-700 text-sm " + (weekStart === 'monday' ? 'bg-black text-white dark:bg-white dark:text-black' : 'text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-900')}
+                    className={"relative rounded-lg w-20 px-3 py-2 border dark:border-neutral-700 text-sm text-center " + (weekStart === 'monday' ? 'bg-black text-white dark:bg-white dark:text-black' : 'text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-900')}
                     aria-pressed={weekStart === 'monday'}
                     title="Week starts on Monday"
                   >
