@@ -63,8 +63,8 @@ export default function ConfirmModal({
       className={`fixed inset-0 z-[80] flex items-center justify-center p-5 transition-colors duration-200 ${closing || entering ? 'bg-black/0' : 'bg-black/60 backdrop-blur-sm'}`}
       onClick={() => { if (!closing) onClose() }}
     >
-      <div
-  className={`w-full max-w-sm rounded-2xl ring-1 ring-black/5 dark:ring-neutral-700/5 p-5 relative transition-all duration-200 ${closing || entering ? 'opacity-0 scale-[0.95] translate-y-1' : 'opacity-100 scale-100 translate-y-0'} bg-white dark:bg-neutral-950`}
+    <div
+  className={`w-full max-w-sm rounded-2xl ring-1 ring-black/5 dark:ring-neutral-700/5 border border-neutral-200 dark:border-neutral-700 p-5 relative transition-all duration-200 ${closing || entering ? 'opacity-0 scale-[0.95] translate-y-1' : 'opacity-100 scale-100 translate-y-0'} bg-white dark:bg-neutral-950`}
         onClick={(e) => { e.stopPropagation() }}
         role="dialog"
         aria-modal="true"
