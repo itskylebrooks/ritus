@@ -50,7 +50,7 @@ export const useHabitStore = create<HabitState>()(
       longestStreak: 0,
       resetStats: () => set({ totalPoints: 0, longestStreak: 0 }),
   // safe id generation: crypto.randomUUID may not exist on some older mobile browsers
-  addHabit: (name, frequency, weeklyTarget = 1, mode: 'build' | 'break' = 'build') =>
+      addHabit: (name, frequency, weeklyTarget = 1, mode: 'build' | 'break' = 'build') =>
         set((s) => {
           const genId = () => {
             try {
@@ -77,52 +77,61 @@ export const useHabitStore = create<HabitState>()(
           }
           const newHabit = recalc(habit)
           const newHabits = [newHabit, ...s.habits]
-          // update longest streak to the max observed
+          // update longest streak to the max observed (preserve historical max)
           const newLongest = Math.max(s.longestStreak, newHabit.streak)
-          const sumPoints = newHabits.reduce((acc, h) => acc + (h.points || 0), 0)
-          return { habits: newHabits, longestStreak: newLongest, totalPoints: sumPoints }
+          // totalPoints is cumulative lifetime points and should not be recomputed from current habits
+          return { habits: newHabits, longestStreak: newLongest }
         }),
       editHabit: (id, patch) =>
         set((s) => {
           const updated = s.habits.map((h) => (h.id === id ? recalc({ ...h, ...patch }) : h))
-          // update longestStreak if any habit's streak exceeds stored longest
+          // update longestStreak if any habit's streak exceeds stored longest (preserve historical max)
           const maxStreak = Math.max(s.longestStreak, ...updated.map((h) => h.streak))
-          const sumPoints = updated.reduce((acc, h) => acc + (h.points || 0), 0)
-          return { habits: updated, longestStreak: maxStreak, totalPoints: sumPoints }
+          // Do not recompute/overwrite cumulative totalPoints when editing habit metadata
+          return { habits: updated, longestStreak: maxStreak }
         }),
       
-      // deleting a habit updates derived totals
+      // deleting a habit should NOT reduce cumulative stats (totalPoints/longestStreak)
       deleteHabit: (id) => set((s) => {
         const remaining = s.habits.filter((h) => h.id !== id)
-        const sumPoints = remaining.reduce((acc, h) => acc + (h.points || 0), 0)
-        // longestStreak remains cumulative max historically achieved
-        return { habits: remaining, totalPoints: sumPoints }
+        // preserve totalPoints and longestStreak as they are lifetime aggregates
+        return { habits: remaining }
       }),
       toggleCompletion: (id, date) =>
         set((s) => {
           const day = new Date(date)
+          let pointsDelta = 0
           const updated = s.habits.map((h) => {
             if (h.id !== id) return h
             // Toggle completion for both build and break habits: for break mode a completion = successful clean day
 
             // Toggle by exact day (same behavior for daily/weekly; weekly allows multiple days per week)
             let completions = [...h.completions]
-            if (completions.some((c) => isSameDay(fromISO(c), day))) {
+            const isAlready = completions.some((c) => isSameDay(fromISO(c), day))
+            if (isAlready) {
+              // user removed a completion — do not deduct from lifetime totalPoints
               completions = completions.filter((c) => !isSameDay(fromISO(c), day))
             } else {
               completions.push(iso(day))
             }
 
             const newHabit = recalc({ ...h, completions })
+            // if points increased due to this toggle, add the positive delta to cumulative totalPoints
+            const oldPts = h.points || 0
+            const newPts = newHabit.points || 0
+            const delta = newPts - oldPts
+            if (delta > 0) pointsDelta += delta
             return newHabit
           })
 
-          // compute new longest streak if any updated habit exceeded it
+          // compute new longest streak if any updated habit exceeded historical max
           const newLongest = Math.max(s.longestStreak, ...updated.map((h) => h.streak))
 
-          const sumPoints = updated.reduce((acc, h) => acc + (h.points || 0), 0)
-          return { habits: updated, totalPoints: sumPoints, longestStreak: newLongest }
+          // update cumulative totalPoints only by positive deltas (prevent reductions)
+          const newTotal = s.totalPoints + pointsDelta
+          return { habits: updated, totalPoints: newTotal, longestStreak: newLongest }
         }),
+      // clearing current habits should not reset cumulative stats (there's a separate resetStats)
       clearAll: () => set({ habits: [] }),
     }),
     {
