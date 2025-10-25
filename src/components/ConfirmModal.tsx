@@ -64,7 +64,7 @@ export default function ConfirmModal({
       onClick={() => { if (!closing) onClose() }}
     >
       <div
-        className={`w-full max-w-sm rounded-2xl ring-1 ring-black/5 dark:ring-white/5 p-5 relative transition-all duration-200 ${closing || entering ? 'opacity-0 scale-[0.95] translate-y-1' : 'opacity-100 scale-100 translate-y-0'} bg-white dark:bg-neutral-950`}
+  className={`w-full max-w-sm rounded-2xl ring-1 ring-black/5 dark:ring-neutral-700/5 p-5 relative transition-all duration-200 ${closing || entering ? 'opacity-0 scale-[0.95] translate-y-1' : 'opacity-100 scale-100 translate-y-0'} bg-white dark:bg-neutral-950`}
         onClick={(e) => { e.stopPropagation() }}
         role="dialog"
         aria-modal="true"
@@ -77,7 +77,7 @@ export default function ConfirmModal({
 
         <div className="mt-5 flex items-center justify-end gap-2">
           <button
-            className="rounded-md border px-3 py-2 text-sm font-medium bg-white hover:bg-neutral-50 dark:bg-neutral-950 dark:hover:bg-neutral-900"
+            className="rounded-md border dark:border-neutral-700 px-3 py-2 text-sm font-medium bg-white hover:bg-neutral-50 dark:bg-neutral-950 dark:hover:bg-neutral-900"
             onClick={() => { if (!closing) onClose() }}
           >
             {cancelLabel}

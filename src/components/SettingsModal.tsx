@@ -141,7 +141,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
   return (
     <div className={"fixed inset-0 z-50 flex items-stretch sm:items-center justify-center settings-overlay backdrop-blur-sm " + (closing? 'closing':'')} onClick={beginClose}>
   <div
-        className={"w-full h-full sm:h-auto max-w-none sm:max-w-sm rounded-none sm:rounded-2xl bg-white dark:bg-neutral-950 p-6 pt-7 pb-8 ring-1 ring-black/5 dark:ring-white/5 overflow-y-auto settings-panel " + (closing? 'closing':'')}
+  className={"w-full h-full sm:h-auto max-w-none sm:max-w-sm rounded-none sm:rounded-2xl bg-white dark:bg-neutral-950 p-6 pt-7 pb-8 ring-1 ring-black/5 dark:ring-neutral-700/5 overflow-y-auto settings-panel " + (closing? 'closing':'')}
         style={{ WebkitOverflowScrolling: 'touch', paddingBottom: 'max(env(safe-area-inset-bottom), 32px)' }}
         onClick={(e)=>e.stopPropagation()}
         role="dialog"
@@ -152,7 +152,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
           <div className="relative h-12 flex items-center justify-center">
             {onShowGuide && (
               <div className="absolute left-0 top-1/2 -translate-y-1/2" style={{ width:48, height:48 }}>
-                <button type="button" aria-label="Open guide" onClick={handleShowGuide} className="w-12 h-12 flex items-center justify-center rounded-full bg-gray-100/40 dark:bg-neutral-800/30 border border-neutral-200 dark:border-white text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-100 hover:bg-gray-100/60 dark:hover:bg-neutral-800/40 transition">
+                <button type="button" aria-label="Open guide" onClick={handleShowGuide} className="w-12 h-12 flex items-center justify-center rounded-full bg-gray-100/40 dark:bg-neutral-800/30 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-100 hover:bg-gray-100/60 dark:hover:bg-neutral-800/40 transition">
                   <span className="text-xl font-semibold">?</span>
                 </button>
                 <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 translate-y-full text-[10px] text-black/40 font-medium whitespace-nowrap pointer-events-none select-none">App guide</div>
@@ -161,7 +161,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
             <span id="settings-title" className="text-lg font-semibold tracking-wide text-neutral-900 dark:text-neutral-100">Settings</span>
             <div className="absolute right-0 top-1/2 -translate-y-1/2" title="Your avatar">
               <div className="relative" style={{ width:48, height:48 }}>
-                <div className="w-full h-full rounded-full border border-neutral-200 dark:border-white shadow-inner overflow-hidden bg-black">
+                <div className="w-full h-full rounded-full border border-neutral-200 dark:border-neutral-700 shadow-inner overflow-hidden bg-black">
                   <div className="flex items-center justify-center w-full h-full text-[24px] select-none text-white">{topEmoji}</div>
                 </div>
               </div>
@@ -171,7 +171,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
 
         <div className="space-y-4">
           {/* Theme */}
-          <div className="p-4 rounded-2xl border shadow-sm text-sm">
+          <div className="p-4 rounded-2xl border dark:border-neutral-700 shadow-sm text-sm">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <div className="text-sm font-semibold mb-0.5">Theme</div>
@@ -181,16 +181,13 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
                 <button
                   type="button"
                   onClick={() => applyTheme('system')}
-                  className={"relative grid h-10 w-10 place-items-center rounded-lg border text-black dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900 transition " + (isSystemTheme ? 'text-neutral-900 dark:text-neutral-100' : 'text-neutral-500')}
+                  className={"relative grid h-10 w-10 place-items-center rounded-lg border dark:border-neutral-700 text-black dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900 transition " + (isSystemTheme ? 'text-neutral-900 dark:text-neutral-100' : 'text-neutral-500')}
                   aria-pressed={isSystemTheme}
                   aria-label="System"
                   title="System"
                 >
                   {isSystemTheme && (
-                    <span
-                      className="absolute inset-0 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/10 pointer-events-none"
-                      aria-hidden
-                    />
+                    <span className="absolute inset-0 rounded-lg border border-black/10 dark:border-neutral-700/10 bg-black/5 dark:bg-neutral-700/10 pointer-events-none" aria-hidden />
                   )}
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="relative z-10 h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
                 </button>
@@ -198,16 +195,13 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
                 <button
                   type="button"
                   onClick={() => applyTheme('light')}
-                  className={"relative grid h-10 w-10 place-items-center rounded-lg border text-black dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900 transition " + (!isSystemTheme && mode === 'light' ? 'text-neutral-900 dark:text-neutral-100' : 'text-neutral-500')}
+                  className={"relative grid h-10 w-10 place-items-center rounded-lg border dark:border-neutral-700 text-black dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900 transition " + (!isSystemTheme && mode === 'light' ? 'text-neutral-900 dark:text-neutral-100' : 'text-neutral-500')}
                   aria-pressed={!isSystemTheme && mode === 'light'}
                   aria-label="Light"
                   title="Light"
                 >
                   {!isSystemTheme && mode === 'light' && (
-                    <span
-                      className="absolute inset-0 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/10 pointer-events-none"
-                      aria-hidden
-                    />
+                    <span className="absolute inset-0 rounded-lg border border-black/10 dark:border-neutral-700/10 bg-black/5 dark:bg-neutral-700/10 pointer-events-none" aria-hidden />
                   )}
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="relative z-10 h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M20 12h2M2 12H0"/><path d="m17 17 1.5 1.5M5.5 5.5 7 7"/><path d="m17 7 1.5-1.5M5.5 18.5 7 17"/></svg>
                 </button>
@@ -215,16 +209,13 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
                 <button
                   type="button"
                   onClick={() => applyTheme('dark')}
-                  className={"relative grid h-10 w-10 place-items-center rounded-lg border text-black dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900 transition " + (!isSystemTheme && mode === 'dark' ? 'text-neutral-900 dark:text-neutral-100' : 'text-neutral-500')}
+                  className={"relative grid h-10 w-10 place-items-center rounded-lg border dark:border-neutral-700 text-black dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900 transition " + (!isSystemTheme && mode === 'dark' ? 'text-neutral-900 dark:text-neutral-100' : 'text-neutral-500')}
                   aria-pressed={!isSystemTheme && mode === 'dark'}
                   aria-label="Dark"
                   title="Dark"
                 >
                   {!isSystemTheme && mode === 'dark' && (
-                    <span
-                      className="absolute inset-0 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/10 pointer-events-none"
-                      aria-hidden
-                    />
+                    <span className="absolute inset-0 rounded-lg border border-black/10 dark:border-neutral-700/10 bg-black/5 dark:bg-neutral-700/10 pointer-events-none" aria-hidden />
                   )}
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="relative z-10 h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                 </button>
@@ -232,7 +223,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
             </div>
           </div>
 
-          <div className="p-4 rounded-2xl border shadow-sm text-sm">
+          <div className="p-4 rounded-2xl border dark:border-neutral-700 shadow-sm text-sm">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <div className="text-sm font-semibold mb-0.5">Data</div>
@@ -245,7 +236,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
                   disabled={importing || exporting}
                   aria-label="Import from file"
                   title="Import from file"
-                  className="grid h-10 w-10 place-items-center rounded-lg border text-black dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="grid h-10 w-10 place-items-center rounded-lg border dark:border-neutral-700 text-black dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-folder-input-icon lucide-folder-input">
                     <path d="M2 9V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-1"/>
@@ -261,7 +252,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
                   disabled={exporting}
                   aria-label="Export all data"
                   title="Export all data"
-                  className="grid h-10 w-10 place-items-center rounded-lg border text-black dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="grid h-10 w-10 place-items-center rounded-lg border dark:border-neutral-700 text-black dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-folder-output-icon lucide-folder-output">
                     <path d="M2 7.5V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-1.5"/>
@@ -284,7 +275,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
           </div>
 
           {false && (
-            <div className="p-4 rounded-2xl border shadow-sm text-sm">
+            <div className="p-4 rounded-2xl border dark:border-neutral-700 shadow-sm text-sm">
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-sm font-semibold">Daily reminder</div>

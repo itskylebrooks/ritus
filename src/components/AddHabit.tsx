@@ -80,11 +80,11 @@ export default function AddHabit() {
   }, [mode, name])
 
   return (
-    <motion.form layout onSubmit={submit} className="flex flex-col gap-3 rounded-2xl border p-4 shadow-sm sm:flex-row sm:items-end">
+  <motion.form layout onSubmit={submit} className="flex flex-col gap-3 rounded-2xl border dark:border-neutral-700 p-4 shadow-sm sm:flex-row sm:items-end">
   <motion.div className="flex-1" layout="position" transition={{ layout: { type: 'spring', stiffness: 300, damping: 30 } }} style={{ minWidth: 0 }}>
         <label className="block text-sm text-neutral-600 dark:text-neutral-300">Habit name</label>
         <input
-          className="mt-1 w-full rounded-xl border bg-white px-3 py-2 outline-none ring-0 placeholder:text-neutral-400 focus:border-black/40 dark:bg-neutral-950 dark:border-neutral-800 dark:focus:border-white/50"
+          className="mt-1 w-full rounded-xl border bg-white px-3 py-2 outline-none ring-0 placeholder:text-neutral-400 focus:border-black/40 dark:bg-neutral-950 dark:border-neutral-700 dark:focus:border-neutral-700/50"
           placeholder={displayedPlaceholder}
           value={name}
           onChange={(e) => {
@@ -106,14 +106,14 @@ export default function AddHabit() {
         <label className="block text-sm text-neutral-600 dark:text-neutral-300">I want to</label>
         <div className="mt-1 flex gap-2">
           <label
-            className={"px-3 py-2 rounded-xl border cursor-pointer transform transition-all duration-150 ease-in-out " + (mode === 'build' ? 'bg-black text-white scale-100 shadow-md' : 'bg-white text-black scale-95')}
+            className={"px-3 py-2 rounded-xl border dark:border-neutral-700 cursor-pointer transform transition-all duration-150 ease-in-out " + (mode === 'build' ? 'bg-black text-white scale-100 shadow-md' : 'bg-white text-black scale-95')}
           >
             <input className="sr-only" type="radio" name="mode" checked={mode === 'build'} onChange={() => setMode('build')} />
             Build
           </label>
 
           <label
-            className={"px-3 py-2 rounded-xl border cursor-pointer transform transition-all duration-150 ease-in-out " + (mode === 'break' ? 'bg-black text-white scale-100 shadow-md' : 'bg-white text-black scale-95')}
+            className={"px-3 py-2 rounded-xl border dark:border-neutral-700 cursor-pointer transform transition-all duration-150 ease-in-out " + (mode === 'break' ? 'bg-black text-white scale-100 shadow-md' : 'bg-white text-black scale-95')}
           >
             <input className="sr-only" type="radio" name="mode" checked={mode === 'break'} onChange={() => setMode('break')} />
             Break
@@ -124,7 +124,7 @@ export default function AddHabit() {
   <motion.div layout transition={{ layout: { type: 'spring', stiffness: 300, damping: 30 } }} style={{ minWidth: 0 }}>
         <label className="block text-sm text-neutral-600 dark:text-neutral-300">Frequency</label>
         <select
-          className="mt-1 w-full rounded-xl border bg-white px-3 py-2 dark:bg-neutral-950 dark:border-neutral-800"
+          className="mt-1 w-full rounded-xl border bg-white px-3 py-2 dark:bg-neutral-950 dark:border-neutral-700"
           value={frequency}
           onChange={(e) => setFrequency(e.target.value as Frequency)}
         >
@@ -145,7 +145,7 @@ export default function AddHabit() {
           >
             <label className="block text-sm text-neutral-600 dark:text-neutral-300">Days / week</label>
             <select
-              className="mt-1 w-full rounded-xl border bg-white px-3 py-2 dark:bg-neutral-950 dark:border-neutral-800"
+              className="mt-1 w-full rounded-xl border bg-white px-3 py-2 dark:bg-neutral-950 dark:border-neutral-700"
               value={weeklyTarget}
               onChange={(e) => setWeeklyTarget(Number(e.target.value))}
             >
