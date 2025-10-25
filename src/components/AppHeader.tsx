@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
 import { CircleHelp, PlusCircle, MinusCircle, ChartPie, Trophy, Home, Menu, ChevronDown, Settings as SettingsIcon } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useMotionPreferences, defaultEase } from '../ui/motion'
 import { useHabitStore } from '../store/store'
 import SettingsModal from './SettingsModal'
 import GuideModal from './GuideModal'
@@ -26,6 +28,32 @@ export default function AppHeader() {
   const moreButtonRef = useRef<HTMLButtonElement | null>(null)
   const menuRef = useRef<HTMLDivElement | null>(null)
   const menuButtonRef = useRef<HTMLButtonElement | null>(null)
+  const { overlayMotion, prefersReducedMotion } = useMotionPreferences()
+
+  // Motion variants used for mobile menu and desktop "more" dropdown
+  const mobileMenuVariants = {
+    initial: prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.98 },
+    animate: prefersReducedMotion
+      ? { opacity: 1, transition: { duration: 0.06 } }
+      : { opacity: 1, y: 0, scale: 1, transition: overlayMotion.panelTransition },
+    exit: prefersReducedMotion
+      ? { opacity: 0, transition: { duration: 0.06 } }
+      : { opacity: 0, y: -8, scale: 0.98, transition: { duration: 0.28, ease: defaultEase } },
+  } as const
+
+  // Slightly different animation for small width desktop dropdowns:
+  const desktopDropdownVariants = {
+    initial: { opacity: 0, y: 6, scale: 0.98 },
+    animate: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.18, ease: defaultEase } },
+    exit: { opacity: 0, y: -6, scale: 0.98, transition: { duration: 0.16, ease: defaultEase } },
+  } as const
+
+  // Submenu variants used for the nested "More" on mobile (height animation)
+  const submenuVariants = {
+    initial: { opacity: 0, y: -4, height: 0 },
+    animate: { opacity: 1, y: 0, height: 'auto', transition: { duration: 0.22, ease: defaultEase } },
+    exit: { opacity: 0, y: -4, height: 0, transition: { duration: 0.18, ease: defaultEase } },
+  } as const
 
   // Close desktop More on outside click / Esc
   useEffect(() => {
@@ -122,9 +150,17 @@ export default function AppHeader() {
               <ChevronDown className="w-4 h-4" />
             </button>
 
-            {moreDesktopOpen && (
-              <div ref={moreRef} className="absolute right-0 top-full mt-2 w-44 rounded-lg border border-neutral-300 bg-black text-white shadow-lg z-30">
-                <ul className="p-2">
+            <AnimatePresence>
+              {moreDesktopOpen && (
+                <motion.div
+                  ref={moreRef as any}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  variants={desktopDropdownVariants as any}
+                  className="absolute right-0 top-full mt-2 w-44 rounded-lg border border-neutral-300 bg-black text-white shadow-lg z-30"
+                >
+                  <ul className="p-2">
                   <li>
                     <button
                       type="button"
@@ -152,9 +188,10 @@ export default function AppHeader() {
                       <span className="flex items-center gap-2"><SettingsIcon className="w-4 h-4" />Settings</span>
                     </button>
                   </li>
-                </ul>
-              </div>
-            )}
+                  </ul>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
 
@@ -173,21 +210,29 @@ export default function AppHeader() {
             </button>
           </div>
 
-          {menuOpen && (
-            <div ref={menuRef} className="absolute right-0 mt-2 w-56 rounded-lg border border-neutral-300 bg-black text-white shadow-lg z-30">
-              <ul className="p-2">
+          <AnimatePresence>
+            {menuOpen && (
+              <motion.div
+                ref={menuRef as any}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                variants={mobileMenuVariants as any}
+                className="absolute right-0 mt-2 w-56 rounded-lg border border-neutral-300 bg-black text-white shadow-lg z-30"
+              >
+                <ul className="p-2">
                 <li>
-                  <NavLink to="/" onClick={() => setMenuOpen(false)} className={({ isActive }: { isActive: boolean }) => `block rounded-md px-3 py-2 text-sm ${isActive ? 'bg-neutral-800' : ''}`} end>
+                  <NavLink to="/" onClick={() => setMenuOpen(false)} className={({ isActive }: { isActive: boolean }) => `block rounded-md px-3 py-2 text-base ${isActive ? 'bg-neutral-800' : ''}`} end>
                     <Home className="inline-block w-4 h-4 mr-2" />Home
                   </NavLink>
                 </li>
                 <li>
-                  <NavLink to="/insight" onClick={() => setMenuOpen(false)} className={({ isActive }: { isActive: boolean }) => `block rounded-md px-3 py-2 text-sm ${isActive ? 'bg-neutral-800' : ''}`}>
+                  <NavLink to="/insight" onClick={() => setMenuOpen(false)} className={({ isActive }: { isActive: boolean }) => `block rounded-md px-3 py-2 text-base ${isActive ? 'bg-neutral-800' : ''}`}>
                     <ChartPie className="inline-block w-4 h-4 mr-2" />Insight
                   </NavLink>
                 </li>
                 <li>
-                  <NavLink to="/milestones" onClick={() => setMenuOpen(false)} className={({ isActive }: { isActive: boolean }) => `block rounded-md px-3 py-2 text-sm ${isActive ? 'bg-neutral-800' : ''}`}>
+                  <NavLink to="/milestones" onClick={() => setMenuOpen(false)} className={({ isActive }: { isActive: boolean }) => `block rounded-md px-3 py-2 text-base ${isActive ? 'bg-neutral-800' : ''}`}>
                     <Trophy className="inline-block w-4 h-4 mr-2" />Milestones
                   </NavLink>
                 </li>
@@ -204,8 +249,16 @@ export default function AppHeader() {
                     <ChevronDown className={`w-4 h-4 ${moreMobileOpen ? 'rotate-180' : ''}`} />
                   </button>
 
-                  {moreMobileOpen && (
-                    <ul className="mt-1 pl-2">
+                  <AnimatePresence initial={false}>
+                    {moreMobileOpen && (
+                      <motion.ul
+                        id="mobile-more-submenu"
+                        initial="initial"
+                        animate="animate"
+                        exit="exit"
+                        variants={submenuVariants as any}
+                        className="mt-1 pl-2 overflow-hidden"
+                      >
                       <li>
                         <button
                           type="button"
@@ -233,12 +286,14 @@ export default function AppHeader() {
                           <span className="flex items-center gap-2"><SettingsIcon className="w-4 h-4" />Settings</span>
                         </button>
                       </li>
-                    </ul>
-                  )}
+                      </motion.ul>
+                    )}
+                  </AnimatePresence>
                 </li>
               </ul>
-            </div>
-          )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 
