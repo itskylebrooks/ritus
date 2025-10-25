@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { useHabitStore } from '../store/store'
+import useThemeStore from '../store/theme'
 import { exportAllData, importAllData } from '../utils/dataTransfer'
 import ConfirmModal from './ConfirmModal'
 import pkg from '../../package.json'
@@ -23,9 +24,10 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
 
   const [reminders, setReminders] = useState(()=> storeReminders || { dailyEnabled: false, dailyTime: '21:00' })
 
-  // Theme switcher
-  const [theme, setTheme] = useState<ThemeMode>('system')
-  const isSystemTheme = theme === 'system'
+  // Theme switcher (centralized)
+  const mode = useThemeStore((s) => s.mode)
+  const setMode = useThemeStore((s) => s.setMode)
+  const isSystemTheme = mode === 'system'
   
   const [exporting, setExporting] = useState(false)
   const [importing, setImporting] = useState(false)
@@ -67,25 +69,12 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
   useEffect(()=>{
     if (open) {
       setReminders(storeReminders || { dailyEnabled: false, dailyTime: '21:00' })
-      try {
-        const stored = (localStorage.getItem('ritus-theme') as ThemeMode | null) || 'system'
-        setTheme(stored)
-      } catch {}
     }
   }, [open])
 
+  // useThemeStore.setMode handles persistence, syncing and applying class
   function applyTheme(next: ThemeMode) {
-    try {
-      localStorage.setItem('ritus-theme', next)
-      setTheme(next)
-      const mq = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)')
-      if (next === 'dark') document.documentElement.classList.add('dark')
-      else if (next === 'light') document.documentElement.classList.remove('dark')
-      else {
-        if (mq && mq.matches) document.documentElement.classList.add('dark')
-        else document.documentElement.classList.remove('dark')
-      }
-    } catch {}
+    try { setMode(next) } catch {}
   }
 
   async function handleExport() {
@@ -209,12 +198,12 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
                 <button
                   type="button"
                   onClick={() => applyTheme('light')}
-                  className={"relative grid h-10 w-10 place-items-center rounded-lg border text-black dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900 transition " + (!isSystemTheme && theme === 'light' ? 'text-neutral-900 dark:text-neutral-100' : 'text-neutral-500')}
-                  aria-pressed={!isSystemTheme && theme === 'light'}
+                  className={"relative grid h-10 w-10 place-items-center rounded-lg border text-black dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900 transition " + (!isSystemTheme && mode === 'light' ? 'text-neutral-900 dark:text-neutral-100' : 'text-neutral-500')}
+                  aria-pressed={!isSystemTheme && mode === 'light'}
                   aria-label="Light"
                   title="Light"
                 >
-                  {!isSystemTheme && theme === 'light' && (
+                  {!isSystemTheme && mode === 'light' && (
                     <span
                       className="absolute inset-0 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/10 pointer-events-none"
                       aria-hidden
@@ -226,12 +215,12 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
                 <button
                   type="button"
                   onClick={() => applyTheme('dark')}
-                  className={"relative grid h-10 w-10 place-items-center rounded-lg border text-black dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900 transition " + (!isSystemTheme && theme === 'dark' ? 'text-neutral-900 dark:text-neutral-100' : 'text-neutral-500')}
-                  aria-pressed={!isSystemTheme && theme === 'dark'}
+                  className={"relative grid h-10 w-10 place-items-center rounded-lg border text-black dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900 transition " + (!isSystemTheme && mode === 'dark' ? 'text-neutral-900 dark:text-neutral-100' : 'text-neutral-500')}
+                  aria-pressed={!isSystemTheme && mode === 'dark'}
                   aria-label="Dark"
                   title="Dark"
                 >
-                  {!isSystemTheme && theme === 'dark' && (
+                  {!isSystemTheme && mode === 'dark' && (
                     <span
                       className="absolute inset-0 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/10 pointer-events-none"
                       aria-hidden
