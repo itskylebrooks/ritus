@@ -87,7 +87,7 @@ export default function Home() {
   }, [habits, showArchived])
 
   return (
-    <div className="mx-auto max-w-3xl px-4">
+    <div>
       <HeaderStats />
 
       <div className="mt-4 grid gap-4">
