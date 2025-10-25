@@ -2,10 +2,10 @@ import { Habit } from '../types'
 import { addDays, fromISO, isSameCalendarWeek, isSameDay, startOfWeek, getWeekStartsOn } from './date'
 import { daysThisWeek } from './date'
 
-export const POINTS_PER_COMPLETION = 10
+export const POINTS_PER_COMPLETION = 5
 export const DAILY_MILESTONE = 7   // 7-day streak bonus
 export const WEEKLY_MILESTONE = 4  // 4-week streak bonus
-export const MILESTONE_BONUS = 50
+export const MILESTONE_BONUS = 10
 
 export function hasCompletionOnDay(completions: string[], day: Date) {
   return completions.some((c) => isSameDay(fromISO(c), day))
