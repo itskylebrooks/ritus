@@ -39,8 +39,11 @@ export default function ClockCard() {
                   const y1 = 50 - Math.cos(angle) * inner;
                   const x2 = 50 + Math.sin(angle) * outer;
                   const y2 = 50 - Math.cos(angle) * outer;
-                  const stroke = isHour ? '#94a3b8' : '#cbd5e1';
                   const width = isHour ? 1.6 : 0.8;
+                  // Slightly brighter dark grey in light mode; keep sensible dark-mode values
+                  const tickClass = isHour
+                    ? 'text-neutral-700 dark:text-neutral-400'
+                    : 'text-neutral-600 dark:text-neutral-600'
                   return (
                     <line
                       key={i}
@@ -48,9 +51,9 @@ export default function ClockCard() {
                       y1={y1}
                       x2={x2}
                       y2={y2}
-                      stroke={stroke}
+                      stroke="currentColor"
                       strokeWidth={width}
-                      className={isHour ? 'dark:stroke-neutral-400' : 'dark:stroke-neutral-600'}
+                      className={tickClass}
                     />
                   );
                 })}
