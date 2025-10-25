@@ -12,6 +12,15 @@ import { useMemo, useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { CircleHelp, PlusCircle, MinusCircle } from 'lucide-react'
 
+function DateDisplay() {
+  const dateFormat = useHabitStore((s) => s.dateFormat)
+  const now = new Date()
+  const mm = String(now.getMonth() + 1).padStart(2, '0')
+  const dd = String(now.getDate()).padStart(2, '0')
+  const yyyy = String(now.getFullYear())
+  return <span>{dateFormat === 'MDY' ? `${mm}/${dd}/${yyyy}` : `${dd}/${mm}/${yyyy}`}</span>
+}
+
 function EmptyState({ disableAnim = false }: { disableAnim?: boolean }) {
   return (
     <motion.div
@@ -87,8 +96,12 @@ export default function App() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
       <header className="mb-6 flex items-center justify-between">
-        <div>
+        <div className="flex items-baseline gap-4">
           <h1 className="text-2xl font-semibold tracking-tight">Ritus</h1>
+          <div className="text-sm text-neutral-600 dark:text-neutral-400" aria-hidden>
+            {/* date shown at right of title; format controlled by settings */}
+            <DateDisplay />
+          </div>
         </div>
         <div>
           <div className="flex items-center gap-2">

@@ -1,5 +1,5 @@
 import { Habit } from '../types'
-import { addDays, fromISO, isSameCalendarWeek, isSameDay, startOfWeek, WSO } from './date'
+import { addDays, fromISO, isSameCalendarWeek, isSameDay, startOfWeek, getWeekStartsOn } from './date'
 import { daysThisWeek } from './date'
 
 export const POINTS_PER_COMPLETION = 10
@@ -16,7 +16,7 @@ export function hasCompletionInWeek(completions: string[], dayInWeek: Date) {
 }
 
 export function countCompletionsInWeek(completions: string[], ref: Date = new Date()): number {
-  const week = daysThisWeek(ref)
+  const week = daysThisWeek(ref, getWeekStartsOn())
   return week.filter((d) => hasCompletionOnDay(completions, d)).length
 }
 
@@ -100,7 +100,7 @@ export function calcPoints(h: Habit): number {
       let lastWeek: Date | null = null
       for (const d of dates) {
         // find week of this date
-        const wk = startOfWeek(d, WSO)
+        const wk = startOfWeek(d, { weekStartsOn: getWeekStartsOn() })
         if (lastWeek && isSameCalendarWeek(wk, lastWeek)) continue
         const count = h.completions.filter((c) => isSameCalendarWeek(fromISO(c), wk)).length
         if (count >= target) weeks.push(wk)

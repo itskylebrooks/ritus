@@ -8,6 +8,11 @@ export interface HabitState {
   habits: Habit[]
   username: string
   setUsername: (u: string) => void
+  // display settings
+  dateFormat: 'MDY' | 'DMY'
+  setDateFormat: (f: 'MDY' | 'DMY') => void
+  weekStart: 'sunday' | 'monday'
+  setWeekStart: (w: 'sunday' | 'monday') => void
   reminders: { dailyEnabled: boolean; dailyTime: string }
   setReminders: (r: { dailyEnabled: boolean; dailyTime: string }) => void
   totalPoints: number
@@ -24,6 +29,11 @@ export const useHabitStore = create<HabitState>()(
   persist(
     (set, get) => ({
       habits: [],
+      // display preferences
+      dateFormat: 'MDY',
+      setDateFormat: (f) => set({ dateFormat: f }),
+      weekStart: 'monday',
+      setWeekStart: (w) => set({ weekStart: w }),
       // user / preferences
       username: '',
       setUsername: (u: string) => set({ username: u }),
@@ -112,13 +122,17 @@ export const useHabitStore = create<HabitState>()(
     {
       name: 'ritus-habits',
       storage: createJSONStorage(() => localStorage),
-      version: 2,
+      version: 3,
       migrate: (persisted: any, prevVersion: number) => {
         // Normalize from previous versions: recompute totalPoints from habits
         if (prevVersion < 2 && persisted && typeof persisted === 'object') {
           const habits: Habit[] = Array.isArray(persisted.habits) ? persisted.habits : []
           const sumPoints = habits.reduce((acc, h) => acc + (h.points || 0), 0)
           return { ...persisted, totalPoints: sumPoints }
+        }
+        // For older persisted state that predates our new settings, ensure defaults are present
+        if (prevVersion < 3 && persisted && typeof persisted === 'object') {
+          return { ...persisted, dateFormat: persisted.dateFormat || 'MDY', weekStart: persisted.weekStart || 'monday' }
         }
         return persisted as any
       },
@@ -128,6 +142,8 @@ export const useHabitStore = create<HabitState>()(
         reminders: state.reminders,
         totalPoints: state.totalPoints,
         longestStreak: state.longestStreak,
+        dateFormat: state.dateFormat,
+        weekStart: state.weekStart,
       }),
     }
   )

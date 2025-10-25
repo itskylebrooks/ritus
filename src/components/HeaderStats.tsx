@@ -6,11 +6,13 @@ import ProgressBar from './ProgressBar'
 
 export default function HeaderStats() {
   const habits = useHabitStore((s) => s.habits)
+  // subscribe to weekStart so weekly totals update when user changes first day of week
+  const weekStart = useHabitStore((s) => s.weekStart)
   // use cumulative totals from the store so they persist across deletions
   const totalPoints = useHabitStore((s) => s.totalPoints)
   const longestStreak = useHabitStore((s) => s.longestStreak)
 
-  const thisWeek = daysThisWeek()
+  const thisWeek = daysThisWeek(new Date(), weekStart === 'sunday' ? 0 : 1)
   const [done, total] = habits.reduce<[number, number]>((acc, h) => {
     if (h.frequency === 'daily') {
       const hits = thisWeek.filter((d) => hasCompletionOnDay(h.completions, d)).length

@@ -21,6 +21,10 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
   const storeSetUsername = useHabitStore((s) => s.setUsername)
   const storeReminders = useHabitStore((s) => s.reminders)
   const storeSetReminders = useHabitStore((s) => s.setReminders)
+  const dateFormat = useHabitStore((s) => s.dateFormat)
+  const setDateFormat = useHabitStore((s) => s.setDateFormat)
+  const weekStart = useHabitStore((s) => s.weekStart)
+  const setWeekStart = useHabitStore((s) => s.setWeekStart)
 
   const [reminders, setReminders] = useState(()=> storeReminders || { dailyEnabled: false, dailyTime: '21:00' })
 
@@ -203,6 +207,59 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
                   )}
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="relative z-10 h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                 </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Format */}
+          <div className="p-4 rounded-2xl border dark:border-neutral-700 shadow-sm text-sm">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <div className="text-sm font-semibold mb-0.5">Format</div>
+                <div className="text-[11px] text-neutral-600 dark:text-neutral-400">Date format and first day of week.</div>
+              </div>
+              <div className="flex flex-col items-end gap-2">
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setDateFormat('MDY')}
+                    className={"relative rounded-lg px-3 py-2 border dark:border-neutral-700 text-sm " + (dateFormat === 'MDY' ? 'bg-black text-white dark:bg-white dark:text-black' : 'text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-900')}
+                    aria-pressed={dateFormat === 'MDY'}
+                    title="Month/Day/Year"
+                  >
+                    MM/DD
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDateFormat('DMY')}
+                    className={"relative rounded-lg px-3 py-2 border dark:border-neutral-700 text-sm " + (dateFormat === 'DMY' ? 'bg-black text-white dark:bg-white dark:text-black' : 'text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-900')}
+                    aria-pressed={dateFormat === 'DMY'}
+                    title="Day/Month/Year"
+                  >
+                    DD/MM
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setWeekStart('sunday')}
+                    className={"relative rounded-lg px-3 py-2 border dark:border-neutral-700 text-sm " + (weekStart === 'sunday' ? 'bg-black text-white dark:bg-white dark:text-black' : 'text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-900')}
+                    aria-pressed={weekStart === 'sunday'}
+                    title="Week starts on Sunday"
+                  >
+                    Sunday
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setWeekStart('monday')}
+                    className={"relative rounded-lg px-3 py-2 border dark:border-neutral-700 text-sm " + (weekStart === 'monday' ? 'bg-black text-white dark:bg-white dark:text-black' : 'text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-900')}
+                    aria-pressed={weekStart === 'monday'}
+                    title="Week starts on Monday"
+                  >
+                    Monday
+                  </button>
+                </div>
               </div>
             </div>
           </div>

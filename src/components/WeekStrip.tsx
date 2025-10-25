@@ -1,10 +1,13 @@
 import { format } from 'date-fns'
 import { daysThisWeek } from '../utils/date'
 import { hasCompletionOnDay } from '../utils/scoring'
+import { useHabitStore } from '../store/store'
 import type { Habit } from '../types'
 
 export default function WeekStrip({ habit, onToggle }: { habit: Habit; onToggle: (d: Date) => void }) {
-  const week = daysThisWeek()
+  // subscribe to weekStart so the component re-renders when user changes first day of week
+  const weekStart = useHabitStore((s) => s.weekStart)
+  const week = daysThisWeek(new Date(), weekStart === 'sunday' ? 0 : 1)
   const todayStart = new Date()
   todayStart.setHours(0, 0, 0, 0)
 
