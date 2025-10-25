@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, Link } from 'react-router-dom'
 import { CircleHelp, PlusCircle, MinusCircle, ChartPie, Trophy, Home, Menu, ChevronDown, Settings as SettingsIcon } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useMotionPreferences, defaultEase } from '../ui/motion'
@@ -107,7 +107,7 @@ export default function AppHeader() {
   return (
     <header className="mb-6 flex items-center justify-between">
       <div className="flex items-baseline gap-4">
-        <h1 className="text-2xl font-semibold tracking-tight">Ritus</h1>
+        <Link to="/" aria-label="Go to home" className="text-2xl font-semibold tracking-tight hover:underline hover:text-neutral-700 dark:hover:text-neutral-200 transition-colors">Ritus</Link>
         <div className="text-sm text-neutral-600 dark:text-neutral-400" aria-hidden>
           <DateDisplay />
         </div>
