@@ -7,28 +7,42 @@
     <link rel="apple-touch-icon" href="/icon.png" />
     <title>Ritus · Habit Tracker</title>
     <script>
-      // Minimal system dark/light mode detection.
-      // Runs early to reduce flash of wrong theme on first paint.
+      // Early theme application with persistence and system fallback
       (function () {
         try {
+          var STORAGE_KEY = 'ritus-theme'; // 'system' | 'light' | 'dark'
           var mq = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
-          if (mq && mq.matches) {
-            document.documentElement.classList.add('dark');
-          } else {
-            document.documentElement.classList.remove('dark');
-          }
-          // Keep in sync if user changes system preference while the page is open
-          if (mq && mq.addEventListener) {
-            mq.addEventListener('change', function (e) {
-              if (e.matches) document.documentElement.classList.add('dark');
+
+          function apply(theme) {
+            var t = theme || localStorage.getItem(STORAGE_KEY) || 'system';
+            if (t === 'dark') {
+              document.documentElement.classList.add('dark');
+            } else if (t === 'light') {
+              document.documentElement.classList.remove('dark');
+            } else {
+              if (mq && mq.matches) document.documentElement.classList.add('dark');
               else document.documentElement.classList.remove('dark');
-            });
-          } else if (mq && mq.addListener) {
-            mq.addListener(function (e) {
-              if (e.matches) document.documentElement.classList.add('dark');
-              else document.documentElement.classList.remove('dark');
-            });
+            }
           }
+
+          apply();
+
+          if (mq) {
+            var onChange = function (e) {
+              var t = localStorage.getItem(STORAGE_KEY) || 'system';
+              if (t === 'system') {
+                if (e.matches) document.documentElement.classList.add('dark');
+                else document.documentElement.classList.remove('dark');
+              }
+            };
+            if (mq.addEventListener) mq.addEventListener('change', onChange);
+            else if (mq.addListener) mq.addListener(onChange);
+          }
+
+          // Sync theme across tabs
+          window.addEventListener('storage', function (e) {
+            if (e.key === STORAGE_KEY) apply(e.newValue);
+          });
         } catch (err) {
           // noop on older browsers
         }

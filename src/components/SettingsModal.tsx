@@ -9,23 +9,23 @@ interface SettingsModalProps {
   open: boolean
   onClose: () => void
   onShowGuide?: () => void
-  onShowPrivacy?: () => void
 }
 
-export default function SettingsModal({ open, onClose, onShowGuide, onShowPrivacy }: SettingsModalProps) {
+type ThemeMode = 'system' | 'light' | 'dark'
+
+export default function SettingsModal({ open, onClose, onShowGuide }: SettingsModalProps) {
   const [closing, setClosing] = useState(false)
   const timeoutRef = useRef<number | null>(null)
-  const pendingRef = useRef<'none' | 'guide' | 'privacy'>('none')
-  const storeUsername = useHabitStore((s) => s.username)
+  const pendingRef = useRef<'none' | 'guide'>('none')
   const storeSetUsername = useHabitStore((s) => s.setUsername)
   const storeReminders = useHabitStore((s) => s.reminders)
   const storeSetReminders = useHabitStore((s) => s.setReminders)
 
-  const [username, setUsername] = useState(() => storeUsername || '')
-  const [dirty, setDirty] = useState(false)
-  const [saving, setSaving] = useState(false)
-  const [savedFlash, setSavedFlash] = useState(false)
   const [reminders, setReminders] = useState(()=> storeReminders || { dailyEnabled: false, dailyTime: '21:00' })
+
+  // Theme switcher
+  const [theme, setTheme] = useState<ThemeMode>('system')
+  const isSystemTheme = theme === 'system'
   
   const [exporting, setExporting] = useState(false)
   const [importing, setImporting] = useState(false)
@@ -52,8 +52,6 @@ export default function SettingsModal({ open, onClose, onShowGuide, onShowPrivac
       if (pendingRef.current === 'guide') {
         // little buffer so the settings overlay/panel fully finishes animating
         window.setTimeout(()=> { try { onShowGuide && onShowGuide() } catch {} ; pendingRef.current = 'none' }, 80)
-      } else if (pendingRef.current === 'privacy') {
-        window.setTimeout(()=> { try { onShowPrivacy && onShowPrivacy() } catch {} ; pendingRef.current = 'none' }, 80)
       } else {
         pendingRef.current = 'none'
       }
@@ -66,19 +64,29 @@ export default function SettingsModal({ open, onClose, onShowGuide, onShowPrivac
     beginClose()
   }
 
-  function handleShowPrivacy() {
-    if (!onShowPrivacy) return
-    pendingRef.current = 'privacy'
-    beginClose()
-  }
-
   useEffect(()=>{
     if (open) {
-  setUsername(storeUsername || '')
-      setDirty(false); setSaving(false); setSavedFlash(false)
-  setReminders(storeReminders || { dailyEnabled: false, dailyTime: '21:00' })
+      setReminders(storeReminders || { dailyEnabled: false, dailyTime: '21:00' })
+      try {
+        const stored = (localStorage.getItem('ritus-theme') as ThemeMode | null) || 'system'
+        setTheme(stored)
+      } catch {}
     }
   }, [open])
+
+  function applyTheme(next: ThemeMode) {
+    try {
+      localStorage.setItem('ritus-theme', next)
+      setTheme(next)
+      const mq = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)')
+      if (next === 'dark') document.documentElement.classList.add('dark')
+      else if (next === 'light') document.documentElement.classList.remove('dark')
+      else {
+        if (mq && mq.matches) document.documentElement.classList.add('dark')
+        else document.documentElement.classList.remove('dark')
+      }
+    } catch {}
+  }
 
   async function handleExport() {
     try { setExporting(true); const payload = exportAllData(); const json = JSON.stringify(payload, null, 2); const blob = new Blob([json], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); const now = new Date().toISOString().slice(0,10); a.href = url; a.download = `ritus-export-${now}.json`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
@@ -132,12 +140,7 @@ export default function SettingsModal({ open, onClose, onShowGuide, onShowPrivac
     }
   }
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) { setUsername(e.target.value); setDirty(true) }
-  async function handleSave(e?: React.FormEvent) { if (e) e.preventDefault(); if (!dirty || saving) return; setSaving(true); if (username.trim().length < 4) { setSaving(false); alert('Username must be at least 4 characters.'); return; } try { storeSetUsername(username.trim()); setSaving(false); setDirty(false); setSavedFlash(true); setTimeout(()=> setSavedFlash(false), 1400) } catch (err) { setSaving(false); alert('Failed to save username') } }
-
   function handleDeleteAllLocal() { setConfirmClearOpen(true) }
-
-  function handlePrivacyPolicy() { handleShowPrivacy() }
 
   const topEmoji = '🙂'
   // reserved for potential future design accents
@@ -178,51 +181,72 @@ export default function SettingsModal({ open, onClose, onShowGuide, onShowPrivac
         </div>
 
         <div className="space-y-4">
+          {/* Theme */}
           <div className="p-4 rounded-2xl border shadow-sm text-sm">
-            <div className="flex items-start justify-between">
+            <div className="flex items-start justify-between gap-3">
               <div>
-                <div className="text-sm font-semibold mb-0.5">Account</div>
+                <div className="text-sm font-semibold mb-0.5">Theme</div>
+                <div className="text-[11px] text-neutral-600 dark:text-neutral-400">Choose the app appearance.</div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => applyTheme('system')}
+                  className={"relative grid h-10 w-10 place-items-center rounded-lg border text-black dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900 transition " + (isSystemTheme ? 'text-neutral-900 dark:text-neutral-100' : 'text-neutral-500')}
+                  aria-pressed={isSystemTheme}
+                  aria-label="System"
+                  title="System"
+                >
+                  {isSystemTheme && (
+                    <span
+                      className="absolute inset-0 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/10 pointer-events-none"
+                      aria-hidden
+                    />
+                  )}
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="relative z-10 h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => applyTheme('light')}
+                  className={"relative grid h-10 w-10 place-items-center rounded-lg border text-black dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900 transition " + (!isSystemTheme && theme === 'light' ? 'text-neutral-900 dark:text-neutral-100' : 'text-neutral-500')}
+                  aria-pressed={!isSystemTheme && theme === 'light'}
+                  aria-label="Light"
+                  title="Light"
+                >
+                  {!isSystemTheme && theme === 'light' && (
+                    <span
+                      className="absolute inset-0 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/10 pointer-events-none"
+                      aria-hidden
+                    />
+                  )}
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="relative z-10 h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M20 12h2M2 12H0"/><path d="m17 17 1.5 1.5M5.5 5.5 7 7"/><path d="m17 7 1.5-1.5M5.5 18.5 7 17"/></svg>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => applyTheme('dark')}
+                  className={"relative grid h-10 w-10 place-items-center rounded-lg border text-black dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900 transition " + (!isSystemTheme && theme === 'dark' ? 'text-neutral-900 dark:text-neutral-100' : 'text-neutral-500')}
+                  aria-pressed={!isSystemTheme && theme === 'dark'}
+                  aria-label="Dark"
+                  title="Dark"
+                >
+                  {!isSystemTheme && theme === 'dark' && (
+                    <span
+                      className="absolute inset-0 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/10 pointer-events-none"
+                      aria-hidden
+                    />
+                  )}
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="relative z-10 h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </button>
               </div>
             </div>
-            <hr className="border-t border-black/6 my-3" />
-            <form onSubmit={handleSave} className="mt-1 space-y-3">
-              <div>
-                <label className="block text-[10px] uppercase tracking-wide text-neutral-600 dark:text-neutral-400 mb-2">Username</label>
-                <div className="flex items-center gap-3">
-                  <input
-                    value={username}
-                    onChange={handleChange}
-                    maxLength={24}
-                    className="flex-1 rounded-md bg-white dark:bg-neutral-950 px-3 py-2 text-sm appearance-none outline-none focus:outline-none focus-visible:outline-none border border-black/10 dark:border-white/10 focus:border-black/20 dark:focus:border-white/20 placeholder:text-neutral-400 text-black dark:text-white transition-colors"
-                    placeholder="user"
-                  />
-                  <button type="submit" disabled={!dirty || saving || username.trim().length < 4} className="rounded-md px-3 py-2 text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed bg-black text-white dark:bg-white dark:text-black">{saving ? 'Saving…' : savedFlash ? 'Saved' : 'Save'}</button>
-                </div>
-                <p className="mt-2 text-[11px] text-neutral-600 dark:text-neutral-400">Lowercase, 4-24 chars, currently local only.</p>
-                <div className="mt-3 grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={handleDeleteAllLocal}
-                    className="w-full rounded-md px-3 py-2 text-sm font-medium bg-white dark:bg-black border border-red-500 text-red-600 dark:text-red-400"
-                  >
-                    Delete local data
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handlePrivacyPolicy}
-                    className="w-full rounded-md px-3 py-2 text-sm font-medium bg-white dark:bg-black border border-emerald-500 text-emerald-700 dark:text-emerald-400"
-                  >
-                    Privacy policy
-                  </button>
-                </div>
-              </div>
-            </form>
           </div>
 
           <div className="p-4 rounded-2xl border shadow-sm text-sm">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <div className="text-sm font-semibold mb-0.5">Data transfer</div>
+                <div className="text-sm font-semibold mb-0.5">Data</div>
                 <div className="text-[11px] text-neutral-600 dark:text-neutral-400">Import or export JSON.</div>
               </div>
               <div className="flex items-center gap-2">
@@ -255,6 +279,16 @@ export default function SettingsModal({ open, onClose, onShowGuide, onShowPrivac
                     <path d="M2 13h10"/>
                     <path d="m5 10-3 3 3 3"/>
                   </svg>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleDeleteAllLocal}
+                  aria-label="Delete local data"
+                  title="Delete local data"
+                  className="grid h-10 w-10 place-items-center rounded-lg border border-red-500 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-eraser-icon lucide-eraser"><path d="M21 21H8a2 2 0 0 1-1.42-.587l-3.994-3.999a2 2 0 0 1 0-2.828l10-10a2 2 0 0 1 2.829 0l5.999 6a2 2 0 0 1 0 2.828L12.834 21"/><path d="m5.082 11.09 8.828 8.828"/></svg>
                 </button>
               </div>
             </div>

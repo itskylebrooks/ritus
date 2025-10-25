@@ -2,7 +2,6 @@ import HeaderStats from './components/HeaderStats'
 import AddHabit from './components/AddHabit'
 import HabitCard from './components/HabitCard'
 import SettingsModal from './components/SettingsModal'
-import PrivacyModal from './components/PrivacyModal'
 import GuideModal from './components/GuideModal'
 import { useHabitStore } from './store/store'
 import { fromISO } from './utils/date'
@@ -32,7 +31,7 @@ function EmptyState({ disableAnim = false }: { disableAnim?: boolean }) {
 export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [guideOpen, setGuideOpen] = useState(false)
-  const [privacyOpen, setPrivacyOpen] = useState(false)
+  
   const habits = useHabitStore((s) => s.habits)
   const initialListRender = useRef(true)
   useEffect(() => { initialListRender.current = false }, [])
@@ -102,10 +101,9 @@ export default function App() {
         open={settingsOpen}
         onClose={() => setSettingsOpen(false)}
         onShowGuide={() => { setGuideOpen(true); setSettingsOpen(false); }}
-        onShowPrivacy={() => { setPrivacyOpen(true); setSettingsOpen(false); }}
       />
   <GuideModal open={guideOpen} onClose={() => setGuideOpen(false)} />
-  <PrivacyModal open={privacyOpen} onClose={() => setPrivacyOpen(false)} />
+  
 
       <HeaderStats />
 
