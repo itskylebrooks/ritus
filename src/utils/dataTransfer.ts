@@ -2,6 +2,7 @@ import pkg from '../../package.json'
 import { useHabitStore } from '../store/store'
 import type { Habit } from '../types'
 import { recalc } from './scoring'
+import { iso, fromISO } from './date'
 
 export interface ImportResult {
   ok: true
@@ -24,7 +25,8 @@ export function exportAllData() {
     app: 'ritus',
     version: pkg.version,
     exportedAt: new Date().toISOString(),
-    habits: s.habits,
+    // Ensure exported completions are date-only ISO strings (no time part)
+    habits: s.habits.map((h) => ({ ...h, completions: (h.completions || []).map((c) => iso(fromISO(c))) })),
     username: s.username,
     // no reminders in export
     totalPoints: s.totalPoints,
@@ -55,7 +57,10 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
         name: String(h.name ?? ''),
         frequency: (h as Habit).frequency ?? 'daily',
         createdAt: String((h as Habit).createdAt ?? new Date().toISOString()),
-        completions: Array.isArray(h.completions) ? (h.completions as string[]) : [],
+        // Normalize incoming completions to date-only ISO strings (no time component)
+        completions: Array.isArray(h.completions)
+          ? (h.completions as string[]).map((c) => iso(fromISO(String(c))))
+          : [],
         mode: (h as Habit).mode ?? 'build',
         weeklyTarget: (h as Habit).weeklyTarget,
         streak: Number((h as Habit).streak ?? 0),
@@ -70,20 +75,34 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
     const newLongest = Math.max(cur.longestStreak || 0, incomingLongest || 0)
 
     // apply to store/persisted state
-    if (newUsername && newUsername !== cur.username) useHabitStore.getState().setUsername(newUsername)
     const updated = {
-      ...cur,
+      // only persist the partial snapshot used by our persist `partialize`
       habits: mergedHabits,
       username: newUsername,
+      reminders: cur.reminders,
       totalPoints: newTotal,
       longestStreak: newLongest,
+      dateFormat: cur.dateFormat,
+      weekStart: cur.weekStart,
+      showAdd: cur.showAdd,
     }
+
     try {
       const key = 'ritus-habits'
-      localStorage.setItem(key, JSON.stringify({ state: updated, version: 1 }))
+      // Persist the same shape the app expects (no {state,version} wrapper).
+      localStorage.setItem(key, JSON.stringify(updated))
     } catch {
-      // ignore; UI will still show feedback
+      // ignore write errors; we'll still update in-memory store below
     }
+
+    // Update in-memory store so the UI reflects the import immediately.
+    // Use setState to update only the persisted fields; keep other funcs intact.
+    useHabitStore.setState((s) => ({
+      habits: updated.habits,
+      username: updated.username,
+      totalPoints: updated.totalPoints,
+      longestStreak: updated.longestStreak,
+    }))
 
     return {
       ok: true,
