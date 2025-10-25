@@ -116,9 +116,14 @@ export default function App() {
       <HeaderStats />
 
       <div className="mt-6 grid gap-4">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <QuoteCard />
-          <ClockCard />
+        <div className="grid gap-4 sm:grid-cols-3 items-stretch">
+          <div className="sm:col-span-2 h-full">
+            <QuoteCard />
+          </div>
+
+          <div className="sm:col-span-1 h-full">
+            <ClockCard />
+          </div>
         </div>
 
         <AddHabit />
