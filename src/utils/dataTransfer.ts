@@ -10,7 +10,6 @@ export interface ImportResult {
   duplicateHabits: number
   invalidHabits: number
   totalHabits: number
-  usernameChanged: boolean
   totalPointsPrev: number
   totalPointsNew: number
   longestStreakPrev: number
@@ -27,7 +26,9 @@ export function exportAllData() {
     exportedAt: new Date().toISOString(),
     // Ensure exported completions are date-only ISO strings (no time part)
     habits: s.habits.map((h) => ({ ...h, completions: (h.completions || []).map((c) => iso(fromISO(c))) })),
-    username: s.username,
+    // export formatting settings so they can be restored on import
+    dateFormat: s.dateFormat,
+    weekStart: s.weekStart,
     // no reminders in export
     totalPoints: s.totalPoints,
     longestStreak: s.longestStreak,
@@ -40,7 +41,8 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
     if (!parsed || typeof parsed !== 'object') return { ok: false, reason: 'invalid' }
     if (parsed.app !== 'ritus') return { ok: false, reason: 'not_ritus' }
     const incomingHabits: Partial<Habit>[] = Array.isArray(parsed.habits) ? parsed.habits : []
-    const incomingUsername = typeof parsed.username === 'string' ? parsed.username : undefined
+  const incomingDateFormat: 'DMY' | 'MDY' | undefined = parsed.dateFormat === 'DMY' ? 'DMY' : parsed.dateFormat === 'MDY' ? 'MDY' : undefined
+  const incomingWeekStart: 'sunday' | 'monday' | undefined = parsed.weekStart === 'sunday' ? 'sunday' : parsed.weekStart === 'monday' ? 'monday' : undefined
     const incomingTotal = typeof parsed.totalPoints === 'number' ? parsed.totalPoints : 0
     const incomingLongest = typeof parsed.longestStreak === 'number' ? parsed.longestStreak : 0
 
@@ -69,7 +71,6 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
     )
     const mergedHabits = [...cur.habits, ...normalized]
 
-    const newUsername = incomingUsername ?? cur.username
     // stats: recompute totalPoints from merged habits; keep max for longestStreak
     const newTotal = mergedHabits.reduce((acc, h) => acc + (h.points || 0), 0)
     const newLongest = Math.max(cur.longestStreak || 0, incomingLongest || 0)
@@ -78,12 +79,12 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
     const updated = {
       // only persist the partial snapshot used by our persist `partialize`
       habits: mergedHabits,
-      username: newUsername,
       reminders: cur.reminders,
       totalPoints: newTotal,
       longestStreak: newLongest,
-      dateFormat: cur.dateFormat,
-      weekStart: cur.weekStart,
+      // restore formatting settings from import when available
+      dateFormat: incomingDateFormat ?? cur.dateFormat,
+      weekStart: incomingWeekStart ?? cur.weekStart,
       showAdd: cur.showAdd,
     }
 
@@ -99,9 +100,10 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
     // Use setState to update only the persisted fields; keep other funcs intact.
     useHabitStore.setState((s) => ({
       habits: updated.habits,
-      username: updated.username,
       totalPoints: updated.totalPoints,
       longestStreak: updated.longestStreak,
+      dateFormat: updated.dateFormat,
+      weekStart: updated.weekStart,
     }))
 
     return {
@@ -110,7 +112,6 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
       duplicateHabits,
       invalidHabits,
       totalHabits: mergedHabits.length,
-      usernameChanged: newUsername !== cur.username,
       totalPointsPrev: cur.totalPoints || 0,
       totalPointsNew: newTotal,
       longestStreakPrev: cur.longestStreak || 0,

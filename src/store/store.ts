@@ -6,8 +6,6 @@ import { recalc } from '../utils/scoring'
 
 export interface HabitState {
   habits: Habit[]
-  username: string
-  setUsername: (u: string) => void
   // display settings
   dateFormat: 'MDY' | 'DMY'
   setDateFormat: (f: 'MDY' | 'DMY') => void
@@ -40,9 +38,7 @@ export const useHabitStore = create<HabitState>()(
   // UI visibility
   showAdd: true,
   setShowAdd: (v) => set({ showAdd: v }),
-      // user / preferences
-      username: '',
-      setUsername: (u: string) => set({ username: u }),
+  // user / preferences (no username — removed)
       reminders: { dailyEnabled: false, dailyTime: '21:00' },
       setReminders: (r: { dailyEnabled: boolean; dailyTime: string }) => set({ reminders: r }),
       // cumulative stats that persist even if habits are deleted
@@ -145,7 +141,6 @@ export const useHabitStore = create<HabitState>()(
       // the future, handle it explicitly (for now keep storage simple).
       partialize: (state) => ({
         habits: state.habits,
-        username: state.username,
         reminders: state.reminders,
         totalPoints: state.totalPoints,
         longestStreak: state.longestStreak,

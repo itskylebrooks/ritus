@@ -18,7 +18,6 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
   const [closing, setClosing] = useState(false)
   const timeoutRef = useRef<number | null>(null)
   const pendingRef = useRef<'none' | 'guide'>('none')
-  const storeSetUsername = useHabitStore((s) => s.setUsername)
   const storeReminders = useHabitStore((s) => s.reminders)
   const storeSetReminders = useHabitStore((s) => s.setReminders)
   const dateFormat = useHabitStore((s) => s.dateFormat)
@@ -107,14 +106,13 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
           if (res.duplicateHabits > 0) changes.push(`Skipped ${res.duplicateHabits} duplicate${res.duplicateHabits === 1 ? '' : 's'}`)
           if (res.invalidHabits > 0) changes.push(`Ignored ${res.invalidHabits} invalid item${res.invalidHabits === 1 ? '' : 's'}`)
         }
-        if (res.usernameChanged) changes.push('Updated username')
+  // username no longer used
         if (res.totalPointsNew !== res.totalPointsPrev) changes.push(`Total points: ${res.totalPointsPrev} → ${res.totalPointsNew}`)
         if (res.longestStreakNew !== res.longestStreakPrev) changes.push(`Longest streak: ${res.longestStreakPrev} → ${res.longestStreakNew}`)
         changes.push(`Now tracking ${res.totalHabits} habit${res.totalHabits === 1 ? '' : 's'}`)
 
         const changed =
           res.addedHabits > 0 ||
-          res.usernameChanged ||
           res.totalPointsNew !== res.totalPointsPrev ||
           res.longestStreakNew !== res.longestStreakPrev
 
@@ -344,7 +342,6 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
                 st.resetStats()
                 // restore UI defaults
                 try { st.setShowAdd(true) } catch {}
-                storeSetUsername('')
                 storeSetReminders({ dailyEnabled: false, dailyTime: '21:00' })
               } catch {}
               setConfirmClearOpen(false)
