@@ -116,19 +116,22 @@ export const useHabitStore = create<HabitState>()(
             }
 
             const newHabit = recalc({ ...h, completions })
-            // if points increased due to this toggle, add the positive delta to cumulative totalPoints
-            const oldPts = h.points || 0
-            const newPts = newHabit.points || 0
-            const delta = newPts - oldPts
-            if (delta > 0) pointsDelta += delta
+              // compute change in habit points caused by this toggle and accumulate the delta
+              // Note: allow negative deltas so that unmarking a day will reduce the user's total points.
+              // We will clamp the cumulative totalPoints to a minimum of 0 below.
+              const oldPts = h.points || 0
+              const newPts = newHabit.points || 0
+              const delta = newPts - oldPts
+              pointsDelta += delta
             return newHabit
           })
 
           // compute new longest streak if any updated habit exceeded historical max
           const newLongest = Math.max(s.longestStreak, ...updated.map((h) => h.streak))
 
-          // update cumulative totalPoints only by positive deltas (prevent reductions)
-          const newTotal = s.totalPoints + pointsDelta
+          // update cumulative totalPoints by the net delta from toggles (allow reductions when user unmarks)
+          // clamp to zero so we never go negative.
+          const newTotal = Math.max(0, s.totalPoints + pointsDelta)
           return { habits: updated, totalPoints: newTotal, longestStreak: newLongest }
         }),
       // clearing current habits should not reset cumulative stats (there's a separate resetStats)
