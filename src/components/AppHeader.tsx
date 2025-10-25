@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
-import { CircleHelp, PlusCircle, MinusCircle, ChartPie, Trophy, Home } from 'lucide-react'
+import { CircleHelp, PlusCircle, MinusCircle, ChartPie, Trophy, Home, Menu, ChevronDown, Settings as SettingsIcon } from 'lucide-react'
 import { useHabitStore } from '../store/store'
 import SettingsModal from './SettingsModal'
 import GuideModal from './GuideModal'
@@ -17,8 +17,64 @@ function DateDisplay() {
 export default function AppHeader() {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [guideOpen, setGuideOpen] = useState(false)
+  const [moreDesktopOpen, setMoreDesktopOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [moreMobileOpen, setMoreMobileOpen] = useState(false)
   const showAdd = useHabitStore((s) => s.showAdd)
   const setShowAdd = useHabitStore((s) => s.setShowAdd)
+  const moreRef = useRef<HTMLDivElement | null>(null)
+  const moreButtonRef = useRef<HTMLButtonElement | null>(null)
+  const menuRef = useRef<HTMLDivElement | null>(null)
+  const menuButtonRef = useRef<HTMLButtonElement | null>(null)
+
+  // Close desktop More on outside click / Esc
+  useEffect(() => {
+    if (!moreDesktopOpen) return
+
+    const handleClick = (e: MouseEvent | TouchEvent) => {
+      const t = e.target as Node | null
+      if (!t) return
+      if (moreRef.current?.contains(t) || moreButtonRef.current?.contains(t)) return
+      setMoreDesktopOpen(false)
+    }
+
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setMoreDesktopOpen(false)
+        moreButtonRef.current?.focus()
+      }
+    }
+
+    document.addEventListener('mousedown', handleClick)
+    document.addEventListener('touchstart', handleClick)
+    window.addEventListener('keydown', handleKey)
+
+    return () => {
+      document.removeEventListener('mousedown', handleClick)
+      document.removeEventListener('touchstart', handleClick)
+      window.removeEventListener('keydown', handleKey)
+    }
+  }, [moreDesktopOpen])
+
+  // Close mobile menu on outside click
+  useEffect(() => {
+    if (!menuOpen) return
+
+    const handleClick = (e: MouseEvent | TouchEvent) => {
+      const t = e.target as Node | null
+      if (!t) return
+      if (menuRef.current?.contains(t) || menuButtonRef.current?.contains(t)) return
+      setMenuOpen(false)
+    }
+
+    document.addEventListener('mousedown', handleClick)
+    document.addEventListener('touchstart', handleClick)
+
+    return () => {
+      document.removeEventListener('mousedown', handleClick)
+      document.removeEventListener('touchstart', handleClick)
+    }
+  }, [menuOpen])
 
   return (
     <header className="mb-6 flex items-center justify-between">
@@ -31,7 +87,8 @@ export default function AppHeader() {
 
       <div className="flex items-center gap-4">
         <nav>
-          <ul className="flex items-center gap-2">
+          {/* Desktop-only page links — hidden on mobile, pages moved into mobile menu */}
+          <ul className="hidden md:flex items-center gap-2">
             <li>
               <NavLink to="/" className={({ isActive }: { isActive: boolean }) => `rounded-lg px-3 py-2 text-sm ${isActive ? 'bg-neutral-100 dark:bg-neutral-800' : 'border dark:border-neutral-700'}`} end>
                 <Home className="inline-block w-4 h-4 mr-2" />Home
@@ -50,26 +107,138 @@ export default function AppHeader() {
           </ul>
         </nav>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowAdd(!showAdd)}
-            className="rounded-lg border dark:border-neutral-700 px-3 py-2 text-sm"
-            aria-label={showAdd ? 'Hide add habit' : 'Show add habit'}
-            title={showAdd ? 'Hide add habit' : 'Show add habit'}
-          >
-            {showAdd ? <MinusCircle className="w-5 h-5" /> : <PlusCircle className="w-5 h-5" />}
-          </button>
+        {/* Desktop: page links + More dropdown (contains Add/Guide/Settings) */}
+        <div className="hidden md:flex items-center gap-2 relative">
+          <div className="flex items-center gap-2 relative">
+            <button
+              ref={moreButtonRef}
+              type="button"
+              onClick={() => setMoreDesktopOpen((v) => !v)}
+              className="rounded-lg border px-3 py-2 text-sm inline-flex items-center gap-2"
+              aria-haspopup="menu"
+              aria-expanded={moreDesktopOpen}
+            >
+              More
+              <ChevronDown className="w-4 h-4" />
+            </button>
 
-          <button onClick={() => setGuideOpen(true)} className="rounded-lg border dark:border-neutral-700 px-3 py-2 text-sm" aria-label="Open guide" title="Open guide">
-            <CircleHelp className="w-5 h-5" />
-          </button>
+            {moreDesktopOpen && (
+              <div ref={moreRef} className="absolute right-0 top-full mt-2 w-44 rounded-lg border border-neutral-300 bg-black text-white shadow-lg z-30">
+                <ul className="p-2">
+                  <li>
+                    <button
+                      type="button"
+                      onClick={() => { setMoreDesktopOpen(false); setShowAdd(!showAdd); }}
+                      className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-800"
+                    >
+                      <span className="flex items-center gap-2">{showAdd ? <MinusCircle className="w-4 h-4" /> : <PlusCircle className="w-4 h-4" />}<span>{showAdd ? 'Hide add' : 'Show add'}</span></span>
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
+                      onClick={() => { setMoreDesktopOpen(false); setGuideOpen(true); }}
+                      className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-800"
+                    >
+                      <span className="flex items-center gap-2"><CircleHelp className="w-4 h-4" />Guide</span>
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
+                      onClick={() => { setMoreDesktopOpen(false); setSettingsOpen(true); }}
+                      className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-800"
+                    >
+                      <span className="flex items-center gap-2"><SettingsIcon className="w-4 h-4" />Settings</span>
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
 
-          <button onClick={() => setSettingsOpen(true)} className="rounded-lg border dark:border-neutral-700 px-3 py-2 text-sm" aria-label="Open settings" title="Open settings">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 lucide lucide-bolt-icon lucide-bolt">
-              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-              <circle cx="12" cy="12" r="4" />
-            </svg>
-          </button>
+        {/* Mobile: hamburger menu which contains page links and a More submenu */}
+        <div className="md:hidden relative">
+          <div className="flex items-center gap-2">
+            <button
+              ref={menuButtonRef}
+              type="button"
+              onClick={() => setMenuOpen((v) => !v)}
+              className="px-2 py-1.5 rounded-lg border text-sm inline-flex items-center gap-2"
+              aria-expanded={menuOpen}
+              aria-label="Open menu"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+          </div>
+
+          {menuOpen && (
+            <div ref={menuRef} className="absolute right-0 mt-2 w-56 rounded-lg border border-neutral-300 bg-black text-white shadow-lg z-30">
+              <ul className="p-2">
+                <li>
+                  <NavLink to="/" onClick={() => setMenuOpen(false)} className={({ isActive }: { isActive: boolean }) => `block rounded-md px-3 py-2 text-sm ${isActive ? 'bg-neutral-800' : ''}`} end>
+                    <Home className="inline-block w-4 h-4 mr-2" />Home
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink to="/insight" onClick={() => setMenuOpen(false)} className={({ isActive }: { isActive: boolean }) => `block rounded-md px-3 py-2 text-sm ${isActive ? 'bg-neutral-800' : ''}`}>
+                    <ChartPie className="inline-block w-4 h-4 mr-2" />Insight
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink to="/milestones" onClick={() => setMenuOpen(false)} className={({ isActive }: { isActive: boolean }) => `block rounded-md px-3 py-2 text-sm ${isActive ? 'bg-neutral-800' : ''}`}>
+                    <Trophy className="inline-block w-4 h-4 mr-2" />Milestones
+                  </NavLink>
+                </li>
+
+                {/* More trigger inside mobile list */}
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => setMoreMobileOpen((v) => !v)}
+                    className={`w-full text-left px-3 py-2 rounded-md hover:bg-neutral-800 flex items-center justify-between`}
+                    aria-expanded={moreMobileOpen}
+                  >
+                    <span className="flex items-center gap-2">More</span>
+                    <ChevronDown className={`w-4 h-4 ${moreMobileOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {moreMobileOpen && (
+                    <ul className="mt-1 pl-2">
+                      <li>
+                        <button
+                          type="button"
+                          onClick={() => { setMenuOpen(false); setMoreMobileOpen(false); setShowAdd(!showAdd); }}
+                          className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-800"
+                        >
+                          <span className="flex items-center gap-2">{showAdd ? <MinusCircle className="w-4 h-4" /> : <PlusCircle className="w-4 h-4" />}<span>{showAdd ? 'Hide add' : 'Show add'}</span></span>
+                        </button>
+                      </li>
+                      <li>
+                        <button
+                          type="button"
+                          onClick={() => { setMenuOpen(false); setMoreMobileOpen(false); setGuideOpen(true); }}
+                          className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-800"
+                        >
+                          <span className="flex items-center gap-2"><CircleHelp className="w-4 h-4" />Guide</span>
+                        </button>
+                      </li>
+                      <li>
+                        <button
+                          type="button"
+                          onClick={() => { setMenuOpen(false); setMoreMobileOpen(false); setSettingsOpen(true); }}
+                          className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-800"
+                        >
+                          <span className="flex items-center gap-2"><SettingsIcon className="w-4 h-4" />Settings</span>
+                        </button>
+                      </li>
+                    </ul>
+                  )}
+                </li>
+              </ul>
+            </div>
+          )}
         </div>
       </div>
 
