@@ -10,7 +10,7 @@ import { fromISO } from './utils/date'
 import { hasCompletionOnDay, countCompletionsInWeek } from './utils/scoring'
 import { useMemo, useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { CircleHelp } from 'lucide-react'
+import { CircleHelp, PlusCircle, MinusCircle } from 'lucide-react'
 
 function EmptyState({ disableAnim = false }: { disableAnim?: boolean }) {
   return (
@@ -34,6 +34,7 @@ function EmptyState({ disableAnim = false }: { disableAnim?: boolean }) {
 export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [guideOpen, setGuideOpen] = useState(false)
+  const [showAdd, setShowAdd] = useState(true)
   
   const habits = useHabitStore((s) => s.habits)
   const initialListRender = useRef(true)
@@ -91,6 +92,15 @@ export default function App() {
         </div>
         <div>
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowAdd((s) => !s)}
+              className="rounded-lg border dark:border-neutral-700 px-3 py-2 text-sm"
+              aria-label={showAdd ? 'Hide add habit' : 'Show add habit'}
+              title={showAdd ? 'Hide add habit' : 'Show add habit'}
+            >
+              {showAdd ? <MinusCircle className="w-5 h-5" /> : <PlusCircle className="w-5 h-5" />}
+            </button>
+
             <button onClick={() => setGuideOpen(true)} className="rounded-lg border dark:border-neutral-700 px-3 py-2 text-sm" aria-label="Open guide" title="Open guide">
               <CircleHelp className="w-5 h-5" />
             </button>
@@ -126,7 +136,11 @@ export default function App() {
           </div>
         </div>
 
-        <AddHabit />
+        {showAdd && (
+          <div className="mt-4">
+            <AddHabit />
+          </div>
+        )}
       </div>
 
       <motion.main layout className="mt-6 grid gap-4">
