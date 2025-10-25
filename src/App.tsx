@@ -1,5 +1,7 @@
 import HeaderStats from './components/HeaderStats'
 import AddHabit from './components/AddHabit'
+import QuoteCard from './components/QuoteCard'
+import ClockCard from './components/ClockCard'
 import HabitCard from './components/HabitCard'
 import SettingsModal from './components/SettingsModal'
 import GuideModal from './components/GuideModal'
@@ -113,7 +115,12 @@ export default function App() {
 
       <HeaderStats />
 
-      <div className="mt-6">
+      <div className="mt-6 grid gap-4">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <QuoteCard />
+          <ClockCard />
+        </div>
+
         <AddHabit />
       </div>
 
