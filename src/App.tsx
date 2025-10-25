@@ -8,6 +8,7 @@ import { fromISO } from './utils/date'
 import { hasCompletionOnDay, countCompletionsInWeek } from './utils/scoring'
 import { useMemo, useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { CircleHelp } from 'lucide-react'
 
 function EmptyState({ disableAnim = false }: { disableAnim?: boolean }) {
   return (
@@ -89,7 +90,7 @@ export default function App() {
         <div>
           <div className="flex items-center gap-2">
             <button onClick={() => setGuideOpen(true)} className="rounded-lg border dark:border-neutral-700 px-3 py-2 text-sm" aria-label="Open guide" title="Open guide">
-              <span className="w-5 h-5 inline-flex items-center justify-center text-sm font-semibold">?</span>
+              <CircleHelp className="w-5 h-5" />
             </button>
 
             <button onClick={() => setSettingsOpen(true)} className="rounded-lg border dark:border-neutral-700 px-3 py-2 text-sm" aria-label="Open settings" title="Open settings">
