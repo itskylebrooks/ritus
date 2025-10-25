@@ -140,23 +140,9 @@ export const useHabitStore = create<HabitState>()(
     {
       name: 'ritus-habits',
       storage: createJSONStorage(() => localStorage),
-      version: 4,
-      migrate: (persisted: any, prevVersion: number) => {
-        // Normalize from previous versions: recompute totalPoints from habits
-        if (prevVersion < 2 && persisted && typeof persisted === 'object') {
-          const habits: Habit[] = Array.isArray(persisted.habits) ? persisted.habits : []
-          const sumPoints = habits.reduce((acc, h) => acc + (h.points || 0), 0)
-          return { ...persisted, totalPoints: sumPoints }
-        }
-        // For older persisted state that predates our new settings, ensure defaults are present
-        if (prevVersion < 3 && persisted && typeof persisted === 'object') {
-          return { ...persisted, dateFormat: persisted.dateFormat || 'MDY', weekStart: persisted.weekStart || 'monday' }
-        }
-        if (prevVersion < 4 && persisted && typeof persisted === 'object') {
-          return { ...persisted, showAdd: persisted.showAdd ?? true }
-        }
-        return persisted as any
-      },
+      // Single DB version: no migrations required. Persisted shape will be the
+      // `partialize` snapshot below. If you need to change persisted shape in
+      // the future, handle it explicitly (for now keep storage simple).
       partialize: (state) => ({
         habits: state.habits,
         username: state.username,
