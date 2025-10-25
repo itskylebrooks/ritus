@@ -107,6 +107,10 @@ export function calcPoints(h: Habit): number {
         lastWeek = wk
       }
 
+      // Award a per-week completion bonus for each week that met the weekly target.
+      // This gives weekly habits a +MILESTONE_BONUS for completing the "week challenge".
+      if (weeks.length > 0) pts += weeks.length * MILESTONE_BONUS
+
       let streak = 0
       let prev: Date | null = null
       for (const wk of weeks) {
