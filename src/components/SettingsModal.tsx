@@ -380,7 +380,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
           </a>
 
           <div className="font-medium text-neutral-900 dark:text-neutral-200">Kyle Brooks <span className="mx-2">•</span> Ritus {pkg.version}</div>
-          <div className="mt-1 flex items-center justify-center gap-6">
+          <div className="mt-0.5 flex items-center justify-center gap-3">
             <a href="https://itskylebrooks.vercel.app/imprint" target="_blank" rel="noopener noreferrer" className="underline">Imprint</a>
             <a href="https://itskylebrooks.vercel.app/privacy" target="_blank" rel="noopener noreferrer" className="underline">Privacy Policy</a>
             <a href="https://itskylebrooks.vercel.app/license" target="_blank" rel="noopener noreferrer" className="underline">License</a>
