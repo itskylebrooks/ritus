@@ -83,7 +83,7 @@ export default function ConfirmModal({
             {cancelLabel}
           </button>
           <button
-            className={`rounded-md px-3 py-2 text-sm font-medium ${destructive ? 'bg-red-600 text-white' : 'bg-black text-white dark:bg-white dark:text-black'}`}
+            className={`rounded-md px-3 py-2 text-sm font-medium ${destructive ? 'bg-red-500 text-white' : 'bg-black text-white dark:bg-white dark:text-black'}`}
             onClick={() => { if (!closing) { onConfirm(); } }}
           >
             {confirmLabel}

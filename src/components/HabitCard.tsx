@@ -110,7 +110,7 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
                 </motion.button>
                 <motion.button
                   onClick={() => setConfirmDeleteOpen(true)}
-                  className="rounded-xl border dark:border-neutral-700 p-2 hover:bg-neutral-50 text-red-600 dark:hover:bg-neutral-900"
+                  className="rounded-xl border dark:border-neutral-700 p-2 hover:bg-neutral-50 text-red-500 dark:hover:bg-neutral-900"
                   aria-label="Delete habit"
                   title="Delete"
                   whileHover={{ scale: 1.1 }}

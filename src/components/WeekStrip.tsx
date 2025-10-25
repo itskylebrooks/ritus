@@ -25,7 +25,7 @@ export default function WeekStrip({ habit, onToggle }: { habit: Habit; onToggle:
           const cls = isMarked
             ? 'border-transparent bg-emerald-600 text-white'
             : isPast
-            ? 'border-transparent bg-red-600 text-white'
+            ? 'border-transparent bg-red-500 text-white'
             : 'border-neutral-300 text-neutral-700 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-900'
 
           return (
