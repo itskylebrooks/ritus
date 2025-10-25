@@ -26,7 +26,7 @@ export default function HeaderStats() {
   const weeklyPct = total === 0 ? 0 : Math.round((done / total) * 100)
 
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
   <div className="rounded-2xl border dark:border-neutral-700 p-4 shadow-sm">
         <div className="flex items-center justify-between text-sm text-neutral-600 dark:text-neutral-300">
           <span>Total points</span>

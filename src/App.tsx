@@ -138,7 +138,7 @@ export default function App() {
 
       <HeaderStats />
 
-      <div className="mt-6 grid gap-4">
+  <div className="mt-4 grid gap-4">
         <div className="grid gap-4 sm:grid-cols-3 items-stretch">
           <div className="sm:col-span-2 h-full">
             <QuoteCard />
@@ -150,13 +150,12 @@ export default function App() {
         </div>
 
         {showAdd && (
-          <div className="mt-4">
+          <div>
             <AddHabit />
           </div>
         )}
-      </div>
 
-      <motion.main layout className="mt-6 grid gap-4">
+      <motion.main layout className="grid gap-4">
         <AnimatePresence initial={false} mode="popLayout">
           {sortedHabits.length === 0 ? (
             emptyReady ? <EmptyState disableAnim={initialListRender.current} /> : null
@@ -176,6 +175,8 @@ export default function App() {
           )}
         </AnimatePresence>
       </motion.main>
+
+      </div>
 
   {/* Footer removed */}
     </div>
