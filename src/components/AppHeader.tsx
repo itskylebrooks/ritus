@@ -118,17 +118,17 @@ export default function AppHeader() {
           {/* Desktop-only page links — hidden on mobile, pages moved into mobile menu */}
           <ul className="hidden md:flex items-center gap-2">
             <li>
-              <NavLink to="/" className={({ isActive }: { isActive: boolean }) => `rounded-lg px-3 py-2 text-sm ${isActive ? 'bg-neutral-100 dark:bg-neutral-800' : 'border dark:border-neutral-700'}`} end>
+              <NavLink to="/" className="rounded-lg border px-3 py-2 text-sm border-neutral-300 dark:border-neutral-700" end>
                 <Home className="inline-block w-4 h-4 mr-2" />Home
               </NavLink>
             </li>
             <li>
-              <NavLink to="/insight" className={({ isActive }: { isActive: boolean }) => `rounded-lg px-3 py-2 text-sm ${isActive ? 'bg-neutral-100 dark:bg-neutral-800' : 'border dark:border-neutral-700'}`}>
+              <NavLink to="/insight" className="rounded-lg border px-3 py-2 text-sm border-neutral-300 dark:border-neutral-700">
                 <ChartPie className="inline-block w-4 h-4 mr-2" />Insight
               </NavLink>
             </li>
             <li>
-              <NavLink to="/milestones" className={({ isActive }: { isActive: boolean }) => `rounded-lg px-3 py-2 text-sm ${isActive ? 'bg-neutral-100 dark:bg-neutral-800' : 'border dark:border-neutral-700'}`}>
+              <NavLink to="/milestones" className="rounded-lg border px-3 py-2 text-sm border-neutral-300 dark:border-neutral-700">
                 <Trophy className="inline-block w-4 h-4 mr-2" />Milestones
               </NavLink>
             </li>
@@ -142,7 +142,7 @@ export default function AppHeader() {
               ref={moreButtonRef}
               type="button"
               onClick={() => setMoreDesktopOpen((v) => !v)}
-              className="rounded-lg border px-3 py-2 text-sm inline-flex items-center gap-2"
+              className="rounded-lg border dark:border-neutral-700 px-3 py-2 text-sm inline-flex items-center gap-2"
               aria-haspopup="menu"
               aria-expanded={moreDesktopOpen}
             >
@@ -158,14 +158,14 @@ export default function AppHeader() {
                   animate="animate"
                   exit="exit"
                   variants={desktopDropdownVariants as any}
-                  className="absolute right-0 top-full mt-2 w-44 rounded-lg border border-neutral-300 bg-black text-white shadow-lg z-30"
+                  className="absolute right-0 top-full mt-2 w-44 rounded-lg border bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 shadow-lg z-30"
                 >
                   <ul className="p-2">
                   <li>
                     <button
                       type="button"
                       onClick={() => { setMoreDesktopOpen(false); setShowAdd(!showAdd); }}
-                      className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-800"
+                      className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
                     >
                       <span className="flex items-center gap-2">{showAdd ? <MinusCircle className="w-4 h-4" /> : <PlusCircle className="w-4 h-4" />}<span>{showAdd ? 'Hide add' : 'Show add'}</span></span>
                     </button>
@@ -174,7 +174,7 @@ export default function AppHeader() {
                     <button
                       type="button"
                       onClick={() => { setMoreDesktopOpen(false); setGuideOpen(true); }}
-                      className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-800"
+                      className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
                     >
                       <span className="flex items-center gap-2"><CircleHelp className="w-4 h-4" />Guide</span>
                     </button>
@@ -183,7 +183,7 @@ export default function AppHeader() {
                     <button
                       type="button"
                       onClick={() => { setMoreDesktopOpen(false); setSettingsOpen(true); }}
-                      className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-800"
+                      className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
                     >
                       <span className="flex items-center gap-2"><SettingsIcon className="w-4 h-4" />Settings</span>
                     </button>
@@ -202,7 +202,7 @@ export default function AppHeader() {
               ref={menuButtonRef}
               type="button"
               onClick={() => setMenuOpen((v) => !v)}
-              className="px-2 py-1.5 rounded-lg border text-sm inline-flex items-center gap-2"
+              className="px-2 py-1.5 rounded-lg border dark:border-neutral-700 text-sm inline-flex items-center gap-2"
               aria-expanded={menuOpen}
               aria-label="Open menu"
             >
@@ -218,21 +218,21 @@ export default function AppHeader() {
                 animate="animate"
                 exit="exit"
                 variants={mobileMenuVariants as any}
-                className="absolute right-0 mt-2 w-56 rounded-lg border border-neutral-300 bg-black text-white shadow-lg z-30"
+                className="absolute right-0 mt-2 w-56 rounded-lg border bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 shadow-lg z-30"
               >
                 <ul className="p-2">
                 <li>
-                  <NavLink to="/" onClick={() => setMenuOpen(false)} className={({ isActive }: { isActive: boolean }) => `block rounded-md px-3 py-2 text-base ${isActive ? 'bg-neutral-800' : ''}`} end>
+                  <NavLink to="/" onClick={() => setMenuOpen(false)} className={({ isActive }: { isActive: boolean }) => `block rounded-md px-3 py-2 text-base ${isActive ? 'bg-neutral-100 dark:bg-neutral-800' : ''}`} end>
                     <Home className="inline-block w-4 h-4 mr-2" />Home
                   </NavLink>
                 </li>
                 <li>
-                  <NavLink to="/insight" onClick={() => setMenuOpen(false)} className={({ isActive }: { isActive: boolean }) => `block rounded-md px-3 py-2 text-base ${isActive ? 'bg-neutral-800' : ''}`}>
+                  <NavLink to="/insight" onClick={() => setMenuOpen(false)} className={({ isActive }: { isActive: boolean }) => `block rounded-md px-3 py-2 text-base ${isActive ? 'bg-neutral-100 dark:bg-neutral-800' : ''}`}>
                     <ChartPie className="inline-block w-4 h-4 mr-2" />Insight
                   </NavLink>
                 </li>
                 <li>
-                  <NavLink to="/milestones" onClick={() => setMenuOpen(false)} className={({ isActive }: { isActive: boolean }) => `block rounded-md px-3 py-2 text-base ${isActive ? 'bg-neutral-800' : ''}`}>
+                  <NavLink to="/milestones" onClick={() => setMenuOpen(false)} className={({ isActive }: { isActive: boolean }) => `block rounded-md px-3 py-2 text-base ${isActive ? 'bg-neutral-100 dark:bg-neutral-800' : ''}`}>
                     <Trophy className="inline-block w-4 h-4 mr-2" />Milestones
                   </NavLink>
                 </li>
@@ -242,7 +242,7 @@ export default function AppHeader() {
                   <button
                     type="button"
                     onClick={() => setMoreMobileOpen((v) => !v)}
-                    className={`w-full text-left px-3 py-2 rounded-md hover:bg-neutral-800 flex items-center justify-between`}
+                    className={`w-full text-left px-3 py-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 flex items-center justify-between`}
                     aria-expanded={moreMobileOpen}
                   >
                     <span className="flex items-center gap-2">More</span>
@@ -263,7 +263,7 @@ export default function AppHeader() {
                         <button
                           type="button"
                           onClick={() => { setMenuOpen(false); setMoreMobileOpen(false); setShowAdd(!showAdd); }}
-                          className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-800"
+                          className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
                         >
                           <span className="flex items-center gap-2">{showAdd ? <MinusCircle className="w-4 h-4" /> : <PlusCircle className="w-4 h-4" />}<span>{showAdd ? 'Hide add' : 'Show add'}</span></span>
                         </button>
@@ -272,7 +272,7 @@ export default function AppHeader() {
                         <button
                           type="button"
                           onClick={() => { setMenuOpen(false); setMoreMobileOpen(false); setGuideOpen(true); }}
-                          className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-800"
+                          className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
                         >
                           <span className="flex items-center gap-2"><CircleHelp className="w-4 h-4" />Guide</span>
                         </button>
@@ -281,7 +281,7 @@ export default function AppHeader() {
                         <button
                           type="button"
                           onClick={() => { setMenuOpen(false); setMoreMobileOpen(false); setSettingsOpen(true); }}
-                          className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-800"
+                          className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
                         >
                           <span className="flex items-center gap-2"><SettingsIcon className="w-4 h-4" />Settings</span>
                         </button>

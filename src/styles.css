@@ -94,3 +94,88 @@ html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 .habit-remove {
   animation: habitRemove 0.3s ease-in forwards;
 }
+
+/* Header-specific button visuals
+   - Targets only header page links and the desktop "More" button (by attribute)
+   - Provides a neutral grey hover, smooth transitions, slight elevation via shadow only
+   - Active page buttons are color-inverted (no frame) and accessible in both themes
+   - Desktop "More" button border matches app frame colors used elsewhere
+   NOTE: Selectors avoid touching dropdown menu items and mobile menu controls.
+*/
+header nav > ul > li > a,
+header button[aria-haspopup="menu"] {
+  transition: background-color .18s var(--motion-page-ease),
+              color .18s var(--motion-page-ease),
+              box-shadow .18s var(--motion-page-ease),
+              border-color .18s var(--motion-page-ease);
+  background-color: transparent;
+  color: inherit; /* icons use currentColor */
+  padding: .5rem .75rem; /* match existing page button spacing */
+  font-size: .875rem; /* text-sm equivalent */
+  min-height: 36px; /* keep consistent sizing */
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+/* Hover: subtle neutral grey — light mode keeps same bg but removes shadow; dark mode is darker than frame */
+header nav > ul > li > a:hover,
+header button[aria-haspopup="menu"]:hover {
+  background-color: #f4f4f5; /* requested light-mode hover */
+  box-shadow: none; /* remove hover shadow in light mode per request */
+}
+
+/* Dark mode hover: darker than the frame (use neutral-900) to provide stronger contrast */
+.dark header nav > ul > li > a:hover,
+.dark header button[aria-haspopup="menu"]:hover {
+  background-color: #1f1f1f; /* requested dark-mode hover */
+  box-shadow: 0 6px 14px rgba(2,6,23,0.36);
+}
+
+/* Active page button: inverted colors, no frame
+   - Light mode: black bg, white text/icon
+   - Dark mode: white bg, black text/icon
+   Use aria-current="page" because NavLink sets that for active route.
+*/
+header nav > ul > li > a[aria-current="page"] {
+  border-color: transparent !important;
+  box-shadow: none;
+}
+
+/* Restore inverted active appearance for desktop page buttons
+   - Light mode: black bg, white text
+   - Dark mode: white bg, black text
+   Also set hover for the active button to use the inverted system hover colors:
+   - Light active hover -> dark hover (#1f1f1f)
+   - Dark active hover -> light hover (#f4f4f5)
+*/
+header nav > ul > li > a[aria-current="page"] {
+  background-color: #000; /* light-mode active: black */
+  color: #fff;
+}
+.dark header nav > ul > li > a[aria-current="page"] {
+  background-color: #fff; /* dark-mode active: white */
+  color: #000;
+}
+
+header nav > ul > li > a[aria-current="page"]:hover {
+  /* Active hovered in light mode: use inverted (dark) hover */
+  background-color: #1f1f1f;
+}
+.dark header nav > ul > li > a[aria-current="page"]:hover {
+  /* Active hovered in dark mode: use inverted (light) hover */
+  background-color: #f4f4f5;
+}
+
+/* Ensure icons inherit the text color when a page is active */
+header nav > ul > li > a[aria-current="page"] svg {
+  color: inherit;
+}
+
+/* Desktop More button: match the app frame colors used elsewhere
+   - Light: neutral-300-ish frame
+   - Dark: neutral-700-ish frame
+*/
+header button[aria-haspopup="menu"] {
+  background-clip: padding-box;
+}
