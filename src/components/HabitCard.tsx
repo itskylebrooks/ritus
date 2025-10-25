@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useEffect, useMemo, useState, useRef } from 'react'
-import { Check, Flame, Pencil, Trash2 } from 'lucide-react'
+import { Check, Flame, Pencil, Trash2, Archive, Inbox } from 'lucide-react'
 import { useHabitStore } from '../store/store'
 import type { Habit } from '../types'
 import WeekStrip from './WeekStrip'
@@ -13,6 +13,8 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
   const toggleCompletion = useHabitStore((s) => s.toggleCompletion)
   const editHabit = useHabitStore((s) => s.editHabit)
   const deleteHabit = useHabitStore((s) => s.deleteHabit)
+  const archiveHabit = useHabitStore((s) => (s as any).archiveHabit)
+  const unarchiveHabit = useHabitStore((s) => (s as any).unarchiveHabit)
 
   const [editing, setEditing] = useState(false)
   const [name, setName] = useState(habit.name)
@@ -82,6 +84,7 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
               >
                 <h3 className="truncate text-lg font-semibold">{habit.name}</h3>
                 <Badge>{habit.frequency}</Badge>
+                {habit.archived && <Badge>archived</Badge>}
               </motion.div>
             )}
           </AnimatePresence>
@@ -107,6 +110,16 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
                   whileTap={{ scale: 0.95 }}
                 >
                   <Pencil className="h-4 w-4" />
+                </motion.button>
+                <motion.button
+                  onClick={() => (habit.archived ? unarchiveHabit(habit.id) : archiveHabit(habit.id))}
+                  className="rounded-xl border dark:border-neutral-700 p-2 hover:bg-neutral-50 dark:hover:bg-neutral-900"
+                  aria-label={habit.archived ? 'Unarchive habit' : 'Archive habit'}
+                  title={habit.archived ? 'Unarchive' : 'Archive'}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {habit.archived ? <Inbox className="h-4 w-4" /> : <Archive className="h-4 w-4" />}
                 </motion.button>
                 <motion.button
                   onClick={() => setConfirmDeleteOpen(true)}

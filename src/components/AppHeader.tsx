@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { NavLink, Link } from 'react-router-dom'
-import { CircleHelp, PlusCircle, MinusCircle, ChartPie, Trophy, Home, Menu, ChevronDown, Settings as SettingsIcon } from 'lucide-react'
+import { CircleHelp, PlusCircle, MinusCircle, ChartPie, Trophy, Home, Menu, ChevronDown, Settings as SettingsIcon, Archive } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useMotionPreferences, defaultEase } from '../ui/motion'
 import { useHabitStore } from '../store/store'
@@ -24,6 +24,8 @@ export default function AppHeader() {
   const [moreMobileOpen, setMoreMobileOpen] = useState(false)
   const showAdd = useHabitStore((s) => s.showAdd)
   const setShowAdd = useHabitStore((s) => s.setShowAdd)
+  const showArchived = useHabitStore((s) => (s as any).showArchived)
+  const setShowArchived = useHabitStore((s) => (s as any).setShowArchived)
   const moreRef = useRef<HTMLDivElement | null>(null)
   const moreButtonRef = useRef<HTMLButtonElement | null>(null)
   const menuRef = useRef<HTMLDivElement | null>(null)
@@ -182,6 +184,15 @@ export default function AppHeader() {
                   <li>
                     <button
                       type="button"
+                      onClick={() => { setMoreDesktopOpen(false); setShowArchived(!showArchived); }}
+                      className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                    >
+                      <span className="flex items-center gap-2"><Archive className="w-4 h-4" />{showArchived ? 'Hide archived' : 'Show archived'}</span>
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
                       onClick={() => { setMoreDesktopOpen(false); setSettingsOpen(true); }}
                       className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
                     >
@@ -275,6 +286,15 @@ export default function AppHeader() {
                           className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
                         >
                           <span className="flex items-center gap-2"><CircleHelp className="w-4 h-4" />Guide</span>
+                        </button>
+                      </li>
+                      <li>
+                        <button
+                          type="button"
+                          onClick={() => { setMenuOpen(false); setMoreMobileOpen(false); setShowArchived(!showArchived); }}
+                          className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                        >
+                          <span className="flex items-center gap-2"><Archive className="w-4 h-4" />{showArchived ? 'Hide archived' : 'Show archived'}</span>
                         </button>
                       </li>
                       <li>

@@ -29,6 +29,8 @@ export function exportAllData() {
     // export formatting settings so they can be restored on import
     dateFormat: s.dateFormat,
     weekStart: s.weekStart,
+    // UI visibility flags
+    showArchived: s.showArchived,
     // no reminders in export
     totalPoints: s.totalPoints,
     longestStreak: s.longestStreak,
@@ -41,8 +43,9 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
     if (!parsed || typeof parsed !== 'object') return { ok: false, reason: 'invalid' }
     if (parsed.app !== 'ritus') return { ok: false, reason: 'not_ritus' }
     const incomingHabits: Partial<Habit>[] = Array.isArray(parsed.habits) ? parsed.habits : []
-  const incomingDateFormat: 'DMY' | 'MDY' | undefined = parsed.dateFormat === 'DMY' ? 'DMY' : parsed.dateFormat === 'MDY' ? 'MDY' : undefined
+    const incomingDateFormat: 'DMY' | 'MDY' | undefined = parsed.dateFormat === 'DMY' ? 'DMY' : parsed.dateFormat === 'MDY' ? 'MDY' : undefined
   const incomingWeekStart: 'sunday' | 'monday' | undefined = parsed.weekStart === 'sunday' ? 'sunday' : parsed.weekStart === 'monday' ? 'monday' : undefined
+  const incomingShowArchived: boolean | undefined = typeof parsed.showArchived === 'boolean' ? parsed.showArchived : undefined
     const incomingTotal = typeof parsed.totalPoints === 'number' ? parsed.totalPoints : 0
     const incomingLongest = typeof parsed.longestStreak === 'number' ? parsed.longestStreak : 0
 
@@ -65,6 +68,7 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
           : [],
         mode: (h as Habit).mode ?? 'build',
         weeklyTarget: (h as Habit).weeklyTarget,
+        archived: Boolean((h as any).archived ?? false),
         streak: Number((h as Habit).streak ?? 0),
         points: Number((h as Habit).points ?? 0),
       })
@@ -85,6 +89,7 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
       // restore formatting settings from import when available
       dateFormat: incomingDateFormat ?? cur.dateFormat,
       weekStart: incomingWeekStart ?? cur.weekStart,
+      showArchived: incomingShowArchived ?? cur.showArchived,
       showAdd: cur.showAdd,
     }
 

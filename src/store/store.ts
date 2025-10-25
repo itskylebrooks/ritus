@@ -14,6 +14,11 @@ export interface HabitState {
   // UI visibility
   showAdd: boolean
   setShowAdd: (v: boolean) => void
+  // archived visibility toggle (hide archived by default)
+  showArchived: boolean
+  setShowArchived: (v: boolean) => void
+  archiveHabit: (id: string) => void
+  unarchiveHabit: (id: string) => void
   reminders: { dailyEnabled: boolean; dailyTime: string }
   setReminders: (r: { dailyEnabled: boolean; dailyTime: string }) => void
   totalPoints: number
@@ -37,7 +42,9 @@ export const useHabitStore = create<HabitState>()(
   setWeekStart: (w) => set({ weekStart: w }),
   // UI visibility
   showAdd: true,
+  showArchived: false,
   setShowAdd: (v) => set({ showAdd: v }),
+  setShowArchived: (v) => set({ showArchived: v }),
   // user / preferences (no username — removed)
       reminders: { dailyEnabled: false, dailyTime: '21:00' },
       setReminders: (r: { dailyEnabled: boolean; dailyTime: string }) => set({ reminders: r }),
@@ -64,6 +71,7 @@ export const useHabitStore = create<HabitState>()(
             id: genId(),
             name: name.trim(),
             frequency,
+            archived: false,
             mode,
             createdAt: iso(new Date()),
             completions: [],
@@ -93,6 +101,9 @@ export const useHabitStore = create<HabitState>()(
         // preserve totalPoints and longestStreak as they are lifetime aggregates
         return { habits: remaining }
       }),
+  // archive/unarchive a habit (archived habits are hidden from default lists)
+      archiveHabit: (id: string) => set((s) => ({ habits: s.habits.map((h) => (h.id === id ? { ...h, archived: true } : h)) })),
+      unarchiveHabit: (id: string) => set((s) => ({ habits: s.habits.map((h) => (h.id === id ? { ...h, archived: false } : h)) })),
       toggleCompletion: (id, date) =>
         set((s) => {
           const day = new Date(date)
@@ -144,6 +155,7 @@ export const useHabitStore = create<HabitState>()(
         reminders: state.reminders,
         totalPoints: state.totalPoints,
         longestStreak: state.longestStreak,
+        showArchived: state.showArchived,
         dateFormat: state.dateFormat,
         weekStart: state.weekStart,
         showAdd: state.showAdd,

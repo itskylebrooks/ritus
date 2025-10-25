@@ -41,6 +41,7 @@ export default function Home() {
   const setShowAdd = useHabitStore((s) => s.setShowAdd)
 
   const habits = useHabitStore((s) => s.habits)
+  const showArchived = useHabitStore((s) => (s as any).showArchived)
   const initialListRender = useRef(true)
   useEffect(() => { initialListRender.current = false }, [])
   const [emptyReady, setEmptyReady] = useState(habits.length === 0)
@@ -70,7 +71,8 @@ export default function Home() {
 
   const sortedHabits = useMemo(() => {
     const today = new Date()
-    return [...habits].sort((a, b) => {
+    const source = showArchived ? habits : habits.filter((h) => !h.archived)
+    return [...source].sort((a, b) => {
       const aDone = a.frequency === 'daily'
         ? hasCompletionOnDay(a.completions, today)
         : countCompletionsInWeek(a.completions, today) >= (a.weeklyTarget ?? 1)
@@ -82,7 +84,7 @@ export default function Home() {
       if (aDone !== bDone) return aDone ? 1 : -1
       return fromISO(b.createdAt).getTime() - fromISO(a.createdAt).getTime()
     })
-  }, [habits])
+  }, [habits, showArchived])
 
   return (
     <div className="mx-auto max-w-3xl px-4">
