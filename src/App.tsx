@@ -43,7 +43,8 @@ function EmptyState({ disableAnim = false }: { disableAnim?: boolean }) {
 export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [guideOpen, setGuideOpen] = useState(false)
-  const [showAdd, setShowAdd] = useState(true)
+  const showAdd = useHabitStore((s) => s.showAdd)
+  const setShowAdd = useHabitStore((s) => s.setShowAdd)
   
   const habits = useHabitStore((s) => s.habits)
   const initialListRender = useRef(true)
@@ -106,7 +107,7 @@ export default function App() {
         <div>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setShowAdd((s) => !s)}
+              onClick={() => setShowAdd(!showAdd)}
               className="rounded-lg border dark:border-neutral-700 px-3 py-2 text-sm"
               aria-label={showAdd ? 'Hide add habit' : 'Show add habit'}
               title={showAdd ? 'Hide add habit' : 'Show add habit'}

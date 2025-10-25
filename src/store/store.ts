@@ -13,6 +13,9 @@ export interface HabitState {
   setDateFormat: (f: 'MDY' | 'DMY') => void
   weekStart: 'sunday' | 'monday'
   setWeekStart: (w: 'sunday' | 'monday') => void
+  // UI visibility
+  showAdd: boolean
+  setShowAdd: (v: boolean) => void
   reminders: { dailyEnabled: boolean; dailyTime: string }
   setReminders: (r: { dailyEnabled: boolean; dailyTime: string }) => void
   totalPoints: number
@@ -29,11 +32,14 @@ export const useHabitStore = create<HabitState>()(
   persist(
     (set, get) => ({
       habits: [],
-      // display preferences
-      dateFormat: 'MDY',
-      setDateFormat: (f) => set({ dateFormat: f }),
-      weekStart: 'monday',
-      setWeekStart: (w) => set({ weekStart: w }),
+  // display preferences
+  dateFormat: 'MDY',
+  setDateFormat: (f) => set({ dateFormat: f }),
+  weekStart: 'monday',
+  setWeekStart: (w) => set({ weekStart: w }),
+  // UI visibility
+  showAdd: true,
+  setShowAdd: (v) => set({ showAdd: v }),
       // user / preferences
       username: '',
       setUsername: (u: string) => set({ username: u }),
@@ -122,7 +128,7 @@ export const useHabitStore = create<HabitState>()(
     {
       name: 'ritus-habits',
       storage: createJSONStorage(() => localStorage),
-      version: 3,
+      version: 4,
       migrate: (persisted: any, prevVersion: number) => {
         // Normalize from previous versions: recompute totalPoints from habits
         if (prevVersion < 2 && persisted && typeof persisted === 'object') {
@@ -134,6 +140,9 @@ export const useHabitStore = create<HabitState>()(
         if (prevVersion < 3 && persisted && typeof persisted === 'object') {
           return { ...persisted, dateFormat: persisted.dateFormat || 'MDY', weekStart: persisted.weekStart || 'monday' }
         }
+        if (prevVersion < 4 && persisted && typeof persisted === 'object') {
+          return { ...persisted, showAdd: persisted.showAdd ?? true }
+        }
         return persisted as any
       },
       partialize: (state) => ({
@@ -144,6 +153,7 @@ export const useHabitStore = create<HabitState>()(
         longestStreak: state.longestStreak,
         dateFormat: state.dateFormat,
         weekStart: state.weekStart,
+        showAdd: state.showAdd,
       }),
     }
   )
