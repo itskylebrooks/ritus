@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useRef } from 'react'
 import { Check, Flame, Pencil, Trash2 } from 'lucide-react'
 import { useHabitStore } from '../store/store'
 import type { Habit } from '../types'
@@ -18,6 +18,11 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
   const [name, setName] = useState(habit.name)
   const [isRemoving, setIsRemoving] = useState(false)
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
+
+  // Capture the initial value of disableEntryAnim so it doesn't flip
+  // on the first parent-triggered re-render (which caused the entry
+  // animation to run for all cards after any button click).
+  const initialDisableEntry = useRef(disableEntryAnim)
 
   useEffect(() => {
     setName(habit.name)
@@ -40,7 +45,7 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
 
   return (
     <div
-      className={`rounded-2xl border dark:border-neutral-700 p-4 shadow-sm ${isRemoving ? 'habit-remove' : (disableEntryAnim ? '' : 'habit-add')}`}
+      className={`rounded-2xl border dark:border-neutral-700 p-4 shadow-sm ${isRemoving ? 'habit-remove' : (initialDisableEntry.current ? '' : 'habit-add')}`}
     >
       <div className="flex items-start justify-between gap-3">
   <div className="min-w-0 flex-1 min-h-[48px]">
