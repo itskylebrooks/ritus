@@ -131,7 +131,6 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
 
   function handleDeleteAllLocal() { setConfirmClearOpen(true) }
 
-  const topEmoji = '🙂'
   // reserved for potential future design accents
   // const gradientCSS = 'linear-gradient(135deg,#111,#0b1220)'
 
@@ -148,26 +147,11 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
         aria-modal="true"
         aria-labelledby="settings-title"
       >
-        <div className="mb-8">
-          <div className="relative h-12 flex items-center justify-center">
-            {onShowGuide && (
-              <div className="absolute left-0 top-1/2 -translate-y-1/2" style={{ width:48, height:48 }}>
-                <button type="button" aria-label="Open guide" onClick={handleShowGuide} className="w-12 h-12 flex items-center justify-center rounded-full bg-gray-100/40 dark:bg-neutral-800/30 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-100 hover:bg-gray-100/60 dark:hover:bg-neutral-800/40 transition">
-                  <span className="text-xl font-semibold">?</span>
-                </button>
-                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 translate-y-full text-[10px] text-black/40 font-medium whitespace-nowrap pointer-events-none select-none">App guide</div>
-              </div>
-            )}
-            <span id="settings-title" className="text-lg font-semibold tracking-wide text-neutral-900 dark:text-neutral-100">Settings</span>
-            <div className="absolute right-0 top-1/2 -translate-y-1/2" title="Your avatar">
-              <div className="relative" style={{ width:48, height:48 }}>
-                <div className="w-full h-full rounded-full border border-neutral-200 dark:border-neutral-700 shadow-inner overflow-hidden bg-black">
-                  <div className="flex items-center justify-center w-full h-full text-[24px] select-none text-white">{topEmoji}</div>
+        <div className="mb-4">
+                <div className="relative h-10 flex items-center justify-center">
+                  <span id="settings-title" className="text-lg font-semibold tracking-wide text-neutral-900 dark:text-neutral-100">Settings</span>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
 
         <div className="space-y-4">
           {/* Theme */}
