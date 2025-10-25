@@ -169,43 +169,34 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
                 <button
                   type="button"
                   onClick={() => applyTheme('system')}
-                  className={"relative grid h-10 w-10 place-items-center rounded-lg border dark:border-neutral-700 text-black dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900 transition " + (isSystemTheme ? 'text-neutral-900 dark:text-neutral-100' : 'text-neutral-500')}
+                  className={"grid h-10 w-10 place-items-center rounded-lg border dark:border-neutral-700 transition " + (isSystemTheme ? 'bg-black text-white dark:bg-white dark:text-black' : 'text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-900')}
                   aria-pressed={isSystemTheme}
                   aria-label="System"
                   title="System"
                 >
-                  {isSystemTheme && (
-                    <span className="absolute inset-0 rounded-lg border border-black/10 dark:border-neutral-700/10 bg-black/5 dark:bg-neutral-700/10 pointer-events-none" aria-hidden />
-                  )}
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="relative z-10 h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => applyTheme('light')}
-                  className={"relative grid h-10 w-10 place-items-center rounded-lg border dark:border-neutral-700 text-black dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900 transition " + (!isSystemTheme && mode === 'light' ? 'text-neutral-900 dark:text-neutral-100' : 'text-neutral-500')}
+                  className={"grid h-10 w-10 place-items-center rounded-lg border dark:border-neutral-700 transition " + (!isSystemTheme && mode === 'light' ? 'bg-black text-white dark:bg-white dark:text-black' : 'text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-900')}
                   aria-pressed={!isSystemTheme && mode === 'light'}
                   aria-label="Light"
                   title="Light"
                 >
-                  {!isSystemTheme && mode === 'light' && (
-                    <span className="absolute inset-0 rounded-lg border border-black/10 dark:border-neutral-700/10 bg-black/5 dark:bg-neutral-700/10 pointer-events-none" aria-hidden />
-                  )}
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="relative z-10 h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M20 12h2M2 12H0"/><path d="m17 17 1.5 1.5M5.5 5.5 7 7"/><path d="m17 7 1.5-1.5M5.5 18.5 7 17"/></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M20 12h2M2 12H0"/><path d="m17 17 1.5 1.5M5.5 5.5 7 7"/><path d="m17 7 1.5-1.5M5.5 18.5 7 17"/></svg>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => applyTheme('dark')}
-                  className={"relative grid h-10 w-10 place-items-center rounded-lg border dark:border-neutral-700 text-black dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900 transition " + (!isSystemTheme && mode === 'dark' ? 'text-neutral-900 dark:text-neutral-100' : 'text-neutral-500')}
+                  className={"grid h-10 w-10 place-items-center rounded-lg border dark:border-neutral-700 transition " + (!isSystemTheme && mode === 'dark' ? 'bg-black text-white dark:bg-white dark:text-black' : 'text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-900')}
                   aria-pressed={!isSystemTheme && mode === 'dark'}
                   aria-label="Dark"
                   title="Dark"
                 >
-                  {!isSystemTheme && mode === 'dark' && (
-                    <span className="absolute inset-0 rounded-lg border border-black/10 dark:border-neutral-700/10 bg-black/5 dark:bg-neutral-700/10 pointer-events-none" aria-hidden />
-                  )}
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="relative z-10 h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                 </button>
               </div>
             </div>
