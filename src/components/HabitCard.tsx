@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useEffect, useMemo, useState, useRef } from 'react'
-import { Check, Flame, Pencil, Trash2, Archive, Inbox } from 'lucide-react'
+import { Check, Flame, Pencil, Trash2, Archive, Inbox, Diamond } from 'lucide-react'
 import { useHabitStore } from '../store/store'
 import type { Habit } from '../types'
 import WeekStrip from './WeekStrip'
@@ -138,7 +138,9 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
       </div>
 
   <div className="mt-3 grid gap-3 md:grid-cols-[1fr_auto] md:items-center">
-        <WeekStrip habit={habit} onToggle={(d) => toggleCompletion(habit.id, d)} />
+        <div className="flex justify-center md:justify-start">
+          <WeekStrip habit={habit} onToggle={(d) => toggleCompletion(habit.id, d)} />
+        </div>
         {habit.mode === 'break' ? (
           <button
             onClick={() => toggleCompletion(habit.id, new Date())}
@@ -157,23 +159,46 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
         )}
       </div>
 
-      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <div>
-          <div className="text-sm text-neutral-600 dark:text-neutral-300">{habit.mode === 'break' ? 'Clean streak' : 'Streak'}</div>
-          <div className="mt-1 flex items-center gap-1 text-xl font-semibold">
-            <Flame className="h-5 w-5" /> {habit.streak}
+      <div className="mt-4">
+        {/* Mobile top row: streak (left) and points (right, icon above number) */}
+        <div className="flex items-center justify-between sm:hidden">
+          <div className="flex items-center gap-2">
+            <Flame className="h-5 w-5 text-black dark:text-white" aria-hidden />
+            <div className="text-lg font-semibold">{habit.streak}</div>
+            <span className="sr-only">{habit.mode === 'break' ? 'Clean streak' : 'Streak'}</span>
+          </div>
+          <div className="flex flex-col items-center">
+            <Diamond className="h-5 w-5 text-black dark:text-white" aria-hidden />
+            <div className="text-lg font-semibold">{habit.points}</div>
+            <span className="sr-only">Points</span>
           </div>
         </div>
-        <div>
-          <div className="text-sm text-neutral-600 dark:text-neutral-300">Weekly progress</div>
-          <div className="mt-2"><ProgressBar value={weeklyVal} max={weeklyMax} /></div>
-          <div className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">
-            {weeklyVal}/{weeklyMax}
-          </div>
+
+        {/* Mobile progress bar full width */}
+        <div className="mt-2 sm:hidden flex items-center gap-3">
+          <div className="flex-1"><ProgressBar value={weeklyVal} max={weeklyMax} /></div>
+          <div className="text-sm text-neutral-600 dark:text-neutral-300 tabular-nums">{weeklyVal}/{weeklyMax}</div>
         </div>
-        <div>
-          <div className="text-sm text-neutral-600 dark:text-neutral-300">Points</div>
-          <div className="mt-1 text-xl font-semibold">{habit.points}</div>
+
+        {/* Desktop/tablet: three-column centered layout */}
+        <div className="hidden sm:grid sm:grid-cols-[auto_1fr_auto] sm:items-center sm:gap-3">
+          <div className="flex items-center gap-2">
+            <Flame className="h-5 w-5 text-black dark:text-white" aria-hidden />
+            <div className="text-lg font-semibold">{habit.streak}</div>
+            <span className="sr-only">{habit.mode === 'break' ? 'Clean streak' : 'Streak'}</span>
+          </div>
+
+          <div className="flex items-center gap-2 justify-center justify-self-center">
+            <div className="w-56"><ProgressBar value={weeklyVal} max={weeklyMax} /></div>
+            <div className="text-sm text-neutral-600 dark:text-neutral-300 tabular-nums ml-3">{weeklyVal}/{weeklyMax}</div>
+            <span className="sr-only">Weekly progress</span>
+          </div>
+
+          <div className="flex items-center justify-end gap-2">
+            <Diamond className="h-5 w-5 text-black dark:text-white" aria-hidden />
+            <div className="sr-only">Points</div>
+            <div className="text-xl font-semibold">{habit.points}</div>
+          </div>
         </div>
       </div>
 
