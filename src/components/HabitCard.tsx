@@ -139,7 +139,7 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
     <div
       className={`rounded-2xl border dark:border-neutral-700 p-4 shadow-sm ${isRemoving ? 'habit-remove' : (initialDisableEntry.current ? '' : 'habit-add')}`}
     >
-      <div className="flex items-start justify-between gap-3">
+    <div className="flex items-start justify-between gap-3">
   <div className="min-w-0 flex-1 min-h-[48px]">
           <AnimatePresence mode="wait" initial={false}>
             {editing ? (
@@ -167,7 +167,7 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.22 }}
-                    className="flex flex-wrap items-center gap-2"
+                    className="relative top-1 flex flex-wrap items-center gap-2"
                   >
                 {/* Title with badges inline so badges sit immediately after the end of the title text */}
                 <div className="w-full">
