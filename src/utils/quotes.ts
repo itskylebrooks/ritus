@@ -324,6 +324,58 @@ export const QUOTES = [
     text: 'I fear not the man who has practiced 10,000 kicks once, but I fear the man who has practiced one kick 10,000 times.',
     author: 'Bruce Lee',
   },
+  {
+    text: "If you wish to conquer the whole world, conquer yourself.",
+    author: 'Fyodor Dostoevsky',
+  },
+  {
+    text: 'In a person, everything should be beautiful: face, clothes, soul, and thoughts.',
+    author: 'Anton Chekhov',
+  },
+  {
+    text: 'To live honestly, one must struggle, get entangled, make mistakes, start and quit, start again and quit again, and fight endlessly.',
+    author: 'Leo Tolstoy',
+  },
+  {
+    text: "If you want to be respected, first and foremost — respect yourself.",
+    author: 'Fyodor Dostoevsky',
+  },
+  {
+    text: 'Everyone dreams of changing the world, but no one sets out to change themselves.',
+    author: 'Leo Tolstoy',
+  },
+  {
+    text: 'To feel happiness within yourself continuously, even in moments of sorrow and grief, you must: a) know how to be content with the present, and b) take joy in the thought that "it could have been worse."',
+    author: 'Anton Chekhov',
+  },
+  {
+    text: "It’s easier to live without love. But without it, there’s no meaning.",
+    author: 'Leo Tolstoy',
+  },
+  {
+    text: "Never ask for anything! Never and from no one, especially from those who are stronger than you. They'll offer and give it themselves!",
+    author: 'Mikhail Bulgakov',
+  },
+  {
+    text: 'Look at a day as a small life.',
+    author: 'Maxim Gorky',
+  },
+  {
+    text: 'Death does not wait — and life should not wait either.',
+    author: 'Ivan Turgenev',
+  },
+  {
+    text: 'The battle is won by the one who has firmly decided to win it!',
+    author: 'Leo Tolstoy',
+  },
+  {
+    text: 'Learn from everyone — imitate no one.',
+    author: 'Maxim Gorky',
+  },
+  {
+    text: 'Why chase after the traces of something that has long since ended?',
+    author: 'Mikhail Bulgakov',
+  },
 ]
 
 export type Quote = {
