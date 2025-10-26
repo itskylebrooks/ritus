@@ -41,6 +41,10 @@ function ButtonsMenu({ habit, archiveHabit, unarchiveHabit, setEditing, setConfi
             className="rounded-xl border dark:border-neutral-700 p-2 hover:bg-neutral-50 dark:hover:bg-neutral-900"
             aria-label="More actions"
             title="More"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -49,10 +53,9 @@ function ButtonsMenu({ habit, archiveHabit, unarchiveHabit, setEditing, setConfi
         ) : (
           <motion.div
             key="expanded"
-            layout
-            initial={{ opacity: 0, x: 6 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 6 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: 0.18 }}
             className="flex items-center gap-2"
           >
@@ -140,36 +143,32 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
   <div className="min-w-0 flex-1 min-h-[48px]">
           <AnimatePresence mode="wait" initial={false}>
             {editing ? (
-              <motion.div
-                key="edit-mode"
-                layout
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.3 }}
-                className="flex flex-col items-start gap-2 sm:flex-row sm:items-center"
-              >
-                <input
-                  value={name}
-                  onChange={(e) => setName(e.target.value.slice(0, 60))}
-                  maxLength={60}
-                  className="w-full rounded-xl border dark:border-neutral-700 bg-white px-3 py-2 dark:bg-neutral-950"
-                />
-                <div className="flex gap-2">
-                  <button onClick={saveEdit} className="rounded-xl bg-black px-3 py-2 text-white dark:bg-white dark:text-black">Save</button>
-                  <button onClick={() => setEditing(false)} className="rounded-xl border dark:border-neutral-700 px-3 py-2">Cancel</button>
-                </div>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="normal-mode"
-                layout
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.3 }}
-                className="flex flex-wrap items-center gap-2"
-              >
+                  <motion.div
+                    key="edit-mode"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.22 }}
+                    className="flex flex-col gap-2 sm:flex-row sm:items-center"
+                  >
+                    <div className="w-full">
+                      <input
+                        value={name}
+                        onChange={(e) => setName(e.target.value.slice(0, 60))}
+                        maxLength={60}
+                        className="w-full rounded-xl border dark:border-neutral-700 bg-white px-3 py-2 dark:bg-neutral-950"
+                      />
+                    </div>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="normal-mode"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.22 }}
+                    className="flex flex-wrap items-center gap-2"
+                  >
                 {/* Title on its own line */}
                 <div className="w-full min-w-0">
                   <h3 className="text-lg font-semibold whitespace-normal break-words">{habit.name}</h3>
@@ -186,14 +185,35 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <AnimatePresence mode="wait" initial={false}>
-            {!editing && (
-              <ButtonsMenu
-                habit={habit}
-                archiveHabit={archiveHabit}
-                unarchiveHabit={unarchiveHabit}
-                setEditing={setEditing}
-                setConfirmDeleteOpen={setConfirmDeleteOpen}
-              />
+            {editing ? (
+              <motion.div
+                key="edit-actions"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.22 }}
+                className="flex items-center gap-2"
+              >
+                <button onClick={saveEdit} className="rounded-xl bg-black px-3 py-2 text-white dark:bg-white dark:text-black">Save</button>
+                <button onClick={() => { setEditing(false); setName(habit.name) }} className="rounded-xl border dark:border-neutral-700 px-3 py-2">Cancel</button>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="buttons"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.18 }}
+                className="flex items-center"
+              >
+                <ButtonsMenu
+                  habit={habit}
+                  archiveHabit={archiveHabit}
+                  unarchiveHabit={unarchiveHabit}
+                  setEditing={setEditing}
+                  setConfirmDeleteOpen={setConfirmDeleteOpen}
+                />
+              </motion.div>
             )}
           </AnimatePresence>
         </div>
