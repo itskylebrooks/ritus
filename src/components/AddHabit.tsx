@@ -108,36 +108,39 @@ export default function AddHabit() {
           }}
         />
       </motion.div>
-  <motion.div layout transition={{ layout: { type: 'spring', stiffness: 300, damping: 30 } }} style={{ minWidth: 0 }}>
-        <label className="block text-sm text-neutral-600 dark:text-neutral-300">I want to</label>
-        <div className="mt-1 flex gap-2">
-          <label
-            className={"px-3 py-2 rounded-xl border dark:border-neutral-700 cursor-pointer transform transition-all duration-150 ease-in-out " + (mode === 'build' ? 'bg-black text-white scale-100 shadow-md' : 'bg-white text-black scale-95 hover:bg-neutral-700 hover:text-white dark:hover:bg-neutral-300 dark:hover:text-black')}
-          >
-            <input className="sr-only" type="radio" name="mode" checked={mode === 'build'} onChange={() => setMode('build')} />
-            Build
-          </label>
-
-          <label
-            className={"px-3 py-2 rounded-xl border dark:border-neutral-700 cursor-pointer transform transition-all duration-150 ease-in-out " + (mode === 'break' ? 'bg-black text-white scale-100 shadow-md' : 'bg-white text-black scale-95 hover:bg-neutral-700 hover:text-white dark:hover:bg-neutral-300 dark:hover:text-black')}
-          >
-            <input className="sr-only" type="radio" name="mode" checked={mode === 'break'} onChange={() => setMode('break')} />
-            Break
-          </label>
-        </div>
-  </motion.div>
-
-  <motion.div layout transition={{ layout: { type: 'spring', stiffness: 300, damping: 30 } }} style={{ minWidth: 0 }}>
-        <label className="block text-sm text-neutral-600 dark:text-neutral-300">Frequency</label>
-        <select
-          className="mt-1 w-full rounded-xl border bg-white px-3 py-2 dark:bg-neutral-950 dark:border-neutral-700"
-          value={frequency}
-          onChange={(e) => setFrequency(e.target.value as Frequency)}
+  {/* On mobile: show 'I want to' and 'Frequency' side-by-side (two columns). */}
+  <div className="grid grid-cols-2 gap-3" style={{ minWidth: 0 }}>
+    <motion.div layout transition={{ layout: { type: 'spring', stiffness: 300, damping: 30 } }} style={{ minWidth: 0 }}>
+      <label className="block text-sm text-neutral-600 dark:text-neutral-300">I want to</label>
+      <div className="mt-1 flex gap-2">
+        <label
+          className={"px-3 py-2 rounded-xl border dark:border-neutral-700 cursor-pointer transform transition-all duration-150 ease-in-out " + (mode === 'build' ? 'bg-black text-white scale-100 shadow-md' : 'bg-white text-black scale-95 hover:bg-neutral-700 hover:text-white dark:hover:bg-neutral-300 dark:hover:text-black')}
         >
-          <option value="daily">Daily</option>
-          <option value="weekly">Weekly</option>
-        </select>
-  </motion.div>
+          <input className="sr-only" type="radio" name="mode" checked={mode === 'build'} onChange={() => setMode('build')} />
+          Build
+        </label>
+
+        <label
+          className={"px-3 py-2 rounded-xl border dark:border-neutral-700 cursor-pointer transform transition-all duration-150 ease-in-out " + (mode === 'break' ? 'bg-black text-white scale-100 shadow-md' : 'bg-white text-black scale-95 hover:bg-neutral-700 hover:text-white dark:hover:bg-neutral-300 dark:hover:text-black')}
+        >
+          <input className="sr-only" type="radio" name="mode" checked={mode === 'break'} onChange={() => setMode('break')} />
+          Break
+        </label>
+      </div>
+    </motion.div>
+
+    <motion.div layout transition={{ layout: { type: 'spring', stiffness: 300, damping: 30 } }} style={{ minWidth: 0 }}>
+      <label className="block text-sm text-neutral-600 dark:text-neutral-300">Frequency</label>
+      <select
+        className="mt-1 w-full rounded-xl border bg-white px-3 py-2 dark:bg-neutral-950 dark:border-neutral-700"
+        value={frequency}
+        onChange={(e) => setFrequency(e.target.value as Frequency)}
+      >
+        <option value="daily">Daily</option>
+        <option value="weekly">Weekly</option>
+      </select>
+    </motion.div>
+  </div>
   <AnimatePresence initial={false} mode="popLayout">
         {frequency === 'weekly' && (
           <motion.div
