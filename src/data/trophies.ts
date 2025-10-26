@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react'
-import { Flame, ShieldCheck, CalendarRange, Trophy, Medal } from 'lucide-react'
+import { Zap, ShieldCheck, CalendarRange, Trophy, Medal } from 'lucide-react'
 
 export type TrophyGroup = 'daily_build' | 'daily_break' | 'weekly' | 'totals'
 export interface TrophyDef {
@@ -13,11 +13,11 @@ export interface TrophyDef {
 }
 
 export const TROPHIES: TrophyDef[] = [
-  { id: 'streak_daily_build_7',   label: 'First Flame',      group: 'daily_build', threshold: 7,  Icon: Flame, reason: '7-day streak' },
-  { id: 'streak_daily_build_14',  label: 'Quiet Momentum',   group: 'daily_build', threshold: 14, Icon: Flame, reason: '14-day streak' },
-  { id: 'streak_daily_build_30',  label: 'Steady Ember',     group: 'daily_build', threshold: 30, Icon: Flame, reason: '30-day streak' },
-  { id: 'streak_daily_build_50',  label: 'Rhythm Keeper',    group: 'daily_build', threshold: 50, Icon: Flame, reason: '50-day streak' },
-  { id: 'streak_daily_build_100', label: 'Enduring Flame',   group: 'daily_build', threshold: 100,Icon: Flame, reason: '100-day streak' },
+  { id: 'streak_daily_build_7',   label: 'First Flame',      group: 'daily_build', threshold: 7,  Icon: Zap, reason: '7-day streak' },
+  { id: 'streak_daily_build_14',  label: 'Quiet Momentum',   group: 'daily_build', threshold: 14, Icon: Zap, reason: '14-day streak' },
+  { id: 'streak_daily_build_30',  label: 'Steady Ember',     group: 'daily_build', threshold: 30, Icon: Zap, reason: '30-day streak' },
+  { id: 'streak_daily_build_50',  label: 'Rhythm Keeper',    group: 'daily_build', threshold: 50, Icon: Zap, reason: '50-day streak' },
+  { id: 'streak_daily_build_100', label: 'Enduring Flame',   group: 'daily_build', threshold: 100,Icon: Zap, reason: '100-day streak' },
 
   { id: 'streak_daily_break_7',   label: 'Clean Start',      group: 'daily_break', threshold: 7,  Icon: ShieldCheck, reason: '7-day clean streak' },
   { id: 'streak_daily_break_14',  label: 'Clear Mind',       group: 'daily_break', threshold: 14, Icon: ShieldCheck, reason: '14-day clean streak' },
