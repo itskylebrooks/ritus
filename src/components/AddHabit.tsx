@@ -82,17 +82,23 @@ export default function AddHabit() {
   return (
   <motion.form layout onSubmit={submit} className="flex flex-col gap-3 rounded-2xl border dark:border-neutral-700 p-3 shadow-sm sm:flex-row sm:items-end">
   <motion.div className="flex-1" layout="position" transition={{ layout: { type: 'spring', stiffness: 300, damping: 30 } }} style={{ minWidth: 0 }}>
-        <label className="block text-sm text-neutral-600 dark:text-neutral-300">Habit name</label>
+        <div className="flex items-baseline justify-between">
+          <label className="block text-sm text-neutral-600 dark:text-neutral-300">
+            Habit name {name.length > 0 && <span className="ml-1">({name.length}/60)</span>}
+          </label>
+        </div>
         <input
           className="mt-1 w-full rounded-xl border bg-white px-3 py-2 outline-none ring-0 placeholder:text-neutral-400 focus:border-black/40 dark:bg-neutral-950 dark:border-neutral-700 dark:focus:border-neutral-700/50"
           placeholder={displayedPlaceholder}
           value={name}
+          maxLength={60}
           onChange={(e) => {
             if (typingTimer.current) {
               clearTimeout(typingTimer.current)
               typingTimer.current = null
             }
-            setName(e.target.value)
+            // enforce 60 char max defensively (HTML maxLength will also prevent longer input)
+            setName(e.target.value.slice(0, 60))
           }}
           onFocus={() => {
             if (typingTimer.current) {
