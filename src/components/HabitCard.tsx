@@ -83,9 +83,16 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
                 transition={{ duration: 0.3 }}
                 className="flex flex-wrap items-center gap-2"
               >
-                <h3 className="truncate text-lg font-semibold">{habit.name}</h3>
-                <Badge>{habit.frequency}</Badge>
-                {habit.archived && <Badge>archived</Badge>}
+                {/* Title on its own line */}
+                <div className="w-full min-w-0">
+                  <h3 className="truncate text-lg font-semibold">{habit.name}</h3>
+                </div>
+
+                {/* Tags / badges always on a new line */}
+                <div className="w-full mt-1 flex items-center gap-2">
+                  <Badge>{habit.frequency}</Badge>
+                  {habit.archived && <Badge>archived</Badge>}
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
