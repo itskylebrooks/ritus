@@ -172,10 +172,11 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
                 {/* Title with badges inline so badges sit immediately after the end of the title text */}
                 <div className="w-full">
                   <div className="text-lg font-semibold whitespace-normal break-words leading-tight">
-                    <span className="inline">{habit.name}{'\u00A0'}</span>
-                    <span className="inline-flex items-center gap-2">
-                      <Badge>{habit.frequency}</Badge>
-                      {habit.archived && <Badge>archived</Badge>}
+                    <span className="inline after:content-[''] after:inline-block after:w-2">{habit.name}</span>
+                    <span className="inline-flex items-center gap-2 align-text-bottom">
+                      {/* Compact badge labels: daily -> D, weekly -> W, archived -> A */}
+                      <Badge>{habit.frequency === 'daily' ? 'D' : habit.frequency === 'weekly' ? 'W' : String(habit.frequency).charAt(0).toUpperCase()}</Badge>
+                      {habit.archived && <Badge>A</Badge>}
                     </span>
                   </div>
                 </div>
