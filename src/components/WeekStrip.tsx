@@ -19,6 +19,7 @@ export default function WeekStrip({ habit, onToggle }: { habit: Habit; onToggle:
         const done = hasCompletionOnDay(habit.completions, d)
         const isPast = d < todayStart
         const isFuture = d > todayStart
+        const disabled = isFuture || habit.archived
 
   if (habit.mode === 'break') {
           const isMarked = hasCompletionOnDay(habit.completions, d)
@@ -33,13 +34,14 @@ export default function WeekStrip({ habit, onToggle }: { habit: Habit; onToggle:
           return (
             <motion.button
               key={d.toISOString()}
-              onClick={() => { if (!isFuture) onToggle(d) }}
-              disabled={isFuture}
+              onClick={() => { if (!disabled) onToggle(d) }}
+              disabled={disabled}
+              aria-disabled={disabled}
               aria-label={`${format(d, 'EEEE, d MMM')}: ${isMarked ? 'Marked clean' : isPast ? 'Missed' : 'Not set'}`}
-              className={`grid h-8 w-8 place-items-center rounded-full border text-xs font-medium ${cls} ${isFuture ? 'opacity-60 cursor-not-allowed' : ''}`}
+              className={`grid h-8 w-8 place-items-center rounded-full border text-xs font-medium ${cls} ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`}
               title={`${label} ${format(d, 'd MMM')}`}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: disabled ? 1 : 1.1 }}
+              whileTap={{ scale: disabled ? 1 : 0.95 }}
             >
               {content}
             </motion.button>
@@ -49,17 +51,18 @@ export default function WeekStrip({ habit, onToggle }: { habit: Habit; onToggle:
         return (
           <motion.button
             key={d.toISOString()}
-            onClick={() => { if (!isFuture) onToggle(d) }}
-            disabled={isFuture}
+            onClick={() => { if (!disabled) onToggle(d) }}
+            disabled={disabled}
+            aria-disabled={disabled}
             className={`grid h-8 w-8 place-items-center rounded-full border text-xs font-medium ${
               done
                 ? 'border-transparent bg-black text-white dark:bg-white dark:text-black'
                 : 'border-neutral-300 text-neutral-700 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-900'
-            } ${isFuture ? 'opacity-60 cursor-not-allowed' : ''}`}
-            aria-label={`${format(d, 'EEEE, d MMM')}: ${done ? 'Completed' : isFuture ? 'In future' : 'Not completed'}`}
+            } ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`}
+            aria-label={`${format(d, 'EEEE, d MMM')}: ${done ? 'Completed' : disabled ? 'Not available' : 'Not completed'}`}
             title={`${label} ${format(d, 'd MMM')}`}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: disabled ? 1 : 1.1 }}
+            whileTap={{ scale: disabled ? 1 : 0.95 }}
           >
             {label[0]}
           </motion.button>
