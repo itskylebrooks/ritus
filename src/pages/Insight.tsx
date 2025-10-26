@@ -53,7 +53,7 @@ export default function Insight() {
               <div className="flex items-center gap-2 min-w-0">
                 <h3 className="text-lg font-semibold truncate after:content-[''] after:inline-block after:w-2">{h.name}</h3>
                 <span className="inline-flex items-center align-text-bottom gap-2">
-                  <Badge>{h.frequency === 'daily' ? 'D' : h.frequency === 'weekly' ? 'W' : String(h.frequency).charAt(0).toUpperCase()}</Badge>
+                  <Badge>{h.frequency === 'daily' ? 'D' : h.frequency === 'weekly' ? `W${h.weeklyTarget ?? 1}` : String(h.frequency).charAt(0).toUpperCase()}</Badge>
                   {h.archived && <Badge>A</Badge>}
                 </span>
               </div>

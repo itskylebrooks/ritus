@@ -174,8 +174,8 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
                   <div className="text-lg font-semibold whitespace-normal break-words leading-tight">
                     <span className="inline after:content-[''] after:inline-block after:w-2">{habit.name}</span>
                     <span className="inline-flex items-center gap-2 align-text-bottom">
-                      {/* Compact badge labels: daily -> D, weekly -> W, archived -> A */}
-                      <Badge>{habit.frequency === 'daily' ? 'D' : habit.frequency === 'weekly' ? 'W' : String(habit.frequency).charAt(0).toUpperCase()}</Badge>
+                      {/* Compact badge labels: daily -> D, weekly -> W{n}, archived -> A */}
+                      <Badge>{habit.frequency === 'daily' ? 'D' : habit.frequency === 'weekly' ? `W${habit.weeklyTarget ?? 1}` : String(habit.frequency).charAt(0).toUpperCase()}</Badge>
                       {habit.archived && <Badge>A</Badge>}
                     </span>
                   </div>
