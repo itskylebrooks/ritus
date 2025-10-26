@@ -35,6 +35,9 @@ export default function AppHeader() {
   const { overlayMotion, prefersReducedMotion } = useMotionPreferences()
   const location = useLocation()
   const isHome = location.pathname === '/'
+  const isMilestones = location.pathname === '/milestones'
+  const isInspiration = location.pathname === '/inspiration'
+  const isArchiveHidden = isMilestones || isInspiration
 
   // Motion variants used for mobile menu and desktop "more" dropdown
   const mobileMenuVariants = {
@@ -207,24 +210,18 @@ export default function AppHeader() {
                         </button>
                       </li>
                     )}
-                    <li>
-                      <button
-                        type="button"
-                        onClick={() => { setMoreDesktopOpen(false); setGuideOpen(true); }}
-                        className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                      >
-                        <span className="flex items-center gap-2"><CircleHelp className="w-4 h-4" />Guide</span>
-                      </button>
-                    </li>
-                    <li>
-                      <button
-                        type="button"
-                        onClick={() => { setMoreDesktopOpen(false); setShowArchived(!showArchived); }}
-                        className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                      >
-                        <span className="flex items-center gap-2"><Archive className="w-4 h-4" />{showArchived ? 'Hide archived' : 'Show archived'}</span>
-                      </button>
-                    </li>
+                    {/* Guide (moved closer to Inspiration) */}
+                    {!isArchiveHidden && (
+                      <li>
+                        <button
+                          type="button"
+                          onClick={() => { setMoreDesktopOpen(false); setShowArchived(!showArchived); }}
+                          className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                        >
+                          <span className="flex items-center gap-2"><Archive className="w-4 h-4" />{showArchived ? 'Hide archived' : 'Show archived'}</span>
+                        </button>
+                      </li>
+                    )}
                     {isHome && (
                       <li>
                         <button
@@ -236,6 +233,17 @@ export default function AppHeader() {
                         </button>
                       </li>
                     )}
+
+                    {/* Guide placed directly above Inspiration */}
+                    <li>
+                      <button
+                        type="button"
+                        onClick={() => { setMoreDesktopOpen(false); setGuideOpen(true); }}
+                        className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                      >
+                        <span className="flex items-center gap-2"><CircleHelp className="w-4 h-4" />Guide</span>
+                      </button>
+                    </li>
                     <li>
                       <NavLink
                         to="/inspiration"
@@ -337,6 +345,18 @@ export default function AppHeader() {
                           </button>
                         </li>
                       )}
+                      {!isArchiveHidden && (
+                        <li>
+                          <button
+                            type="button"
+                            onClick={() => { setMenuOpen(false); setMoreMobileOpen(false); setShowArchived(!showArchived); }}
+                            className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                          >
+                            <span className="flex items-center gap-2"><Archive className="w-4 h-4" />{showArchived ? 'Hide archived' : 'Show archived'}</span>
+                          </button>
+                        </li>
+                      )}
+                      {/* Guide placed directly above Inspiration */}
                       <li>
                         <button
                           type="button"
@@ -344,15 +364,6 @@ export default function AppHeader() {
                           className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
                         >
                           <span className="flex items-center gap-2"><CircleHelp className="w-4 h-4" />Guide</span>
-                        </button>
-                      </li>
-                      <li>
-                        <button
-                          type="button"
-                          onClick={() => { setMenuOpen(false); setMoreMobileOpen(false); setShowArchived(!showArchived); }}
-                          className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                        >
-                          <span className="flex items-center gap-2"><Archive className="w-4 h-4" />{showArchived ? 'Hide archived' : 'Show archived'}</span>
                         </button>
                       </li>
                       <li>
