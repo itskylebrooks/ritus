@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import defaultHabits from '../store/defaultHabits'
 import { useHabitStore } from '../store/store'
+import ConfirmModal from './ConfirmModal'
 
 interface GuideModalProps {
   open: boolean
@@ -50,6 +51,36 @@ export default function GuideModal({ open, onClose, onLoadExample }: GuideModalP
   const enterRaf = useRef<number | null>(null)
   const stepAnimTimer = useRef<number | null>(null)
   const stepKeyRef = useRef(0)
+
+  // state for in-app confirmation when loading example data
+  const [confirmLoadOpen, setConfirmLoadOpen] = useState(false)
+
+  const doLoad = async () => {
+    const attemptLoad = async () => {
+      // compute cumulative totals from example data
+      const total = (defaultHabits || []).reduce((s, h) => s + (h.points || 0), 0)
+      const longest = (defaultHabits || []).reduce((m, h) => Math.max(m, h.streak || 0), 0)
+      useHabitStore.setState({ habits: defaultHabits, totalPoints: total, longestStreak: longest })
+    }
+
+    if (onLoadExample) {
+      try { await onLoadExample() } catch { await attemptLoad() }
+    } else {
+      await attemptLoad()
+    }
+
+    if (!closing) onClose()
+  }
+
+  const handleLoadClick = () => {
+    const state = useHabitStore.getState()
+    const existing = state.habits || []
+    if (existing.length > 0) {
+      setConfirmLoadOpen(true)
+    } else {
+      void doLoad()
+    }
+  }
 
   useEffect(()=>{
     if (open) {
@@ -137,40 +168,18 @@ export default function GuideModal({ open, onClose, onLoadExample }: GuideModalP
             )
           })}
         </div>
-    <div className="mt-5 flex items-center justify-between text-xs text-neutral-600 dark:text-neutral-400">
+  <div className="mt-5 flex items-center justify-between text-xs text-neutral-600 dark:text-neutral-400">
           <div>Step {step+1} / {STEPS.length}</div>
           <div className="flex gap-1">
       {STEPS.map((_,i)=> <span key={i} className={`h-1.5 w-1.5 rounded-full ${i===step? 'bg-neutral-900 dark:bg-neutral-100':'bg-neutral-300 dark:bg-neutral-700'}`}/>) }
           </div>
         </div>
-        <div className="mt-6 flex gap-3">
+  <div className="mt-6 flex gap-3">
           {last ? (
             // On final step show Finish (left) and Load data (right)
             <>
               <button onClick={()=> { if(!closing) onClose(); }} className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-gray-100 hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-black/80 dark:text-neutral-300 transition">Finish</button>
-              <button onClick={async()=> {
-                // prefer parent-provided loader, otherwise do an internal load
-                const attemptLoad = async () => {
-                  const state = useHabitStore.getState()
-                  const existing = state.habits || []
-                  if (existing.length > 0) {
-                    const ok = window.confirm('Load example data will replace your current habits. Continue?')
-                    if (!ok) return
-                  }
-                  // compute cumulative totals from example data
-                  const total = (defaultHabits || []).reduce((s, h) => s + (h.points || 0), 0)
-                  const longest = (defaultHabits || []).reduce((m, h) => Math.max(m, h.streak || 0), 0)
-                  useHabitStore.setState({ habits: defaultHabits, totalPoints: total, longestStreak: longest })
-                }
-
-                if (onLoadExample) {
-                  try { await onLoadExample() } catch { await attemptLoad() }
-                } else {
-                  await attemptLoad()
-                }
-
-                if(!closing) onClose()
-              }} className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-black text-white dark:bg-white dark:text-black">Load data</button>
+              <button onClick={async()=> { handleLoadClick() }} className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-black text-white dark:bg-white dark:text-black">Load data</button>
             </>
           ) : (
             <>
@@ -181,6 +190,17 @@ export default function GuideModal({ open, onClose, onLoadExample }: GuideModalP
             </>
           )}
         </div>
+
+        <ConfirmModal
+          open={confirmLoadOpen}
+          onClose={() => setConfirmLoadOpen(false)}
+          onConfirm={async () => { setConfirmLoadOpen(false); await doLoad() }}
+          title="Load example data?"
+          message="Load example data will replace your current habits. Continue?"
+          confirmLabel="Load"
+          cancelLabel="Cancel"
+          destructive
+        />
       </div>
     </div>
   )

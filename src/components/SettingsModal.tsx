@@ -34,6 +34,10 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
   
   const [exporting, setExporting] = useState(false)
   const [importing, setImporting] = useState(false)
+  const [importReportOpen, setImportReportOpen] = useState(false)
+  const [importReportTitle, setImportReportTitle] = useState('')
+  const [importReportMessage, setImportReportMessage] = useState<string | null>(null)
+  const [importReportReload, setImportReportReload] = useState(false)
   const [confirmClearOpen, setConfirmClearOpen] = useState(false)
   // export preview not shown in UI; omitted to keep UI minimal
   const fileRef = useRef<HTMLInputElement | null>(null)
@@ -94,10 +98,14 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
       const res = importAllData(txt)
       if (!res.ok) {
         if (res.reason === 'not_ritus') {
-          alert('This file is not a Ritus export. Please export from Ritus and try again.')
+          setImportReportTitle('Import failed')
+          setImportReportMessage('This file is not a Ritus export. Please export from Ritus and try again.')
         } else {
-          alert('Import failed')
+          setImportReportTitle('Import failed')
+          setImportReportMessage('Import failed')
         }
+        setImportReportReload(false)
+        setImportReportOpen(true)
       } else {
         const changes: string[] = []
         const anyHabitsInfo = res.addedHabits > 0 || res.duplicateHabits > 0 || res.invalidHabits > 0
@@ -117,14 +125,22 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
           res.longestStreakNew !== res.longestStreakPrev
 
         if (!changed) {
-          alert('No changes imported. All items were duplicates or invalid.')
+          setImportReportTitle('No changes imported')
+          setImportReportMessage('No changes imported. All items were duplicates or invalid.')
+          setImportReportReload(false)
+          setImportReportOpen(true)
         } else {
-          alert(`Import summary:\n- ${changes.join('\n- ')}`)
-          window.location.reload()
+          setImportReportTitle('Import summary')
+          setImportReportMessage(`- ${changes.join('\n- ')}`)
+          setImportReportReload(true)
+          setImportReportOpen(true)
         }
       }
     } catch {
-      alert('Import failed')
+      setImportReportTitle('Import failed')
+      setImportReportMessage('Import failed')
+      setImportReportReload(false)
+      setImportReportOpen(true)
     } finally {
       setImporting(false)
       try { e.target.value = '' } catch {}
@@ -360,6 +376,22 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
           destructive
         />
 
+        <ConfirmModal
+          open={importReportOpen}
+          onClose={() => setImportReportOpen(false)}
+          onConfirm={() => {
+            setImportReportOpen(false)
+            if (importReportReload) {
+              // reload so UI reflects imported changes (keeps behavior similar to previous impl)
+              window.location.reload()
+            }
+          }}
+          title={importReportTitle || 'Import'}
+          message={importReportMessage ? <pre className="whitespace-pre-wrap text-sm text-neutral-700 dark:text-neutral-300">{importReportMessage}</pre> : undefined}
+          confirmLabel={importReportReload ? 'Reload' : 'OK'}
+          cancelLabel={importReportReload ? 'Cancel' : 'Close'}
+        />
+
   <div className="mt-6 text-center text-[12px] text-neutral-600 dark:text-neutral-400 relative">
           <a
             href="https://itskylebrooks.vercel.app/"
@@ -392,3 +424,4 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
     </div>
   )
 }
+

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import type { ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 
 interface ConfirmModalProps {
@@ -6,7 +7,7 @@ interface ConfirmModalProps {
   onClose: () => void
   onConfirm: () => void
   title?: string
-  message?: string
+  message?: ReactNode
   confirmLabel?: string
   cancelLabel?: string
   destructive?: boolean
