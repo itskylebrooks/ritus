@@ -1,5 +1,4 @@
 import AddHabit from '../components/AddHabit'
-import HeaderStats from '../components/HeaderStats'
 import QuoteCard from '../components/QuoteCard'
 import ClockCard from '../components/ClockCard'
 import HabitCard from '../components/HabitCard'
@@ -90,7 +89,7 @@ export default function Home() {
 
   return (
     <div>
-      <HeaderStats />
+      
 
       <div className="mt-4 grid gap-4">
         <div className="grid gap-4 sm:grid-cols-3 items-stretch">

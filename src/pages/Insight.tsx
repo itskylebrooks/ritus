@@ -3,6 +3,7 @@ import { ChartPie, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useHabitStore } from '../store/store'
 import type { Habit } from '../types'
 import MonthGrid from '../components/MonthGrid'
+import HeaderStats from '../components/HeaderStats'
 import Badge from '../components/Badge'
 import { addYears, startOfMonth, isAfter, startOfYear } from 'date-fns'
 
@@ -36,6 +37,10 @@ export default function Insight() {
   return (
     <div>
       <h2 className="text-xl font-semibold flex items-center gap-2"><ChartPie className="w-5 h-5" /> Insight</h2>
+
+      <div className="mt-4">
+        <HeaderStats />
+      </div>
 
       <div className="mt-4 space-y-4">
         {visible.length === 0 && (
