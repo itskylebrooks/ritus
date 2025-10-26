@@ -1,9 +1,9 @@
 import { useEffect, useState, useRef } from 'react'
-import { useHabitStore } from '../store/store'
-import useThemeStore from '../store/theme'
-import { exportAllData, importAllData } from '../utils/dataTransfer'
+import { useHabitStore } from '../../store/store'
+import useThemeStore from '../../store/theme'
+import { exportAllData, importAllData } from '../../utils/dataTransfer'
 import ConfirmModal from './ConfirmModal'
-import pkg from '../../package.json'
+import pkg from '../../../package.json'
 function clearAllData() { localStorage.clear() }
 
 interface SettingsModalProps {

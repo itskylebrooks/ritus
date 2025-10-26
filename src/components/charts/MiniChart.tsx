@@ -1,8 +1,8 @@
 import { format } from 'date-fns'
-import { lastNDays } from '../utils/date'
-import { hasCompletionOnDay } from '../utils/scoring'
+import { lastNDays } from '../../utils/date'
+import { hasCompletionOnDay } from '../../utils/scoring'
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import type { Habit } from '../types'
+import type { Habit } from '../../types'
 
 export default function MiniChart({ habit }: { habit: Habit }) {
   const days = lastNDays(14)

@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, ChevronDown } from 'lucide-react'
-import { useHabitStore } from '../store/store'
-import type { Frequency } from '../types'
-import { HABIT_SUGGESTIONS } from '../data/habitSuggestions'
+import { useHabitStore } from '../../store/store'
+import type { Frequency } from '../../types'
+import { HABIT_SUGGESTIONS } from '../../data/habitSuggestions'
 
 export default function AddHabit() {
   const addHabit = useHabitStore((s) => s.addHabit)

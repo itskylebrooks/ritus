@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { addDays, eachDayOfInterval, endOfWeek, format, isSameDay, startOfWeek, subDays, startOfYear, endOfYear } from 'date-fns'
-import { useHabitStore } from '../store/store'
-import type { Habit } from '../types'
+import { useHabitStore } from '../../store/store'
+import type { Habit } from '../../types'
 
 // Render a GitHub-style contributions heatmap: columns = weeks, rows = weekdays.
 // Non-interactive (read-only) view. Shows ~52 weeks ending at the provided month reference.

@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { ChartPie, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useHabitStore } from '../store/store'
 import type { Habit } from '../types'
-import MonthGrid from '../components/MonthGrid'
-import HeaderStats from '../components/HeaderStats'
-import Badge from '../components/Badge'
+import MonthGrid from '../components/layout/MonthGrid'
+import HeaderStats from '../components/headers/HeaderStats'
+import Badge from '../components/cards/Badge'
 import { addYears, startOfMonth, isAfter, startOfYear } from 'date-fns'
 
 export default function Insight() {

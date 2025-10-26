@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
-import defaultHabits, { defaultProgress } from '../store/defaultHabits'
-import { useHabitStore } from '../store/store'
+import defaultHabits, { defaultProgress } from '../../store/defaultHabits'
+import { useHabitStore } from '../../store/store'
 import ConfirmModal from './ConfirmModal'
 
 interface GuideModalProps {

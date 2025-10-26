@@ -1,7 +1,7 @@
 import { Trophy } from 'lucide-react'
-import MilestonesHeaderCard from '../components/MilestonesHeaderCard'
-import TrophiesBoard from '../components/TrophiesBoard'
-import CollectiblesStoreCard from '../components/CollectiblesStoreCard'
+import MilestonesHeaderCard from '../components/cards/MilestonesHeaderCard'
+import TrophiesBoard from '../components/cards/TrophiesBoard'
+import CollectiblesStoreCard from '../components/cards/CollectiblesStoreCard'
 
 export default function Milestones() {
   return (

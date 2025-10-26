@@ -2,10 +2,10 @@ import { useState, useRef, useEffect } from 'react'
 import { NavLink, Link, useLocation } from 'react-router-dom'
 import { CircleHelp, PlusCircle, MinusCircle, ChartPie, Trophy, Home, Menu, ChevronDown, Settings as SettingsIcon, Archive, LayoutList, LayoutGrid, Lightbulb } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useMotionPreferences, defaultEase } from '../ui/motion'
-import { useHabitStore } from '../store/store'
-import SettingsModal from './SettingsModal'
-import GuideModal from './GuideModal'
+import { useMotionPreferences, defaultEase } from '../../ui/motion'
+import { useHabitStore } from '../../store/store'
+import SettingsModal from '../modals/SettingsModal'
+import GuideModal from '../modals/GuideModal'
 
 function DateDisplay() {
   const dateFormat = useHabitStore((s) => s.dateFormat)

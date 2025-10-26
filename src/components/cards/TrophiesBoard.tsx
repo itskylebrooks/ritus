@@ -1,5 +1,5 @@
-import { TROPHIES } from '../data/trophies'
-import { useHabitStore } from '../store/store'
+import { TROPHIES } from '../../data/trophies'
+import { useHabitStore } from '../../store/store'
 import { Trophy } from 'lucide-react'
 
 export default function TrophiesBoard() {

@@ -1,8 +1,8 @@
 import { Flame, Info, ChartNoAxesColumnIncreasing } from 'lucide-react'
-import { useHabitStore } from '../store/store'
-import { daysThisWeek } from '../utils/date'
-import { hasCompletionOnDay, countCompletionsInWeek } from '../utils/scoring'
-import ProgressBar from './ProgressBar'
+import { useHabitStore } from '../../store/store'
+import { daysThisWeek } from '../../utils/date'
+import { hasCompletionOnDay, countCompletionsInWeek } from '../../utils/scoring'
+import ProgressBar from '../charts/ProgressBar'
 
 export default function HeaderStats() {
   const habits = useHabitStore((s) => s.habits)

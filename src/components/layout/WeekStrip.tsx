@@ -1,9 +1,9 @@
 import { format } from 'date-fns'
 import { motion } from 'framer-motion'
-import { daysThisWeek } from '../utils/date'
-import { hasCompletionOnDay } from '../utils/scoring'
-import { useHabitStore } from '../store/store'
-import type { Habit } from '../types'
+import { daysThisWeek } from '../../utils/date'
+import { hasCompletionOnDay } from '../../utils/scoring'
+import { useHabitStore } from '../../store/store'
+import type { Habit } from '../../types'
 
 export default function WeekStrip({ habit, onToggle }: { habit: Habit; onToggle: (d: Date) => void }) {
   // subscribe to weekStart so the component re-renders when user changes first day of week

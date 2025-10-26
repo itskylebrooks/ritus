@@ -1,6 +1,6 @@
 import { Quote, Check } from 'lucide-react'
 import { useState } from 'react'
-import { QUOTES } from '../utils/quotes'
+import { QUOTES } from '../../utils/quotes'
 
 export default function QuoteCard() {
   // Choose a random quote once and keep it so copying doesn't change it

@@ -1,13 +1,13 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useEffect, useMemo, useState, useRef } from 'react'
 import { Check, Flame, Pencil, Trash2, Archive, Inbox, Diamond, Settings2 } from 'lucide-react'
-import { useHabitStore } from '../store/store'
-import type { Habit } from '../types'
-import WeekStrip from './WeekStrip'
-import ProgressBar from './ProgressBar'
+import { useHabitStore } from '../../store/store'
+import type { Habit } from '../../types'
+import WeekStrip from '../layout/WeekStrip'
+import ProgressBar from '../charts/ProgressBar'
 import Badge from './Badge'
-import { DAILY_MILESTONE, MILESTONE_BONUS, POINTS_PER_COMPLETION, WEEKLY_MILESTONE, countCompletionsInWeek } from '../utils/scoring'
-import ConfirmModal from './ConfirmModal'
+import { DAILY_MILESTONE, MILESTONE_BONUS, POINTS_PER_COMPLETION, WEEKLY_MILESTONE, countCompletionsInWeek } from '../../utils/scoring'
+import ConfirmModal from '../modals/ConfirmModal'
 
 type ButtonsMenuProps = {
   habit: Habit

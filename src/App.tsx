@@ -3,7 +3,7 @@ import Home from './pages/Home'
 import Insight from './pages/Insight'
 import Milestones from './pages/Milestones'
 import Inspiration from './pages/Inspiration'
-import AppHeader from './components/AppHeader'
+import AppHeader from './components/headers/AppHeader'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 
 export default function App() {

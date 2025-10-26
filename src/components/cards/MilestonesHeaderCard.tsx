@@ -1,6 +1,6 @@
-import ProgressBar from './ProgressBar'
-import { useHabitStore } from '../store/store'
-import { LEVEL_TITLES, levelWindow } from '../data/progression'
+import ProgressBar from '../charts/ProgressBar'
+import { useHabitStore } from '../../store/store'
+import { LEVEL_TITLES, levelWindow } from '../../data/progression'
 import { HeartPulse, Coins } from 'lucide-react'
 
 export default function MilestonesHeaderCard() {

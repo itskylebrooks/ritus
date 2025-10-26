@@ -1,6 +1,6 @@
-import { COLLECTIBLES } from '../data/collectibles'
-import { useHabitStore } from '../store/store'
-import type { CollectibleType } from '../data/collectibles'
+import { COLLECTIBLES } from '../../data/collectibles'
+import { useHabitStore } from '../../store/store'
+import type { CollectibleType } from '../../data/collectibles'
 
 export default function CollectiblesStoreCard() {
   const points = useHabitStore((s) => s.progress.points || 0)
