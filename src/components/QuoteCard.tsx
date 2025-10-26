@@ -45,14 +45,14 @@ export default function QuoteCard() {
             type="button"
             onClick={copyQuote}
             aria-label="Copy quote"
-            className="-ml-1 rounded-md p-1 transition-colors duration-150 ease-in-out"
+            className="group -ml-1 rounded-md p-1 transition-colors duration-150 ease-in-out"
             title="Copy quote"
           >
                 <span className="relative inline-block w-6 h-6">
                   {/* Quote icon (fades out when copied) */}
                   <Quote
                     className={
-                      `absolute inset-0 m-auto w-6 h-6 transition-all duration-200 ease-out text-neutral-400 hover:text-neutral-600 dark:text-neutral-600 dark:hover:text-neutral-300 ` +
+                      `absolute inset-0 m-auto w-6 h-6 transition-all duration-200 ease-out text-neutral-400 dark:text-neutral-600 pointer-events-none group-hover:text-neutral-600 dark:group-hover:text-neutral-300 ` +
                       (copied ? 'opacity-0 scale-95' : 'opacity-100 scale-100')
                     }
                   />
@@ -60,7 +60,7 @@ export default function QuoteCard() {
                   {/* Check icon (fades in when copied). Uses same base color as quote icon */}
                   <Check
                     className={
-                      `absolute inset-0 m-auto w-6 h-6 transition-all duration-200 ease-out text-neutral-400 dark:text-neutral-600 ` +
+                      `absolute inset-0 m-auto w-6 h-6 transition-all duration-200 ease-out text-neutral-400 dark:text-neutral-600 pointer-events-none group-hover:text-neutral-600 dark:group-hover:text-neutral-300 ` +
                       (copied ? 'opacity-100 scale-100' : 'opacity-0 scale-95')
                     }
                   />
