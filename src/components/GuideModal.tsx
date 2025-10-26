@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import defaultHabits from '../store/defaultHabits'
+import defaultHabits, { defaultProgress } from '../store/defaultHabits'
 import { useHabitStore } from '../store/store'
 import ConfirmModal from './ConfirmModal'
 
@@ -60,7 +60,23 @@ export default function GuideModal({ open, onClose, onLoadExample }: GuideModalP
       // compute cumulative totals from example data
       const total = (defaultHabits || []).reduce((s, h) => s + (h.points || 0), 0)
       const longest = (defaultHabits || []).reduce((m, h) => Math.max(m, h.streak || 0), 0)
-      useHabitStore.setState({ habits: defaultHabits, totalPoints: total, longestStreak: longest })
+      // also set example progress when loading sample data (essence/points/level)
+      if (defaultProgress) {
+        useHabitStore.setState({ habits: defaultHabits, totalPoints: total, longestStreak: longest, progress: defaultProgress })
+      } else {
+        useHabitStore.setState({ habits: defaultHabits, totalPoints: total, longestStreak: longest })
+      }
+
+      // Compute trophy summary from the example habits and award any trophies idempotently
+      try {
+        const summary = {
+          dailyBuildStreak: Math.max(0, ...defaultHabits.filter(h => h.frequency === 'daily' && h.mode === 'build').map(h => h.streak || 0)),
+          dailyBreakStreak: Math.max(0, ...defaultHabits.filter(h => h.frequency === 'daily' && h.mode === 'break').map(h => h.streak || 0)),
+          weeklyStreak: Math.max(0, ...defaultHabits.filter(h => h.frequency === 'weekly').map(h => h.streak || 0)),
+          totalCompletions: defaultHabits.reduce((acc, h) => acc + (h.completions ? h.completions.length : 0), 0),
+        }
+        try { useHabitStore.getState().awardTrophies(summary) } catch {}
+      } catch {}
     }
 
     if (onLoadExample) {

@@ -1,4 +1,5 @@
 import { Habit } from '../types';
+import { computeLevel } from '../data/progression'
 
 // Realistic default dataset for Kyle Brooks (creative developer & student)
 export const defaultHabits: Habit[] = [
@@ -222,3 +223,18 @@ export const defaultHabits: Habit[] = [
 ];
 
 export default defaultHabits;
+
+// Example default progress that pairs with the example habits above.
+export const defaultProgress = {
+  // lifetime essence (example)
+  essence: 4200,
+  // spendable points
+  points: 150,
+  // derived level
+  level: computeLevel(4200),
+  // bookkeeping maps (empty by default for example data)
+  weekBonusKeys: {},
+  completionAwardKeys: {},
+  // example unlocked trophies (empty by default)
+  unlocked: {},
+}
