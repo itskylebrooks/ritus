@@ -3,9 +3,16 @@ import { persist, createJSONStorage } from 'zustand/middleware'
 import { Habit, Frequency } from '../types'
 import { iso, fromISO, isSameDay } from '../utils/date'
 import { recalc } from '../utils/scoring'
+import { computeLevel } from '../data/progression'
 
 export interface HabitState {
   habits: Habit[]
+  // progression / XP
+  progress: { essence: number; points: number; level: number }
+  setEssence: (n: number) => void
+  addEssence: (delta: number) => void
+  setPoints: (n: number) => void
+  addPoints: (delta: number) => void
   // display settings
   dateFormat: 'MDY' | 'DMY'
   setDateFormat: (f: 'MDY' | 'DMY') => void
@@ -38,6 +45,8 @@ export const useHabitStore = create<HabitState>()(
   persist(
     (set, get) => ({
       habits: [],
+      // Progression defaults (essence = lifetime XP that determines level)
+      progress: { essence: 0, points: 0, level: 1 },
   // display preferences
   dateFormat: 'MDY',
   setDateFormat: (f) => set({ dateFormat: f }),
@@ -57,6 +66,21 @@ export const useHabitStore = create<HabitState>()(
       // cumulative stats that persist even if habits are deleted
       totalPoints: 0,
       longestStreak: 0,
+      // progression helpers
+      setEssence: (n: number) =>
+        set((s) => {
+          const essence = Math.max(0, Math.floor(n))
+          const level = computeLevel(essence)
+          return { progress: { ...s.progress, essence, level } }
+        }),
+      addEssence: (delta: number) =>
+        set((s) => {
+          const essence = Math.max(0, Math.floor(s.progress.essence + delta))
+          const level = computeLevel(essence)
+          return { progress: { ...s.progress, essence, level } }
+        }),
+      setPoints: (n: number) => set((s) => ({ progress: { ...s.progress, points: Math.max(0, Math.floor(n)) } })),
+      addPoints: (delta: number) => set((s) => ({ progress: { ...s.progress, points: Math.max(0, Math.floor(s.progress.points + delta)) } })),
       resetStats: () => set({ totalPoints: 0, longestStreak: 0 }),
   // safe id generation: crypto.randomUUID may not exist on some older mobile browsers
       addHabit: (name, frequency, weeklyTarget = 1, mode: 'build' | 'break' = 'build') =>
@@ -158,6 +182,7 @@ export const useHabitStore = create<HabitState>()(
       // the future, handle it explicitly (for now keep storage simple).
       partialize: (state) => ({
         habits: state.habits,
+        progress: state.progress,
         reminders: state.reminders,
         totalPoints: state.totalPoints,
         longestStreak: state.longestStreak,
