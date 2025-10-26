@@ -113,7 +113,7 @@ export default function AppHeader() {
   return (
     <header className="mb-6 flex items-center justify-between">
       <div className="flex items-baseline gap-4">
-        <Link to="/" aria-label="Go to home" className="text-2xl font-semibold tracking-tight hover:underline hover:text-neutral-700 dark:hover:text-neutral-200 transition-colors">Ritus</Link>
+  <Link to="/" aria-label="Go to home" className="text-2xl font-semibold tracking-tight hover-change-color transition-colors">Ritus</Link>
         <div className="text-sm text-neutral-600 dark:text-neutral-400" aria-hidden>
           <DateDisplay />
         </div>

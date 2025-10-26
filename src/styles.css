@@ -179,3 +179,14 @@ header nav > ul > li > a[aria-current="page"] svg {
 header button[aria-haspopup="menu"] {
   background-clip: padding-box;
 }
+
+/* Utility: only enable the title hover color on devices that support hover (avoid touch) */
+@media (hover: hover) and (pointer: fine) {
+  .hover-change-color:hover {
+    color: #374151; /* tailwind neutral-700 */
+  }
+  /* Dark mode variant for the same utility */
+  .dark .hover-change-color:hover {
+    color: #e5e7eb; /* tailwind neutral-200 */
+  }
+}
