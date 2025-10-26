@@ -1,4 +1,5 @@
 import { format } from 'date-fns'
+import { motion } from 'framer-motion'
 import { daysThisWeek } from '../utils/date'
 import { hasCompletionOnDay } from '../utils/scoring'
 import { useHabitStore } from '../store/store'
@@ -19,7 +20,7 @@ export default function WeekStrip({ habit, onToggle }: { habit: Habit; onToggle:
         const isPast = d < todayStart
         const isFuture = d > todayStart
 
-        if (habit.mode === 'break') {
+  if (habit.mode === 'break') {
           const isMarked = hasCompletionOnDay(habit.completions, d)
           // Always show the first letter for break-mode days; use bg color to indicate state
           const content = label[0]
@@ -30,34 +31,38 @@ export default function WeekStrip({ habit, onToggle }: { habit: Habit; onToggle:
             : 'border-neutral-300 text-neutral-700 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-900'
 
           return (
-            <button
+            <motion.button
               key={d.toISOString()}
               onClick={() => { if (!isFuture) onToggle(d) }}
               disabled={isFuture}
               aria-label={`${format(d, 'EEEE, d MMM')}: ${isMarked ? 'Marked clean' : isPast ? 'Missed' : 'Not set'}`}
-              className={`grid h-8 w-8 place-items-center rounded-full border text-xs font-medium transition ${cls} ${isFuture ? 'opacity-60 cursor-not-allowed' : ''}`}
+              className={`grid h-8 w-8 place-items-center rounded-full border text-xs font-medium ${cls} ${isFuture ? 'opacity-60 cursor-not-allowed' : ''}`}
               title={`${label} ${format(d, 'd MMM')}`}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
             >
               {content}
-            </button>
+            </motion.button>
           )
         }
 
         return (
-          <button
+          <motion.button
             key={d.toISOString()}
             onClick={() => { if (!isFuture) onToggle(d) }}
             disabled={isFuture}
-            className={`grid h-8 w-8 place-items-center rounded-full border text-xs font-medium transition ${
+            className={`grid h-8 w-8 place-items-center rounded-full border text-xs font-medium ${
               done
                 ? 'border-transparent bg-black text-white dark:bg-white dark:text-black'
                 : 'border-neutral-300 text-neutral-700 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-900'
             } ${isFuture ? 'opacity-60 cursor-not-allowed' : ''}`}
             aria-label={`${format(d, 'EEEE, d MMM')}: ${done ? 'Completed' : isFuture ? 'In future' : 'Not completed'}`}
             title={`${label} ${format(d, 'd MMM')}`}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
           >
             {label[0]}
-          </button>
+          </motion.button>
         )
       })}
     </div>
