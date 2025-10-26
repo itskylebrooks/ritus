@@ -224,11 +224,11 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
         <div className="flex justify-center md:justify-start">
           <WeekStrip habit={habit} onToggle={(d) => toggleCompletion(habit.id, d)} />
         </div>
-        {habit.mode === 'break' ? (
+            {habit.mode === 'break' ? (
           showList ? (
             <button
               onClick={() => toggleCompletion(habit.id, new Date())}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-3 py-2 text-sm text-white transition active:scale-[.98] md:justify-self-end"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-3 py-2 text-sm text-white transition-colors duration-150 ease-in-out hover:bg-emerald-700 dark:hover:bg-emerald-500 active:scale-[.98] md:justify-self-end"
             >
               <Check className="h-4 w-4" />
               <span>Mark clean</span>
@@ -237,7 +237,7 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
             <button
               onClick={() => toggleCompletion(habit.id, new Date())}
               aria-label="Mark clean"
-              className="inline-flex items-center justify-center rounded-xl bg-emerald-600 p-2 text-white transition active:scale-[.98] md:justify-self-end"
+              className="inline-flex items-center justify-center rounded-xl bg-emerald-600 p-2 text-white transition-colors duration-150 ease-in-out hover:bg-emerald-700 dark:hover:bg-emerald-500 active:scale-[.98] md:justify-self-end"
             >
               <Check className="h-4 w-4" />
               <span className="sr-only">Mark clean</span>
@@ -247,7 +247,7 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
           showList ? (
             <button
               onClick={() => toggleCompletion(habit.id, new Date())}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-black px-3 py-2 text-sm text-white transition active:scale-[.98] md:justify-self-end dark:bg-white dark:text-black"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-black px-3 py-2 text-sm text-white transition-colors duration-150 ease-in-out hover:bg-neutral-700 active:scale-[.98] md:justify-self-end dark:bg-white dark:text-black dark:hover:bg-neutral-300"
             >
               <Check className="h-4 w-4" />
               <span>Done today</span>
@@ -256,7 +256,7 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
             <button
               onClick={() => toggleCompletion(habit.id, new Date())}
               aria-label="Done today"
-              className="inline-flex items-center justify-center rounded-xl bg-black p-2 text-white transition active:scale-[.98] md:justify-self-end dark:bg-white dark:text-black"
+              className="inline-flex items-center justify-center rounded-xl bg-black p-2 text-white transition-colors duration-150 ease-in-out hover:bg-neutral-700 active:scale-[.98] md:justify-self-end dark:bg-white dark:text-black dark:hover:bg-neutral-300"
             >
               <Check className="h-4 w-4" />
               <span className="sr-only">Done today</span>

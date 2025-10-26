@@ -158,14 +158,9 @@ header nav > ul > li > a[aria-current="page"] {
   color: #000;
 }
 
-header nav > ul > li > a[aria-current="page"]:hover {
-  /* Active hovered in light mode: use inverted (dark) hover */
-  background-color: #1f1f1f;
-}
-.dark header nav > ul > li > a[aria-current="page"]:hover {
-  /* Active hovered in dark mode: use inverted (light) hover */
-  background-color: #f4f4f5;
-}
+/* Active hovered styles for header nav are handled via Tailwind classes on the NavLink elements
+   to keep hover shades consistent with buttons (use hover:bg-neutral-700 and dark:hover:bg-neutral-300).
+   Removing the hard-coded CSS hover overrides so the component-level classes take precedence. */
 
 /* Ensure icons inherit the text color when a page is active */
 header nav > ul > li > a[aria-current="page"] svg {

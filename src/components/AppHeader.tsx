@@ -124,17 +124,33 @@ export default function AppHeader() {
           {/* Desktop-only page links — hidden on mobile, pages moved into mobile menu */}
           <ul className="hidden md:flex items-center gap-2">
             <li>
-              <NavLink to="/" className="rounded-lg border px-3 py-2 text-sm border-neutral-300 dark:border-neutral-700" end>
+              <NavLink
+                to="/"
+                end
+                className={({ isActive }: { isActive: boolean }) =>
+                  `rounded-lg border px-3 py-2 text-sm border-neutral-300 dark:border-neutral-700 ${isActive ? 'transition-colors duration-150 ease-in-out hover:bg-neutral-700 dark:hover:bg-neutral-300' : ''}`
+                }
+              >
                 <Home className="inline-block w-4 h-4 mr-2" />Home
               </NavLink>
             </li>
             <li>
-              <NavLink to="/insight" className="rounded-lg border px-3 py-2 text-sm border-neutral-300 dark:border-neutral-700">
+              <NavLink
+                to="/insight"
+                className={({ isActive }: { isActive: boolean }) =>
+                  `rounded-lg border px-3 py-2 text-sm border-neutral-300 dark:border-neutral-700 ${isActive ? 'transition-colors duration-150 ease-in-out hover:bg-neutral-700 dark:hover:bg-neutral-300' : ''}`
+                }
+              >
                 <ChartPie className="inline-block w-4 h-4 mr-2" />Insight
               </NavLink>
             </li>
             <li>
-              <NavLink to="/milestones" className="rounded-lg border px-3 py-2 text-sm border-neutral-300 dark:border-neutral-700">
+              <NavLink
+                to="/milestones"
+                className={({ isActive }: { isActive: boolean }) =>
+                  `rounded-lg border px-3 py-2 text-sm border-neutral-300 dark:border-neutral-700 ${isActive ? 'transition-colors duration-150 ease-in-out hover:bg-neutral-700 dark:hover:bg-neutral-300' : ''}`
+                }
+              >
                 <Trophy className="inline-block w-4 h-4 mr-2" />Milestones
               </NavLink>
             </li>

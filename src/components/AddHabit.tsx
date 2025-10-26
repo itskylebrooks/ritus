@@ -112,14 +112,14 @@ export default function AddHabit() {
         <label className="block text-sm text-neutral-600 dark:text-neutral-300">I want to</label>
         <div className="mt-1 flex gap-2">
           <label
-            className={"px-3 py-2 rounded-xl border dark:border-neutral-700 cursor-pointer transform transition-all duration-150 ease-in-out " + (mode === 'build' ? 'bg-black text-white scale-100 shadow-md' : 'bg-white text-black scale-95')}
+            className={"px-3 py-2 rounded-xl border dark:border-neutral-700 cursor-pointer transform transition-all duration-150 ease-in-out " + (mode === 'build' ? 'bg-black text-white scale-100 shadow-md' : 'bg-white text-black scale-95 hover:bg-neutral-700 hover:text-white dark:hover:bg-neutral-300 dark:hover:text-black')}
           >
             <input className="sr-only" type="radio" name="mode" checked={mode === 'build'} onChange={() => setMode('build')} />
             Build
           </label>
 
           <label
-            className={"px-3 py-2 rounded-xl border dark:border-neutral-700 cursor-pointer transform transition-all duration-150 ease-in-out " + (mode === 'break' ? 'bg-black text-white scale-100 shadow-md' : 'bg-white text-black scale-95')}
+            className={"px-3 py-2 rounded-xl border dark:border-neutral-700 cursor-pointer transform transition-all duration-150 ease-in-out " + (mode === 'break' ? 'bg-black text-white scale-100 shadow-md' : 'bg-white text-black scale-95 hover:bg-neutral-700 hover:text-white dark:hover:bg-neutral-300 dark:hover:text-black')}
           >
             <input className="sr-only" type="radio" name="mode" checked={mode === 'break'} onChange={() => setMode('break')} />
             Break
@@ -167,7 +167,7 @@ export default function AddHabit() {
         transition={{ layout: { type: 'spring', stiffness: 300, damping: 30 } }}
         style={{ minWidth: 0 }}
         type="submit"
-        className="inline-flex items-center justify-center gap-2 rounded-xl bg-black px-4 py-2 text-white transition active:scale-[.98] dark:bg-white dark:text-black"
+  className="inline-flex items-center justify-center gap-2 rounded-xl bg-black px-4 py-2 text-white transition-colors duration-150 ease-in-out hover:bg-neutral-600 active:scale-[.98] dark:bg-white dark:text-black dark:hover:bg-neutral-300"
         aria-label="Add habit"
       >
         <Plus className="h-4 w-4" /> Add
