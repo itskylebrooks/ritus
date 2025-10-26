@@ -65,7 +65,8 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
               >
                 <input
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) => setName(e.target.value.slice(0, 60))}
+                  maxLength={60}
                   className="w-full rounded-xl border dark:border-neutral-700 bg-white px-3 py-2 dark:bg-neutral-950"
                 />
                 <div className="flex gap-2">
