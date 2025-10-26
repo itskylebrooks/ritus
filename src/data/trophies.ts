@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react'
-import { Flame, ShieldCheck, CalendarRange, Trophy } from 'lucide-react'
+import { Flame, ShieldCheck, CalendarRange, Trophy, Medal } from 'lucide-react'
 
 export type TrophyGroup = 'daily_build' | 'daily_break' | 'weekly' | 'totals'
 export interface TrophyDef {
@@ -30,10 +30,10 @@ export const TROPHIES: TrophyDef[] = [
   { id: 'streak_weekly_26',       label: 'Half-Year Pace',   group: 'weekly',      threshold: 26, Icon: CalendarRange, reason: '26 consecutive weekly wins' },
   { id: 'streak_weekly_52',       label: 'Year of Practice', group: 'weekly',      threshold: 52, Icon: CalendarRange, reason: '52 consecutive weekly wins' },
 
-  { id: 'total_50',               label: 'Momentum Starter', group: 'totals',      threshold: 50,  Icon: Trophy, reason: '50 total completions' },
-  { id: 'total_200',              label: 'Daily Craftsman',  group: 'totals',      threshold: 200, Icon: Trophy, reason: '200 total completions' },
-  { id: 'total_500',              label: 'Habit Architect',  group: 'totals',      threshold: 500, Icon: Trophy, reason: '500 total completions' },
-  { id: 'total_1000',             label: 'Ritus Veteran',    group: 'totals',      threshold: 1000,Icon: Trophy, reason: '1000 total completions' },
+  { id: 'total_50',               label: 'Momentum Starter', group: 'totals',      threshold: 50,  Icon: Medal, reason: '50 total completions' },
+  { id: 'total_200',              label: 'Daily Craftsman',  group: 'totals',      threshold: 200, Icon: Medal, reason: '200 total completions' },
+  { id: 'total_500',              label: 'Habit Architect',  group: 'totals',      threshold: 500, Icon: Medal, reason: '500 total completions' },
+  { id: 'total_1000',             label: 'Ritus Veteran',    group: 'totals',      threshold: 1000,Icon: Medal, reason: '1000 total completions' },
 ]
 
 export default TROPHIES
