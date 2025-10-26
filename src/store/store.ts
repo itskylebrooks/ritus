@@ -9,13 +9,14 @@ import { computeLevel } from '../data/progression'
 export interface HabitState {
   habits: Habit[]
   // progression / XP
-  progress: { essence: number; points: number; level: number; weekBonusKeys?: Record<string, true | undefined>; completionAwardKeys?: Record<string, true | undefined>; unlocked?: Record<string, true | undefined> }
+  progress: { essence: number; points: number; level: number; weekBonusKeys?: Record<string, true | undefined>; completionAwardKeys?: Record<string, true | undefined>; unlocked?: Record<string, true | undefined>; ownedCollectibles?: string[] }
   setEssence: (n: number) => void
   addEssence: (delta: number) => void
   setPoints: (n: number) => void
   addPoints: (delta: number) => void
   tryAwardWeeklyBonus: (habitId: string, weekDate: Date, reached: boolean) => void
   awardTrophies: (summary: { dailyBuildStreak: number; dailyBreakStreak: number; weeklyStreak: number; totalCompletions: number }) => string[]
+  purchaseCollectible: (id: string, cost: number) => boolean
   // display settings
   dateFormat: 'MDY' | 'DMY'
   setDateFormat: (f: 'MDY' | 'DMY') => void
@@ -49,7 +50,7 @@ export const useHabitStore = create<HabitState>()(
     (set, get) => ({
       habits: [],
   // Progression defaults (essence = lifetime XP that determines level)
-  progress: { essence: 0, points: 0, level: 1, weekBonusKeys: {}, completionAwardKeys: {}, unlocked: {} },
+  progress: { essence: 0, points: 0, level: 1, weekBonusKeys: {}, completionAwardKeys: {}, unlocked: {}, ownedCollectibles: [] },
   // display preferences
   dateFormat: 'MDY',
   setDateFormat: (f) => set({ dateFormat: f }),
@@ -143,6 +144,13 @@ export const useHabitStore = create<HabitState>()(
         if (newly.length === 0) return newly
         set((s) => ({ progress: { ...s.progress, unlocked } }))
         return newly
+      },
+      purchaseCollectible: (id, cost) => {
+        const state = get()
+        const owned = new Set(state.progress.ownedCollectibles || [])
+        if (owned.has(id) || (state.progress.points || 0) < cost) return false
+        set((s) => ({ progress: { ...s.progress, points: Math.max(0, Math.floor((s.progress.points || 0) - cost)), ownedCollectibles: [...(s.progress.ownedCollectibles || []), id] } }))
+        return true
       },
       resetStats: () => set({ totalPoints: 0, longestStreak: 0 }),
   // safe id generation: crypto.randomUUID may not exist on some older mobile browsers

@@ -1,6 +1,7 @@
 import { Trophy } from 'lucide-react'
 import MilestonesHeaderCard from '../components/MilestonesHeaderCard'
 import TrophiesBoard from '../components/TrophiesBoard'
+import CollectiblesStoreCard from '../components/CollectiblesStoreCard'
 
 export default function Milestones() {
   return (
@@ -11,6 +12,9 @@ export default function Milestones() {
       </div>
       <div className="mt-6">
         <TrophiesBoard />
+      </div>
+      <div className="mt-6">
+        <CollectiblesStoreCard />
       </div>
     </div>
   )
