@@ -46,7 +46,8 @@ export const useHabitStore = create<HabitState>()(
   // UI visibility
   showAdd: true,
   showArchived: false,
-  showList: false,
+  // default to list view
+  showList: true,
   setShowAdd: (v) => set({ showAdd: v }),
   setShowArchived: (v) => set({ showArchived: v }),
   setShowList: (v) => set({ showList: v }),

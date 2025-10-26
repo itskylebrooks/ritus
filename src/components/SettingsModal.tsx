@@ -340,6 +340,8 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
                 const st = useHabitStore.getState()
                 st.clearAll()
                 st.resetStats()
+                // restore UI defaults (reset view mode to list and other UI prefs)
+                try { st.setShowList(true) } catch {}
                 // restore UI defaults
                 try { st.setShowAdd(true) } catch {}
                 storeSetReminders({ dailyEnabled: false, dailyTime: '21:00' })
