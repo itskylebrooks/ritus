@@ -2,18 +2,20 @@ import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { Habit, Frequency } from '../types'
 import { iso, fromISO, isSameDay, startOfWeek, daysThisWeek } from '../utils/date'
+import { TROPHIES } from '../data/trophies'
 import { recalc } from '../utils/scoring'
 import { computeLevel } from '../data/progression'
 
 export interface HabitState {
   habits: Habit[]
   // progression / XP
-  progress: { essence: number; points: number; level: number; weekBonusKeys?: Record<string, true | undefined>; completionAwardKeys?: Record<string, true | undefined> }
+  progress: { essence: number; points: number; level: number; weekBonusKeys?: Record<string, true | undefined>; completionAwardKeys?: Record<string, true | undefined>; unlocked?: Record<string, true | undefined> }
   setEssence: (n: number) => void
   addEssence: (delta: number) => void
   setPoints: (n: number) => void
   addPoints: (delta: number) => void
   tryAwardWeeklyBonus: (habitId: string, weekDate: Date, reached: boolean) => void
+  awardTrophies: (summary: { dailyBuildStreak: number; dailyBreakStreak: number; weeklyStreak: number; totalCompletions: number }) => string[]
   // display settings
   dateFormat: 'MDY' | 'DMY'
   setDateFormat: (f: 'MDY' | 'DMY') => void
@@ -47,7 +49,7 @@ export const useHabitStore = create<HabitState>()(
     (set, get) => ({
       habits: [],
   // Progression defaults (essence = lifetime XP that determines level)
-  progress: { essence: 0, points: 0, level: 1, weekBonusKeys: {}, completionAwardKeys: {} },
+  progress: { essence: 0, points: 0, level: 1, weekBonusKeys: {}, completionAwardKeys: {}, unlocked: {} },
   // display preferences
   dateFormat: 'MDY',
   setDateFormat: (f) => set({ dateFormat: f }),
@@ -121,6 +123,27 @@ export const useHabitStore = create<HabitState>()(
           }
           return {}
         }),
+      // award trophies centrally and idempotently based on a summary of stats
+      awardTrophies: (summary) => {
+        const { progress } = get()
+        const newly: string[] = []
+        const unlocked = { ...(progress.unlocked || {}) }
+        const meets = (t: typeof TROPHIES[number]) => {
+          if (t.group === 'daily_build') return summary.dailyBuildStreak >= t.threshold
+          if (t.group === 'daily_break') return summary.dailyBreakStreak >= t.threshold
+          if (t.group === 'weekly') return summary.weeklyStreak >= t.threshold
+          return summary.totalCompletions >= t.threshold
+        }
+        for (const t of TROPHIES) {
+          if (!unlocked[t.id] && meets(t)) {
+            unlocked[t.id] = true
+            newly.push(t.id)
+          }
+        }
+        if (newly.length === 0) return newly
+        set((s) => ({ progress: { ...s.progress, unlocked } }))
+        return newly
+      },
       resetStats: () => set({ totalPoints: 0, longestStreak: 0 }),
   // safe id generation: crypto.randomUUID may not exist on some older mobile browsers
       addHabit: (name, frequency, weeklyTarget = 1, mode: 'build' | 'break' = 'build') =>
@@ -264,6 +287,27 @@ export const useHabitStore = create<HabitState>()(
               points: newPoints,
               weekBonusKeys: weekKeys,
               completionAwardKeys: compKeys,
+              // evaluate trophies idempotently based on updated habits
+              unlocked: (() => {
+                const existing = { ...(s.progress.unlocked || {}) }
+                const summary = {
+                  dailyBuildStreak: Math.max(0, ...updated.filter((hh) => hh.frequency === 'daily' && hh.mode === 'build').map((hh) => hh.streak || 0)),
+                  dailyBreakStreak: Math.max(0, ...updated.filter((hh) => hh.frequency === 'daily' && hh.mode === 'break').map((hh) => hh.streak || 0)),
+                  weeklyStreak: Math.max(0, ...updated.filter((hh) => hh.frequency === 'weekly').map((hh) => hh.streak || 0)),
+                  totalCompletions: updated.reduce((acc, hh) => acc + (hh.completions ? hh.completions.length : 0), 0),
+                }
+                for (const t of TROPHIES) {
+                  const meets = t.group === 'daily_build'
+                    ? summary.dailyBuildStreak >= t.threshold
+                    : t.group === 'daily_break'
+                      ? summary.dailyBreakStreak >= t.threshold
+                      : t.group === 'weekly'
+                        ? summary.weeklyStreak >= t.threshold
+                        : summary.totalCompletions >= t.threshold
+                  if (!existing[t.id] && meets) existing[t.id] = true
+                }
+                return existing
+              })(),
             },
           }
         }),
