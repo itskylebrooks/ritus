@@ -1,9 +1,11 @@
-import { useMemo } from 'react'
 import { Quote } from 'lucide-react'
 import { QUOTES } from '../utils/quotes'
 
 export default function QuoteCard() {
-  const quote = useMemo(() => QUOTES[Math.floor(Math.random() * QUOTES.length)], [])
+  // Choose a random quote each render
+  const quote = QUOTES.length
+    ? QUOTES[Math.floor(Math.random() * QUOTES.length)]
+    : { text: '', author: '' }
 
   return (
     <article className="rounded-2xl border dark:border-neutral-700 p-6 bg-white dark:bg-neutral-950 shadow-sm h-full">
