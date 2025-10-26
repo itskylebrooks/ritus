@@ -3,8 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/png" href="/icon.png" />
-    <link rel="apple-touch-icon" href="/icon.png" />
+  <!-- Favicons that respect system color scheme (uses prefers-color-scheme) -->
+  <link rel="icon" type="image/png" href="/icon-black.png" media="(prefers-color-scheme: light)" />
+  <link rel="icon" type="image/png" href="/icon-white.png" media="(prefers-color-scheme: dark)" />
+  <!-- Fallback for browsers that do not support the media attribute -->
+  <link rel="icon" type="image/png" href="/icon-black.png" />
+  <!-- Apple touch icon: iOS Safari doesn't reliably honor media on icons, so provide a sensible fallback -->
+  <link rel="apple-touch-icon" href="/icon-black.png" />
+  <!-- Theme color for browser UI (matches system preference where supported) -->
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
   <title>Ritus</title>
     <script>
       // Early theme application with persistence and system fallback
@@ -43,6 +51,47 @@
           window.addEventListener('storage', function (e) {
             if (e.key === STORAGE_KEY) apply(e.newValue);
           });
+        } catch (err) {
+          // noop on older browsers
+        }
+      })();
+    </script>
+    <script>
+      // Force favicon to follow system (prefers-color-scheme) regardless of app theme.
+      // This helps browsers that ignore media on <link rel="icon"> or that cache favicons.
+      (function () {
+        try {
+          var mq = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+
+          function setIconForMode(isDark) {
+            var href = isDark ? '/icon-white.png' : '/icon-black.png';
+            // Use or create a dynamic favicon link element
+            var link = document.querySelector('link[rel="icon"][data-dynamic-favicon]');
+            if (!link) {
+              link = document.createElement('link');
+              link.setAttribute('rel', 'icon');
+              link.setAttribute('type', 'image/png');
+              link.setAttribute('data-dynamic-favicon', 'true');
+              document.head.appendChild(link);
+            }
+            if (link.getAttribute('href') !== href) link.setAttribute('href', href);
+          }
+
+          // Initial set based on system preference (explicitly ignoring app's stored theme)
+          setIconForMode(!!(mq && mq.matches));
+
+          // Listen for system changes and update favicon
+          if (mq) {
+            if (mq.addEventListener) {
+              mq.addEventListener('change', function (e) {
+                setIconForMode(!!e.matches);
+              });
+            } else if (mq.addListener) {
+              mq.addListener(function (e) {
+                setIconForMode(!!e.matches);
+              });
+            }
+          }
         } catch (err) {
           // noop on older browsers
         }
