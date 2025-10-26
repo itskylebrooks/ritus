@@ -21,6 +21,8 @@ export default function CollectiblesStoreCard() {
         COLLECTIBLES STORE
       </div>
 
+      <div className="text-xs text-center text-neutral-600 dark:text-neutral-400 mb-3">All items are placeholders for now — the store is in development.</div>
+
       <div className="space-y-5">
         {groups.map((g) => {
           const items = COLLECTIBLES.filter((i) => i.type === g.type).slice().sort((a, b) => {
