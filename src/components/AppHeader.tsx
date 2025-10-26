@@ -110,6 +110,19 @@ export default function AppHeader() {
     }
   }, [menuOpen])
 
+  // Show guide automatically for first-time visitors (persisted in localStorage)
+  useEffect(() => {
+    try {
+      const seen = localStorage.getItem('ritus_seen_guide')
+      if (!seen) {
+        // show guide on first visit
+        setGuideOpen(true)
+      }
+    } catch (e) {
+      // ignore localStorage errors
+    }
+  }, [])
+
   return (
     <header className="mb-6 flex items-center justify-between">
       <div className="flex items-baseline gap-4">
@@ -376,7 +389,10 @@ export default function AppHeader() {
         onClose={() => setSettingsOpen(false)}
         onShowGuide={() => { setGuideOpen(true); setSettingsOpen(false); }}
       />
-      <GuideModal open={guideOpen} onClose={() => setGuideOpen(false)} />
+      <GuideModal
+        open={guideOpen}
+        onClose={() => { setGuideOpen(false); try { localStorage.setItem('ritus_seen_guide', '1') } catch {} }}
+      />
     </header>
   )
 }
