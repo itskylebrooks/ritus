@@ -34,6 +34,8 @@ export function exportAllData() {
     // no reminders in export
     totalPoints: s.totalPoints,
     longestStreak: s.longestStreak,
+    // progression state (essence/points/level and bookkeeping keys)
+    progress: s.progress || { essence: 0, points: 0, level: 1, weekBonusKeys: {}, completionAwardKeys: {} },
   }
 }
 
@@ -46,8 +48,9 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
     const incomingDateFormat: 'DMY' | 'MDY' | undefined = parsed.dateFormat === 'DMY' ? 'DMY' : parsed.dateFormat === 'MDY' ? 'MDY' : undefined
   const incomingWeekStart: 'sunday' | 'monday' | undefined = parsed.weekStart === 'sunday' ? 'sunday' : parsed.weekStart === 'monday' ? 'monday' : undefined
   const incomingShowArchived: boolean | undefined = typeof parsed.showArchived === 'boolean' ? parsed.showArchived : undefined
-    const incomingTotal = typeof parsed.totalPoints === 'number' ? parsed.totalPoints : 0
-    const incomingLongest = typeof parsed.longestStreak === 'number' ? parsed.longestStreak : 0
+  const incomingTotal = typeof parsed.totalPoints === 'number' ? parsed.totalPoints : 0
+  const incomingLongest = typeof parsed.longestStreak === 'number' ? parsed.longestStreak : 0
+  const incomingProgress = parsed && typeof parsed.progress === 'object' ? parsed.progress : undefined
 
     const cur = useHabitStore.getState()
     const existingIds = new Set(cur.habits.map((h) => h.id))
@@ -91,6 +94,8 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
       weekStart: incomingWeekStart ?? cur.weekStart,
       showArchived: incomingShowArchived ?? cur.showArchived,
       showAdd: cur.showAdd,
+      // include progress when persisting import
+      progress: incomingProgress ?? cur.progress,
     }
 
     try {
@@ -109,6 +114,7 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
       longestStreak: updated.longestStreak,
       dateFormat: updated.dateFormat,
       weekStart: updated.weekStart,
+      progress: updated.progress,
     }))
 
     return {

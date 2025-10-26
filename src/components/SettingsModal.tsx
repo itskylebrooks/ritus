@@ -356,6 +356,10 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
                 const st = useHabitStore.getState()
                 st.clearAll()
                 st.resetStats()
+                    // reset progression (essence/points/level and award keys)
+                    try {
+                      useHabitStore.setState({ progress: { essence: 0, points: 0, level: 1, weekBonusKeys: {}, completionAwardKeys: {} } })
+                    } catch {}
                 // restore UI defaults (reset view mode to list and other UI prefs)
                 try { st.setShowList(true) } catch {}
                 // restore UI defaults
