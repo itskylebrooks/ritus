@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { NavLink, Link } from 'react-router-dom'
+import { NavLink, Link, useLocation } from 'react-router-dom'
 import { CircleHelp, PlusCircle, MinusCircle, ChartPie, Trophy, Home, Menu, ChevronDown, Settings as SettingsIcon, Archive, LayoutList, LayoutGrid } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useMotionPreferences, defaultEase } from '../ui/motion'
@@ -33,6 +33,8 @@ export default function AppHeader() {
   const menuRef = useRef<HTMLDivElement | null>(null)
   const menuButtonRef = useRef<HTMLButtonElement | null>(null)
   const { overlayMotion, prefersReducedMotion } = useMotionPreferences()
+  const location = useLocation()
+  const isHome = location.pathname === '/'
 
   // Motion variants used for mobile menu and desktop "more" dropdown
   const mobileMenuVariants = {
@@ -165,15 +167,17 @@ export default function AppHeader() {
                   className="absolute right-0 top-full mt-2 w-44 rounded-lg border bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 shadow-lg z-30"
                 >
                   <ul className="p-2">
-                  <li>
-                    <button
-                      type="button"
-                      onClick={() => { setMoreDesktopOpen(false); setShowAdd(!showAdd); }}
-                      className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                    >
-                      <span className="flex items-center gap-2">{showAdd ? <MinusCircle className="w-4 h-4" /> : <PlusCircle className="w-4 h-4" />}<span>{showAdd ? 'Hide add' : 'Show add'}</span></span>
-                    </button>
-                  </li>
+                  {isHome && (
+                    <li>
+                      <button
+                        type="button"
+                        onClick={() => { setMoreDesktopOpen(false); setShowAdd(!showAdd); }}
+                        className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                      >
+                        <span className="flex items-center gap-2">{showAdd ? <MinusCircle className="w-4 h-4" /> : <PlusCircle className="w-4 h-4" />}<span>{showAdd ? 'Hide add' : 'Show add'}</span></span>
+                      </button>
+                    </li>
+                  )}
                   <li>
                     <button
                       type="button"
@@ -192,15 +196,17 @@ export default function AppHeader() {
                       <span className="flex items-center gap-2"><Archive className="w-4 h-4" />{showArchived ? 'Hide archived' : 'Show archived'}</span>
                     </button>
                   </li>
-                  <li>
-                    <button
-                      type="button"
-                      onClick={() => { setMoreDesktopOpen(false); setShowList(!showList); }}
-                      className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                    >
-                      <span className="flex items-center gap-2">{showList ? <LayoutGrid className="w-4 h-4" /> : <LayoutList className="w-4 h-4" />}{showList ? 'Show as grid' : 'Show as list'}</span>
-                    </button>
-                  </li>
+                  {isHome && (
+                    <li>
+                      <button
+                        type="button"
+                        onClick={() => { setMoreDesktopOpen(false); setShowList(!showList); }}
+                        className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                      >
+                        <span className="flex items-center gap-2">{showList ? <LayoutGrid className="w-4 h-4" /> : <LayoutList className="w-4 h-4" />}{showList ? 'Show as grid' : 'Show as list'}</span>
+                      </button>
+                    </li>
+                  )}
                   <li>
                     <button
                       type="button"
@@ -281,15 +287,17 @@ export default function AppHeader() {
                         variants={submenuVariants as any}
                         className="mt-1 pl-2 overflow-hidden"
                       >
-                      <li>
-                        <button
-                          type="button"
-                          onClick={() => { setMenuOpen(false); setMoreMobileOpen(false); setShowAdd(!showAdd); }}
-                          className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                        >
-                          <span className="flex items-center gap-2">{showAdd ? <MinusCircle className="w-4 h-4" /> : <PlusCircle className="w-4 h-4" />}<span>{showAdd ? 'Hide add' : 'Show add'}</span></span>
-                        </button>
-                      </li>
+                      {isHome && (
+                        <li>
+                          <button
+                            type="button"
+                            onClick={() => { setMenuOpen(false); setMoreMobileOpen(false); setShowAdd(!showAdd); }}
+                            className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                          >
+                            <span className="flex items-center gap-2">{showAdd ? <MinusCircle className="w-4 h-4" /> : <PlusCircle className="w-4 h-4" />}<span>{showAdd ? 'Hide add' : 'Show add'}</span></span>
+                          </button>
+                        </li>
+                      )}
                       <li>
                         <button
                           type="button"
