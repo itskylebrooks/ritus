@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useEffect, useMemo, useState, useRef } from 'react'
-import { Check, Flame, Pencil, Trash2, Archive, Inbox, Diamond } from 'lucide-react'
+import { Check, Flame, Pencil, Trash2, Archive, Inbox, Diamond, Settings2 } from 'lucide-react'
 import { useHabitStore } from '../store/store'
 import type { Habit } from '../types'
 import WeekStrip from './WeekStrip'
@@ -8,6 +8,92 @@ import ProgressBar from './ProgressBar'
 import Badge from './Badge'
 import { DAILY_MILESTONE, MILESTONE_BONUS, POINTS_PER_COMPLETION, WEEKLY_MILESTONE, countCompletionsInWeek } from '../utils/scoring'
 import ConfirmModal from './ConfirmModal'
+
+type ButtonsMenuProps = {
+  habit: Habit
+  archiveHabit: (id: string) => void
+  unarchiveHabit: (id: string) => void
+  setEditing: (v: boolean) => void
+  setConfirmDeleteOpen: (v: boolean) => void
+}
+
+function ButtonsMenu({ habit, archiveHabit, unarchiveHabit, setEditing, setConfirmDeleteOpen }: ButtonsMenuProps) {
+  const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => setOpen(false)
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('keydown', onKey)
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [])
+
+  return (
+    <div className="flex items-center gap-2">
+      <AnimatePresence initial={false} mode="wait">
+        {!open ? (
+          <motion.button
+            key="settings"
+            onClick={() => setOpen(true)}
+            className="rounded-xl border dark:border-neutral-700 p-2 hover:bg-neutral-50 dark:hover:bg-neutral-900"
+            aria-label="More actions"
+            title="More"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Settings2 className="h-4 w-4" />
+          </motion.button>
+        ) : (
+          <motion.div
+            key="expanded"
+            layout
+            initial={{ opacity: 0, x: 6 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 6 }}
+            transition={{ duration: 0.18 }}
+            className="flex items-center gap-2"
+          >
+            <motion.button
+              onClick={() => { setOpen(false); setEditing(true) }}
+              className="rounded-xl border dark:border-neutral-700 p-2 hover:bg-neutral-50 dark:hover:bg-neutral-900"
+              aria-label="Edit habit"
+              title="Edit"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Pencil className="h-4 w-4" />
+            </motion.button>
+
+            <motion.button
+              onClick={() => { setOpen(false); (habit.archived ? unarchiveHabit(habit.id) : archiveHabit(habit.id)) }}
+              className="rounded-xl border dark:border-neutral-700 p-2 hover:bg-neutral-50 dark:hover:bg-neutral-900"
+              aria-label={habit.archived ? 'Unarchive habit' : 'Archive habit'}
+              title={habit.archived ? 'Unarchive' : 'Archive'}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              {habit.archived ? <Inbox className="h-4 w-4" /> : <Archive className="h-4 w-4" />}
+            </motion.button>
+
+            <motion.button
+              onClick={() => { setOpen(false); setConfirmDeleteOpen(true) }}
+              className="rounded-xl border dark:border-neutral-700 p-2 hover:bg-neutral-50 text-red-500 dark:hover:bg-neutral-900"
+              aria-label="Delete habit"
+              title="Delete"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Trash2 className="h-4 w-4" />
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
 
 export default function HabitCard({ habit, disableEntryAnim = false }: { habit: Habit; disableEntryAnim?: boolean }) {
   const toggleCompletion = useHabitStore((s) => s.toggleCompletion)
@@ -86,7 +172,7 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
               >
                 {/* Title on its own line */}
                 <div className="w-full min-w-0">
-                  <h3 className="truncate text-lg font-semibold">{habit.name}</h3>
+                  <h3 className="text-lg font-semibold whitespace-normal break-words">{habit.name}</h3>
                 </div>
 
                 {/* Tags / badges always on a new line */}
@@ -101,46 +187,13 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
         <div className="flex shrink-0 items-center gap-2">
           <AnimatePresence mode="wait" initial={false}>
             {!editing && (
-              <motion.div
-                key="buttons"
-                layout
-                initial={{ opacity: 0, x: 6 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 6 }}
-                transition={{ duration: 0.25 }}
-                className="flex items-center gap-2"
-              >
-                <motion.button
-                  onClick={() => setEditing(true)}
-                  className="rounded-xl border dark:border-neutral-700 p-2 hover:bg-neutral-50 dark:hover:bg-neutral-900"
-                  aria-label="Edit habit"
-                  title="Edit"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Pencil className="h-4 w-4" />
-                </motion.button>
-                <motion.button
-                  onClick={() => (habit.archived ? unarchiveHabit(habit.id) : archiveHabit(habit.id))}
-                  className="rounded-xl border dark:border-neutral-700 p-2 hover:bg-neutral-50 dark:hover:bg-neutral-900"
-                  aria-label={habit.archived ? 'Unarchive habit' : 'Archive habit'}
-                  title={habit.archived ? 'Unarchive' : 'Archive'}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  {habit.archived ? <Inbox className="h-4 w-4" /> : <Archive className="h-4 w-4" />}
-                </motion.button>
-                <motion.button
-                  onClick={() => setConfirmDeleteOpen(true)}
-                  className="rounded-xl border dark:border-neutral-700 p-2 hover:bg-neutral-50 text-red-500 dark:hover:bg-neutral-900"
-                  aria-label="Delete habit"
-                  title="Delete"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </motion.button>
-              </motion.div>
+              <ButtonsMenu
+                habit={habit}
+                archiveHabit={archiveHabit}
+                unarchiveHabit={unarchiveHabit}
+                setEditing={setEditing}
+                setConfirmDeleteOpen={setConfirmDeleteOpen}
+              />
             )}
           </AnimatePresence>
         </div>
