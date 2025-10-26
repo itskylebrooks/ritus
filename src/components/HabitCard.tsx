@@ -15,6 +15,7 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
   const deleteHabit = useHabitStore((s) => s.deleteHabit)
   const archiveHabit = useHabitStore((s) => (s as any).archiveHabit)
   const unarchiveHabit = useHabitStore((s) => (s as any).unarchiveHabit)
+  const showList = useHabitStore((s) => (s as any).showList)
 
   const [editing, setEditing] = useState(false)
   const [name, setName] = useState(habit.name)
@@ -142,20 +143,43 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
           <WeekStrip habit={habit} onToggle={(d) => toggleCompletion(habit.id, d)} />
         </div>
         {habit.mode === 'break' ? (
-          <button
-            onClick={() => toggleCompletion(habit.id, new Date())}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-3 py-2 text-sm text-white transition active:scale-[.98] md:justify-self-end"
-          >
-            <Check className="h-4 w-4" />
-            <span className="text-sm">Mark clean</span>
-          </button>
+          showList ? (
+            <button
+              onClick={() => toggleCompletion(habit.id, new Date())}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-3 py-2 text-sm text-white transition active:scale-[.98] md:justify-self-end"
+            >
+              <Check className="h-4 w-4" />
+              <span>Mark clean</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => toggleCompletion(habit.id, new Date())}
+              aria-label="Mark clean"
+              className="inline-flex items-center justify-center rounded-xl bg-emerald-600 p-2 text-white transition active:scale-[.98] md:justify-self-end"
+            >
+              <Check className="h-4 w-4" />
+              <span className="sr-only">Mark clean</span>
+            </button>
+          )
         ) : (
-          <button
-            onClick={() => toggleCompletion(habit.id, new Date())}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-black px-3 py-2 text-sm text-white transition active:scale-[.98] md:justify-self-end dark:bg-white dark:text-black"
-          >
-            <Check className="h-4 w-4" /> Done today
-          </button>
+          showList ? (
+            <button
+              onClick={() => toggleCompletion(habit.id, new Date())}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-black px-3 py-2 text-sm text-white transition active:scale-[.98] md:justify-self-end dark:bg-white dark:text-black"
+            >
+              <Check className="h-4 w-4" />
+              <span>Done today</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => toggleCompletion(habit.id, new Date())}
+              aria-label="Done today"
+              className="inline-flex items-center justify-center rounded-xl bg-black p-2 text-white transition active:scale-[.98] md:justify-self-end dark:bg-white dark:text-black"
+            >
+              <Check className="h-4 w-4" />
+              <span className="sr-only">Done today</span>
+            </button>
+          )
         )}
       </div>
 
@@ -189,7 +213,7 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
           </div>
 
           <div className="flex items-center gap-2 justify-center justify-self-center">
-            <div className="w-56"><ProgressBar value={weeklyVal} max={weeklyMax} /></div>
+            <div className="w-56 md:w-40"><ProgressBar value={weeklyVal} max={weeklyMax} /></div>
             <div className="text-sm text-neutral-600 dark:text-neutral-300 tabular-nums ml-3">{weeklyVal}/{weeklyMax}</div>
             <span className="sr-only">Weekly progress</span>
           </div>

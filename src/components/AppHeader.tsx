@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { NavLink, Link } from 'react-router-dom'
-import { CircleHelp, PlusCircle, MinusCircle, ChartPie, Trophy, Home, Menu, ChevronDown, Settings as SettingsIcon, Archive } from 'lucide-react'
+import { CircleHelp, PlusCircle, MinusCircle, ChartPie, Trophy, Home, Menu, ChevronDown, Settings as SettingsIcon, Archive, LayoutList, LayoutGrid } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useMotionPreferences, defaultEase } from '../ui/motion'
 import { useHabitStore } from '../store/store'
@@ -26,6 +26,8 @@ export default function AppHeader() {
   const setShowAdd = useHabitStore((s) => s.setShowAdd)
   const showArchived = useHabitStore((s) => (s as any).showArchived)
   const setShowArchived = useHabitStore((s) => (s as any).setShowArchived)
+  const showList = useHabitStore((s) => (s as any).showList)
+  const setShowList = useHabitStore((s) => (s as any).setShowList)
   const moreRef = useRef<HTMLDivElement | null>(null)
   const moreButtonRef = useRef<HTMLButtonElement | null>(null)
   const menuRef = useRef<HTMLDivElement | null>(null)
@@ -188,6 +190,15 @@ export default function AppHeader() {
                       className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
                     >
                       <span className="flex items-center gap-2"><Archive className="w-4 h-4" />{showArchived ? 'Hide archived' : 'Show archived'}</span>
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
+                      onClick={() => { setMoreDesktopOpen(false); setShowList(!showList); }}
+                      className="w-full text-left px-3 py-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                    >
+                      <span className="flex items-center gap-2">{showList ? <LayoutGrid className="w-4 h-4" /> : <LayoutList className="w-4 h-4" />}{showList ? 'Show as grid' : 'Show as list'}</span>
                     </button>
                   </li>
                   <li>

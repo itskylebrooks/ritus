@@ -40,6 +40,8 @@ export default function Home() {
   const showAdd = useHabitStore((s) => s.showAdd)
   const setShowAdd = useHabitStore((s) => s.setShowAdd)
 
+  const showList = useHabitStore((s) => (s as any).showList)
+
   const habits = useHabitStore((s) => s.habits)
   const showArchived = useHabitStore((s) => (s as any).showArchived)
   const initialListRender = useRef(true)
@@ -107,7 +109,7 @@ export default function Home() {
           </div>
         )}
 
-        <motion.main layout className="grid gap-4">
+  <motion.main layout className={`grid gap-4 ${showList ? '' : 'sm:grid-cols-2'}`}>
           <AnimatePresence initial={false} mode="popLayout">
             {sortedHabits.length === 0 ? (
               emptyReady ? <EmptyState disableAnim={initialListRender.current} /> : null

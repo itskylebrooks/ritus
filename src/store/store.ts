@@ -17,6 +17,9 @@ export interface HabitState {
   // archived visibility toggle (hide archived by default)
   showArchived: boolean
   setShowArchived: (v: boolean) => void
+  // display mode: grid (false) or list (true)
+  showList: boolean
+  setShowList: (v: boolean) => void
   archiveHabit: (id: string) => void
   unarchiveHabit: (id: string) => void
   reminders: { dailyEnabled: boolean; dailyTime: string }
@@ -43,8 +46,10 @@ export const useHabitStore = create<HabitState>()(
   // UI visibility
   showAdd: true,
   showArchived: false,
+  showList: false,
   setShowAdd: (v) => set({ showAdd: v }),
   setShowArchived: (v) => set({ showArchived: v }),
+  setShowList: (v) => set({ showList: v }),
   // user / preferences (no username — removed)
       reminders: { dailyEnabled: false, dailyTime: '21:00' },
       setReminders: (r: { dailyEnabled: boolean; dailyTime: string }) => set({ reminders: r }),
@@ -156,6 +161,7 @@ export const useHabitStore = create<HabitState>()(
         totalPoints: state.totalPoints,
         longestStreak: state.longestStreak,
         showArchived: state.showArchived,
+        showList: state.showList,
         dateFormat: state.dateFormat,
         weekStart: state.weekStart,
         showAdd: state.showAdd,
