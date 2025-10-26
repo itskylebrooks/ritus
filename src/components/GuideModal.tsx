@@ -1,43 +1,38 @@
 import { useState, useEffect, useRef } from 'react'
+import defaultHabits from '../store/defaultHabits'
+import { useHabitStore } from '../store/store'
 
 interface GuideModalProps {
   open: boolean
   onClose: () => void
+  onLoadExample?: () => void
 }
 
 type GuideStep = { title: string; body: string }
 const STEPS: GuideStep[] = [
   {
     title: 'Welcome to Ritus',
-    body: 'Ritus helps you build small habits. Create a habit, pick its frequency, and track progress with a single tap.'
+    body: 'Ritus helps you build or break habits. New: build/break modes, weekly targets, streaks, points, archive and export — all local-first.'
   },
   {
-    title: 'Add a habit',
-    body: 'Tap Add, give your habit a name and choose Daily or Weekly. For weekly habits, pick how many days per week you want to complete.'
+    title: 'Create a habit',
+    body: 'Tap Add, name your habit, choose Daily or Weekly. For weekly habits set a weekly target (how many days/week count).' 
   },
   {
-    title: 'Mark completions',
-    body: 'Use the week strip or the Done button on a card to mark a habit complete for a day. Weekly habits let you pick multiple days per week.'
+    title: 'Track completions',
+    body: 'Tap Done on a card or use the week strip to mark days. Weekly habits count when you meet the weekly target; gaps are normal — pick up where you left off.'
   },
   {
-    title: 'Streaks & points',
-    body: 'Ritus awards points per completion and tracks streaks. Weekly streaks count when you reach your chosen days/week target. +5 pts per completion. Milestone bonus: 10 pts every 4-week streak.'
+    title: 'Points & streaks',
+    body: 'Completions earn points and grow streaks. Header and Insights show totals and weekly percent. Milestones give bonus points for long streaks.'
   },
   {
-    title: 'Edit & manage',
-    body: 'Tap the pencil to rename or change frequency. You can delete habits or reset all data from Settings.'
+    title: 'Manage & backup',
+    body: 'Edit habits with the pencil, archive finished ones, or export/import JSON from Settings. Data stays on your device unless you export or opt into sync.'
   },
   {
-    title: 'Progress at a glance',
-    body: 'HeaderStats shows total points and weekly completion percent. Cards show streak, weekly progress, and points.'
-  },
-  {
-    title: 'Local-first & export',
-    body: 'Your data is stored locally in the browser. Use Settings to export/import JSON for backups or device transfer.'
-  },
-  {
-    title: 'Privacy & sync',
-    body: 'Ritus is local-first. Cloud sync is optional and opt-in; settings expose placeholder controls for future sync.'
+    title: 'Try example data',
+    body: "Click 'Load data' below to populate sample habits. If you already have data you'll be asked to confirm; loading will replace your current habits."
   }
 ]
 
@@ -45,7 +40,7 @@ type LayerPhase = 'enter' | 'exit'
 type LayerDir = 'forward' | 'back'
 interface StepLayer { key: number; idx: number; phase: LayerPhase; dir: LayerDir }
 
-export default function GuideModal({ open, onClose }: GuideModalProps) {
+export default function GuideModal({ open, onClose, onLoadExample }: GuideModalProps) {
   const [step, setStep] = useState(0)
   const [renderedSteps, setRenderedSteps] = useState<StepLayer[]>([{ key: 0, idx: 0, phase: 'enter', dir: 'forward' }])
   const [visible, setVisible] = useState(open)
@@ -148,11 +143,43 @@ export default function GuideModal({ open, onClose }: GuideModalProps) {
       {STEPS.map((_,i)=> <span key={i} className={`h-1.5 w-1.5 rounded-full ${i===step? 'bg-neutral-900 dark:bg-neutral-100':'bg-neutral-300 dark:bg-neutral-700'}`}/>) }
           </div>
         </div>
-    <div className="mt-6 flex gap-3">
-          {step>0 && (
-      <button onClick={()=> queueStep(Math.max(0, step-1))} className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-gray-100 hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-black/80 dark:text-neutral-300 transition">Back</button>
+        <div className="mt-6 flex gap-3">
+          {last ? (
+            // On final step show Finish (left) and Load data (right)
+            <>
+              <button onClick={()=> { if(!closing) onClose(); }} className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-gray-100 hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-black/80 dark:text-neutral-300 transition">Finish</button>
+              <button onClick={async()=> {
+                // prefer parent-provided loader, otherwise do an internal load
+                const attemptLoad = async () => {
+                  const state = useHabitStore.getState()
+                  const existing = state.habits || []
+                  if (existing.length > 0) {
+                    const ok = window.confirm('Load example data will replace your current habits. Continue?')
+                    if (!ok) return
+                  }
+                  // compute cumulative totals from example data
+                  const total = (defaultHabits || []).reduce((s, h) => s + (h.points || 0), 0)
+                  const longest = (defaultHabits || []).reduce((m, h) => Math.max(m, h.streak || 0), 0)
+                  useHabitStore.setState({ habits: defaultHabits, totalPoints: total, longestStreak: longest })
+                }
+
+                if (onLoadExample) {
+                  try { await onLoadExample() } catch { await attemptLoad() }
+                } else {
+                  await attemptLoad()
+                }
+
+                if(!closing) onClose()
+              }} className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-black text-white dark:bg-white dark:text-black">Load data</button>
+            </>
+          ) : (
+            <>
+              {step>0 && (
+                <button onClick={()=> queueStep(Math.max(0, step-1))} className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-gray-100 hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-black/80 dark:text-neutral-300 transition">Back</button>
+              )}
+              <button onClick={()=> queueStep(Math.min(STEPS.length-1, step+1))} className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-black text-white dark:bg-white dark:text-black">Next</button>
+            </>
           )}
-      <button onClick={()=> { if(last) onClose(); else queueStep(Math.min(STEPS.length-1, step+1)); }} className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-black text-white dark:bg-white dark:text-black">{last? 'Finish':'Next'}</button>
         </div>
       </div>
     </div>
