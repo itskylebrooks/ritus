@@ -134,6 +134,9 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
   const weeklyMax = habit.frequency === 'daily' ? 7 : habit.weeklyTarget ?? 1
   const weeklyVal = useMemo(() => countCompletionsInWeek(habit.completions), [habit.completions])
 
+  // If points are large, render the number smaller so it fits the card
+  const pointsClass = habit.points && habit.points > 999 ? 'text-sm font-semibold tabular-nums' : 'text-base font-semibold tabular-nums'
+
   function saveEdit() {
     const trimmed = name.trim()
     if (!trimmed) return setEditing(false)
@@ -287,14 +290,14 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
       <div className="mt-4">
         {/* Mobile top row: streak (left) and points (right, icon beside number) */}
         <div className="flex items-center justify-between sm:hidden">
-          <div className="flex items-center gap-2">
-            <Flame className="h-5 w-5 text-black dark:text-white" aria-hidden />
-            <div className="text-lg font-semibold">{habit.streak}</div>
+      <div className="flex items-center gap-2">
+        <Flame className="h-4 w-4 text-black dark:text-white" aria-hidden />
+        <div className="text-base font-semibold">{habit.streak}</div>
             <span className="sr-only">{habit.mode === 'break' ? 'Clean streak' : 'Streak'}</span>
           </div>
           <div className="flex items-center gap-2">
-            <Diamond className="h-5 w-5 text-black dark:text-white" aria-hidden />
-            <div className="text-lg font-semibold">{habit.points}</div>
+            <Diamond className="h-4 w-4 text-black dark:text-white" aria-hidden />
+            <div className={pointsClass}>{habit.points}</div>
             <span className="sr-only">Points</span>
           </div>
         </div>
@@ -308,8 +311,8 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
         {/* Desktop/tablet: three-column centered layout */}
         <div className="hidden sm:grid sm:grid-cols-[auto_1fr_auto] sm:items-center sm:gap-3">
           <div className="flex items-center gap-2">
-            <Flame className="h-5 w-5 text-black dark:text-white" aria-hidden />
-            <div className="text-lg font-semibold">{habit.streak}</div>
+            <Flame className="h-4 w-4 text-black dark:text-white" aria-hidden />
+            <div className="text-base font-semibold">{habit.streak}</div>
             <span className="sr-only">{habit.mode === 'break' ? 'Clean streak' : 'Streak'}</span>
           </div>
 
@@ -320,9 +323,9 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
           </div>
 
           <div className="flex items-center justify-end gap-2">
-            <Diamond className="h-5 w-5 text-black dark:text-white" aria-hidden />
+            <Diamond className="h-4 w-4 text-black dark:text-white" aria-hidden />
             <div className="sr-only">Points</div>
-            <div className="text-xl font-semibold">{habit.points}</div>
+            <div className={pointsClass}>{habit.points}</div>
           </div>
         </div>
       </div>
