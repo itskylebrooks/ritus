@@ -108,7 +108,21 @@ export default function AddHabit() {
   <motion.div className="flex-1" layout="position" transition={{ layout: { type: 'spring', stiffness: 300, damping: 30 } }} style={{ minWidth: 0 }}>
         <div className="flex items-baseline justify-between">
           <label className="block text-sm text-neutral-600 dark:text-neutral-300">
-            Habit name {name.length > 0 && <span className="ml-1">({name.length}/60)</span>}
+            Habit name
+            <AnimatePresence initial={false}>
+              {name.length > 0 && (
+                <motion.span
+                  key="counter"
+                  className="ml-1"
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.12 }}
+                >
+                  ({name.length}/60)
+                </motion.span>
+              )}
+            </AnimatePresence>
           </label>
         </div>
         <div className="relative mt-1" ref={wrapperRef}>
