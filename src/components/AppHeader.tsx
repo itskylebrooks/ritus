@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { NavLink, Link, useLocation } from 'react-router-dom'
-import { CircleHelp, PlusCircle, MinusCircle, ChartPie, Trophy, Home, Menu, ChevronDown, Settings as SettingsIcon, Archive, LayoutList, LayoutGrid } from 'lucide-react'
+import { CircleHelp, PlusCircle, MinusCircle, ChartPie, Trophy, Home, Menu, ChevronDown, Settings as SettingsIcon, Archive, LayoutList, LayoutGrid, Lightbulb } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useMotionPreferences, defaultEase } from '../ui/motion'
 import { useHabitStore } from '../store/store'
@@ -183,6 +183,15 @@ export default function AppHeader() {
                   className="absolute right-0 top-full mt-2 w-44 rounded-lg border bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 shadow-lg z-30"
                 >
                   <ul className="p-2">
+                  <li>
+                    <NavLink
+                      to="/inspiration"
+                      onClick={() => setMoreDesktopOpen(false)}
+                      className="w-full block text-left px-3 py-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                    >
+                      <span className="flex items-center gap-2"><Lightbulb className="w-4 h-4" />Inspiration</span>
+                    </NavLink>
+                  </li>
                   {isHome && (
                     <li>
                       <button
@@ -303,6 +312,15 @@ export default function AppHeader() {
                         variants={submenuVariants as any}
                         className="mt-1 pl-2 overflow-hidden"
                       >
+                      <li>
+                          <NavLink
+                            to="/inspiration"
+                            onClick={() => { setMenuOpen(false); setMoreMobileOpen(false); }}
+                            className={({ isActive }: { isActive: boolean }) => `block rounded-md px-3 py-2 text-base ${isActive ? 'bg-neutral-100 dark:bg-neutral-800' : ''}`}
+                          >
+                            <span className="flex items-center gap-2"><Lightbulb className="w-4 h-4 mr-2" />Inspiration</span>
+                          </NavLink>
+                      </li>
                       {isHome && (
                         <li>
                           <button
