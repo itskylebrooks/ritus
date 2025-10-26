@@ -169,15 +169,15 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
                     transition={{ duration: 0.22 }}
                     className="flex flex-wrap items-center gap-2"
                   >
-                {/* Title on its own line */}
-                <div className="w-full min-w-0">
-                  <h3 className="text-lg font-semibold whitespace-normal break-words">{habit.name}</h3>
-                </div>
-
-                {/* Tags / badges always on a new line */}
-                <div className="w-full mt-1 flex items-center gap-2">
-                  <Badge>{habit.frequency}</Badge>
-                  {habit.archived && <Badge>archived</Badge>}
+                {/* Title with badges inline so badges sit immediately after the end of the title text */}
+                <div className="w-full">
+                  <div className="text-lg font-semibold whitespace-normal break-words leading-tight">
+                    <span className="inline">{habit.name}{'\u00A0'}</span>
+                    <span className="inline-flex items-center gap-2">
+                      <Badge>{habit.frequency}</Badge>
+                      {habit.archived && <Badge>archived</Badge>}
+                    </span>
+                  </div>
                 </div>
               </motion.div>
             )}
