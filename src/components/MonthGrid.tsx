@@ -99,7 +99,7 @@ export default function MonthGrid({ habit, month, allowScroll = true, alignToNow
   const displayMonthLabels: (string | null)[] = [...Array(2).fill(null), ...monthLabels].slice(0, monthLabels.length)
 
   return (
-    <div ref={containerRef} className={`mt-3 ${allowScroll ? 'overflow-x-auto' : 'overflow-x-hidden'}`}>
+    <div ref={containerRef} className={`mt-3 ${allowScroll ? 'overflow-x-auto' : 'overflow-x-hidden'} overflow-y-hidden`}>
       <div className="mb-2 flex items-center gap-2">
         <div className="w-8 text-sm text-neutral-600 dark:text-neutral-300">&nbsp;</div>
         <div className="flex gap-1">
