@@ -184,14 +184,14 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
       </div>
 
       <div className="mt-4">
-        {/* Mobile top row: streak (left) and points (right, icon above number) */}
+        {/* Mobile top row: streak (left) and points (right, icon beside number) */}
         <div className="flex items-center justify-between sm:hidden">
           <div className="flex items-center gap-2">
             <Flame className="h-5 w-5 text-black dark:text-white" aria-hidden />
             <div className="text-lg font-semibold">{habit.streak}</div>
             <span className="sr-only">{habit.mode === 'break' ? 'Clean streak' : 'Streak'}</span>
           </div>
-          <div className="flex flex-col items-center">
+          <div className="flex items-center gap-2">
             <Diamond className="h-5 w-5 text-black dark:text-white" aria-hidden />
             <div className="text-lg font-semibold">{habit.points}</div>
             <span className="sr-only">Points</span>
