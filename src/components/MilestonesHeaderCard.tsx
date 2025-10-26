@@ -1,6 +1,6 @@
 import ProgressBar from './ProgressBar'
 import { useHabitStore } from '../store/store'
-import { LEVEL_TITLES, DEFAULT_POINTS_TARGET, levelWindow } from '../data/progression'
+import { LEVEL_TITLES, levelWindow } from '../data/progression'
 import { HeartPulse, Coins } from 'lucide-react'
 
 export default function MilestonesHeaderCard() {
@@ -11,8 +11,7 @@ export default function MilestonesHeaderCard() {
   const { curMin, nextMin, within, needed, pct } = levelWindow(essence)
   const levelTitle = LEVEL_TITLES[level - 1] ?? '—'
 
-  const ptsWithin = Math.min(points, DEFAULT_POINTS_TARGET)
-  const ptsPct = Math.round((ptsWithin / DEFAULT_POINTS_TARGET) * 100)
+  // points progress bar removed per design; keep top-right display only
 
   return (
     <div className="rounded-2xl border dark:border-neutral-700 p-5 shadow-sm bg-white dark:bg-neutral-950">
@@ -41,15 +40,7 @@ export default function MilestonesHeaderCard() {
         </div>
       </div>
 
-      <div className="mt-4">
-        <div className="flex items-center justify-between text-xs text-neutral-600 dark:text-neutral-300">
-          <span>Points (to next craft)</span>
-          <span>{ptsWithin} / {DEFAULT_POINTS_TARGET}</span>
-        </div>
-        <div className="mt-1">
-          <ProgressBar value={ptsWithin} max={DEFAULT_POINTS_TARGET} />
-        </div>
-      </div>
+      {/* Points progress removed; top-right displays current spendable points */}
     </div>
   )
 }
