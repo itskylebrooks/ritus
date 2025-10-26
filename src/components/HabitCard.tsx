@@ -19,6 +19,7 @@ type ButtonsMenuProps = {
 
 function ButtonsMenu({ habit, archiveHabit, unarchiveHabit, setEditing, setConfirmDeleteOpen }: ButtonsMenuProps) {
   const [open, setOpen] = useState(false)
+  const rootRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     const onScroll = () => setOpen(false)
@@ -31,8 +32,18 @@ function ButtonsMenu({ habit, archiveHabit, unarchiveHabit, setEditing, setConfi
     }
   }, [])
 
+  // Close the menu when clicking/tapping outside the menu while it's open
+  useEffect(() => {
+    if (!open) return
+    const onPointerDown = (e: PointerEvent) => {
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false)
+    }
+    window.addEventListener('pointerdown', onPointerDown)
+    return () => window.removeEventListener('pointerdown', onPointerDown)
+  }, [open])
+
   return (
-    <div className="flex items-center gap-2">
+  <div ref={rootRef} className="flex items-center gap-2">
       <AnimatePresence initial={false} mode="wait">
         {!open ? (
           <motion.button
