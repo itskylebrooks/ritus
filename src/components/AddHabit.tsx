@@ -3,10 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, ChevronDown } from 'lucide-react'
 import { useHabitStore } from '../store/store'
 import type { Frequency } from '../types'
+import { HABIT_SUGGESTIONS } from '../data/habitSuggestions'
 
 export default function AddHabit() {
   const addHabit = useHabitStore((s) => s.addHabit)
   const [name, setName] = useState('')
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([])
+  const [activeIndex, setActiveIndex] = useState<number>(-1)
   const [frequency, setFrequency] = useState<Frequency>('daily')
   const [weeklyTarget, setWeeklyTarget] = useState<number>(1)
   const [mode, setMode] = useState<'build' | 'break'>('build')
@@ -16,6 +20,7 @@ export default function AddHabit() {
   const typingTimer = useRef<number | null>(null)
   const firstMount = useRef(true)
   const [isReady, setIsReady] = useState(false)
+  const wrapperRef = useRef<HTMLDivElement | null>(null)
 
   function submit(e: React.FormEvent) {
     e.preventDefault()
@@ -36,8 +41,27 @@ export default function AddHabit() {
   setMode('build')
   }
 
+  function selectSuggestion(s: string) {
+    setName(s.slice(0, 60))
+    setShowSuggestions(false)
+    setActiveIndex(-1)
+  }
+
   // Mark app ready after first mount to avoid initial load animations in dev StrictMode
   useEffect(() => { setIsReady(true) }, [])
+
+  // Close suggestions on outside click
+  useEffect(() => {
+    function onDocClick(e: MouseEvent) {
+      if (!wrapperRef.current) return
+      if (e.target instanceof Node && !wrapperRef.current.contains(e.target)) {
+        setShowSuggestions(false)
+        setActiveIndex(-1)
+      }
+    }
+    document.addEventListener('click', onDocClick)
+    return () => document.removeEventListener('click', onDocClick)
+  }, [])
 
   useEffect(() => {
     // Don't animate on first mount
@@ -87,26 +111,100 @@ export default function AddHabit() {
             Habit name {name.length > 0 && <span className="ml-1">({name.length}/60)</span>}
           </label>
         </div>
-        <input
-          className="mt-1 w-full rounded-xl border bg-white px-3 py-2 outline-none ring-0 placeholder:text-neutral-400 focus:border-black/40 dark:bg-neutral-950 dark:border-neutral-700 dark:focus:border-neutral-700/50"
-          placeholder={displayedPlaceholder}
-          value={name}
-          maxLength={60}
-          onChange={(e) => {
-            if (typingTimer.current) {
-              clearTimeout(typingTimer.current)
-              typingTimer.current = null
-            }
-            // enforce 60 char max defensively (HTML maxLength will also prevent longer input)
-            setName(e.target.value.slice(0, 60))
-          }}
-          onFocus={() => {
-            if (typingTimer.current) {
-              clearTimeout(typingTimer.current)
-              typingTimer.current = null
-            }
-          }}
-        />
+        <div className="relative mt-1" ref={wrapperRef}>
+          <input
+            className="w-full rounded-xl border bg-white px-3 py-2 outline-none ring-0 placeholder:text-neutral-400 focus:border-black/40 dark:bg-neutral-950 dark:border-neutral-700 dark:focus:border-neutral-700/50"
+            placeholder={displayedPlaceholder}
+            value={name}
+            maxLength={60}
+            onChange={(e) => {
+              if (typingTimer.current) {
+                clearTimeout(typingTimer.current)
+                typingTimer.current = null
+              }
+              const val = e.target.value.slice(0, 60)
+              setName(val)
+              // update suggestions
+              const q = val.trim().toLowerCase()
+              if (q.length === 0) {
+                setFilteredSuggestions([])
+                setShowSuggestions(false)
+                setActiveIndex(-1)
+              } else {
+                const filtered = HABIT_SUGGESTIONS.filter((s) => s.toLowerCase().includes(q)).slice(0, 8)
+                setFilteredSuggestions(filtered)
+                setShowSuggestions(filtered.length > 0)
+                setActiveIndex(-1)
+              }
+            }}
+            onFocus={() => {
+              if (typingTimer.current) {
+                clearTimeout(typingTimer.current)
+                typingTimer.current = null
+              }
+              // if we have text, show suggestions
+              if (name.trim().length > 0) {
+                const q = name.trim().toLowerCase()
+                const filtered = HABIT_SUGGESTIONS.filter((s) => s.toLowerCase().includes(q)).slice(0, 8)
+                setFilteredSuggestions(filtered)
+                setShowSuggestions(filtered.length > 0)
+              }
+            }}
+            onKeyDown={(e) => {
+              if (!showSuggestions) return
+              if (e.key === 'ArrowDown') {
+                e.preventDefault()
+                setActiveIndex((i) => Math.min(i + 1, filteredSuggestions.length - 1))
+              } else if (e.key === 'ArrowUp') {
+                e.preventDefault()
+                setActiveIndex((i) => Math.max(i - 1, 0))
+              } else if (e.key === 'Enter') {
+                if (activeIndex >= 0 && filteredSuggestions[activeIndex]) {
+                  e.preventDefault()
+                  selectSuggestion(filteredSuggestions[activeIndex])
+                }
+              } else if (e.key === 'Escape') {
+                setShowSuggestions(false)
+                setActiveIndex(-1)
+              }
+            }}
+          />
+
+          <AnimatePresence>
+            {showSuggestions && filteredSuggestions.length > 0 && (
+              <motion.ul
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.12 }}
+                role="listbox"
+                aria-label="Habit suggestions"
+                className="absolute left-0 right-0 z-50 mt-2 rounded-lg border bg-white shadow-lg dark:bg-neutral-950 dark:border-neutral-700"
+                // show only 5 items worth of height; make the list scrollable for more
+                style={{ maxHeight: 5 * 40, overflowY: 'auto' }}
+              >
+                {filteredSuggestions.map((s, idx) => (
+                  <li
+                    key={s}
+                    role="option"
+                    aria-selected={activeIndex === idx}
+                    onMouseDown={(ev) => {
+                      // use onMouseDown to avoid losing focus before click
+                      ev.preventDefault()
+                      selectSuggestion(s)
+                    }}
+                    onMouseEnter={() => setActiveIndex(idx)}
+                    className={
+                      'cursor-pointer px-3 py-2 text-sm ' + (activeIndex === idx ? 'bg-neutral-100 dark:bg-neutral-800' : 'hover:bg-neutral-50 dark:hover:bg-neutral-900')
+                    }
+                  >
+                    {s}
+                  </li>
+                ))}
+              </motion.ul>
+            )}
+          </AnimatePresence>
+        </div>
       </motion.div>
   {/* On mobile: show 'I want to' and 'Frequency' side-by-side (two columns). */}
   <div className="grid grid-cols-2 gap-3" style={{ minWidth: 0 }}>
