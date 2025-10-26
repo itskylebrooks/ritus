@@ -1,0 +1,19 @@
+**Enso — Aikidō Study Companion**
+Copyright © 2025 [Kyle Brooks](https://itskylebrooks.vercel.app)
+
+This project’s **source code** is licensed under the [MIT License](https://opensource.org/licenses/MIT).
+All **content** (technique descriptions, glossary entries, exam guides, etc.) is licensed under the [Creative Commons Attribution–NonCommercial 4.0 International License (CC BY-NC 4.0)](https://creativecommons.org/licenses/by-nc/4.0/).
+
+**Attribution:**
+This project was created and maintained by [Kyle Brooks](https://itskylebrooks.vercel.app).
+Website: [ritus-kb.vercel.app](https://ritus-kb.vercel.app)
+Repository: [github.com/itskylebrooks/ritus](https://github.com/itskylebrooks/ritus)
+
+**Acknowledgments:**
+
+* Built with [React](https://react.dev), [TypeScript](https://www.typescriptlang.org), [Tailwind CSS](https://tailwindcss.com), and [Vite](https://vitejs.dev)
+* Hosted on [Vercel](https://vercel.com)
+* Icons provided by [Lucide](https://lucide.dev) (MIT License)
+
+This NOTICE file provides attribution and credit information for *Ritus*.
+It does not modify the license terms of the [MIT License](https://opensource.org/licenses/MIT).
