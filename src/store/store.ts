@@ -1,18 +1,19 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { Habit, Frequency } from '../types'
-import { iso, fromISO, isSameDay } from '../utils/date'
+import { iso, fromISO, isSameDay, startOfWeek, daysThisWeek } from '../utils/date'
 import { recalc } from '../utils/scoring'
 import { computeLevel } from '../data/progression'
 
 export interface HabitState {
   habits: Habit[]
   // progression / XP
-  progress: { essence: number; points: number; level: number }
+  progress: { essence: number; points: number; level: number; weekBonusKeys?: Record<string, true | undefined>; completionAwardKeys?: Record<string, true | undefined> }
   setEssence: (n: number) => void
   addEssence: (delta: number) => void
   setPoints: (n: number) => void
   addPoints: (delta: number) => void
+  tryAwardWeeklyBonus: (habitId: string, weekDate: Date, reached: boolean) => void
   // display settings
   dateFormat: 'MDY' | 'DMY'
   setDateFormat: (f: 'MDY' | 'DMY') => void
@@ -45,8 +46,8 @@ export const useHabitStore = create<HabitState>()(
   persist(
     (set, get) => ({
       habits: [],
-      // Progression defaults (essence = lifetime XP that determines level)
-      progress: { essence: 0, points: 0, level: 1 },
+  // Progression defaults (essence = lifetime XP that determines level)
+  progress: { essence: 0, points: 0, level: 1, weekBonusKeys: {}, completionAwardKeys: {} },
   // display preferences
   dateFormat: 'MDY',
   setDateFormat: (f) => set({ dateFormat: f }),
@@ -81,6 +82,45 @@ export const useHabitStore = create<HabitState>()(
         }),
       setPoints: (n: number) => set((s) => ({ progress: { ...s.progress, points: Math.max(0, Math.floor(n)) } })),
       addPoints: (delta: number) => set((s) => ({ progress: { ...s.progress, points: Math.max(0, Math.floor(s.progress.points + delta)) } })),
+      tryAwardWeeklyBonus: (habitId: string, weekDate: Date, reached: boolean) =>
+        set((s) => {
+          const key = `${habitId}@${startOfWeek(weekDate, { weekStartsOn: 1 }).toISOString()}`
+          const keys = { ...(s.progress.weekBonusKeys || {}) }
+          const has = !!keys[key]
+          // Award
+          if (reached && !has) {
+            const newEssence = Math.max(0, Math.floor(s.progress.essence + 10))
+            const newLevel = computeLevel(newEssence)
+            const newPoints = Math.max(0, Math.floor(s.progress.points + 10))
+            return {
+              progress: {
+                ...s.progress,
+                essence: newEssence,
+                level: newLevel,
+                points: newPoints,
+                weekBonusKeys: { ...keys, [key]: true },
+              },
+            }
+          }
+          // Revoke
+          if (!reached && has) {
+            const newEssence = Math.max(0, Math.floor(s.progress.essence - 10))
+            const newLevel = computeLevel(newEssence)
+            const newPoints = Math.max(0, Math.floor(s.progress.points - 10))
+            const nextKeys = { ...keys }
+            delete nextKeys[key]
+            return {
+              progress: {
+                ...s.progress,
+                essence: newEssence,
+                level: newLevel,
+                points: newPoints,
+                weekBonusKeys: nextKeys,
+              },
+            }
+          }
+          return {}
+        }),
       resetStats: () => set({ totalPoints: 0, longestStreak: 0 }),
   // safe id generation: crypto.randomUUID may not exist on some older mobile browsers
       addHabit: (name, frequency, weeklyTarget = 1, mode: 'build' | 'break' = 'build') =>
@@ -137,29 +177,67 @@ export const useHabitStore = create<HabitState>()(
       toggleCompletion: (id, date) =>
         set((s) => {
           const day = new Date(date)
-          let pointsDelta = 0
+          let pointsDelta = 0 // for totalPoints (habit-level points changes)
+          // work on copies of award keys so we can atomically update progress at the end
+          const compKeys = { ...(s.progress.completionAwardKeys || {}) }
+          const weekKeys = { ...(s.progress.weekBonusKeys || {}) }
+          let essenceDelta = 0
+          let pointsAwardDelta = 0
+
           const updated = s.habits.map((h) => {
             if (h.id !== id) return h
-            // Toggle completion for both build and break habits: for break mode a completion = successful clean day
 
-            // Toggle by exact day (same behavior for daily/weekly; weekly allows multiple days per week)
+            // Toggle completion for both build and break habits
             let completions = [...h.completions]
             const isAlready = completions.some((c) => isSameDay(fromISO(c), day))
+            const dayKey = `${h.id}@${iso(day)}`
             if (isAlready) {
-              // user removed a completion — do not deduct from lifetime totalPoints
+              // user removed a completion
               completions = completions.filter((c) => !isSameDay(fromISO(c), day))
+              // if we had awarded for this completion previously, revoke it
+              if (compKeys[dayKey]) {
+                essenceDelta -= 5
+                pointsAwardDelta -= 5
+                delete compKeys[dayKey]
+              }
             } else {
+              // adding a completion
               completions.push(iso(day))
+              // only award if we haven't rewarded this specific day before
+              if (!compKeys[dayKey]) {
+                essenceDelta += 5
+                pointsAwardDelta += 5
+                compKeys[dayKey] = true
+              }
             }
 
             const newHabit = recalc({ ...h, completions })
-              // compute change in habit points caused by this toggle and accumulate the delta
-              // Note: allow negative deltas so that unmarking a day will reduce the user's total points.
-              // We will clamp the cumulative totalPoints to a minimum of 0 below.
-              const oldPts = h.points || 0
-              const newPts = newHabit.points || 0
-              const delta = newPts - oldPts
-              pointsDelta += delta
+            const oldPts = h.points || 0
+            const newPts = newHabit.points || 0
+            const delta = newPts - oldPts
+            pointsDelta += delta
+
+            // For weekly bonus: evaluate after the toggle for this habit-week
+            const days = daysThisWeek(day, 1) // Mon–Sun week
+            const weekSet = new Set(days.map((d) => iso(d)))
+            const count = completions.filter((c) => weekSet.has(c)).length
+            const target = h.frequency === 'daily' ? (h.weeklyTarget ?? 7) : (h.weeklyTarget ?? 1)
+            const weekKey = `${h.id}@${startOfWeek(day, { weekStartsOn: 1 }).toISOString()}`
+            const hadWeek = !!weekKeys[weekKey]
+            const reached = count >= target
+            if (reached && !hadWeek) {
+              // award weekly bonus
+              essenceDelta += 10
+              pointsAwardDelta += 10
+              weekKeys[weekKey] = true
+            }
+            if (!reached && hadWeek) {
+              // revoke weekly bonus
+              essenceDelta -= 10
+              pointsAwardDelta -= 10
+              delete weekKeys[weekKey]
+            }
+
             return newHabit
           })
 
@@ -169,7 +247,25 @@ export const useHabitStore = create<HabitState>()(
           // update cumulative totalPoints by the net delta from toggles (allow reductions when user unmarks)
           // clamp to zero so we never go negative.
           const newTotal = Math.max(0, s.totalPoints + pointsDelta)
-          return { habits: updated, totalPoints: newTotal, longestStreak: newLongest }
+
+          // apply award/revoke deltas to persisted progress
+          const newEssence = Math.max(0, Math.floor(s.progress.essence + essenceDelta))
+          const newLevel = computeLevel(newEssence)
+          const newPoints = Math.max(0, Math.floor(s.progress.points + pointsAwardDelta))
+
+          return {
+            habits: updated,
+            totalPoints: newTotal,
+            longestStreak: newLongest,
+            progress: {
+              ...s.progress,
+              essence: newEssence,
+              level: newLevel,
+              points: newPoints,
+              weekBonusKeys: weekKeys,
+              completionAwardKeys: compKeys,
+            },
+          }
         }),
       // clearing current habits should not reset cumulative stats (there's a separate resetStats)
       clearAll: () => set({ habits: [] }),
