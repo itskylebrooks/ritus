@@ -21,7 +21,8 @@ export default function WeekStrip({ habit, onToggle }: { habit: Habit; onToggle:
 
         if (habit.mode === 'break') {
           const isMarked = hasCompletionOnDay(habit.completions, d)
-          const content = isMarked ? '✓' : (isPast ? '✕' : label[0])
+          // Always show the first letter for break-mode days; use bg color to indicate state
+          const content = label[0]
           const cls = isMarked
             ? 'border-transparent bg-emerald-600 text-white'
             : isPast
