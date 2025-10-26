@@ -1,4 +1,4 @@
-import { Trophy, Flame, Info } from 'lucide-react'
+import { Flame, Info, ChartNoAxesColumnIncreasing } from 'lucide-react'
 import { useHabitStore } from '../store/store'
 import { daysThisWeek } from '../utils/date'
 import { hasCompletionOnDay, countCompletionsInWeek } from '../utils/scoring'
@@ -25,14 +25,16 @@ export default function HeaderStats() {
   }, [0, 0])
   const weeklyPct = total === 0 ? 0 : Math.round((done / total) * 100)
 
+  const totalCompletions = habits.reduce((acc, h) => acc + (h.completions ? h.completions.length : 0), 0)
+
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
   <div className="rounded-2xl border dark:border-neutral-700 p-4 shadow-sm">
         <div className="flex items-center justify-between text-sm text-neutral-600 dark:text-neutral-300">
-          <span>Total points</span>
-          <Trophy className="h-4 w-4" />
+          <span>Total completions</span>
+          <ChartNoAxesColumnIncreasing className="h-4 w-4" />
         </div>
-        <div className="mt-1 text-2xl font-semibold">{totalPoints}</div>
+        <div className="mt-1 text-2xl font-semibold">{totalCompletions}</div>
       </div>
   <div className="rounded-2xl border dark:border-neutral-700 p-4 shadow-sm">
         <div className="flex items-center justify-between text-sm text-neutral-600 dark:text-neutral-300">
