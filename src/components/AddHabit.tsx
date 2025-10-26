@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus } from 'lucide-react'
+import { Plus, ChevronDown } from 'lucide-react'
 import { useHabitStore } from '../store/store'
 import type { Frequency } from '../types'
 
@@ -129,16 +129,19 @@ export default function AddHabit() {
       </div>
     </motion.div>
 
-    <motion.div layout transition={{ layout: { type: 'spring', stiffness: 300, damping: 30 } }} style={{ minWidth: 0 }}>
+      <motion.div layout transition={{ layout: { type: 'spring', stiffness: 300, damping: 30 } }} style={{ minWidth: 0 }}>
       <label className="block text-sm text-neutral-600 dark:text-neutral-300">Frequency</label>
-      <select
-        className="mt-1 w-full rounded-xl border bg-white px-3 py-2 dark:bg-neutral-950 dark:border-neutral-700"
-        value={frequency}
-        onChange={(e) => setFrequency(e.target.value as Frequency)}
-      >
-        <option value="daily">Daily</option>
-        <option value="weekly">Weekly</option>
-      </select>
+      <div className="relative mt-1">
+        <select
+          className="appearance-none mt-0 w-full rounded-xl border bg-white px-3 py-2 pr-9 dark:bg-neutral-950 dark:border-neutral-700"
+          value={frequency}
+          onChange={(e) => setFrequency(e.target.value as Frequency)}
+        >
+          <option value="daily">Daily</option>
+          <option value="weekly">Weekly</option>
+        </select>
+        <ChevronDown className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400 dark:text-neutral-300" />
+      </div>
     </motion.div>
   </div>
   <AnimatePresence initial={false} mode="popLayout">
@@ -153,15 +156,18 @@ export default function AddHabit() {
             style={{ minWidth: 0 }}
           >
             <label className="block text-sm text-neutral-600 dark:text-neutral-300">Days / week</label>
-            <select
-              className="mt-1 w-full rounded-xl border bg-white px-3 py-2 dark:bg-neutral-950 dark:border-neutral-700"
-              value={weeklyTarget}
-              onChange={(e) => setWeeklyTarget(Number(e.target.value))}
-            >
-              {[1, 2, 3, 4, 5, 6].map((n) => (
-                <option key={n} value={n}>{n} day{n > 1 ? 's' : ''}</option>
-              ))}
-            </select>
+            <div className="relative mt-1">
+              <select
+                className="appearance-none mt-0 w-full rounded-xl border bg-white px-3 py-2 pr-9 dark:bg-neutral-950 dark:border-neutral-700"
+                value={weeklyTarget}
+                onChange={(e) => setWeeklyTarget(Number(e.target.value))}
+              >
+                {[1, 2, 3, 4, 5, 6].map((n) => (
+                  <option key={n} value={n}>{n} day{n > 1 ? 's' : ''}</option>
+                ))}
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400 dark:text-neutral-300" />
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
