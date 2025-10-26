@@ -13,26 +13,22 @@ type GuideStep = { title: string; body: string }
 const STEPS: GuideStep[] = [
   {
     title: 'Welcome to Ritus',
-    body: 'Ritus helps you build or break habits. New: build/break modes, weekly targets, streaks, points, archive and export — all local-first.'
+    body: 'A simple, local-first habit tracker to help you build or break routines. Track completions, earn points, and see progress over time.'
   },
   {
     title: 'Create a habit',
-    body: 'Tap Add, name your habit, choose Daily or Weekly. For weekly habits set a weekly target (how many days/week count).' 
+    body: 'Tap Add to create a habit, choose Daily or Weekly, and set a weekly target when applicable. Give it a clear name and optional description.'
   },
   {
     title: 'Track completions',
-    body: 'Tap Done on a card or use the week strip to mark days. Weekly habits count when you meet the weekly target; gaps are normal — pick up where you left off.'
+    body: 'Mark days as Done from the card or use the week strip. Weekly habits count toward the weekly target — keep marking to maintain streaks.'
   },
   {
-    title: 'Points & streaks',
-    body: 'Completions earn points and grow streaks. Header and Insights show totals and weekly percent. Milestones give bonus points for long streaks.'
+    title: 'Points, streaks & insights',
+    body: 'Each completion awards points and grows streaks. Check the header and Insights for totals, weekly percent, and milestone bonuses.'
   },
   {
-    title: 'Manage & backup',
-    body: 'Edit habits with the pencil, archive finished ones, or export/import JSON from Settings. Data stays on your device unless you export or opt into sync.'
-  },
-  {
-    title: 'Try example data',
+    title: 'Import example data',
     body: "Click 'Load data' below to populate sample habits. If you already have data you'll be asked to confirm; loading will replace your current habits."
   }
 ]
