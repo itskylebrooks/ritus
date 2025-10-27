@@ -44,15 +44,15 @@ All dependencies are declared in `package.json`.
 Clone the repository and install dependencies with your preferred package manager:
 
 ```bash
-npm install    # or pnpm install / yarn
-npm run dev    # start the development server (Vite)
+pnpm install    # or npm install / yarn
+pnpm run dev    # start the development server (Vite)
 ```
 
 To build and preview the production version:
 
 ```bash
-npm run build
-npm run preview
+pnpm run build
+pnpm run preview
 ```
 
 ## Project Structure
