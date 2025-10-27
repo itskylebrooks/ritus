@@ -17,7 +17,7 @@ const STEPS: GuideStep[] = [
   },
   {
     title: 'Create a habit',
-    body: 'Tap Add to create a habit, choose Daily or Weekly, and set a weekly target when applicable. Give it a clear name and optional description.'
+    body: 'Tap Add to create a habit, choose Daily, Weekly or Monthly, and set a weekly target when applicable. Give it a clear name and optional description.'
   },
   {
     title: 'Track completions',
