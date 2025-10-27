@@ -22,7 +22,7 @@ export default function ClockCard() {
   const nocturne = applied['clock'] === 'clock_nocturne'
 
   return (
-    <div className="rounded-2xl border dark:border-neutral-700 bg-white dark:bg-neutral-950 shadow-sm overflow-hidden h-full">
+  <div className="rounded-2xl border dark:border-neutral-700 shadow-sm overflow-hidden h-full">
       <div className="p-2 h-full flex items-center justify-center">
         <div className="w-full h-full max-w-full max-h-full">
           <div className="aspect-square w-full h-full">

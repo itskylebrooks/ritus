@@ -130,7 +130,7 @@ export default function AddHabit() {
         </div>
         <div className="relative mt-1" ref={wrapperRef}>
           <input
-            className="w-full rounded-xl border bg-white px-3 py-2 outline-none ring-0 placeholder:text-neutral-400 focus:border-black/40 dark:bg-neutral-950 dark:border-neutral-700 dark:focus:border-neutral-700/50"
+            className="w-full rounded-xl border bg-transparent px-3 py-2 outline-none ring-0 placeholder:text-neutral-400 focus:border-black/40 dark:bg-transparent dark:border-neutral-700 dark:focus:border-neutral-700/50"
             placeholder={displayedPlaceholder}
             value={name}
             maxLength={60}
@@ -196,7 +196,7 @@ export default function AddHabit() {
                 transition={{ duration: 0.12 }}
                 role="listbox"
                 aria-label="Habit suggestions"
-                className="absolute left-0 right-0 z-50 mt-2 rounded-lg border bg-white shadow-lg dark:bg-neutral-950 dark:border-neutral-700"
+                className="absolute left-0 right-0 z-50 mt-2 rounded-lg border bg-white shadow-lg dark:bg-neutral-800 dark:border-neutral-700"
                 // show only 5 items worth of height; make the list scrollable for more
                 style={{ maxHeight: 5 * 40, overflowY: 'auto' }}
               >
@@ -229,14 +229,14 @@ export default function AddHabit() {
       <label className="block text-sm text-neutral-600 dark:text-neutral-300">I want to</label>
       <div className="mt-1 flex gap-2">
         <label
-          className={"px-3 py-2 rounded-xl border dark:border-neutral-700 cursor-pointer transform transition-all duration-150 ease-in-out " + (mode === 'build' ? 'bg-black text-white dark:bg-white dark:text-black scale-100 shadow-md' : 'bg-white text-black dark:bg-transparent dark:text-neutral-300 scale-95 hover:bg-neutral-700 hover:text-white dark:hover:bg-neutral-700 dark:hover:text-white')}
+          className={"px-3 py-2 rounded-xl border dark:border-neutral-700 cursor-pointer transform transition-all duration-150 ease-in-out " + (mode === 'build' ? 'bg-black text-white dark:bg-neutral-800 dark:text-white scale-100 shadow-md' : 'bg-white text-black dark:bg-transparent dark:text-neutral-300 scale-95 hover:bg-neutral-700 hover:text-white dark:hover:bg-neutral-700 dark:hover:text-white')}
         >
           <input className="sr-only" type="radio" name="mode" checked={mode === 'build'} onChange={() => setMode('build')} />
           Build
         </label>
 
         <label
-          className={"px-3 py-2 rounded-xl border dark:border-neutral-700 cursor-pointer transform transition-all duration-150 ease-in-out " + (mode === 'break' ? 'bg-black text-white dark:bg-white dark:text-black scale-100 shadow-md' : 'bg-white text-black dark:bg-transparent dark:text-neutral-300 scale-95 hover:bg-neutral-700 hover:text-white dark:hover:bg-neutral-700 dark:hover:text-white')}
+          className={"px-3 py-2 rounded-xl border dark:border-neutral-700 cursor-pointer transform transition-all duration-150 ease-in-out " + (mode === 'break' ? 'bg-black text-white dark:bg-neutral-800 dark:text-white scale-100 shadow-md' : 'bg-white text-black dark:bg-transparent dark:text-neutral-300 scale-95 hover:bg-neutral-700 hover:text-white dark:hover:bg-neutral-700 dark:hover:text-white')}
         >
           <input className="sr-only" type="radio" name="mode" checked={mode === 'break'} onChange={() => setMode('break')} />
           Break
@@ -248,7 +248,7 @@ export default function AddHabit() {
       <label className="block text-sm text-neutral-600 dark:text-neutral-300">Frequency</label>
       <div className="relative mt-1">
         <select
-          className="appearance-none mt-0 w-full rounded-xl border bg-white px-3 py-2 pr-9 dark:bg-neutral-950 dark:border-neutral-700"
+          className="appearance-none mt-0 w-full rounded-xl border bg-transparent px-3 py-2 pr-9 dark:bg-transparent dark:border-neutral-700"
           value={frequency}
           onChange={(e) => setFrequency(e.target.value as Frequency)}
         >
@@ -274,7 +274,7 @@ export default function AddHabit() {
             <label className="block text-sm text-neutral-600 dark:text-neutral-300">Days / week</label>
             <div className="relative mt-1">
               <select
-                className="appearance-none mt-0 w-full rounded-xl border bg-white px-3 py-2 pr-9 dark:bg-neutral-950 dark:border-neutral-700"
+                className="appearance-none mt-0 w-full rounded-xl border bg-transparent px-3 py-2 pr-9 dark:bg-transparent dark:border-neutral-700"
                 value={weeklyTarget}
                 onChange={(e) => setWeeklyTarget(Number(e.target.value))}
               >
@@ -299,7 +299,7 @@ export default function AddHabit() {
             <label className="block text-sm text-neutral-600 dark:text-neutral-300">Times / month</label>
             <div className="relative mt-1">
               <select
-                className="appearance-none mt-0 w-full rounded-xl border bg-white px-3 py-2 pr-9 dark:bg-neutral-950 dark:border-neutral-700"
+                className="appearance-none mt-0 w-full rounded-xl border bg-transparent px-3 py-2 pr-9 dark:bg-transparent dark:border-neutral-700"
                 value={monthlyTarget}
                 onChange={(e) => setMonthlyTarget(Number(e.target.value))}
               >

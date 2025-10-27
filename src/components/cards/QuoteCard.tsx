@@ -38,7 +38,7 @@ export default function QuoteCard() {
   }
 
   return (
-    <article className="rounded-2xl border dark:border-neutral-700 p-6 bg-white dark:bg-neutral-950 shadow-sm h-full">
+  <article className="rounded-2xl border dark:border-neutral-700 p-6 shadow-sm h-full">
       <div className="flex h-full flex-col">
         <div className="flex-1">
           <button
