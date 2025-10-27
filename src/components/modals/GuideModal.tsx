@@ -193,10 +193,10 @@ export default function GuideModal({ open, onClose, onLoadExample }: GuideModalP
         </div>
         <div className="mt-6">
           {last ? (
-            // On final step show Finish (left) and Load data (right)
+            // On final step: left -> Load data, right -> Finish (titles and actions swapped; styles unchanged)
             <div className="flex gap-3">
-              <button onClick={()=> { if(!closing) onClose(); }} className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-gray-100 hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-black/80 dark:text-neutral-300 transition">Finish</button>
-              <button onClick={async()=> { handleLoadClick() }} className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-black text-white dark:bg-white dark:text-black">Load data</button>
+              <button onClick={async()=> { handleLoadClick() }} className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-gray-100 hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-black/80 dark:text-neutral-300 transition">Load data</button>
+              <button onClick={()=> { if(!closing) onClose(); }} className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-black text-white dark:bg-white dark:text-black">Finish</button>
             </div>
           ) : (
             <div className="flex w-full items-center gap-3">
