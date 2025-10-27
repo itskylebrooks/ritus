@@ -7,7 +7,7 @@ export default function TrophiesBoard() {
   const items = TROPHIES.filter((t) => unlocked[t.id])
 
   return (
-    <div className="rounded-2xl border dark:border-neutral-700 p-5 shadow-sm bg-white dark:bg-neutral-950">
+  <div className="rounded-2xl border dark:border-neutral-700 p-5 shadow-sm">
       <div className="mb-4 text-center uppercase tracking-wider text-sm md:text-base font-semibold text-neutral-600 dark:text-neutral-300">
         TROPHY BOARD
       </div>

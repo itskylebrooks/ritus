@@ -18,7 +18,7 @@ export default function CollectiblesStoreCard() {
   ]
 
   return (
-    <div className="rounded-2xl border dark:border-neutral-700 p-5 shadow-sm bg-white dark:bg-neutral-950">
+    <div className="rounded-2xl border dark:border-neutral-700 p-5 shadow-sm">
       <div className="mb-4 text-center uppercase tracking-wider text-sm md:text-base font-semibold text-neutral-600 dark:text-neutral-300">
         COLLECTIBLES STORE
       </div>
@@ -74,13 +74,13 @@ export default function CollectiblesStoreCard() {
                             </button>
                           )
                         ) : (
-                          <button
-                            onClick={() => canBuy && buy(item.id, item.cost)}
-                            disabled={!canBuy}
-                            className="inline-flex items-center justify-center rounded-lg bg-black h-8 px-3 text-xs text-white disabled:opacity-50 dark:bg-white dark:text-black"
-                          >
-                            Unlock
-                          </button>
+                            <button
+                              onClick={() => canBuy && buy(item.id, item.cost)}
+                              disabled={!canBuy}
+                              className="inline-flex items-center justify-center rounded-lg bg-black h-8 px-3 text-xs text-white disabled:opacity-50 dark:bg-neutral-800 dark:text-white"
+                            >
+                              Unlock
+                            </button>
                         )}
                       </div>
                     </div>
