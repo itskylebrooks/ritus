@@ -209,7 +209,8 @@ export default function GuideModal({ open, onClose, onLoadExample }: GuideModalP
                     exit={{ opacity: 0 }}
                     transition={btnTransition}
                     onClick={()=> queueStep(Math.max(0, step-1))}
-                    className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-gray-100 hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-black/80 dark:text-neutral-300 transition"
+                    className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-gray-100 hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-black/80 dark:text-neutral-300"
+                    style={{ willChange: 'opacity, transform, width', WebkitBackfaceVisibility: 'hidden' }}
                     layout
                   >
                     Back
@@ -222,6 +223,7 @@ export default function GuideModal({ open, onClose, onLoadExample }: GuideModalP
                   transition={btnTransition}
                   onClick={()=> queueStep(Math.min(STEPS.length-1, step+1))}
                   className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-black text-white dark:bg-white dark:text-black"
+                  style={{ willChange: 'transform, width', WebkitBackfaceVisibility: 'hidden' }}
                 >
                   Next
                 </motion.button>
