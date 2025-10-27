@@ -303,7 +303,7 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
         </div>
 
         {/* Mobile progress bar full width */}
-          <div className="mt-2 sm:hidden flex items-center gap-3">
+          <div className="mt-2 sm:hidden flex items-center gap-1">
           <div className="flex-1"><ProgressBar value={progressVal} max={progressMax} /></div>
           <div className="text-sm text-neutral-600 dark:text-neutral-300 tabular-nums">{progressVal}/{progressMax}</div>
         </div>
@@ -316,9 +316,9 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
             <span className="sr-only">{habit.mode === 'break' ? 'Clean streak' : 'Streak'}</span>
           </div>
 
-            <div className="flex items-center gap-2 justify-center justify-self-center">
+            <div className="flex items-center gap-1 justify-center justify-self-center">
             <div className="w-56 md:w-40"><ProgressBar value={progressVal} max={progressMax} /></div>
-            <div className="text-sm text-neutral-600 dark:text-neutral-300 tabular-nums ml-3">{progressVal}/{progressMax}</div>
+            <div className="text-sm text-neutral-600 dark:text-neutral-300 tabular-nums ml-1">{progressVal}/{progressMax}</div>
             <span className="sr-only">Weekly progress</span>
           </div>
 
