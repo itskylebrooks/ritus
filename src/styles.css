@@ -24,6 +24,21 @@ html, body, #root {
   font-family: 'IBM Plex Sans', ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
 }
 
+/* Global page background and base text color
+   Centralized so both light and dark modes use a single source of truth.
+   - Light mode: white background with neutral-900 text (matches existing Tailwind usage)
+   - Dark mode: near-black background (matches previous arbitrary color) with neutral-100 text
+   The `index.html` initial body classes are removed so these rules control the page paint.
+*/
+body {
+  background-color: #ffffff; /* light mode page background */
+  color: #111827; /* tailwind neutral-900 */
+}
+.dark body {
+  background-color: #0b0b0b; /* dark mode page background (previously in index.html) */
+  color: #f3f4f6; /* tailwind neutral-100-ish */
+}
+
 /* Smooth fonts */
 html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 
