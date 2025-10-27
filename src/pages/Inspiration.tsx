@@ -132,7 +132,7 @@ export default function Inspiration() {
 					<section>
 						<h2 className="text-lg font-medium">How habits really form</h2>
 						<p className="mt-2 text-neutral-600 dark:text-neutral-300">A habit isn’t a rule you follow — it’s a vote for the person you want to become. Consistency matters more than intensity: five minutes done every day beats an hour done once a week. Most habits fail because people expect motivation to last forever. But discipline isn’t about feeling ready — it’s about making action easier than resistance.</p>
-						<div className="mt-4 rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-3">
+						<div className="mt-4 rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black p-3">
 							<p className="text-sm italic text-center text-neutral-600 dark:text-neutral-300">“Make it obvious, make it easy, make it rewarding.” — three quiet laws of behavioral design.</p>
 						</div>
 					</section>
@@ -162,7 +162,7 @@ export default function Inspiration() {
 
 			{COMPASS_SETS.map((set: any) => (
 				<section key={set.dir}>
-					<div className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-4 bg-white dark:bg-neutral-950 shadow-sm">
+					<div className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-4 bg-white dark:bg-black shadow-sm">
 											<div>
 												<h3 className="text-lg font-semibold flex items-center gap-2">
 													<span className="text-xl text-neutral-600 dark:text-neutral-400">{set.arrow}</span>

@@ -65,7 +65,7 @@ export default function ConfirmModal({
       onClick={() => { if (!closing) onClose() }}
     >
     <div
-  className={`w-full max-w-sm rounded-2xl ring-1 ring-black/5 dark:ring-neutral-700/5 border border-neutral-200 dark:border-neutral-700 p-5 relative transition-all duration-200 ${closing || entering ? 'opacity-0 scale-[0.95] translate-y-1' : 'opacity-100 scale-100 translate-y-0'} bg-white dark:bg-neutral-950`}
+  className={`w-full max-w-sm rounded-2xl ring-1 ring-black/5 dark:ring-neutral-700/5 border border-neutral-200 dark:border-neutral-700 p-5 relative transition-all duration-200 ${closing || entering ? 'opacity-0 scale-[0.95] translate-y-1' : 'opacity-100 scale-100 translate-y-0'} bg-white dark:bg-black`}
         onClick={(e) => { e.stopPropagation() }}
         role="dialog"
         aria-modal="true"

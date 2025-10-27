@@ -196,7 +196,7 @@ export default function AppHeader() {
                   animate="animate"
                   exit="exit"
                   variants={desktopDropdownVariants as any}
-                  className="absolute right-0 top-full mt-2 w-44 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 shadow-sm z-30"
+                  className="absolute right-0 top-full mt-2 w-44 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-black text-neutral-900 dark:text-neutral-100 shadow-sm z-30"
                 >
                   <ul className="p-2">
                     {isHome && (
@@ -292,7 +292,7 @@ export default function AppHeader() {
                 animate="animate"
                 exit="exit"
                 variants={mobileMenuVariants as any}
-                className="absolute right-0 mt-2 w-56 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 shadow-sm z-30"
+                  className="absolute right-0 mt-2 w-56 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-black text-neutral-900 dark:text-neutral-100 shadow-sm z-30"
               >
                 <ul className="p-2">
                 <li>
