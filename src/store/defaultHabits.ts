@@ -283,7 +283,7 @@ export const defaultProgress = {
   // lifetime essence (example)
   essence: 4320,
   // spendable points
-  points: 150,
+  points: 20,
   // derived level
   level: computeLevel(4320),
   // bookkeeping maps (empty by default for example data)
@@ -291,9 +291,9 @@ export const defaultProgress = {
   completionAwardKeys: {},
   // Kyle’s initial pick list for shop UI. These are also granted as owned when
   // loading the example data so the store UI shows them as "Owned".
-  preferredCollectibles: ['clock_sector', 'relic_lamp', 'accent_ocean'],
+  preferredCollectibles: ['clock_nocturne', 'accent_ocean'],
   // Mark these as owned by default when example data is loaded
-  ownedCollectibles: ['clock_sector', 'relic_lamp', 'accent_ocean'],
+  ownedCollectibles: ['clock_nocturne', 'accent_ocean'],
   // example unlocked trophies (empty by default)
   unlocked: {},
 }
