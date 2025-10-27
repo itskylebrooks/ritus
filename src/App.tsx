@@ -1,22 +1,20 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
-import Home from './pages/Home'
-import Insight from './pages/Insight'
-import Milestones from './pages/Milestones'
-import Inspiration from './pages/Inspiration'
-import AppHeader from './components/headers/AppHeader'
+import Home from '@/features/home'
+import Insight from '@/features/insight'
+import Milestones from '@/features/milestones'
+import Inspiration from '@/features/inspiration'
+import AppHeader from '@/shared/components/headers/AppHeader'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { createPageMotion } from '@/shared/animations'
 
 export default function App() {
   const location = useLocation()
   const shouldReduceMotion = useReducedMotion()
 
+  const { initial, animate, transition } = createPageMotion(shouldReduceMotion)
+
   const Page = ({ children }: { children: React.ReactNode }) => (
-    <motion.main
-      className="w-full"
-      initial={shouldReduceMotion ? undefined : { opacity: 0, y: 8 }}
-      animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
-      transition={{ duration: 0.22 }}
-    >
+    <motion.main className="w-full" initial={initial} animate={animate} transition={transition}>
       {children}
     </motion.main>
   )

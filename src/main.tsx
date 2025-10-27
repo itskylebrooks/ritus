@@ -2,9 +2,9 @@ import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App'
-import './styles.css'
+import '@/shared/styles/index.css'
 // Ensure theme store is initialized early so it can apply the resolved theme and listeners
-import './store/theme'
+import '@/shared/store/theme'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <StrictMode>
