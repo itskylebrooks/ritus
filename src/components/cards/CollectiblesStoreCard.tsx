@@ -38,7 +38,11 @@ export default function CollectiblesStoreCard() {
                   const Owned = owned.has(item.id)
                   const canBuy = !Owned && points >= item.cost
                   return (
-                    <div key={item.id} className="rounded-xl border dark:border-neutral-700 p-3 transition-transform hover:-translate-y-0.5 flex flex-col">
+                    <div
+                      key={item.id}
+                      className="rounded-xl border dark:border-neutral-700 p-3 transform-gpu motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out hover:-translate-y-1 hover:shadow-lg motion-reduce:transition-none motion-reduce:transform-none flex flex-col"
+                      style={{ willChange: 'transform' }}
+                    >
                       <div className="flex items-center gap-2">
                         <ItemIcon className="h-5 w-5 text-black dark:text-white" />
                         <div className="font-medium text-neutral-900 dark:text-neutral-100">{item.title}</div>
