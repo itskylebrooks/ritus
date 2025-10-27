@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react'
-import { Clock, Timer, SunMoon, Quote, BookOpen, Palette, Flame, Leaf, Star, Compass, Gem, Feather, Gauge, Radar, Target, PlayCircle, Medal, Moon, Hourglass, Bell, Anchor, Lamp, Stamp } from 'lucide-react'
+import {SunMoon, BookOpen, Waves, Flame, Leaf, Star, Compass, Gem, Feather, Gauge, Radar, Target, PlayCircle, Medal, Moon, Hourglass, Bell, Anchor, Lamp, Stamp } from 'lucide-react'
 
 export type CollectibleType = 'clock' | 'quotes' | 'accent' | 'relic'
 export type Rarity = 'common' | 'rare' | 'epic'
@@ -124,7 +124,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     type: 'accent',
     title: 'Ocean',
     desc: 'Calm blue‑grey accent.',
-    icon: Palette,
+    icon: Waves,
     rarity: 'epic',
     cost: 4000,
   },
