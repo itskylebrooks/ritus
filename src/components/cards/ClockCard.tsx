@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useHabitStore } from '../../store/store'
 
 export default function ClockCard() {
   const [now, setNow] = useState(() => new Date())
@@ -15,6 +16,10 @@ export default function ClockCard() {
   const hourDeg = (hours / 12) * 360
   const minuteDeg = (minutes / 60) * 360
   const secondDeg = (seconds / 60) * 360
+
+  // subscribe to applied collectibles so the clock updates reactively
+  const applied = useHabitStore((s) => s.progress.appliedCollectibles || {})
+  const nocturne = applied['clock'] === 'clock_nocturne'
 
   return (
     <div className="rounded-2xl border dark:border-neutral-700 bg-white dark:bg-neutral-950 shadow-sm overflow-hidden h-full">
@@ -41,9 +46,12 @@ export default function ClockCard() {
                   const y2 = 50 - Math.cos(angle) * outer;
                   const width = isHour ? 1.6 : 0.8;
                   // Slightly brighter dark grey in light mode; keep sensible dark-mode values
-                  const tickClass = isHour
-                    ? 'text-neutral-700 dark:text-neutral-400'
-                    : 'text-neutral-600 dark:text-neutral-600'
+                  // if nocturne style is applied, force high-contrast monochrome ticks
+                  const tickClass = nocturne
+                    ? 'text-neutral-900 dark:text-neutral-100'
+                    : isHour
+                      ? 'text-neutral-700 dark:text-neutral-400'
+                      : 'text-neutral-600 dark:text-neutral-600'
                   return (
                     <line
                       key={i}
@@ -58,23 +66,30 @@ export default function ClockCard() {
                   );
                 })}
 
-                {/* hour hand */}
-                <g transform={`rotate(${hourDeg} 50 50)`}>
-                  <line x1="50" y1="50" x2="50" y2="28" stroke="#111827" strokeWidth={3.8} strokeLinecap="round" className="dark:stroke-neutral-100" />
-                </g>
+                {/* hour, minute, second hands: adjust when nocturne collectible is applied */}
+                {(() => {
+                  const armColorClass = nocturne ? 'text-neutral-900 dark:text-neutral-100' : ''
+                  return (
+                    <>
+                      <g transform={`rotate(${hourDeg} 50 50)`}>
+                        <line x1="50" y1="50" x2="50" y2="28" stroke={nocturne ? 'currentColor' : '#111827'} strokeWidth={3.8} strokeLinecap="round" className={nocturne ? armColorClass : 'dark:stroke-neutral-100'} />
+                      </g>
 
-                {/* minute hand */}
-                <g transform={`rotate(${minuteDeg} 50 50)`}>
-                  <line x1="50" y1="50" x2="50" y2="18" stroke="#374151" strokeWidth={2.4} strokeLinecap="round" className="dark:stroke-neutral-200" />
-                </g>
+                      {/* minute hand: kept under nocturne but styled monochrome */}
+                      <g transform={`rotate(${minuteDeg} 50 50)`}>
+                        <line x1="50" y1="50" x2="50" y2="18" stroke={nocturne ? 'currentColor' : '#374151'} strokeWidth={2.4} strokeLinecap="round" className={nocturne ? armColorClass : 'dark:stroke-neutral-200'} />
+                      </g>
 
-                {/* second hand */}
-                <g transform={`rotate(${secondDeg} 50 50)`}>
-                  <line x1="50" y1="54" x2="50" y2="14" stroke="#ef4444" strokeWidth={1.4} strokeLinecap="round" />
-                </g>
+                      {/* second hand */}
+                      <g transform={`rotate(${secondDeg} 50 50)`}>
+                        <line x1="50" y1="54" x2="50" y2="14" stroke={nocturne ? 'currentColor' : '#ef4444'} strokeWidth={1.4} strokeLinecap="round" className={nocturne ? armColorClass : ''} />
+                      </g>
 
-                {/* center */}
-                <circle cx="50" cy="50" r="2" fill="#111827" className="dark:fill-neutral-100" />
+                      {/* center */}
+                      <circle cx="50" cy="50" r="2" fill={nocturne ? 'currentColor' : '#111827'} className={nocturne ? armColorClass : 'dark:fill-neutral-100'} />
+                    </>
+                  )
+                })()}
               </g>
             </svg>
           </div>
