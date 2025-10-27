@@ -1,7 +1,7 @@
 import type { ComponentType } from 'react'
-import { Zap, ShieldCheck, CalendarRange, Trophy, Medal } from 'lucide-react'
+import { Zap, ShieldCheck, Sunrise, CalendarRange, Trophy, Medal } from 'lucide-react'
 
-export type TrophyGroup = 'daily_build' | 'daily_break' | 'weekly' | 'totals'
+export type TrophyGroup = 'daily_build' | 'daily_break' | 'weekly' | 'monthly' | 'totals'
 export interface TrophyDef {
   id: string
   label: string
@@ -34,6 +34,11 @@ export const TROPHIES: TrophyDef[] = [
   { id: 'total_200',              label: 'Daily Craftsman',  group: 'totals',      threshold: 200, Icon: Medal, reason: '200 total completions' },
   { id: 'total_500',              label: 'Habit Architect',  group: 'totals',      threshold: 500, Icon: Medal, reason: '500 total completions' },
   { id: 'total_1000',             label: 'Ritus Veteran',    group: 'totals',      threshold: 1000,Icon: Medal, reason: '1000 total completions' },
+    // Monthly habit trophies (consecutive monthly wins)
+    { id: 'streak_monthly_1',      label: 'Monthly Novice',   group: 'monthly',     threshold: 1,  Icon: Sunrise, reason: '1 consecutive monthly win' },
+    { id: 'streak_monthly_3',      label: 'Quarterly Keeper',  group: 'monthly',     threshold: 3,  Icon: Sunrise, reason: '3 consecutive monthly wins' },
+    { id: 'streak_monthly_6',      label: 'Half-Year Ritual',  group: 'monthly',     threshold: 6,  Icon: Sunrise, reason: '6 consecutive monthly wins' },
+    { id: 'streak_monthly_12',     label: 'Year of Rituals',   group: 'monthly',     threshold: 12, Icon: Sunrise, reason: '12 consecutive monthly wins' },
 ]
 
 export default TROPHIES
