@@ -267,7 +267,8 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
                   className={`inline-flex items-center justify-center rounded-xl bg-success p-2 text-inverse transition transform duration-150 ease-in-out ${habit.archived ? 'opacity-60 cursor-not-allowed' : 'hover:bg-success-soft hover:opacity-90 active:scale-[.98]'} md:justify-self-end`}
                 >
                   <Check className="h-4 w-4" />
-                  <span className="sr-only">Mark clean</span>
+                  {/* Visible label on mobile, hidden on small+ so grid view buttons stay icon-only */}
+                  <span className="ml-2 inline sm:hidden">Mark clean</span>
                 </button>
               )
             ) : (
@@ -290,7 +291,8 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
                   className={`inline-flex items-center justify-center rounded-xl bg-accent p-2 text-inverse transition transform duration-150 ease-in-out ${habit.archived ? 'opacity-60 cursor-not-allowed' : 'hover:bg-accent-soft hover:opacity-90 active:scale-[.98]'} md:justify-self-end`}
                 >
                   <Check className="h-4 w-4" />
-                  <span className="sr-only">Done today</span>
+                  {/* Visible label on mobile, hidden on small+ so grid view buttons stay icon-only */}
+                  <span className="ml-2 inline sm:hidden">Done today</span>
                 </button>
               )
             )}
