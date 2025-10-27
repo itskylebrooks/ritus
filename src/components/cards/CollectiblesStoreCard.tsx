@@ -6,7 +6,9 @@ export default function CollectiblesStoreCard() {
   const points = useHabitStore((s) => s.progress.points || 0)
   const ownedArr = useHabitStore((s) => s.progress.ownedCollectibles || [])
   const owned = new Set(ownedArr)
+  const applied = useHabitStore((s) => s.progress.appliedCollectibles || {})
   const buy = useHabitStore((s) => s.purchaseCollectible)
+  const apply = useHabitStore((s) => (s as any).applyCollectible as (id: string) => boolean)
 
   const groups: { label: string; type: CollectibleType }[] = [
     { label: 'Clock styles', type: 'clock' },
@@ -54,7 +56,23 @@ export default function CollectiblesStoreCard() {
                             <span className="rounded-full border dark:border-neutral-700 px-2 py-0.5 text-[10px] uppercase tracking-wide text-neutral-600 dark:text-neutral-300">{item.rarity}</span>
                           </div>
                         {Owned ? (
-                          <span className="inline-flex items-center justify-center h-8 px-3 rounded-lg border dark:border-neutral-700 text-xs text-neutral-600 dark:text-neutral-300">Owned</span>
+                          // Owned items show an Apply button so the user can activate them.
+                          applied[item.type] === item.id ? (
+                            // When already applied, show a button that allows the user to unapply
+                            <button
+                              onClick={() => apply(item.id)}
+                              className="inline-flex items-center justify-center rounded-lg border dark:border-neutral-700 h-8 px-3 text-xs text-neutral-600 dark:text-neutral-300"
+                            >
+                              Unapply
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => apply(item.id)}
+                              className="inline-flex items-center justify-center rounded-lg bg-white/5 border dark:border-neutral-700 h-8 px-3 text-xs text-neutral-900 dark:text-neutral-100"
+                            >
+                              Apply
+                            </button>
+                          )
                         ) : (
                           <button
                             onClick={() => canBuy && buy(item.id, item.cost)}

@@ -3,13 +3,14 @@ import { persist, createJSONStorage } from 'zustand/middleware'
 import { Habit, Frequency } from '../types'
 import { iso, fromISO, isSameDay, startOfWeek, daysThisWeek, lastNDays } from '../utils/date'
 import { TROPHIES } from '../data/trophies'
+import { COLLECTIBLES } from '../data/collectibles'
 import { recalc } from '../utils/scoring'
 import { computeLevel } from '../data/progression'
 
 export interface HabitState {
   habits: Habit[]
   // progression / XP
-  progress: { essence: number; points: number; level: number; weekBonusKeys?: Record<string, true | undefined>; completionAwardKeys?: Record<string, true | undefined>; unlocked?: Record<string, true | undefined>; ownedCollectibles?: string[] }
+  progress: { essence: number; points: number; level: number; weekBonusKeys?: Record<string, true | undefined>; completionAwardKeys?: Record<string, true | undefined>; unlocked?: Record<string, true | undefined>; ownedCollectibles?: string[]; appliedCollectibles?: Record<string, string> }
   setEssence: (n: number) => void
   addEssence: (delta: number) => void
   setPoints: (n: number) => void
@@ -17,6 +18,7 @@ export interface HabitState {
   tryAwardWeeklyBonus: (habitId: string, weekDate: Date, reached: boolean) => void
   awardTrophies: (summary: { dailyBuildStreak: number; dailyBreakStreak: number; weeklyStreak: number; totalCompletions: number }) => string[]
   purchaseCollectible: (id: string, cost: number) => boolean
+  applyCollectible: (id: string) => boolean
   // display settings
   dateFormat: 'MDY' | 'DMY'
   setDateFormat: (f: 'MDY' | 'DMY') => void
@@ -50,7 +52,7 @@ export const useHabitStore = create<HabitState>()(
     (set, get) => ({
       habits: [],
   // Progression defaults (essence = lifetime XP that determines level)
-  progress: { essence: 0, points: 0, level: 1, weekBonusKeys: {}, completionAwardKeys: {}, unlocked: {}, ownedCollectibles: [] },
+  progress: { essence: 0, points: 0, level: 1, weekBonusKeys: {}, completionAwardKeys: {}, unlocked: {}, ownedCollectibles: [], appliedCollectibles: {} },
   // display preferences
   dateFormat: 'MDY',
   setDateFormat: (f) => set({ dateFormat: f }),
@@ -210,6 +212,31 @@ export const useHabitStore = create<HabitState>()(
         const owned = new Set(state.progress.ownedCollectibles || [])
         if (owned.has(id) || (state.progress.points || 0) < cost) return false
         set((s) => ({ progress: { ...s.progress, points: Math.max(0, Math.floor((s.progress.points || 0) - cost)), ownedCollectibles: [...(s.progress.ownedCollectibles || []), id] } }))
+        return true
+      },
+      // Apply an owned collectible. Records the applied collectible by its type so
+      // UI and other modules can react. This does not implement the visual/functional
+      // behavior of each collectible — that will be added per-item later.
+      applyCollectible: (id: string) => {
+        const state = get()
+        const owned = new Set(state.progress.ownedCollectibles || [])
+        if (!owned.has(id)) return false
+        // find collectible to determine its type
+        const def = COLLECTIBLES.find((c) => c.id === id)
+        if (!def) return false
+        const type = def.type
+        const current = state.progress.appliedCollectibles?.[type]
+        if (current === id) {
+          // unapply: remove the applied id for this type
+          set((s) => {
+            const next = { ...(s.progress.appliedCollectibles || {}) }
+            delete next[type]
+            return { progress: { ...s.progress, appliedCollectibles: next } }
+          })
+          return true
+        }
+        // apply: set as the active collectible for this type
+        set((s) => ({ progress: { ...s.progress, appliedCollectibles: { ...(s.progress.appliedCollectibles || {}), [type]: id } } }))
         return true
       },
       resetStats: () => set({ totalPoints: 0, longestStreak: 0 }),
