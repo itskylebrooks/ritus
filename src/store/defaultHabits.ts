@@ -165,7 +165,7 @@ export const defaultHabits: Habit[] = [
 
   {
     id: 'habit-005',
-    name: 'Write Journal in Flowday',
+    name: 'Write Journal Entry',
     frequency: 'daily',
     mode: 'build',
     createdAt: '2025-01-01',
