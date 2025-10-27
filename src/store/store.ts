@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { Habit, Frequency } from '../types'
-import { iso, fromISO, isSameDay, startOfWeek, daysThisWeek } from '../utils/date'
+import { iso, fromISO, isSameDay, startOfWeek, daysThisWeek, lastNDays } from '../utils/date'
 import { TROPHIES } from '../data/trophies'
 import { recalc } from '../utils/scoring'
 import { computeLevel } from '../data/progression'
@@ -126,15 +126,75 @@ export const useHabitStore = create<HabitState>()(
         }),
       // award trophies centrally and idempotently based on a summary of stats
       awardTrophies: (summary) => {
-        const { progress } = get()
+        const { progress, habits } = get()
         const newly: string[] = []
         const unlocked = { ...(progress.unlocked || {}) }
-        const meets = (t: typeof TROPHIES[number]) => {
-          if (t.group === 'daily_build') return summary.dailyBuildStreak >= t.threshold
-          if (t.group === 'daily_break') return summary.dailyBreakStreak >= t.threshold
-          if (t.group === 'weekly') return summary.weeklyStreak >= t.threshold
-          return summary.totalCompletions >= t.threshold
+
+        // Build a richer summary from either the provided summary or the current habits
+        const allHabits = habits || []
+        const totalCompletions = summary?.totalCompletions ?? allHabits.reduce((acc, h) => acc + (h.completions ? h.completions.length : 0), 0)
+        const dailyBuildStreak = summary?.dailyBuildStreak ?? Math.max(0, ...allHabits.filter(h => h.frequency === 'daily' && h.mode === 'build').map(h => h.streak || 0))
+        const dailyBreakStreak = summary?.dailyBreakStreak ?? Math.max(0, ...allHabits.filter(h => h.frequency === 'daily' && h.mode === 'break').map(h => h.streak || 0))
+        const weeklyStreak = summary?.weeklyStreak ?? Math.max(0, ...allHabits.filter(h => h.frequency === 'weekly').map(h => h.streak || 0))
+  const monthlyStreak = (summary as any)?.monthlyStreak ?? Math.max(0, ...allHabits.filter(h => h.frequency === 'monthly').map(h => h.streak || 0))
+
+        // compute unique days with at least one completion across all habits
+        const uniqueDays = new Set<string>()
+        for (const h of allHabits) for (const c of h.completions || []) uniqueDays.add(c)
+        const daysUsedCount = uniqueDays.size
+
+        // helper checks for meta trophies
+        // max streak across build and break habits
+        const maxBuildStreak = Math.max(0, ...allHabits.filter(h => h.mode === 'build').map(h => h.streak || 0))
+        const maxBreakStreak = Math.max(0, ...allHabits.filter(h => h.mode === 'break').map(h => h.streak || 0))
+
+        // daily persistence: at least one completion every day for last N days
+        const hasContinuousDays = (n: number) => {
+          const days = lastNDays(n)
+          for (const d of days) if (![...uniqueDays].some(u => isSameDay(fromISO(u), d))) return false
+          return true
         }
+
+        const allActiveDailyCompletedN = (n: number) => {
+          const activeDaily = allHabits.filter(h => !h.archived && h.frequency === 'daily')
+          if (activeDaily.length === 0) return false
+          const days = lastNDays(n)
+          for (const d of days) {
+            for (const h of activeDaily) {
+              if (!h.completions.some(c => isSameDay(fromISO(c), d))) return false
+            }
+          }
+          return true
+        }
+
+        const meets = (t: typeof TROPHIES[number]) => {
+          if (t.group === 'daily_build') return dailyBuildStreak >= t.threshold
+          if (t.group === 'daily_break') return dailyBreakStreak >= t.threshold
+          if (t.group === 'weekly') return weeklyStreak >= t.threshold
+          if (t.group === 'monthly') return monthlyStreak >= t.threshold
+          if (t.group === 'milestone') return daysUsedCount >= t.threshold
+          if (t.group === 'meta') {
+            // behavioral/meta trophies with custom logic
+            switch (t.id) {
+              case 'meta_balance':
+                // require both a build and a break habit to have a long streak
+                return maxBuildStreak >= t.threshold && maxBreakStreak >= t.threshold
+              case 'meta_focus':
+                return allActiveDailyCompletedN(t.threshold)
+              case 'meta_persistence':
+                // threshold represents days here
+                return hasContinuousDays(t.threshold)
+              // meta_awareness intentionally not auto-awarded here
+              case 'meta_resilience':
+                // complex to detect from static summary; not auto-awarded here
+                return false
+              default:
+                return false
+            }
+          }
+          return totalCompletions >= t.threshold
+        }
+
         for (const t of TROPHIES) {
           if (!unlocked[t.id] && meets(t)) {
             unlocked[t.id] = true
@@ -301,20 +361,67 @@ export const useHabitStore = create<HabitState>()(
               // evaluate trophies idempotently based on updated habits
               unlocked: (() => {
                 const existing = { ...(s.progress.unlocked || {}) }
-                const summary = {
-                  dailyBuildStreak: Math.max(0, ...updated.filter((hh) => hh.frequency === 'daily' && hh.mode === 'build').map((hh) => hh.streak || 0)),
-                  dailyBreakStreak: Math.max(0, ...updated.filter((hh) => hh.frequency === 'daily' && hh.mode === 'break').map((hh) => hh.streak || 0)),
-                  weeklyStreak: Math.max(0, ...updated.filter((hh) => hh.frequency === 'weekly').map((hh) => hh.streak || 0)),
-                  totalCompletions: updated.reduce((acc, hh) => acc + (hh.completions ? hh.completions.length : 0), 0),
+
+                const allHabits = updated
+                const totalCompletions = allHabits.reduce((acc, hh) => acc + (hh.completions ? hh.completions.length : 0), 0)
+                const dailyBuildStreak = Math.max(0, ...allHabits.filter((hh) => hh.frequency === 'daily' && hh.mode === 'build').map((hh) => hh.streak || 0))
+                const dailyBreakStreak = Math.max(0, ...allHabits.filter((hh) => hh.frequency === 'daily' && hh.mode === 'break').map((hh) => hh.streak || 0))
+                const weeklyStreak = Math.max(0, ...allHabits.filter((hh) => hh.frequency === 'weekly').map((hh) => hh.streak || 0))
+                const monthlyStreak = Math.max(0, ...allHabits.filter((hh) => hh.frequency === 'monthly').map((hh) => hh.streak || 0))
+
+                const uniqueDays = new Set<string>()
+                for (const h of allHabits) for (const c of h.completions || []) uniqueDays.add(c)
+                const daysUsedCount = uniqueDays.size
+
+                const maxBuildStreak = Math.max(0, ...allHabits.filter(h => h.mode === 'build').map(h => h.streak || 0))
+                const maxBreakStreak = Math.max(0, ...allHabits.filter(h => h.mode === 'break').map(h => h.streak || 0))
+
+                const hasContinuousDays = (n: number) => {
+                  const days = lastNDays(n)
+                  for (const d of days) if (![...uniqueDays].some(u => isSameDay(fromISO(u), d))) return false
+                  return true
                 }
+
+                const allActiveDailyCompletedN = (n: number) => {
+                  const activeDaily = allHabits.filter(h => !h.archived && h.frequency === 'daily')
+                  if (activeDaily.length === 0) return false
+                  const days = lastNDays(n)
+                  for (const d of days) {
+                    for (const h of activeDaily) {
+                      if (!h.completions.some(c => isSameDay(fromISO(c), d))) return false
+                    }
+                  }
+                  return true
+                }
+
                 for (const t of TROPHIES) {
-                  const meets = t.group === 'daily_build'
-                    ? summary.dailyBuildStreak >= t.threshold
-                    : t.group === 'daily_break'
-                      ? summary.dailyBreakStreak >= t.threshold
-                      : t.group === 'weekly'
-                        ? summary.weeklyStreak >= t.threshold
-                        : summary.totalCompletions >= t.threshold
+                  let meets = false
+                  if (t.group === 'daily_build') meets = dailyBuildStreak >= t.threshold
+                  else if (t.group === 'daily_break') meets = dailyBreakStreak >= t.threshold
+                  else if (t.group === 'weekly') meets = weeklyStreak >= t.threshold
+                  else if (t.group === 'monthly') meets = monthlyStreak >= t.threshold
+                  else if (t.group === 'milestone') meets = daysUsedCount >= t.threshold
+                  else if (t.group === 'meta') {
+                    switch (t.id) {
+                      case 'meta_balance':
+                        meets = maxBuildStreak >= t.threshold && maxBreakStreak >= t.threshold
+                        break
+                      case 'meta_focus':
+                        meets = allActiveDailyCompletedN(t.threshold)
+                        break
+                      case 'meta_persistence':
+                        meets = hasContinuousDays(t.threshold)
+                        break
+                      // meta_awareness intentionally not auto-awarded here
+                      case 'meta_resilience':
+                        meets = false
+                        break
+                      default:
+                        meets = false
+                    }
+                  } else {
+                    meets = totalCompletions >= t.threshold
+                  }
                   if (!existing[t.id] && meets) existing[t.id] = true
                 }
                 return existing
@@ -322,8 +429,8 @@ export const useHabitStore = create<HabitState>()(
             },
           }
         }),
-      // clearing current habits should not reset cumulative stats (there's a separate resetStats)
-      clearAll: () => set({ habits: [] }),
+  // clearing current habits should not reset cumulative stats (there's a separate resetStats)
+  clearAll: () => set({ habits: [] }),
     }),
     {
       name: 'ritus-habits',
