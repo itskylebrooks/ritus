@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import defaultHabits, { defaultProgress } from '../../store/defaultHabits'
 import { useHabitStore } from '../../store/store'
 import ConfirmModal from './ConfirmModal'
+import { useMotionPreferences, defaultEase } from '../../ui/motion'
 
 interface GuideModalProps {
   open: boolean
@@ -43,6 +45,8 @@ export default function GuideModal({ open, onClose, onLoadExample }: GuideModalP
   const [visible, setVisible] = useState(open)
   const [closing, setClosing] = useState(false)
   const [entering, setEntering] = useState(false)
+  const { prefersReducedMotion } = useMotionPreferences()
+  const btnTransition = prefersReducedMotion ? { duration: 0 } : { duration: 0.18, ease: defaultEase }
   const closeTimer = useRef<number | null>(null)
   const enterRaf = useRef<number | null>(null)
   const stepAnimTimer = useRef<number | null>(null)
@@ -130,7 +134,9 @@ export default function GuideModal({ open, onClose, onLoadExample }: GuideModalP
   const queueStep = (next: number) => {
     if (next === step) return
     const dir: LayerDir = next > step ? 'forward' : 'back'
-    // mark existing layers as exiting first
+    // update step immediately so controls (Back/Next) animate right away
+    setStep(next)
+    // mark existing layers as exiting first (content will transition after a short exit)
     setRenderedSteps(prev => prev.map(p => ({ ...p, phase: 'exit' as const, dir })))
     // after exit animation, insert new entering layer
     if (stepAnimTimer.current) clearTimeout(stepAnimTimer.current)
@@ -139,7 +145,6 @@ export default function GuideModal({ open, onClose, onLoadExample }: GuideModalP
     stepAnimTimer.current = window.setTimeout(()=> {
       stepKeyRef.current++
       setRenderedSteps([{ key: stepKeyRef.current, idx: next, phase: 'enter', dir }])
-      setStep(next)
       // cleanup after enter animation completes
       stepAnimTimer.current = window.setTimeout(()=> {
         setRenderedSteps(curr => curr.filter(layer => layer.phase === 'enter'))
@@ -186,20 +191,42 @@ export default function GuideModal({ open, onClose, onLoadExample }: GuideModalP
       {STEPS.map((_,i)=> <span key={i} className={`h-1.5 w-1.5 rounded-full ${i===step? 'bg-neutral-900 dark:bg-neutral-100':'bg-neutral-300 dark:bg-neutral-700'}`}/>) }
           </div>
         </div>
-  <div className="mt-6 flex gap-3">
+        <div className="mt-6">
           {last ? (
             // On final step show Finish (left) and Load data (right)
-            <>
+            <div className="flex gap-3">
               <button onClick={()=> { if(!closing) onClose(); }} className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-gray-100 hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-black/80 dark:text-neutral-300 transition">Finish</button>
               <button onClick={async()=> { handleLoadClick() }} className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-black text-white dark:bg-white dark:text-black">Load data</button>
-            </>
+            </div>
           ) : (
-            <>
-              {step>0 && (
-                <button onClick={()=> queueStep(Math.max(0, step-1))} className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-gray-100 hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-black/80 dark:text-neutral-300 transition">Back</button>
-              )}
-              <button onClick={()=> queueStep(Math.min(STEPS.length-1, step+1))} className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-black text-white dark:bg-white dark:text-black">Next</button>
-            </>
+            <div className="flex w-full items-center gap-3">
+              <AnimatePresence initial={false} mode="popLayout">
+                {step>0 && (
+                  <motion.button
+                    key="back"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={btnTransition}
+                    onClick={()=> queueStep(Math.max(0, step-1))}
+                    className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-gray-100 hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-black/80 dark:text-neutral-300 transition"
+                    layout
+                  >
+                    Back
+                  </motion.button>
+                )}
+
+                <motion.button
+                  key="next"
+                  layout
+                  transition={btnTransition}
+                  onClick={()=> queueStep(Math.min(STEPS.length-1, step+1))}
+                  className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-black text-white dark:bg-white dark:text-black"
+                >
+                  Next
+                </motion.button>
+              </AnimatePresence>
+            </div>
           )}
         </div>
 
