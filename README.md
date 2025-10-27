@@ -1,150 +1,98 @@
-# Ritus — Minimal, Local‑First Habit Tracker
+# Ritus — A Minimal, Local-First Habit Tracker
 
-Build better days with a fast, privacy‑first habit tracker. Create daily or weekly habits, track streaks and points, and see progress at a glance — all stored on your device. No accounts. No analytics. Just momentum.
+Ritus invites you to build better days with a habit tracker designed for simplicity, privacy, and local-first reliability. It helps you create and maintain habits, track completions and streaks, and reward your progress with points you can spend on cosmetic collectibles — all stored securely in your browser.
 
-## Why Ritus
-- Local‑first: your data stays in the browser (no servers).
-- One‑tap tracking: mark today or any day this week in seconds.
-- Motivation built‑in: streaks, weekly goals, and points with milestone bonuses.
-- Simple by design: clean UI, smooth animations, dark mode, mobile‑friendly.
+## Overview
 
-## What You Can Do
-- Create, edit, and delete habits
-  - Frequency: `daily` or `weekly` with custom days/week targets
-  - Mode: `build` a habit or `break` one (e.g., “No sugar”)
-- Track completions via a Mon–Sun week strip or a one‑tap button
-- See progress for each habit
-  - Streaks (daily or weekly)
-  - Weekly progress bar and counts
-  - Points (+10 per completion, +50 milestone bonus for 7‑day daily streaks or 4‑week weekly streaks)
-- View overall stats in the header
-  - Total points, longest streak, weekly completion %
-- Manage data from Settings
-  - Export/Import JSON
-  - Clear all local data
-  - Set a username (local only)
-  - Privacy policy (no tracking, optional sync may come later)
+Ritus embraces a local-first approach: your data stays with you, saved directly in your browser’s `localStorage`. There are no accounts, no analytics, and no cloud syncing. It supports daily, weekly, and monthly habits, with flexible modes to either build new habits or break old ones. Progression is meaningful, with essence (XP) that translates into levels and spendable points. You’ll find trophies to celebrate milestones and a small collectibles store for personalization.
 
-## Privacy
-- No login, no cloud, no analytics.
-- Everything is stored in `localStorage` and can be exported/imported as JSON.
-- You’re always in control: delete local data anytime in Settings.
+Data management is straightforward: export and import your data as JSON, or clear it entirely from the app’s Settings.
 
-## Tech Stack
-- React, TypeScript, Vite
+## Features at a Glance
+
+Create, edit, archive, and delete habits with ease. Choose frequencies—daily, weekly, or monthly—and modes that help you either build habits or break them. Weekly and monthly habits support numeric targets, such as completing a habit three times per week.
+
+Mark completions quickly through a week strip (Monday through Sunday) or with a single tap. Each habit view offers insights like streaks, progress bars, completion counts, and preview charts.
+
+Progression is rewarding: earn essence (lifetime XP) and level up as you progress. Points are awarded not only for completions but also for meeting weekly consistency goals, and these points can be spent in the collectibles store. Weekly bonuses and one-time trophies recognize your dedication and milestones.
+
+The collectibles store offers cosmetic customizations—clock styles, quote packs, accent themes, and relics—that personalize your experience without affecting gameplay. Purchases deduct points and mark items as owned.
+
+Manage your data and preferences easily: export and import JSON with robust deduplication and summaries, clear local data to start fresh, and customize themes (system, light, or dark), date formats (MM/DD or DD/MM), and week start days (Sunday or Monday). While reminders are part of the data model, the on-screen reminder UI is reserved for future updates.
+
+## Privacy and Data Ownership
+
+Your data belongs to you. Ritus requires no login, no cloud sync, and collects no analytics. All information is stored locally in your browser via a persisted Zustand store. You can export your data at any time and re-import it locally. Clearing data removes it completely from your browser.
+
+## Technology Stack
+
+Ritus is built with modern, efficient tools:
+
+- React 18 and TypeScript for a robust UI
+- Vite for fast development and production builds
 - Tailwind CSS for styling
-- Zustand (persisted store)
-- date‑fns for dates
-- lucide‑react for icons
+- Zustand for local persisted state management
+- Framer Motion for smooth UI animations
+- Date-fns for reliable date utilities
+- Lucide-react for crisp icons
+- Recharts for compact, informative charts
+
+All dependencies are declared in `package.json`.
 
 ## Getting Started
+
+Clone the repository and install dependencies with your preferred package manager:
+
 ```bash
-npm install   # or pnpm i / yarn
-npm run dev   # start the dev server
+npm install    # or pnpm install / yarn
+npm run dev    # start the development server (Vite)
 ```
 
-Build and preview a production bundle:
+To build and preview the production version:
+
 ```bash
 npm run build
 npm run preview
 ```
 
 ## Project Structure
-```text
-src/
- ├─ components/
- │   ├─ AddHabit.tsx          # Create new habits (build/break, daily/weekly)
- │   ├─ HabitCard.tsx         # Habit UI: edit, delete, streaks, points
- │   ├─ HeaderStats.tsx       # Total points, longest streak, weekly %
- │   ├─ WeekStrip.tsx         # Mon–Sun toggles
- │   ├─ ProgressBar.tsx       # Lightweight progress UI
- │   ├─ SettingsModal.tsx     # Username, data import/export, privacy
- │   ├─ GuideModal.tsx        # Quick onboarding guide
- │   └─ PrivacyModal.tsx      # Local‑first policy
- ├─ store/store.ts            # Zustand store (persisted)
- ├─ utils/{date,scoring,dataTransfer}.ts
- ├─ App.tsx, main.tsx, styles.css
-```
 
-## License
+Here’s a high-level overview of key files and folders:
 
-This code is for **personal viewing and inspiration only**.  
-All rights reserved © 2025 Kyle Brooks.  
-No commercial use or redistribution without permission.
+- `src/pages/` — main app pages: `Home.tsx`, `Insight.tsx`, `Inspiration.tsx`, `Milestones.tsx`
+- `src/components/` — reusable UI elements such as cards, charts, modals, and forms
+  - `components/forms/AddHabit.tsx` — form to add or edit habits
+  - `components/cards/HabitCard.tsx` — habit display with streaks, editing, and completion toggles
+  - `components/cards/CollectiblesStoreCard.tsx` — the in-app collectibles store UI
+  - `components/cards/TrophiesBoard.tsx` — display unlocked trophies
+  - `components/layout/WeekStrip.tsx` and `MonthGrid.tsx` — calendar and week views
+  - `components/modals/SettingsModal.tsx` — export/import, theme settings, and data clearing
+- `src/store/store.ts` — main Zustand store managing habits, progression, purchases, and persistence
+- `src/utils/` — utilities for date handling, scoring, data transfer, and quotes
+- `src/data/` — sample data for collectibles, trophies, progression, and habit suggestions
 
-# Ritus — Minimal, Local‑First Habit Tracker
+If you modify persisted state shapes, remember to update the storage partialization in `src/store/store.ts`.
 
-Build better days with a fast, privacy‑first habit tracker. Create daily or weekly habits, track streaks and progress, and see your year at a glance — all stored on your device. No accounts. No analytics. Just momentum.
+## Implementation Details
 
-## Why Ritus
-- **Local‑first:** your data lives in the browser (no servers).
-- **Frictionless:** one‑tap tracking; quick week strip (Mon–Sun).
-- **Keeps you coming back:** streaks, weekly goals, levels, and gentle trophies.
-- **Calm design:** clean UI, smooth micro‑animations, dark‑first, mobile‑friendly.
+The habit model supports daily, weekly, and monthly frequencies, with numeric targets for weekly and monthly habits. Completions are recorded as ISO dates; toggling a completion updates habit points, streaks, and global progression. The store manages essence and points, awarding bonuses for completions and weekly consistency, and calculates trophies idempotently.
 
-## Features
+The import process merges data safely, adding new habits, skipping duplicates, and providing a summary. The collectibles store remains cosmetic, with placeholder items defined in `src/data/collectibles.ts`.
 
-### Tracking
-- Create, edit, archive, and delete habits.
-  - **Mode:** `build` a habit or `break` one (e.g., “No sugar”).
-  - **Frequency:** `daily` or `weekly` with custom `days/week` targets.
-- Mark completions via a **week strip** or a **single button** (“Done today” / “Mark clean”).
-- Per‑habit status:
-  - **Streaks** (daily clean streak or weekly consecutive wins)
-  - **Weekly progress** (bar + counts)
-  - **Points** earned
+## Contributing
 
-### Insight
-- **Year heatmaps** per habit (GitHub‑style MonthGrid).
-- Header stats: **total completions**, **longest streak**, **weekly completion %**.
-- Lightweight, monochrome visuals that match the rest of Ritus.
+Contributions are welcome. Please open an issue or submit a pull request with small, focused changes. Follow existing style conventions and aim for concise, reviewable commits. For any added third-party quotes, ensure they are public domain or properly licensed; the app ships with placeholder packs only.
 
-### Milestones
-- **Levels:** lifetime **essence** (XP) determines level; **points** are spendable.
-  - Essence/points are awarded on completions, with small weekly bonuses for consistency.
-  - Essence never decreases; points can be spent without affecting level.
-- **Trophies:** one‑time badges for key streaks and totals (unlocked badges only; no “locked” placeholders).
-- **Collectibles store (cosmetic placeholders):** clock styles, quote packs, accent themes, and symbolic relics. Purchasing marks items as owned; no gameplay effects yet.
+## License and Copyright
 
-### More
-- **Inspiration:** short notes on habit‑building + curated example “sets” you can add.
-- **Settings:** theme (system/light/dark), username (local), export/import JSON, privacy policy.
-- **Design touches:** Telegram‑style surface, analog clock tile, subtle hover & press states.
+This project is original work by Kyle Brooks. See the `LICENSE` and `NOTICE` files in the project root for details.
 
-## Privacy
-- **No login, no cloud, no analytics.**
-- Everything is stored in `localStorage` and can be exported/imported as JSON.
-- You control your data: clear local data anytime in **Settings**.
+---
 
-> Quote packs ship as categories/placeholders. If you add quotes, use your own writing or public‑domain/licensed sources.
+If you’d like, I can also help with:
 
-## Tech Stack
-- React + TypeScript + Vite
-- Tailwind CSS for styling
-- Zustand (persisted store)
-- date‑fns for calendar math
-- lucide‑react for icons
+- Adding a brief screenshots or GIF section to the README  
+- Creating a small usage example or demo data to ease first-time use  
+- Generating a concise CONTRIBUTING.md and a PR checklist  
 
-## Getting Started
-```bash
-npm install   # or pnpm i / yarn
-npm run dev   # start the dev server
-```
-
-Build and preview a production bundle:
-```bash
-npm run build
-npm run preview
-```
-
-## Roadmap
-- Optional reminders (local notifications)
-- PWA polish (offline install)
-- Sync (opt‑in) when/if it adds real value
-- More collectible visuals (clock styles, accents), gentle confetti for big trophies
-
-## License
-
-This code is for **personal viewing and inspiration only**.  
-All rights reserved © 2025 Kyle Brooks.  
-No commercial use or redistribution without permission.
+Just let me know which you'd prefer next, and I’ll update the repository accordingly.
