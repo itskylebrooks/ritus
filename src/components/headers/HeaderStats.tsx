@@ -1,7 +1,7 @@
 import { Flame, Info, ChartNoAxesColumnIncreasing } from 'lucide-react'
 import { useHabitStore } from '../../store/store'
 import { daysThisWeek } from '../../utils/date'
-import { hasCompletionOnDay, countCompletionsInWeek } from '../../utils/scoring'
+import { hasCompletionOnDay, countCompletionsInWeek, countCompletionsInMonth } from '../../utils/scoring'
 import ProgressBar from '../charts/ProgressBar'
 
 export default function HeaderStats() {
@@ -17,11 +17,16 @@ export default function HeaderStats() {
     if (h.frequency === 'daily') {
       const hits = thisWeek.filter((d) => hasCompletionOnDay(h.completions, d)).length
       return [acc[0] + hits, acc[1] + thisWeek.length]
-    } else {
+    }
+    if (h.frequency === 'weekly') {
       const target = h.weeklyTarget ?? 1
       const doneWeek = countCompletionsInWeek(h.completions) >= target ? 1 : 0
       return [acc[0] + doneWeek, acc[1] + 1]
     }
+    // monthly
+    const mtarget = h.monthlyTarget ?? 1
+    const doneMonth = countCompletionsInMonth(h.completions) >= mtarget ? 1 : 0
+    return [acc[0] + doneMonth, acc[1] + 1]
   }, [0, 0])
   const weeklyPct = total === 0 ? 0 : Math.round((done / total) * 100)
 

@@ -13,6 +13,7 @@ export default function AddHabit() {
   const [activeIndex, setActiveIndex] = useState<number>(-1)
   const [frequency, setFrequency] = useState<Frequency>('daily')
   const [weeklyTarget, setWeeklyTarget] = useState<number>(1)
+  const [monthlyTarget, setMonthlyTarget] = useState<number>(1)
   const [mode, setMode] = useState<'build' | 'break'>('build')
   const buildPlaceholder = 'e.g., Morning Run'
   const breakPlaceholder = 'e.g., No Alcohol'
@@ -26,7 +27,8 @@ export default function AddHabit() {
     e.preventDefault()
     if (!name.trim()) return
     try {
-  addHabit(name.trim(), frequency, weeklyTarget, mode)
+      // call store.addHabit with weeklyTarget and monthlyTarget (store will ignore the irrelevant one)
+      addHabit(name.trim(), frequency, weeklyTarget, monthlyTarget, mode)
     } catch (err) {
       // on some mobile browsers/storage modes this can throw (e.g., blocked storage or missing APIs)
       // surface to console and avoid crashing the UI
@@ -38,6 +40,7 @@ export default function AddHabit() {
     setName('')
     setFrequency('daily')
   setWeeklyTarget(1)
+  setMonthlyTarget(1)
   setMode('build')
   }
 
@@ -251,6 +254,7 @@ export default function AddHabit() {
         >
           <option value="daily">Daily</option>
           <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
         </select>
         <ChevronDown className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400 dark:text-neutral-300" />
       </div>
@@ -276,6 +280,31 @@ export default function AddHabit() {
               >
                 {[1, 2, 3, 4, 5, 6].map((n) => (
                   <option key={n} value={n}>{n} day{n > 1 ? 's' : ''}</option>
+                ))}
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400 dark:text-neutral-300" />
+            </div>
+          </motion.div>
+        )}
+        {frequency === 'monthly' && (
+          <motion.div
+            key="times-month"
+            initial={{ opacity: 0, x: 12 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 12 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            layout
+            style={{ minWidth: 0 }}
+          >
+            <label className="block text-sm text-neutral-600 dark:text-neutral-300">Times / month</label>
+            <div className="relative mt-1">
+              <select
+                className="appearance-none mt-0 w-full rounded-xl border bg-white px-3 py-2 pr-9 dark:bg-neutral-950 dark:border-neutral-700"
+                value={monthlyTarget}
+                onChange={(e) => setMonthlyTarget(Number(e.target.value))}
+              >
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <option key={n} value={n}>{n} time{n > 1 ? 's' : ''}</option>
                 ))}
               </select>
               <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400 dark:text-neutral-300" />

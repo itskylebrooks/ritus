@@ -259,6 +259,21 @@ export const defaultHabits: Habit[] = [
     points: 95,
     archived: false
   }
+  ,
+  {
+    id: 'habit-011',
+    name: 'Review Finances',
+    frequency: 'monthly',
+    mode: 'build',
+    createdAt: '2025-01-05',
+    // monthly review roughly once per month through the year
+    completions: [
+      '2025-01-05','2025-02-04','2025-03-06','2025-04-02','2025-05-05','2025-06-03','2025-07-02','2025-08-04','2025-09-03','2025-10-05'
+    ],
+    monthlyTarget: 1,
+    streak: 10,
+    points: 50
+  }
 ];
 
 export default defaultHabits;

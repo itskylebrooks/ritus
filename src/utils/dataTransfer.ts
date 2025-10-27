@@ -70,7 +70,8 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
           ? (h.completions as string[]).map((c) => iso(fromISO(String(c))))
           : [],
         mode: (h as Habit).mode ?? 'build',
-        weeklyTarget: (h as Habit).weeklyTarget,
+  weeklyTarget: (h as Habit).weeklyTarget,
+  monthlyTarget: (h as Habit).monthlyTarget,
         archived: Boolean((h as any).archived ?? false),
         streak: Number((h as Habit).streak ?? 0),
         points: Number((h as Habit).points ?? 0),

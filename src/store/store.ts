@@ -38,8 +38,8 @@ export interface HabitState {
   totalPoints: number
   longestStreak: number
   resetStats: () => void
-  addHabit: (name: string, frequency: Frequency, weeklyTarget?: number, mode?: 'build' | 'break') => void
-  editHabit: (id: string, patch: Partial<Pick<Habit, 'name' | 'frequency' | 'weeklyTarget' | 'mode'>>) => void
+  addHabit: (name: string, frequency: Frequency, weeklyTarget?: number, monthlyTarget?: number, mode?: 'build' | 'break') => void
+  editHabit: (id: string, patch: Partial<Pick<Habit, 'name' | 'frequency' | 'weeklyTarget' | 'monthlyTarget' | 'mode'>>) => void
   deleteHabit: (id: string) => void
   toggleCompletion: (id: string, date: Date) => void
   clearAll: () => void
@@ -154,7 +154,7 @@ export const useHabitStore = create<HabitState>()(
       },
       resetStats: () => set({ totalPoints: 0, longestStreak: 0 }),
   // safe id generation: crypto.randomUUID may not exist on some older mobile browsers
-      addHabit: (name, frequency, weeklyTarget = 1, mode: 'build' | 'break' = 'build') =>
+      addHabit: (name, frequency, weeklyTarget = 1, monthlyTarget = 1, mode: 'build' | 'break' = 'build') =>
         set((s) => {
           const genId = () => {
             try {
@@ -177,6 +177,7 @@ export const useHabitStore = create<HabitState>()(
             createdAt: iso(new Date()),
             completions: [],
             weeklyTarget: frequency === 'weekly' ? weeklyTarget : undefined,
+            monthlyTarget: frequency === 'monthly' ? monthlyTarget : undefined,
             streak: 0,
             points: 0,
           }
@@ -248,25 +249,27 @@ export const useHabitStore = create<HabitState>()(
             const delta = newPts - oldPts
             pointsDelta += delta
 
-            // For weekly bonus: evaluate after the toggle for this habit-week
-            const days = daysThisWeek(day, 1) // Mon–Sun week
-            const weekSet = new Set(days.map((d) => iso(d)))
-            const count = completions.filter((c) => weekSet.has(c)).length
-            const target = h.frequency === 'daily' ? (h.weeklyTarget ?? 7) : (h.weeklyTarget ?? 1)
-            const weekKey = `${h.id}@${startOfWeek(day, { weekStartsOn: 1 }).toISOString()}`
-            const hadWeek = !!weekKeys[weekKey]
-            const reached = count >= target
-            if (reached && !hadWeek) {
-              // award weekly bonus
-              essenceDelta += 10
-              pointsAwardDelta += 10
-              weekKeys[weekKey] = true
-            }
-            if (!reached && hadWeek) {
-              // revoke weekly bonus
-              essenceDelta -= 10
-              pointsAwardDelta -= 10
-              delete weekKeys[weekKey]
+            // For weekly bonus: evaluate after the toggle for this habit-week (only for weekly habits)
+            if (h.frequency === 'weekly') {
+              const days = daysThisWeek(day, 1) // Mon–Sun week
+              const weekSet = new Set(days.map((d) => iso(d)))
+              const count = completions.filter((c) => weekSet.has(c)).length
+              const target = h.weeklyTarget ?? 1
+              const weekKey = `${h.id}@${startOfWeek(day, { weekStartsOn: 1 }).toISOString()}`
+              const hadWeek = !!weekKeys[weekKey]
+              const reached = count >= target
+              if (reached && !hadWeek) {
+                // award weekly bonus
+                essenceDelta += 10
+                pointsAwardDelta += 10
+                weekKeys[weekKey] = true
+              }
+              if (!reached && hadWeek) {
+                // revoke weekly bonus
+                essenceDelta -= 10
+                pointsAwardDelta -= 10
+                delete weekKeys[weekKey]
+              }
             }
 
             return newHabit

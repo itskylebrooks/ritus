@@ -1,5 +1,6 @@
 import { Habit } from '../types'
 import { addDays, fromISO, isSameCalendarWeek, isSameDay, startOfWeek, getWeekStartsOn } from './date'
+import { isSameMonth, startOfMonth, addMonths } from 'date-fns'
 import { daysThisWeek } from './date'
 
 export const POINTS_PER_COMPLETION = 5
@@ -15,9 +16,18 @@ export function hasCompletionInWeek(completions: string[], dayInWeek: Date) {
   return completions.some((c) => isSameCalendarWeek(fromISO(c), dayInWeek))
 }
 
+export function hasCompletionInMonth(completions: string[], dayInMonth: Date) {
+  return completions.some((c) => isSameMonth(fromISO(c), dayInMonth))
+}
+
 export function countCompletionsInWeek(completions: string[], ref: Date = new Date()): number {
   const week = daysThisWeek(ref, getWeekStartsOn())
   return week.filter((d) => hasCompletionOnDay(completions, d)).length
+}
+
+export function countCompletionsInMonth(completions: string[], ref: Date = new Date()): number {
+  // count unique days within the calendar month that have a completion
+  return completions.map(fromISO).filter((d) => isSameMonth(d, ref)).length
 }
 
 export function calcDailyStreak(h: Habit, ref: Date = new Date()) {
@@ -59,6 +69,32 @@ export function calcWeeklyStreak(h: Habit, ref: Date = new Date()) {
   return s
 }
 
+export function calcMonthlyStreak(h: Habit, ref: Date = new Date()) {
+  // Count consecutive months with at least `monthlyTarget` completions, backwards from current month
+  const target = h.monthlyTarget ?? 1
+  let s = 0
+  let cursor = new Date(ref)
+  if (h.mode === 'break') {
+    // For break habits, count consecutive calendar months that have at least one completion
+    while (true) {
+      const monthCount = h.completions.filter((c) => isSameMonth(fromISO(c), cursor)).length
+      if (monthCount > 0) {
+        s += 1
+        cursor = addMonths(cursor, -1)
+      } else break
+    }
+  } else {
+    while (true) {
+      const monthCount = h.completions.filter((c) => isSameMonth(fromISO(c), cursor)).length
+      if (monthCount >= target) {
+        s += 1
+        cursor = addMonths(cursor, -1)
+      } else break
+    }
+  }
+  return s
+}
+
 export function calcPoints(h: Habit): number {
   let pts = 0
 
@@ -92,7 +128,7 @@ export function calcPoints(h: Habit): number {
         if (streak % DAILY_MILESTONE === 0) pts += MILESTONE_BONUS
         prev = d
       }
-    } else {
+    } else if (h.frequency === 'weekly') {
       // Weekly scoring: consider a week a 'hit' if completions in that calendar week >= weeklyTarget
       const target = h.weeklyTarget ?? 1
       // build list of week-start dates representing weeks with at least target completions
@@ -119,6 +155,31 @@ export function calcPoints(h: Habit): number {
         if (streak % WEEKLY_MILESTONE === 0) pts += MILESTONE_BONUS
         prev = wk
       }
+    } else if (h.frequency === 'monthly') {
+      // Monthly scoring: consider a month a 'hit' if completions in that calendar month >= monthlyTarget
+      const target = h.monthlyTarget ?? 1
+      // build list of month-start dates representing months with at least target completions
+      const months: Date[] = []
+      let lastMonth: Date | null = null
+      for (const d of dates) {
+        const mo = startOfMonth(d)
+        if (lastMonth && isSameMonth(mo, lastMonth)) continue
+        const count = h.completions.filter((c) => isSameMonth(fromISO(c), mo)).length
+        if (count >= target) months.push(mo)
+        lastMonth = mo
+      }
+
+      if (months.length > 0) pts += months.length * MILESTONE_BONUS
+
+      let streak = 0
+      let prev: Date | null = null
+      for (const mo of months) {
+        if (!prev || isSameMonth(mo, addMonths(prev, 1))) streak += 1
+        else streak = 1
+        // reuse weekly milestone constant here for monthly streak milestones
+        if (streak % WEEKLY_MILESTONE === 0) pts += MILESTONE_BONUS
+        prev = mo
+      }
     }
   }
 
@@ -127,7 +188,7 @@ export function calcPoints(h: Habit): number {
 
 export function recalc(h: Habit): Habit {
   const base = { ...h }
-  base.streak = h.frequency === 'daily' ? calcDailyStreak(h) : calcWeeklyStreak(h)
+  base.streak = h.frequency === 'daily' ? calcDailyStreak(h) : h.frequency === 'weekly' ? calcWeeklyStreak(h) : calcMonthlyStreak(h)
   base.points = calcPoints(h)
   return base
 }

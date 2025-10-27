@@ -6,8 +6,9 @@ import { useHabitStore } from '../store/store'
 interface HabitDef {
 	name: string
 	mode: 'build' | 'break'
-	frequency: 'daily' | 'weekly'
+	frequency: 'daily' | 'weekly' | 'monthly'
 	weeklyTarget?: number
+	monthlyTarget?: number
 	description?: string
 }
 
@@ -33,6 +34,7 @@ const COMPASS_SETS = [
 					{ name: 'Digital Sabbath', mode: 'break', frequency: 'weekly', weeklyTarget: 1 },
 				{ name: 'Plan Tomorrow Before Sleep', mode: 'build', frequency: 'daily' },
 					{ name: 'Declutter Workspace', mode: 'build', frequency: 'weekly', weeklyTarget: 1 },
+					{ name: 'Monthly Reflection', mode: 'build', frequency: 'monthly', monthlyTarget: 1 },
 				{ name: 'No Multitasking', mode: 'break', frequency: 'daily' },
 					{ name: 'Walk Without Headphones', mode: 'build', frequency: 'weekly', weeklyTarget: 2 },
 					{ name: 'Minimal Day', mode: 'break', frequency: 'weekly', weeklyTarget: 1 },
@@ -66,7 +68,7 @@ const COMPASS_SETS = [
 		note: 'I see discipline as art — something built brick by brick. My West keeps me grounded in work, study, and effort that actually changes who I am. It’s not about perfection, just the next small proof that I’m learning.',
 		disclaimer: 'Discipline means different things to different people. Don’t use it to punish yourself — it’s meant to build trust with your future self.',
 		habits: [
-			{ name: 'Code for 1 Hour', mode: 'build', frequency: 'daily' },
+				{ name: 'Code for 1 Hour', mode: 'build', frequency: 'daily' },
 					{ name: 'Study English', mode: 'build', frequency: 'weekly', weeklyTarget: 2 },
 			{ name: 'Journal Reflection', mode: 'build', frequency: 'daily' },
 			{ name: 'Cold Shower', mode: 'build', frequency: 'daily' },
@@ -76,6 +78,7 @@ const COMPASS_SETS = [
 				{ name: 'Limit Distractions', mode: 'break', frequency: 'daily' },
 					{ name: 'Weekly Sprint', mode: 'build', frequency: 'weekly', weeklyTarget: 1 },
 					{ name: 'Teach What You Learn', mode: 'build', frequency: 'weekly', weeklyTarget: 1 },
+						{ name: 'Monthly Review', mode: 'build', frequency: 'monthly', monthlyTarget: 1 },
 		],
 	},
 	{
@@ -95,6 +98,7 @@ const COMPASS_SETS = [
 				{ name: 'Compliment Someone', mode: 'build', frequency: 'daily' },
 					{ name: 'Family Dinner', mode: 'build', frequency: 'weekly', weeklyTarget: 1 },
 					{ name: 'Random Kindness', mode: 'build', frequency: 'weekly', weeklyTarget: 2 },
+					{ name: 'Family Budget Review', mode: 'build', frequency: 'monthly', monthlyTarget: 1 },
 				{ name: 'No Gossip', mode: 'break', frequency: 'daily' },
 		],
 	},
@@ -105,11 +109,12 @@ export default function Inspiration() {
 	const [recentlyAdded, setRecentlyAdded] = useState<string[]>([])
 
 	const handleAdd = (h: HabitDef) => {
-		// Map frequency and mode to store call
-		const freq = h.frequency === 'daily' ? 'daily' : 'weekly'
-		const target = freq === 'weekly' ? (h.weeklyTarget ?? 1) : undefined
-		// pass weekly target only for weekly habits; store will ignore it for daily
-		addHabit(h.name, freq, target, h.mode)
+		// Map frequency and mode to store call; include monthlyTarget when relevant
+		const freq = h.frequency
+		const weekly = h.weeklyTarget ?? 1
+		const monthly = h.monthlyTarget ?? 1
+		// pass both targets; store will only persist the relevant one
+		addHabit(h.name, freq as any, weekly, monthly, h.mode)
 		// give quick visual feedback on the pill itself
 		setRecentlyAdded((s) => [...s, h.name])
 		setTimeout(() => setRecentlyAdded((s) => s.filter((n) => n !== h.name)), 1400)
@@ -183,7 +188,7 @@ export default function Inspiration() {
 														<>
 															{/* Keep name and frequency in DOM to preserve pill width; fade them when showing the added overlay */}
 															<span className={`${recentlyAdded.includes(h.name) ? 'opacity-0' : 'opacity-100'} whitespace-normal leading-tight transition-opacity duration-150`}>{h.name}</span>
-															<span className={`${recentlyAdded.includes(h.name) ? 'opacity-0' : 'opacity-60'} text-[10px] ml-1 flex-none transition-opacity duration-150`}>{h.frequency === 'daily' ? 'D' : `W${h.weeklyTarget ? h.weeklyTarget : ''}`}</span>
+																														<span className={`${recentlyAdded.includes(h.name) ? 'opacity-0' : 'opacity-60'} text-[10px] ml-1 flex-none transition-opacity duration-150`}>{h.frequency === 'daily' ? 'D' : h.frequency === 'weekly' ? `W${h.weeklyTarget ? h.weeklyTarget : ''}` : `M${h.monthlyTarget ?? 1}`}</span>
 																<AnimatePresence>
 																	{recentlyAdded.includes(h.name) && (
 																		<motion.span

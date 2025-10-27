@@ -263,6 +263,8 @@ export const HABIT_SUGGESTIONS: string[] = [
   'Mop the Floor',
   'Change Bed Sheets',
   'Clean Fridge Shelf',
+  'Deep Clean Home',
+  'Water the flowers',
   'Wipe Kitchen Counters',
   'Dust Surfaces',
   'Sort Mail',
@@ -284,6 +286,9 @@ export const HABIT_SUGGESTIONS: string[] = [
   'LinkedIn Touch‑Up',
   'Inbox Clean Sweep',
   'Plan Monthly Bills',
+  'Monthly Review',
+  'Plan Monthly Goals',
+  'Monthly Budget Review',
 
   // ────────────────────────────────────────────────────────────────────────────
   // Career & Craft

@@ -6,7 +6,7 @@ import type { Habit } from '../../types'
 import WeekStrip from '../layout/WeekStrip'
 import ProgressBar from '../charts/ProgressBar'
 import Badge from './Badge'
-import { DAILY_MILESTONE, MILESTONE_BONUS, POINTS_PER_COMPLETION, WEEKLY_MILESTONE, countCompletionsInWeek } from '../../utils/scoring'
+import { DAILY_MILESTONE, MILESTONE_BONUS, POINTS_PER_COMPLETION, WEEKLY_MILESTONE, countCompletionsInWeek, countCompletionsInMonth } from '../../utils/scoring'
 import ConfirmModal from '../modals/ConfirmModal'
 
 type ButtonsMenuProps = {
@@ -131,8 +131,8 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
     setName(habit.name)
   }, [habit.name])
 
-  const weeklyMax = habit.frequency === 'daily' ? 7 : habit.weeklyTarget ?? 1
-  const weeklyVal = useMemo(() => countCompletionsInWeek(habit.completions), [habit.completions])
+  const progressMax = habit.frequency === 'daily' ? 7 : habit.frequency === 'weekly' ? (habit.weeklyTarget ?? 1) : (habit.monthlyTarget ?? 1)
+  const progressVal = useMemo(() => (habit.frequency === 'monthly' ? countCompletionsInMonth(habit.completions) : countCompletionsInWeek(habit.completions)), [habit.completions, habit.frequency])
 
   // If points are large, render the number smaller so it fits the card
   const pointsClass = habit.points && habit.points > 999 ? 'text-sm font-semibold tabular-nums' : 'text-base font-semibold tabular-nums'
@@ -188,8 +188,8 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
                   <div className="text-lg font-semibold whitespace-normal break-words leading-tight">
                     <span className="inline after:content-[''] after:inline-block after:w-2">{habit.name}</span>
                     <span className="inline-flex items-center gap-2 align-text-bottom">
-                      {/* Compact badge labels: daily -> D, weekly -> W{n}, archived -> A */}
-                      <Badge>{habit.frequency === 'daily' ? 'D' : habit.frequency === 'weekly' ? `W${habit.weeklyTarget ?? 1}` : String(habit.frequency).charAt(0).toUpperCase()}</Badge>
+                      {/* Compact badge labels: daily -> D, weekly -> W{n}, monthly -> M{n}, archived -> A */}
+                      <Badge>{habit.frequency === 'daily' ? 'D' : habit.frequency === 'weekly' ? `W${habit.weeklyTarget ?? 1}` : habit.frequency === 'monthly' ? `M${habit.monthlyTarget ?? 1}` : String(habit.frequency).charAt(0).toUpperCase()}</Badge>
                       {habit.archived && <Badge>A</Badge>}
                     </span>
                   </div>
@@ -303,9 +303,9 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
         </div>
 
         {/* Mobile progress bar full width */}
-        <div className="mt-2 sm:hidden flex items-center gap-3">
-          <div className="flex-1"><ProgressBar value={weeklyVal} max={weeklyMax} /></div>
-          <div className="text-sm text-neutral-600 dark:text-neutral-300 tabular-nums">{weeklyVal}/{weeklyMax}</div>
+          <div className="mt-2 sm:hidden flex items-center gap-3">
+          <div className="flex-1"><ProgressBar value={progressVal} max={progressMax} /></div>
+          <div className="text-sm text-neutral-600 dark:text-neutral-300 tabular-nums">{progressVal}/{progressMax}</div>
         </div>
 
         {/* Desktop/tablet: three-column centered layout */}
@@ -316,9 +316,9 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
             <span className="sr-only">{habit.mode === 'break' ? 'Clean streak' : 'Streak'}</span>
           </div>
 
-          <div className="flex items-center gap-2 justify-center justify-self-center">
-            <div className="w-56 md:w-40"><ProgressBar value={weeklyVal} max={weeklyMax} /></div>
-            <div className="text-sm text-neutral-600 dark:text-neutral-300 tabular-nums ml-3">{weeklyVal}/{weeklyMax}</div>
+            <div className="flex items-center gap-2 justify-center justify-self-center">
+            <div className="w-56 md:w-40"><ProgressBar value={progressVal} max={progressMax} /></div>
+            <div className="text-sm text-neutral-600 dark:text-neutral-300 tabular-nums ml-3">{progressVal}/{progressMax}</div>
             <span className="sr-only">Weekly progress</span>
           </div>
 

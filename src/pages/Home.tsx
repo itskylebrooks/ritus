@@ -4,7 +4,7 @@ import ClockCard from '../components/cards/ClockCard'
 import HabitCard from '../components/cards/HabitCard'
 import { useHabitStore } from '../store/store'
 import { fromISO } from '../utils/date'
-import { hasCompletionOnDay, countCompletionsInWeek } from '../utils/scoring'
+import { hasCompletionOnDay, countCompletionsInWeek, countCompletionsInMonth } from '../utils/scoring'
 import { useMemo, useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { PlusCircle, MinusCircle } from 'lucide-react'
@@ -76,11 +76,15 @@ export default function Home() {
     return [...source].sort((a, b) => {
       const aDone = a.frequency === 'daily'
         ? hasCompletionOnDay(a.completions, today)
-        : countCompletionsInWeek(a.completions, today) >= (a.weeklyTarget ?? 1)
+        : a.frequency === 'weekly'
+          ? countCompletionsInWeek(a.completions, today) >= (a.weeklyTarget ?? 1)
+          : countCompletionsInMonth(a.completions, today) >= (a.monthlyTarget ?? 1)
 
       const bDone = b.frequency === 'daily'
         ? hasCompletionOnDay(b.completions, today)
-        : countCompletionsInWeek(b.completions, today) >= (b.weeklyTarget ?? 1)
+        : b.frequency === 'weekly'
+          ? countCompletionsInWeek(b.completions, today) >= (b.weeklyTarget ?? 1)
+          : countCompletionsInMonth(b.completions, today) >= (b.monthlyTarget ?? 1)
 
       if (aDone !== bDone) return aDone ? 1 : -1
       return fromISO(b.createdAt).getTime() - fromISO(a.createdAt).getTime()
