@@ -1,4 +1,4 @@
-import { Trophy } from 'lucide-react'
+import { WandSparkles } from 'lucide-react'
 import { TROPHIES } from '@/shared/constants/trophies'
 import { useHabitStore } from '@/shared/store/store'
 
@@ -16,7 +16,7 @@ export default function TrophiesBoard() {
         {items.length === 0 ? (
             <div className="col-span-2 md:col-span-4 flex flex-col items-center gap-3 rounded-lg border border-subtle p-6 bg-[#f9fafb] dark:bg-[#0b0b0b]">
             <div className="p-2 rounded-md">
-              <Trophy className="h-8 w-8 text-accent" />
+              <WandSparkles className="h-8 w-8 text-accent" />
             </div>
             <div className="text-base font-semibold text-strong text-center">No trophies yet</div>
             <div className="text-sm text-muted text-center max-w-xl">
