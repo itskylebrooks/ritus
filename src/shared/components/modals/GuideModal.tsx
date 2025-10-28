@@ -202,19 +202,23 @@ export default function GuideModal({ open, onClose, onLoadExample }: GuideModalP
             <div className="flex w-full items-center gap-3">
               <AnimatePresence initial={false} mode="popLayout">
                 {step>0 && (
-                  <motion.button
+                  <button
                     key="back"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={btnTransition}
                     onClick={()=> queueStep(Math.max(0, step-1))}
-                    className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-subtle text-strong transition duration-200 hover:bg-subtle-hover"
-                    style={{ willChange: 'opacity, transform, width', WebkitBackfaceVisibility: 'hidden' }}
-                    layout
+                    className={`flex-1 rounded-md px-3 py-2 text-sm font-medium bg-subtle text-strong hover:bg-subtle-hover transition-opacity ${prefersReducedMotion ? '' : 'duration-180'}`}
+                    style={{
+                      opacity: step > 0 ? 1 : 0,
+                      pointerEvents: step > 0 ? 'auto' : 'none',
+                      willChange: 'opacity',
+                      WebkitTransform: 'translateZ(0)',
+                      WebkitBackfaceVisibility: 'hidden'
+                    }}
+                    aria-hidden={step === 0}
+                    disabled={step === 0}
+                    tabIndex={step > 0 ? 0 : -1}
                   >
                     Back
-                  </motion.button>
+                  </button>
                 )}
 
                 <motion.button
@@ -222,7 +226,8 @@ export default function GuideModal({ open, onClose, onLoadExample }: GuideModalP
                   layout
                   transition={btnTransition}
                   onClick={()=> queueStep(Math.min(STEPS.length-1, step+1))}
-                  className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-accent text-inverse transition duration-200 hover:bg-accent-soft hover:opacity-90"
+                  // Restrict CSS transitions to color only so Framer Motion controls layout/transform
+                  className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-accent text-inverse transition-colors duration-200 hover:bg-accent-soft hover:opacity-90"
                   style={{ willChange: 'transform, width', WebkitBackfaceVisibility: 'hidden' }}
                 >
                   Next
