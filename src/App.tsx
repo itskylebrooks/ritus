@@ -2,6 +2,7 @@ import { Routes, Route, useLocation } from 'react-router-dom'
 import Home from '@/features/home'
 import Insight from '@/features/insight'
 import Milestones from '@/features/milestones'
+import Compass from '@/features/compass'
 import Inspiration from '@/features/inspiration'
 import AppHeader from '@/shared/components/headers/AppHeader'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
@@ -30,6 +31,7 @@ export default function App() {
             <Route path="/insight" element={<Page><Insight /></Page>} />
             <Route path="/milestones" element={<Page><Milestones /></Page>} />
             <Route path="/inspiration" element={<Page><Inspiration /></Page>} />
+            <Route path="/compass" element={<Page><Compass /></Page>} />
           </Routes>
         </AnimatePresence>
       </main>

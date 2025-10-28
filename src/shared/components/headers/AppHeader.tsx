@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Archive, ChartPie, ChevronDown, CircleHelp, Home, LayoutGrid, LayoutList, Lightbulb, Menu, MinusCircle, PlusCircle, Settings as SettingsIcon, Trophy } from 'lucide-react'
+import { Archive, ChartPie, ChevronDown, CircleHelp, Compass as CompassIcon, Home, LayoutGrid, LayoutList, Lightbulb, Menu, MinusCircle, PlusCircle, Settings as SettingsIcon, Trophy } from 'lucide-react'
 import { createMobileMenuVariants, desktopDropdownVariants, submenuVariants, useMotionPreferences } from '@/shared/animations'
 import { useHabitStore } from '@/shared/store/store'
 import GuideModal from '@/shared/components/modals/GuideModal'
@@ -40,7 +40,8 @@ export default function AppHeader() {
   const isHome = location.pathname === '/'
   const isMilestones = location.pathname === '/milestones'
   const isInspiration = location.pathname === '/inspiration'
-  const isArchiveHidden = isMilestones || isInspiration
+  const isCompass = location.pathname === '/compass'
+  const isArchiveHidden = isMilestones || isInspiration || isCompass
   const navLinkBase = 'rounded-lg border border-subtle px-3 text-sm transition-colors duration-150 ease-in-out inline-flex items-center h-10'
   const mobileNavLinkBase = 'block rounded-md px-3 py-2 text-base transition-colors duration-150 ease-in-out'
 
@@ -232,7 +233,7 @@ export default function AppHeader() {
                       </li>
                     )}
 
-                    {/* Guide placed directly above Inspiration */}
+                    {/* Guide placed above Compass and Inspiration */}
                     <li>
                       <button
                         type="button"
@@ -242,7 +243,18 @@ export default function AppHeader() {
                         <span className="flex items-center gap-2"><CircleHelp className="w-4 h-4" />Guide</span>
                       </button>
                     </li>
-                      <li>
+                    <li>
+                      <NavLink
+                        to="/compass"
+                        onClick={() => setMoreDesktopOpen(false)}
+                        className={({ isActive }: { isActive: boolean }) =>
+                          `block w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 ${isActive ? 'bg-subtle' : 'hover-nonaccent'}`
+                        }
+                      >
+                        <CompassIcon className="inline-block w-4 h-4 mr-2" />Compass
+                      </NavLink>
+                    </li>
+                    <li>
                       <NavLink
                         to="/inspiration"
                         onClick={() => setMoreDesktopOpen(false)}
@@ -378,7 +390,7 @@ export default function AppHeader() {
                           </button>
                         </li>
                       )}
-                      {/* Guide placed directly above Inspiration */}
+                      {/* Guide placed above Compass and Inspiration */}
                       <li>
                         <button
                           type="button"
@@ -387,6 +399,17 @@ export default function AppHeader() {
                         >
                           <span className="flex items-center gap-2"><CircleHelp className="w-4 h-4" />Guide</span>
                         </button>
+                      </li>
+                      <li>
+                        <NavLink
+                          to="/compass"
+                          onClick={() => { setMenuOpen(false); setMoreMobileOpen(false); }}
+                          className={({ isActive }: { isActive: boolean }) =>
+                            `${mobileNavLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover:bg-accent-soft' : 'text-strong hover-nonaccent'}`
+                          }
+                        >
+                          <CompassIcon className="inline-block w-4 h-4 mr-2" />Compass
+                        </NavLink>
                       </li>
                       <li>
                         <NavLink
