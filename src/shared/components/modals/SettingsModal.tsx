@@ -155,7 +155,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
 
   if (!open && !closing) return null
   return (
-    <div className={"fixed inset-0 z-50 flex items-center justify-center settings-overlay backdrop-blur-sm " + (closing? 'closing':'')} onClick={beginClose}>
+    <div className={`fixed inset-0 z-[80] flex items-center justify-center p-5 transition-colors duration-200 ${closing ? 'bg-transparent' : 'bg-overlay backdrop-blur-sm'}`} onClick={beginClose}>
   <div
   className={`w-full max-w-sm rounded-2xl bg-surface-elevated p-6 pt-7 pb-8 ring-1 ring-black/5 dark:ring-neutral-700/5 border border-subtle overflow-y-auto settings-panel ${closing ? 'closing' : ''}`}
         style={{ WebkitOverflowScrolling: 'touch', paddingBottom: 'max(env(safe-area-inset-bottom), 32px)' }}
