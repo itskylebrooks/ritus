@@ -19,7 +19,7 @@ function DateDisplay() {
 
 function HeaderDateEmoji() {
   return (
-    <div className="flex items-center gap-2 text-sm text-muted">
+    <div className="flex items-center gap-4 text-sm text-muted">
       <span aria-hidden>
         <DateDisplay />
       </span>
