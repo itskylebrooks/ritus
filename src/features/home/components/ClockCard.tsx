@@ -68,20 +68,25 @@ export default function ClockCard() {
 
                 {/* hour, minute, second hands: adjust when nocturne collectible is applied */}
                 {(() => {
-                  const armColorClass = nocturne ? 'text-neutral-900 dark:text-neutral-100' : ''
+                  // When nocturne is active, use the current accent color for the clock
+                  // by setting the element color to `var(--color-accent)` via the
+                  // `text-accent` utility. This allows the clock to adapt when the
+                  // user switches accent collectibles. Otherwise, fall back to the
+                  // existing neutral/monochrome styling.
+                  const armColorClass = nocturne ? 'text-accent' : ''
                   return (
                     <>
-                      <g transform={`rotate(${hourDeg} 50 50)`}>
+                      <g transform={`rotate(${hourDeg} 50 50)`} className={nocturne ? 'text-accent' : ''}>
                         <line x1="50" y1="50" x2="50" y2="28" stroke={nocturne ? 'currentColor' : 'var(--color-text-primary)'} strokeWidth={3.8} strokeLinecap="round" className={nocturne ? armColorClass : 'dark:stroke-neutral-100'} />
                       </g>
 
                       {/* minute hand: kept under nocturne but styled monochrome */}
-                      <g transform={`rotate(${minuteDeg} 50 50)`}>
+                      <g transform={`rotate(${minuteDeg} 50 50)`} className={nocturne ? 'text-accent' : ''}>
                         <line x1="50" y1="50" x2="50" y2="18" stroke={nocturne ? 'currentColor' : 'var(--color-text-secondary)'} strokeWidth={2.4} strokeLinecap="round" className={nocturne ? armColorClass : 'dark:stroke-neutral-200'} />
                       </g>
 
                       {/* second hand */}
-                      <g transform={`rotate(${secondDeg} 50 50)`}>
+                      <g transform={`rotate(${secondDeg} 50 50)`} className={nocturne ? 'text-accent' : ''}>
                         <line x1="50" y1="54" x2="50" y2="14" stroke={nocturne ? 'currentColor' : 'var(--color-danger)'} strokeWidth={1.4} strokeLinecap="round" className={nocturne ? armColorClass : ''} />
                       </g>
 
