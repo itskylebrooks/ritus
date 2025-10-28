@@ -1,17 +1,28 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { CSSProperties, useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { CirclePlus, XCircle } from 'lucide-react'
 import { emojiCategories, emojiIndex, EmojiItem } from '@/shared/constants/emojis'
 import { useEmojiOfTheDay } from '@/shared/hooks/useEmojiOfTheDay'
-import useThemeStore from '@/shared/store/theme'
+// Emojis are rendered inline and tinted via currentColor
 
 function normalizeQuery(value: string) {
   return value.toLowerCase().replace(/[_\s-]+/g, ' ').trim()
 }
 
+// Render inline SVG content tinted by currentColor; set color to --color-accent
+function InlineAccentEmoji({ svg, size = 20, label }: { svg: string; size?: number; label?: string }) {
+  const style: CSSProperties = {
+    color: 'var(--color-accent)',
+    fontSize: size,
+    lineHeight: 0,
+    display: 'inline-block',
+    verticalAlign: 'baseline',
+  }
+  return <span aria-hidden style={style} dangerouslySetInnerHTML={{ __html: svg }} role={label ? 'img' : undefined} />
+}
+
 export default function EmojiPicker() {
   const { emoji, setEmoji, clearEmoji, emojiId, recents } = useEmojiOfTheDay()
-  const theme = useThemeStore((s) => s.theme)
   const [open, setOpen] = useState(false)
   const [closing, setClosing] = useState(false)
   const closeTimerRef = useRef<number | null>(null)
@@ -87,7 +98,7 @@ export default function EmojiPicker() {
     }
   }, [emojiId, clearEmoji])
 
-  const imageStyle = theme === 'dark' ? { filter: 'invert(1) brightness(1.1)' } : undefined
+  // Inline SVGs use currentColor and are tinted via --color-accent.
 
   return (
     <div className="relative" ref={containerRef}>
@@ -101,12 +112,7 @@ export default function EmojiPicker() {
         aria-label={emoji ? `Emoji of the day: ${emoji.label}. Click to change.` : 'Select emoji of the day'}
       >
         {emoji ? (
-          <img
-            src={emoji.path}
-            alt={emoji.label}
-            className="h-5 w-5 transition-transform duration-150 ease-out align-baseline"
-            style={imageStyle}
-          />
+          <InlineAccentEmoji svg={emoji.svg} size={20} label={emoji.label} />
         ) : (
           <CirclePlus className="h-4 w-4" />
         )}
@@ -197,12 +203,7 @@ export default function EmojiPicker() {
                           whileHover={{ scale: 1.04 }}
                           whileTap={{ scale: 0.96 }}
                         >
-                          <img
-                            src={item.path}
-                            alt={item.label}
-                            className="h-8 w-8 pointer-events-none"
-                            style={imageStyle}
-                          />
+                          <InlineAccentEmoji svg={item.svg} size={32} label={item.label} />
                           <span className="sr-only">{item.label}</span>
                         </motion.button>
                       ))}

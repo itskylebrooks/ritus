@@ -1,4 +1,10 @@
-const emojiModules = import.meta.glob<string>('../../emoji/**/*.svg', {
+// Import SVGs as raw strings so we can normalize colors to currentColor
+// and also as URLs for any legacy <img> usage.
+const emojiModulesRaw = import.meta.glob<string>('../../emoji/**/*.svg', {
+  eager: true,
+  as: 'raw',
+})
+const emojiModulesUrl = import.meta.glob<string>('../../emoji/**/*.svg', {
   eager: true,
   import: 'default',
 })
@@ -29,7 +35,10 @@ export interface EmojiItem {
   categoryLabel: string
   label: string
   fileName: string
-  path: string
+  // Original asset URL (kept for any legacy usage)
+  path?: string
+  // Normalized inline SVG content set to use currentColor
+  svg: string
   searchText: string
 }
 
@@ -42,7 +51,24 @@ export interface EmojiCategory {
 const byCategory = new Map<string, EmojiItem[]>()
 const emojiIndex = new Map<string, EmojiItem>()
 
-for (const [fullPath, mod] of Object.entries(emojiModules)) {
+function normalizeSvgToCurrentColor(src: string): string {
+  let s = src
+  // Ensure width/height are scalable with font-size
+  s = s.replace(/<svg\b([^>]*?)>/i, (m, attrs) => {
+    // Drop existing width/height attrs and replace with 1em
+    const clean = attrs
+      .replace(/\swidth="[^"]*"/gi, '')
+      .replace(/\sheight="[^"]*"/gi, '')
+    return `<svg${clean} width="1em" height="1em">`
+  })
+  // Replace fills (except 'none') with currentColor
+  s = s.replace(/fill="(?!none)[^"]*"/gi, 'fill="currentColor"')
+  // Replace strokes (except 'none') with currentColor as well, for outline icons
+  s = s.replace(/stroke="(?!none)[^"]*"/gi, 'stroke="currentColor"')
+  return s
+}
+
+for (const [fullPath, raw] of Object.entries(emojiModulesRaw)) {
   const parts = fullPath.split('/')
   if (parts.length < 3) continue
   const fileName = parts[parts.length - 1]
@@ -50,7 +76,8 @@ for (const [fullPath, mod] of Object.entries(emojiModules)) {
   const id = `${category}/${fileName.replace(/\.svg$/i, '')}`
   const categoryLabel = formatLabel(category)
   const label = formatLabel(fileName)
-  const path = mod
+  const svg = normalizeSvgToCurrentColor(raw)
+  const url = (emojiModulesUrl as Record<string, string>)[fullPath]
 
   const searchText = buildSearchText([label, categoryLabel, fileName, category])
 
@@ -60,7 +87,8 @@ for (const [fullPath, mod] of Object.entries(emojiModules)) {
     categoryLabel,
     label,
     fileName,
-    path,
+    path: url,
+    svg,
     searchText,
   }
 
