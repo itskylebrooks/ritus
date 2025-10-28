@@ -103,15 +103,15 @@ export default function EmojiPicker() {
       <button
         type="button"
         onClick={() => { setSearch(''); setActiveCategory(null); setOpen(true) }}
-        className="h-5 w-5 inline-flex items-center justify-center align-baseline rounded-md text-muted hover:text-strong transition-colors focus:outline-none no-focus-ring"
+        className="h-7 w-7 inline-flex items-center justify-center align-baseline rounded-md text-muted hover:text-strong transition-colors focus:outline-none no-focus-ring"
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-label={emoji ? `Emoji of the day: ${emoji.label}. Click to change.` : 'Select emoji of the day'}
       >
         {emoji ? (
-          <span aria-hidden className="text-base leading-none">{emoji.emoji}</span>
+          <span aria-hidden className="text-[1.5rem] leading-none">{emoji.emoji}</span>
         ) : (
-          <CirclePlus className="h-4 w-4" />
+          <CirclePlus className="h-6 w-6" />
         )}
       </button>
 
@@ -189,19 +189,19 @@ export default function EmojiPicker() {
                     <div className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-soft">
                       {category.categoryLabel}
                     </div>
-                    <div className="grid grid-cols-[repeat(6,2.5rem)] justify-between gap-y-2">
+                    <div className="grid grid-cols-[repeat(6,3rem)] justify-between gap-y-2">
                       {category.items.map((item) => (
                         <button
                           key={item.id}
                           type="button"
                           onClick={() => handleSelect(item)}
-                          className={`group relative flex h-10 w-10 items-center justify-center rounded-md focus:outline-none ${
+                          className={`group relative flex h-12 w-12 items-center justify-center rounded-md focus:outline-none ${
                             emojiId === item.id ? 'border border-accent rounded-md' : ''
                           }`}
                         >
                           <span
                             aria-hidden
-                            className={`text-2xl leading-none transition-transform ${
+                            className={`text-3xl leading-none transition-transform ${
                               prefersReducedMotion ? '' : 'duration-150 ease-out hover:scale-[1.18] active:scale-95'
                             }`}
                           >
