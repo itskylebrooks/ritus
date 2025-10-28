@@ -135,7 +135,7 @@ export default function MonthGrid({ habit, month, allowScroll = true, alignToNow
                   ? 'bg-white dark:bg-neutral-950 border-transparent'
                   : done
                   ? 'bg-black dark:bg-white border-transparent'
-                  : 'bg-neutral-900/10 dark:bg-neutral-800 border-transparent'
+                  : 'bg-neutral-900/10 dark:bg-neutral-700/60 border-transparent'
 
                 return (
                   <div
