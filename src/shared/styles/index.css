@@ -104,7 +104,11 @@ body,
   --color-progress-track: color-mix(in srgb, var(--color-text-primary) 18%, transparent);
   --color-success-hover: color-mix(in srgb, var(--color-success) 45%, var(--color-text-primary));
   --color-tile: #0b0b0b;
-  --color-subtle-hover: color-mix(in srgb, var(--color-surface-alt) 25%, var(--color-text-primary));
+  /* Make hover surfaces slightly lighter than pure black by mixing a small amount
+    of the primary text color into the app background. This yields a subtle
+    but visible separation on pure-black backgrounds. Tweak percentage (3-10%)
+    to taste. */
+  --color-subtle-hover: color-mix(in srgb, var(--color-text-primary) 8%, var(--color-app-bg));
 
   --color-overlay: rgba(0, 0, 0, 0.78);
   --shadow-elevated: 0 12px 24px rgba(2, 6, 23, 0.38);
@@ -325,7 +329,8 @@ header button[aria-haspopup='menu'] {
 
 header nav > ul > li > a:not([aria-current='page']):hover,
 header button[aria-haspopup='menu']:hover {
-  background-color: var(--color-surface-alt);
+  /* use the subtle hover token which is adapted per-theme for better contrast */
+  background-color: var(--color-subtle-hover);
   box-shadow: none;
 }
 
@@ -352,9 +357,9 @@ header button[aria-haspopup='menu'] {
 }
 
 @layer utilities {
-  /* Standard hover for non-accent buttons (matches unselected Build/Break) */
   .hover-nonaccent:hover {
-    background-color: var(--color-surface-alt);
+    /* prefer the subtle hover mix so dark-mode shows a visible surface separation */
+    background-color: var(--color-subtle-hover);
     color: var(--color-text-primary);
   }
   .text-strong {
