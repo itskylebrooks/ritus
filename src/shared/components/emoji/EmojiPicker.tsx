@@ -65,14 +65,24 @@ export default function EmojiPicker() {
       if (event.key === 'Escape') beginClose()
     }
     window.addEventListener('keydown', handleKey)
-    const id = requestAnimationFrame(() => {
-      inputRef.current?.focus()
-      inputRef.current?.select()
-    })
+    let raf: number | null = null
+    try {
+      const isCoarse = typeof window !== 'undefined' && 'matchMedia' in window && window.matchMedia('(pointer: coarse)').matches
+      const isSmall = typeof window !== 'undefined' && 'matchMedia' in window && window.matchMedia('(max-width: 768px)').matches
+      const shouldFocus = !(isCoarse && isSmall)
+      if (shouldFocus) {
+        raf = requestAnimationFrame(() => {
+          inputRef.current?.focus()
+          inputRef.current?.select()
+        })
+      }
+    } catch {
+      // no-op: conservative fallback is to not auto-focus
+    }
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     return () => {
-      cancelAnimationFrame(id)
+      if (raf !== null) cancelAnimationFrame(raf)
       window.removeEventListener('keydown', handleKey)
       document.body.style.overflow = prev
       if (closeTimerRef.current) window.clearTimeout(closeTimerRef.current)
