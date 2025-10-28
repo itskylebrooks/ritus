@@ -283,7 +283,7 @@ export const defaultProgress = {
   // lifetime essence (example)
   essence: 4320,
   // spendable points
-  points: 20,
+  points: 20000,
   // derived level
   level: computeLevel(4320),
   // bookkeeping maps (empty by default for example data)

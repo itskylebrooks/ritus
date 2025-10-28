@@ -146,15 +146,6 @@ export const COLLECTIBLES: CollectibleDef[] = [
     rarity: 'rare',
     cost: 800,
   },
-  {
-    id: 'accent_gold',
-    type: 'accent',
-    title: 'Gold',
-    desc: 'Muted gold accent for highlights.',
-    icon: Star,
-    rarity: 'epic',
-    cost: 2000,
-  },
 
   // ────────────────────────────────────────────────────────────────────────────
   // MYSTERIOUS RELICS (symbolic; placeholders)

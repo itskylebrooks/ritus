@@ -5,6 +5,7 @@ import App from './App'
 import '@/shared/styles/index.css'
 // Ensure theme store is initialized early so it can apply the resolved theme and listeners
 import '@/shared/store/theme'
+import initAccentSync from '@/shared/theme/accent'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -19,3 +20,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 requestAnimationFrame(() => {
   document.body.classList.remove('preload')
 })
+
+// Initialize accent sync after hydration kicks off
+try { initAccentSync() } catch {}
