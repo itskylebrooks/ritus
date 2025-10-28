@@ -3,7 +3,7 @@ import { useHabitStore } from '@/shared/store/store'
 import type { Habit } from '@/shared/types'
 import { recalc } from './scoring'
 import { iso, fromISO } from './date'
-import { emojiIndex } from '@/shared/constants/emojis'
+import { emojiIndex, resolveEmojiId } from '@/shared/constants/emojis'
 
 export interface ImportResult {
   ok: true
@@ -57,7 +57,7 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
     const incomingLongest = typeof parsed.longestStreak === 'number' ? parsed.longestStreak : 0
     const incomingProgress = parsed && typeof parsed.progress === 'object' ? parsed.progress : undefined
     const incomingEmojiByDateRaw = parsed && typeof parsed.emojiByDate === 'object' ? (parsed.emojiByDate as Record<string, string>) : undefined
-    const normalizeId = (id: unknown) => (typeof id === 'string' && emojiIndex.has(id) ? id : null)
+    const normalizeId = (id: unknown) => (typeof id === 'string' ? resolveEmojiId(id) : null)
     const incomingEmojiByDate = incomingEmojiByDateRaw
       ? Object.entries(incomingEmojiByDateRaw).reduce<Record<string, string>>((acc, [key, value]) => {
           const normalized = normalizeId(value)

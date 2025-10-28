@@ -4,14 +4,11 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useHabitStore } from '@/shared/store/store'
 import { iso } from '@/shared/utils/date'
 import { emojiIndex } from '@/shared/constants/emojis'
-import useThemeStore from '@/shared/store/theme'
 
 export default function EmojiHistoryCard() {
   const emojiByDate = useHabitStore((s) => s.emojiByDate || {})
   const ws = useHabitStore((s) => (s.weekStart === 'sunday' ? 0 : 1))
   const [yearDate, setYearDate] = useState<Date>(startOfYear(new Date()))
-  const theme = useThemeStore((s) => s.theme)
-  const imgStyle = theme === 'dark' ? { filter: 'invert(1) brightness(1.1)' } : undefined
 
   const today = new Date()
 
@@ -128,7 +125,7 @@ export default function EmojiHistoryCard() {
                   return (
                     <div key={rIdx} title={title} className="grid place-items-center" style={fillWidth ? { height: `calc(${cellVar})`, width: `calc(${cellVar})` } : { height: CELL, width: CELL }}>
                       {e ? (
-                        <img src={e.path} alt={e.label} style={fillWidth ? { height: `calc(${cellVar} - 4px)`, width: `calc(${cellVar} - 4px)`, ...imgStyle } : { height: CELL - 4, width: CELL - 4, ...imgStyle }} />
+                        <span className="text-base leading-none" aria-hidden>{e.emoji}</span>
                       ) : (
                         <span className="text-muted" style={fillWidth ? { fontSize: 'calc(var(--cell, 14px) * 0.6)', lineHeight: `calc(${cellVar})` } : { fontSize: 11, lineHeight: `${CELL}px` }}>•</span>
                       )}

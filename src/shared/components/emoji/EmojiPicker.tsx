@@ -1,24 +1,11 @@
-import { CSSProperties, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { CirclePlus, XCircle } from 'lucide-react'
 import { emojiCategories, emojiIndex, EmojiItem } from '@/shared/constants/emojis'
 import { useEmojiOfTheDay } from '@/shared/hooks/useEmojiOfTheDay'
-// Emojis are rendered inline and tinted via currentColor
 
 function normalizeQuery(value: string) {
   return value.toLowerCase().replace(/[_\s-]+/g, ' ').trim()
-}
-
-// Render inline SVG content tinted by currentColor; set color to --color-accent
-function InlineAccentEmoji({ svg, size = 20, label }: { svg: string; size?: number; label?: string }) {
-  const style: CSSProperties = {
-    color: 'var(--color-accent)',
-    fontSize: size,
-    lineHeight: 0,
-    display: 'inline-block',
-    verticalAlign: 'baseline',
-  }
-  return <span aria-hidden style={style} dangerouslySetInnerHTML={{ __html: svg }} role={label ? 'img' : undefined} />
 }
 
 export default function EmojiPicker() {
@@ -98,8 +85,6 @@ export default function EmojiPicker() {
     }
   }, [emojiId, clearEmoji])
 
-  // Inline SVGs use currentColor and are tinted via --color-accent.
-
   return (
     <div className="relative" ref={containerRef}>
 
@@ -112,7 +97,7 @@ export default function EmojiPicker() {
         aria-label={emoji ? `Emoji of the day: ${emoji.label}. Click to change.` : 'Select emoji of the day'}
       >
         {emoji ? (
-          <InlineAccentEmoji svg={emoji.svg} size={20} label={emoji.label} />
+          <span aria-hidden className="text-base leading-none">{emoji.emoji}</span>
         ) : (
           <CirclePlus className="h-4 w-4" />
         )}
@@ -203,7 +188,7 @@ export default function EmojiPicker() {
                           whileHover={{ scale: 1.04 }}
                           whileTap={{ scale: 0.96 }}
                         >
-                          <InlineAccentEmoji svg={item.svg} size={32} label={item.label} />
+                          <span aria-hidden className="text-xl leading-none">{item.emoji}</span>
                           <span className="sr-only">{item.label}</span>
                         </motion.button>
                       ))}

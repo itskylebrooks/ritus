@@ -12,6 +12,8 @@
   "dependencies": {
     "canvas-confetti": "^1.9.4",
     "date-fns": "^3.6.0",
+    "emojibase": "^16.0.0",
+    "emojibase-data": "^16.0.3",
     "framer-motion": "^12.23.12",
     "lucide-react": "^0.468.0",
     "react": "^18.3.1",
