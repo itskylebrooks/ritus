@@ -163,7 +163,7 @@ export default function EmojiPicker() {
               </div>
             </div>
 
-            <div ref={listRef} className="max-h-[55vh] overflow-y-auto no-scrollbar pl-3 pr-0 py-3">
+            <div ref={listRef} className="max-h-[55vh] overflow-y-auto no-scrollbar px-3 py-3">
               {filteredCategories.length === 0 ? (
                 <div className="flex h-32 items-center justify-center text-sm text-muted">
                   No emojis match "{search}".
@@ -178,7 +178,7 @@ export default function EmojiPicker() {
                     <div className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-soft">
                       {category.categoryLabel}
                     </div>
-                    <div className="grid grid-cols-6 gap-2">
+                    <div className="grid grid-cols-[repeat(6,2.5rem)] justify-between gap-y-2">
                       {category.items.map((item) => (
                         <motion.button
                           key={item.id}
