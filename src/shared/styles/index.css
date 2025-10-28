@@ -86,9 +86,10 @@ body,
   --color-border-strong: rgba(148, 163, 184, 0.44);
   --color-border-contrast: #f9fafb;
 
-  --color-accent: #f4f4f5;
+  --color-accent: #e5e7eb;
   --color-accent-contrast: #050505;
   --color-accent-soft: color-mix(in srgb, var(--color-accent) 30%, var(--color-text-primary));
+
 
   --color-success: #34d399;
   --color-danger: #f87171;
