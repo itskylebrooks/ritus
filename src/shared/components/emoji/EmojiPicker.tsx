@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, useDeferredValue } from 'react'
-import { CirclePlus, XCircle } from 'lucide-react'
+import { CirclePlus } from 'lucide-react'
 import { emojiCategories, emojiIndex, EmojiItem } from '@/shared/constants/emojis'
 import { useEmojiOfTheDay } from '@/shared/hooks/useEmojiOfTheDay'
 import { useMotionPreferences } from '@/shared/animations'
@@ -134,18 +134,9 @@ export default function EmojiPicker() {
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
                   placeholder="Search emoji..."
+                  maxLength={50}
                   className="w-full rounded-xl border border-subtle bg-transparent px-3 py-2 outline-none ring-0 placeholder:text-muted focus:border-accent no-focus-ring text-sm text-strong"
                 />
-                {search && (
-                  <button
-                    type="button"
-                    onClick={() => setSearch('')}
-                    className="text-muted hover:text-strong"
-                    aria-label="Clear search"
-                  >
-                    <XCircle className="h-4 w-4" />
-                  </button>
-                )}
               </label>
             </div>
             {/* Category tabs */}
