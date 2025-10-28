@@ -51,7 +51,7 @@ function ButtonsMenu({ habit, archiveHabit, unarchiveHabit, setEditing, setConfi
           <motion.button
             key="settings"
             onClick={() => setOpen(true)}
-            className="rounded-xl border dark:border-neutral-700 p-2 hover:bg-neutral-50 dark:hover:bg-neutral-900"
+            className="rounded-xl border dark:border-neutral-700 p-2 hover-nonaccent"
             aria-label="More actions"
             title="More"
             initial={{ opacity: 0 }}
@@ -74,7 +74,7 @@ function ButtonsMenu({ habit, archiveHabit, unarchiveHabit, setEditing, setConfi
           >
             <motion.button
               onClick={() => { setOpen(false); setEditing(true) }}
-              className="rounded-xl border dark:border-neutral-700 p-2 hover:bg-neutral-50 dark:hover:bg-neutral-900"
+              className="rounded-xl border dark:border-neutral-700 p-2 hover-nonaccent"
               aria-label="Edit habit"
               title="Edit"
               whileHover={{ scale: 1.1 }}
@@ -85,7 +85,7 @@ function ButtonsMenu({ habit, archiveHabit, unarchiveHabit, setEditing, setConfi
 
             <motion.button
               onClick={() => { setOpen(false); (habit.archived ? unarchiveHabit(habit.id) : archiveHabit(habit.id)) }}
-              className="rounded-xl border dark:border-neutral-700 p-2 hover:bg-neutral-50 dark:hover:bg-neutral-900"
+              className="rounded-xl border dark:border-neutral-700 p-2 hover-nonaccent"
               aria-label={habit.archived ? 'Unarchive habit' : 'Archive habit'}
               title={habit.archived ? 'Unarchive' : 'Archive'}
               whileHover={{ scale: 1.1 }}
@@ -96,7 +96,7 @@ function ButtonsMenu({ habit, archiveHabit, unarchiveHabit, setEditing, setConfi
 
             <motion.button
               onClick={() => { setOpen(false); setConfirmDeleteOpen(true) }}
-              className="rounded-xl border dark:border-neutral-700 p-2 hover:bg-neutral-50 text-red-500 dark:hover:bg-neutral-900"
+              className="rounded-xl border dark:border-neutral-700 p-2 hover-nonaccent text-red-500"
               aria-label="Delete habit"
               title="Delete"
               whileHover={{ scale: 1.1 }}
@@ -219,7 +219,7 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
                 className="flex items-center gap-2"
               >
                 <button onClick={saveEdit} className="rounded-xl bg-accent px-3 py-2 text-inverse hover-accent-fade">Save</button>
-                <button onClick={() => { setEditing(false); setName(habit.name) }} className="rounded-xl border dark:border-neutral-700 px-3 py-2">Cancel</button>
+                <button onClick={() => { setEditing(false); setName(habit.name) }} className="rounded-xl border dark:border-neutral-700 px-3 py-2 hover-nonaccent">Cancel</button>
               </motion.div>
             ) : (
               <motion.div

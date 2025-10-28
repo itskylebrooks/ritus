@@ -227,14 +227,14 @@ export default function AddHabit() {
       <label className="block text-sm text-muted">I want to</label>
       <div className="mt-1 flex gap-2">
         <label
-          className={`px-3 py-2 rounded-xl border border-subtle cursor-pointer transition-all duration-150 ease-in-out ${mode === 'build' ? 'bg-accent text-inverse shadow-elevated hover-accent-fade' : 'bg-surface-elevated text-muted hover:bg-subtle hover:text-strong'}`}
+          className={`px-3 py-2 rounded-xl border border-subtle cursor-pointer transition-all duration-150 ease-in-out ${mode === 'build' ? 'bg-accent text-inverse shadow-elevated hover-accent-fade' : 'bg-surface-elevated text-muted hover-nonaccent'}`}
         >
           <input className="sr-only" type="radio" name="mode" checked={mode === 'build'} onChange={() => setMode('build')} />
           Build
         </label>
 
         <label
-          className={`px-3 py-2 rounded-xl border border-subtle cursor-pointer transition-all duration-150 ease-in-out ${mode === 'break' ? 'bg-accent text-inverse shadow-elevated hover-accent-fade' : 'bg-surface-elevated text-muted hover:bg-subtle hover:text-strong'}`}
+          className={`px-3 py-2 rounded-xl border border-subtle cursor-pointer transition-all duration-150 ease-in-out ${mode === 'break' ? 'bg-accent text-inverse shadow-elevated hover-accent-fade' : 'bg-surface-elevated text-muted hover-nonaccent'}`}
         >
           <input className="sr-only" type="radio" name="mode" checked={mode === 'break'} onChange={() => setMode('break')} />
           Break

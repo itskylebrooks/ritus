@@ -123,7 +123,7 @@ export default function AppHeader() {
                 to="/"
                 end
                 className={({ isActive }: { isActive: boolean }) =>
-                  `${navLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover-accent-fade' : 'text-strong hover:bg-subtle'}`
+                  `${navLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover-accent-fade' : 'text-strong hover-nonaccent'}`
                 }
               >
                 <Home className="inline-block w-4 h-4 mr-2" />Home
@@ -133,7 +133,7 @@ export default function AppHeader() {
               <NavLink
                 to="/insight"
                 className={({ isActive }: { isActive: boolean }) =>
-                  `${navLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover-accent-fade' : 'text-strong hover:bg-subtle'}`
+                  `${navLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover-accent-fade' : 'text-strong hover-nonaccent'}`
                 }
               >
                 <ChartPie className="inline-block w-4 h-4 mr-2" />Insight
@@ -143,7 +143,7 @@ export default function AppHeader() {
               <NavLink
                 to="/milestones"
                 className={({ isActive }: { isActive: boolean }) =>
-                  `${navLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover-accent-fade' : 'text-strong hover:bg-subtle'}`
+                  `${navLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover-accent-fade' : 'text-strong hover-nonaccent'}`
                 }
               >
                 <Trophy className="inline-block w-4 h-4 mr-2" />Milestones
@@ -159,7 +159,7 @@ export default function AppHeader() {
               ref={moreButtonRef}
               type="button"
               onClick={() => setMoreDesktopOpen((v) => !v)}
-              className="rounded-lg border border-subtle px-3 py-2 text-sm inline-flex items-center gap-2 transition-colors duration-150 hover:bg-subtle"
+              className="rounded-lg border border-subtle px-3 py-2 text-sm inline-flex items-center gap-2 transition-colors duration-150 hover-nonaccent"
               aria-haspopup="menu"
               aria-expanded={moreDesktopOpen}
             >
@@ -183,7 +183,7 @@ export default function AppHeader() {
                         <button
                           type="button"
                           onClick={() => { setMoreDesktopOpen(false); setShowAdd(!showAdd); }}
-                          className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover:bg-subtle"
+                          className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent"
                         >
                           <span className="flex items-center gap-2">{showAdd ? <MinusCircle className="w-4 h-4" /> : <PlusCircle className="w-4 h-4" />}<span>{showAdd ? 'Hide add' : 'Show add'}</span></span>
                         </button>
@@ -195,7 +195,7 @@ export default function AppHeader() {
                         <button
                           type="button"
                           onClick={() => { setMoreDesktopOpen(false); setShowArchived(!showArchived); }}
-                          className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover:bg-subtle"
+                          className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent"
                         >
                           <span className="flex items-center gap-2"><Archive className="w-4 h-4" />{showArchived ? 'Hide archived' : 'Show archived'}</span>
                         </button>
@@ -206,7 +206,7 @@ export default function AppHeader() {
                         <button
                           type="button"
                           onClick={() => { setMoreDesktopOpen(false); setShowList(!showList); }}
-                          className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover:bg-subtle"
+                          className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent"
                         >
                           <span className="flex items-center gap-2">{showList ? <LayoutGrid className="w-4 h-4" /> : <LayoutList className="w-4 h-4" />}{showList ? 'Show as grid' : 'Show as list'}</span>
                         </button>
@@ -218,7 +218,7 @@ export default function AppHeader() {
                       <button
                         type="button"
                         onClick={() => { setMoreDesktopOpen(false); setGuideOpen(true); }}
-                        className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover:bg-subtle"
+                        className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent"
                       >
                         <span className="flex items-center gap-2"><CircleHelp className="w-4 h-4" />Guide</span>
                       </button>
@@ -228,7 +228,7 @@ export default function AppHeader() {
                         to="/inspiration"
                         onClick={() => setMoreDesktopOpen(false)}
                         className={({ isActive }: { isActive: boolean }) =>
-                          `block w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 ${isActive ? 'bg-subtle' : 'hover:bg-subtle'}`
+                          `block w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 ${isActive ? 'bg-subtle' : 'hover-nonaccent'}`
                         }
                       >
                         <Lightbulb className="inline-block w-4 h-4 mr-2" />Inspiration
@@ -238,7 +238,7 @@ export default function AppHeader() {
                       <button
                         type="button"
                         onClick={() => { setMoreDesktopOpen(false); setSettingsOpen(true); }}
-                        className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover:bg-subtle"
+                        className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent"
                       >
                         <span className="flex items-center gap-2"><SettingsIcon className="w-4 h-4" />Settings</span>
                       </button>
@@ -257,7 +257,7 @@ export default function AppHeader() {
               ref={menuButtonRef}
               type="button"
               onClick={() => setMenuOpen((v) => !v)}
-              className="px-2 py-1.5 rounded-lg border border-subtle text-sm inline-flex items-center gap-2 transition-colors duration-150 hover:bg-subtle"
+              className="px-2 py-1.5 rounded-lg border border-subtle text-sm inline-flex items-center gap-2 transition-colors duration-150 hover-nonaccent"
               aria-expanded={menuOpen}
               aria-label="Open menu"
             >
@@ -281,7 +281,7 @@ export default function AppHeader() {
                     to="/"
                     onClick={() => setMenuOpen(false)}
                     className={({ isActive }: { isActive: boolean }) =>
-                      `${mobileNavLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover:bg-accent-soft' : 'text-strong hover:bg-subtle'}`
+                      `${mobileNavLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover:bg-accent-soft' : 'text-strong hover-nonaccent'}`
                     }
                     end
                   >
@@ -293,7 +293,7 @@ export default function AppHeader() {
                     to="/insight"
                     onClick={() => setMenuOpen(false)}
                     className={({ isActive }: { isActive: boolean }) =>
-                      `${mobileNavLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover:bg-accent-soft' : 'text-strong hover:bg-subtle'}`
+                      `${mobileNavLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover:bg-accent-soft' : 'text-strong hover-nonaccent'}`
                     }
                   >
                     <ChartPie className="inline-block w-4 h-4 mr-2" />Insight
@@ -304,7 +304,7 @@ export default function AppHeader() {
                     to="/milestones"
                     onClick={() => setMenuOpen(false)}
                     className={({ isActive }: { isActive: boolean }) =>
-                      `${mobileNavLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover:bg-accent-soft' : 'text-strong hover:bg-subtle'}`
+                      `${mobileNavLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover:bg-accent-soft' : 'text-strong hover-nonaccent'}`
                     }
                   >
                     <Trophy className="inline-block w-4 h-4 mr-2" />Milestones
@@ -316,7 +316,7 @@ export default function AppHeader() {
                   <button
                     type="button"
                     onClick={() => setMoreMobileOpen((v) => !v)}
-                    className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover:bg-subtle flex items-center justify-between"
+                    className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent flex items-center justify-between"
                     aria-expanded={moreMobileOpen}
                   >
                     <span className="flex items-center gap-2">More</span>
@@ -339,7 +339,7 @@ export default function AppHeader() {
                           <button
                             type="button"
                             onClick={() => { setMenuOpen(false); setMoreMobileOpen(false); setShowAdd(!showAdd); }}
-                            className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover:bg-subtle"
+                            className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent"
                           >
                             <span className="flex items-center gap-2">{showAdd ? <MinusCircle className="w-4 h-4" /> : <PlusCircle className="w-4 h-4" />}<span>{showAdd ? 'Hide add' : 'Show add'}</span></span>
                           </button>
@@ -350,7 +350,7 @@ export default function AppHeader() {
                           <button
                             type="button"
                             onClick={() => { setMenuOpen(false); setMoreMobileOpen(false); setShowArchived(!showArchived); }}
-                            className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover:bg-subtle"
+                            className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent"
                           >
                             <span className="flex items-center gap-2"><Archive className="w-4 h-4" />{showArchived ? 'Hide archived' : 'Show archived'}</span>
                           </button>
@@ -361,7 +361,7 @@ export default function AppHeader() {
                         <button
                           type="button"
                           onClick={() => { setMenuOpen(false); setMoreMobileOpen(false); setGuideOpen(true); }}
-                          className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover:bg-subtle"
+                          className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent"
                         >
                           <span className="flex items-center gap-2"><CircleHelp className="w-4 h-4" />Guide</span>
                         </button>
@@ -371,7 +371,7 @@ export default function AppHeader() {
                           to="/inspiration"
                           onClick={() => { setMenuOpen(false); setMoreMobileOpen(false); }}
                           className={({ isActive }: { isActive: boolean }) =>
-                            `${mobileNavLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover:bg-accent-soft' : 'text-strong hover:bg-subtle'}`
+                            `${mobileNavLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover:bg-accent-soft' : 'text-strong hover-nonaccent'}`
                           }
                         >
                           <Lightbulb className="inline-block w-4 h-4 mr-2" />Inspiration
@@ -381,7 +381,7 @@ export default function AppHeader() {
                         <button
                           type="button"
                           onClick={() => { setMenuOpen(false); setMoreMobileOpen(false); setSettingsOpen(true); }}
-                          className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover:bg-subtle"
+                          className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent"
                         >
                           <span className="flex items-center gap-2"><SettingsIcon className="w-4 h-4" />Settings</span>
                         </button>

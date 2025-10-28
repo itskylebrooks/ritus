@@ -352,6 +352,11 @@ header button[aria-haspopup='menu'] {
 }
 
 @layer utilities {
+  /* Standard hover for non-accent buttons (matches unselected Build/Break) */
+  .hover-nonaccent:hover {
+    background-color: var(--color-surface-alt);
+    color: var(--color-text-primary);
+  }
   .text-strong {
     color: var(--color-text-primary);
   }

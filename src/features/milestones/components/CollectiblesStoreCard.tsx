@@ -61,7 +61,7 @@ export default function CollectiblesStoreCard() {
                             // When already applied, show a button that allows the user to unapply
                             <button
                               onClick={() => apply(item.id)}
-                              className="inline-flex items-center justify-center rounded-lg border border-subtle h-8 px-3 text-xs text-muted hover:bg-subtle"
+                              className="inline-flex items-center justify-center rounded-lg border border-subtle h-8 px-3 text-xs text-muted hover-nonaccent"
                             >
                               Unapply
                             </button>

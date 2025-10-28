@@ -182,7 +182,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
                 <button
                   type="button"
                   onClick={() => applyTheme('system')}
-                  className={`grid h-10 w-10 place-items-center rounded-lg border border-subtle transition ${isSystemTheme ? 'bg-accent text-inverse shadow-elevated' : 'text-muted hover:bg-subtle hover:text-strong'}`}
+                  className={`grid h-10 w-10 place-items-center rounded-lg border border-subtle transition ${isSystemTheme ? 'bg-accent text-inverse shadow-elevated' : 'text-muted hover-nonaccent'}`}
                   aria-pressed={isSystemTheme}
                   aria-label="System"
                   title="System"
@@ -193,7 +193,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
                 <button
                   type="button"
                   onClick={() => applyTheme('light')}
-                  className={`grid h-10 w-10 place-items-center rounded-lg border border-subtle transition ${!isSystemTheme && mode === 'light' ? 'bg-accent text-inverse shadow-elevated' : 'text-muted hover:bg-subtle hover:text-strong'}`}
+                  className={`grid h-10 w-10 place-items-center rounded-lg border border-subtle transition ${!isSystemTheme && mode === 'light' ? 'bg-accent text-inverse shadow-elevated' : 'text-muted hover-nonaccent'}`}
                   aria-pressed={!isSystemTheme && mode === 'light'}
                   aria-label="Light"
                   title="Light"
@@ -204,7 +204,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
                 <button
                   type="button"
                   onClick={() => applyTheme('dark')}
-                  className={`grid h-10 w-10 place-items-center rounded-lg border border-subtle transition ${!isSystemTheme && mode === 'dark' ? 'bg-accent text-inverse shadow-elevated' : 'text-muted hover:bg-subtle hover:text-strong'}`}
+                  className={`grid h-10 w-10 place-items-center rounded-lg border border-subtle transition ${!isSystemTheme && mode === 'dark' ? 'bg-accent text-inverse shadow-elevated' : 'text-muted hover-nonaccent'}`}
                   aria-pressed={!isSystemTheme && mode === 'dark'}
                   aria-label="Dark"
                   title="Dark"
@@ -227,7 +227,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
                   <button
                     type="button"
                     onClick={() => setDateFormat('MDY')}
-                    className={`relative rounded-lg w-20 px-3 py-2 border border-subtle text-sm text-center ${dateFormat === 'MDY' ? 'bg-accent text-inverse shadow-elevated' : 'text-muted hover:bg-subtle hover:text-strong'}`}
+                    className={`relative rounded-lg w-20 px-3 py-2 border border-subtle text-sm text-center ${dateFormat === 'MDY' ? 'bg-accent text-inverse shadow-elevated' : 'text-muted hover-nonaccent'}`}
                     aria-pressed={dateFormat === 'MDY'}
                     title="Month/Day/Year"
                   >
@@ -236,7 +236,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
                   <button
                     type="button"
                     onClick={() => setDateFormat('DMY')}
-                    className={`relative rounded-lg w-20 px-3 py-2 border border-subtle text-sm text-center ${dateFormat === 'DMY' ? 'bg-accent text-inverse shadow-elevated' : 'text-muted hover:bg-subtle hover:text-strong'}`}
+                    className={`relative rounded-lg w-20 px-3 py-2 border border-subtle text-sm text-center ${dateFormat === 'DMY' ? 'bg-accent text-inverse shadow-elevated' : 'text-muted hover-nonaccent'}`}
                     aria-pressed={dateFormat === 'DMY'}
                     title="Day/Month/Year"
                   >
@@ -248,7 +248,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
                   <button
                     type="button"
                     onClick={() => setWeekStart('sunday')}
-                    className={`relative rounded-lg w-20 px-3 py-2 border border-subtle text-sm text-center ${weekStart === 'sunday' ? 'bg-accent text-inverse shadow-elevated' : 'text-muted hover:bg-subtle hover:text-strong'}`}
+                    className={`relative rounded-lg w-20 px-3 py-2 border border-subtle text-sm text-center ${weekStart === 'sunday' ? 'bg-accent text-inverse shadow-elevated' : 'text-muted hover-nonaccent'}`}
                     aria-pressed={weekStart === 'sunday'}
                     title="Week starts on Sunday"
                   >
@@ -257,7 +257,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
                   <button
                     type="button"
                     onClick={() => setWeekStart('monday')}
-                    className={`relative rounded-lg w-20 px-3 py-2 border border-subtle text-sm text-center ${weekStart === 'monday' ? 'bg-accent text-inverse shadow-elevated' : 'text-muted hover:bg-subtle hover:text-strong'}`}
+                    className={`relative rounded-lg w-20 px-3 py-2 border border-subtle text-sm text-center ${weekStart === 'monday' ? 'bg-accent text-inverse shadow-elevated' : 'text-muted hover-nonaccent'}`}
                     aria-pressed={weekStart === 'monday'}
                     title="Week starts on Monday"
                   >

@@ -164,7 +164,7 @@ export default function GuideModal({ open, onClose, onLoadExample }: GuideModalP
         aria-labelledby="guide-title"
       >
         <div className="absolute top-2 right-2">
-          <button aria-label="Close guide" onClick={()=>{ if(!closing) onClose(); }} className="w-8 h-8 rounded-full flex items-center justify-center bg-subtle text-muted transition duration-200 hover:bg-subtle-hover">
+          <button aria-label="Close guide" onClick={()=>{ if(!closing) onClose(); }} className="w-8 h-8 rounded-full flex items-center justify-center bg-surface text-muted transition duration-200 hover-nonaccent">
             ✕
           </button>
         </div>
@@ -195,7 +195,7 @@ export default function GuideModal({ open, onClose, onLoadExample }: GuideModalP
           {last ? (
             // On final step: left -> Load data, right -> Finish (titles and actions swapped; styles unchanged)
             <div className="flex gap-3">
-              <button onClick={async()=> { handleLoadClick() }} className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-subtle text-strong transition duration-200 hover:bg-subtle-hover">Load data</button>
+              <button onClick={async()=> { handleLoadClick() }} className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-surface text-strong transition duration-200 hover-nonaccent">Load data</button>
               <button onClick={()=> { if(!closing) onClose(); }} className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-accent text-inverse transition duration-200 hover-accent-fade">Finish</button>
             </div>
           ) : (
@@ -205,7 +205,7 @@ export default function GuideModal({ open, onClose, onLoadExample }: GuideModalP
                   <button
                     key="back"
                     onClick={()=> queueStep(Math.max(0, step-1))}
-                    className={`flex-1 rounded-md px-3 py-2 text-sm font-medium bg-subtle text-strong hover:bg-subtle-hover transition-opacity ${prefersReducedMotion ? '' : 'duration-180'}`}
+                    className={`flex-1 rounded-md px-3 py-2 text-sm font-medium bg-surface text-strong hover-nonaccent transition-opacity ${prefersReducedMotion ? '' : 'duration-180'}`}
                     style={{
                       opacity: step > 0 ? 1 : 0,
                       pointerEvents: step > 0 ? 'auto' : 'none',
