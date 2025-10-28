@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { CirclePlus, XCircle } from 'lucide-react'
 import { emojiCategories, emojiIndex, EmojiItem } from '@/shared/constants/emojis'
 import { useEmojiOfTheDay } from '@/shared/hooks/useEmojiOfTheDay'
+import { useMotionPreferences } from '@/shared/animations'
 
 function normalizeQuery(value: string) {
   return value.toLowerCase().replace(/[_\s-]+/g, ' ').trim()
@@ -10,6 +11,7 @@ function normalizeQuery(value: string) {
 
 export default function EmojiPicker() {
   const { emoji, setEmoji, clearEmoji, emojiId, recents } = useEmojiOfTheDay()
+  const { prefersReducedMotion } = useMotionPreferences()
   const [open, setOpen] = useState(false)
   const [closing, setClosing] = useState(false)
   const closeTimerRef = useRef<number | null>(null)
@@ -185,10 +187,17 @@ export default function EmojiPicker() {
                           className={`group relative flex h-10 w-10 items-center justify-center rounded-md focus:outline-none ${
                             emojiId === item.id ? 'border border-accent rounded-md' : ''
                           }`}
-                          whileHover={{ scale: 1.04 }}
-                          whileTap={{ scale: 0.96 }}
                         >
-                          <span aria-hidden className="text-xl leading-none">{item.emoji}</span>
+                          <motion.span
+                            aria-hidden
+                            className="text-2xl leading-none"
+                            style={{ willChange: prefersReducedMotion ? undefined : 'transform' }}
+                            whileHover={prefersReducedMotion ? undefined : { scale: 1.18 }}
+                            whileTap={prefersReducedMotion ? undefined : { scale: 0.95 }}
+                            transition={prefersReducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 28 }}
+                          >
+                            {item.emoji}
+                          </motion.span>
                           <span className="sr-only">{item.label}</span>
                         </motion.button>
                       ))}
