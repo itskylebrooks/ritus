@@ -147,8 +147,18 @@ export default function EmojiPicker() {
                     type="button"
                     onClick={() => {
                       const el = categoryRefs.get(cat.category)
-                      if (el && listRef.current) {
-                        listRef.current.scrollTo({ top: el.offsetTop - 4, behavior: 'smooth' })
+                      if (el) {
+                        try {
+                          el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                        } catch {
+                          const scroller = listRef.current
+                          if (scroller) {
+                            const rect = el.getBoundingClientRect()
+                            const srect = scroller.getBoundingClientRect()
+                            const top = scroller.scrollTop + (rect.top - srect.top)
+                            scroller.scrollTo({ top, behavior: 'smooth' })
+                          }
+                        }
                         setActiveCategory(cat.category)
                       }
                     }}
@@ -171,7 +181,7 @@ export default function EmojiPicker() {
                 filteredCategories.map((category) => (
                   <div
                     key={category.category}
-                    className="mb-4 last:mb-0"
+                    className="mb-4 last:mb-0 scroll-mt-3"
                     style={{ contentVisibility: 'auto', containIntrinsicSize: '600px' }}
                     ref={(el) => categoryRefs.set(category.category, el)}
                   >
