@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { useEffect, useMemo, useRef, useState, useDeferredValue } from 'react'
 import { CirclePlus, XCircle } from 'lucide-react'
 import { emojiCategories, emojiIndex, EmojiItem } from '@/shared/constants/emojis'
 import { useEmojiOfTheDay } from '@/shared/hooks/useEmojiOfTheDay'
@@ -22,7 +21,8 @@ export default function EmojiPicker() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement | null>(null)
 
-  const query = normalizeQuery(search)
+  const deferredSearch = useDeferredValue(search)
+  const query = normalizeQuery(deferredSearch)
 
   const baseCats = useMemo(() => {
     const recentCat = recents.length > 0 ? [{ category: 'recent', categoryLabel: 'Recent', items: recents }] : []
@@ -105,19 +105,18 @@ export default function EmojiPicker() {
         )}
       </button>
 
-      <AnimatePresence>
-        {open && (
+      {open && (
+        <div
+          className={`fixed inset-0 z-[80] flex items-center justify-center p-5 settings-overlay ${closing ? 'closing bg-transparent' : 'bg-overlay backdrop-blur-sm'}`}
+          onClick={beginClose}
+        >
           <div
-            className={`fixed inset-0 z-[80] flex items-center justify-center p-5 settings-overlay ${closing ? 'closing bg-transparent' : 'bg-overlay backdrop-blur-sm'}`}
-            onClick={beginClose}
+            className={`w-full max-w-md rounded-2xl bg-surface-elevated p-3 ring-1 ring-black/5 dark:ring-neutral-700/5 border border-subtle overflow-hidden settings-panel ${closing ? 'closing' : ''}`}
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Emoji of the day"
           >
-            <div
-              className={`w-full max-w-md rounded-2xl bg-surface-elevated p-3 ring-1 ring-black/5 dark:ring-neutral-700/5 border border-subtle overflow-hidden settings-panel ${closing ? 'closing' : ''}`}
-              onClick={(e) => e.stopPropagation()}
-              role="dialog"
-              aria-modal="true"
-              aria-label="Emoji of the day"
-            >
             <div className="bg-surface-elevated px-3 py-2">
               <label className="flex items-center">
                 <input
@@ -173,6 +172,7 @@ export default function EmojiPicker() {
                   <div
                     key={category.category}
                     className="mb-4 last:mb-0"
+                    style={{ contentVisibility: 'auto', containIntrinsicSize: '600px' }}
                     ref={(el) => categoryRefs.set(category.category, el)}
                   >
                     <div className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-soft">
@@ -180,7 +180,7 @@ export default function EmojiPicker() {
                     </div>
                     <div className="grid grid-cols-[repeat(6,2.5rem)] justify-between gap-y-2">
                       {category.items.map((item) => (
-                        <motion.button
+                        <button
                           key={item.id}
                           type="button"
                           onClick={() => handleSelect(item)}
@@ -188,28 +188,25 @@ export default function EmojiPicker() {
                             emojiId === item.id ? 'border border-accent rounded-md' : ''
                           }`}
                         >
-                          <motion.span
+                          <span
                             aria-hidden
-                            className="text-2xl leading-none"
-                            style={{ willChange: prefersReducedMotion ? undefined : 'transform' }}
-                            whileHover={prefersReducedMotion ? undefined : { scale: 1.18 }}
-                            whileTap={prefersReducedMotion ? undefined : { scale: 0.95 }}
-                            transition={prefersReducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 28 }}
+                            className={`text-2xl leading-none transition-transform ${
+                              prefersReducedMotion ? '' : 'duration-150 ease-out hover:scale-[1.18] active:scale-95'
+                            }`}
                           >
                             {item.emoji}
-                          </motion.span>
+                          </span>
                           <span className="sr-only">{item.label}</span>
-                        </motion.button>
+                        </button>
                       ))}
                     </div>
                   </div>
                 ))
               )}
             </div>
-            </div>
           </div>
-        )}
-      </AnimatePresence>
+        </div>
+      )}
     </div>
   )
 }
