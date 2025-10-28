@@ -111,8 +111,12 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
     )
     const mergedHabits = [...cur.habits, ...normalized].map((h) => recalc(h))
 
-    // stats: recompute totalPoints and longest streak from merged habits
-    const newTotal = mergedHabits.reduce((acc, h) => acc + (h.points || 0), 0)
+    // stats: preserve cumulative totalPoints semantics and longest streak
+    // totalPoints is cumulative lifetime points and should not be strictly
+    // recomputed from current habits. Prefer the highest seen value among
+    // existing, incoming export, and a safety recompute from merged habits.
+    const recomputedTotal = mergedHabits.reduce((acc, h) => acc + (h.points || 0), 0)
+    const newTotal = Math.max(incomingTotal || 0, cur.totalPoints || 0, recomputedTotal)
     const newLongest = Math.max(
       incomingLongest || 0,
       cur.longestStreak || 0,
