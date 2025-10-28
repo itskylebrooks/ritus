@@ -168,7 +168,7 @@ export default function AppHeader() {
 
       {/* Right side: date then More button */}
       <div className="flex items-center gap-2">
-        <div className="hidden md:inline-flex items-center rounded-lg border border-subtle px-3 text-sm text-muted h-10">
+        <div className="hidden md:inline-flex items-center px-3 text-sm text-muted h-10">
           <DateDisplay />
         </div>
         {/* Desktop: More dropdown (contains Add/Guide/Settings) */}
@@ -272,6 +272,9 @@ export default function AppHeader() {
         {/* Mobile: hamburger menu which contains page links and a More submenu */}
         <div className="md:hidden relative">
           <div className="flex items-center gap-2">
+            <div className="inline-flex items-center h-10 px-2 text-sm text-muted">
+              <DateDisplay />
+            </div>
             <button
               ref={menuButtonRef}
               type="button"
