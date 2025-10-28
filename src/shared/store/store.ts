@@ -271,25 +271,25 @@ export const useHabitStore = create<HabitState>()(
           }
           const newHabit = recalc(habit)
           const newHabits = [newHabit, ...s.habits]
-          // update longest streak to the max observed (preserve historical max)
-          const newLongest = Math.max(s.longestStreak, newHabit.streak)
+          // recompute longest streak from current habits so UI reflects live streaks
+          const newLongest = Math.max(0, ...newHabits.map((h) => h.streak || 0))
           // totalPoints is cumulative lifetime points and should not be recomputed from current habits
           return { habits: newHabits, longestStreak: newLongest }
         }),
       editHabit: (id, patch) =>
         set((s) => {
           const updated = s.habits.map((h) => (h.id === id ? recalc({ ...h, ...patch }) : h))
-          // update longestStreak if any habit's streak exceeds stored longest (preserve historical max)
-          const maxStreak = Math.max(s.longestStreak, ...updated.map((h) => h.streak))
+          // recompute longest streak from the edited list so stats stay in sync with the UI
+          const maxStreak = Math.max(0, ...updated.map((h) => h.streak || 0))
           // Do not recompute/overwrite cumulative totalPoints when editing habit metadata
           return { habits: updated, longestStreak: maxStreak }
         }),
       
-      // deleting a habit should NOT reduce cumulative stats (totalPoints/longestStreak)
+      // deleting a habit keeps cumulative points but recomputes longest streak from remaining habits
       deleteHabit: (id) => set((s) => {
         const remaining = s.habits.filter((h) => h.id !== id)
-        // preserve totalPoints and longestStreak as they are lifetime aggregates
-        return { habits: remaining }
+        const nextLongest = Math.max(0, ...remaining.map((h) => h.streak || 0))
+        return { habits: remaining, longestStreak: nextLongest }
       }),
   // archive/unarchive a habit (archived habits are hidden from default lists)
       archiveHabit: (id: string) => set((s) => ({ habits: s.habits.map((h) => (h.id === id ? { ...h, archived: true } : h)) })),
@@ -364,8 +364,8 @@ export const useHabitStore = create<HabitState>()(
             return newHabit
           })
 
-          // compute new longest streak if any updated habit exceeded historical max
-          const newLongest = Math.max(s.longestStreak, ...updated.map((h) => h.streak))
+          // recompute longest streak from updated habits so insights stay accurate
+          const newLongest = Math.max(0, ...updated.map((h) => h.streak || 0))
 
           // update cumulative totalPoints by the net delta from toggles (allow reductions when user unmarks)
           // clamp to zero so we never go negative.
@@ -458,8 +458,8 @@ export const useHabitStore = create<HabitState>()(
             },
           }
         }),
-  // clearing current habits should not reset cumulative stats (there's a separate resetStats)
-  clearAll: () => set({ habits: [] }),
+  // clearing current habits resets longest streak so insights reflect empty state (totalPoints handled via resetStats)
+  clearAll: () => set({ habits: [], longestStreak: 0 }),
     }),
     {
       name: 'ritus-habits',

@@ -20,12 +20,13 @@ export type ImportResultFail = { ok: false; reason: 'invalid' | 'not_ritus' }
 
 export function exportAllData() {
   const s = useHabitStore.getState()
+  const habitsForExport = s.habits.map((h) => recalc(h))
   return {
     app: 'ritus',
     version: pkg.version,
     exportedAt: new Date().toISOString(),
     // Ensure exported completions are date-only ISO strings (no time part)
-    habits: s.habits.map((h) => ({ ...h, completions: (h.completions || []).map((c) => iso(fromISO(c))) })),
+    habits: habitsForExport.map((h) => ({ ...h, completions: (h.completions || []).map((c) => iso(fromISO(c))) })),
     // export formatting settings so they can be restored on import
     dateFormat: s.dateFormat,
     weekStart: s.weekStart,
@@ -77,11 +78,15 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
         points: Number((h as Habit).points ?? 0),
       })
     )
-    const mergedHabits = [...cur.habits, ...normalized]
+    const mergedHabits = [...cur.habits, ...normalized].map((h) => recalc(h))
 
-    // stats: recompute totalPoints from merged habits; keep max for longestStreak
+    // stats: recompute totalPoints and longest streak from merged habits
     const newTotal = mergedHabits.reduce((acc, h) => acc + (h.points || 0), 0)
-    const newLongest = Math.max(cur.longestStreak || 0, incomingLongest || 0)
+    const newLongest = Math.max(
+      incomingLongest || 0,
+      cur.longestStreak || 0,
+      ...mergedHabits.map((h) => h.streak || 0)
+    )
 
     // apply to store/persisted state
     const updated = {
