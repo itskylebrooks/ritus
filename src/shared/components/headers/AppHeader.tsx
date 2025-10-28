@@ -123,7 +123,7 @@ export default function AppHeader() {
                 to="/"
                 end
                 className={({ isActive }: { isActive: boolean }) =>
-                  `${navLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover:bg-accent-soft hover:opacity-90' : 'text-strong hover:bg-subtle'}`
+                  `${navLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover-accent-fade' : 'text-strong hover:bg-subtle'}`
                 }
               >
                 <Home className="inline-block w-4 h-4 mr-2" />Home
@@ -133,7 +133,7 @@ export default function AppHeader() {
               <NavLink
                 to="/insight"
                 className={({ isActive }: { isActive: boolean }) =>
-                  `${navLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover:bg-accent-soft hover:opacity-90' : 'text-strong hover:bg-subtle'}`
+                  `${navLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover-accent-fade' : 'text-strong hover:bg-subtle'}`
                 }
               >
                 <ChartPie className="inline-block w-4 h-4 mr-2" />Insight
@@ -143,7 +143,7 @@ export default function AppHeader() {
               <NavLink
                 to="/milestones"
                 className={({ isActive }: { isActive: boolean }) =>
-                  `${navLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover:bg-accent-soft hover:opacity-90' : 'text-strong hover:bg-subtle'}`
+                  `${navLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover-accent-fade' : 'text-strong hover:bg-subtle'}`
                 }
               >
                 <Trophy className="inline-block w-4 h-4 mr-2" />Milestones

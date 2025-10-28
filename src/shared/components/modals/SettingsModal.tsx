@@ -341,7 +341,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
         </div>
 
         <div className="mt-5">
-          <button onClick={beginClose} className="w-full rounded-2xl px-4 py-3 text-sm font-semibold bg-accent text-inverse hover:bg-accent-soft hover:opacity-90 transition">Done</button>
+          <button onClick={beginClose} className="w-full rounded-2xl px-4 py-3 text-sm font-semibold bg-accent text-inverse hover-accent-fade transition">Done</button>
         </div>
 
         <ConfirmModal

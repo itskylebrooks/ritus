@@ -68,7 +68,7 @@ export default function CollectiblesStoreCard() {
                           ) : (
                             <button
                               onClick={() => apply(item.id)}
-                              className="inline-flex items-center justify-center rounded-lg bg-accent border border-subtle h-8 px-3 text-xs text-inverse hover:bg-accent-soft"
+                              className="inline-flex items-center justify-center rounded-lg bg-accent border border-subtle h-8 px-3 text-xs text-inverse hover-accent-fade"
                             >
                               Apply
                             </button>
@@ -77,7 +77,7 @@ export default function CollectiblesStoreCard() {
                             <button
                               onClick={() => canBuy && buy(item.id, item.cost)}
                               disabled={!canBuy}
-                              className="inline-flex items-center justify-center rounded-lg bg-accent h-8 px-3 text-xs text-inverse hover:bg-accent-soft disabled:opacity-50"
+                              className="inline-flex items-center justify-center rounded-lg bg-accent h-8 px-3 text-xs text-inverse hover-accent-fade disabled:opacity-50"
                             >
                               Unlock
                             </button>

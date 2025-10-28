@@ -218,7 +218,7 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
                 transition={transitions.fadeMd}
                 className="flex items-center gap-2"
               >
-                <button onClick={saveEdit} className="rounded-xl bg-accent px-3 py-2 text-inverse hover:bg-accent-soft">Save</button>
+                <button onClick={saveEdit} className="rounded-xl bg-accent px-3 py-2 text-inverse hover-accent-fade">Save</button>
                 <button onClick={() => { setEditing(false); setName(habit.name) }} className="rounded-xl border dark:border-neutral-700 px-3 py-2">Cancel</button>
               </motion.div>
             ) : (
@@ -253,7 +253,7 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
                   onClick={() => { if (!habit.archived) toggleCompletion(habit.id, new Date()) }}
                   disabled={habit.archived}
                   aria-disabled={habit.archived}
-                  className={`inline-flex items-center justify-center gap-2 rounded-xl bg-success px-3 py-2 text-sm text-inverse transition transform duration-150 ease-in-out ${habit.archived ? 'opacity-60 cursor-not-allowed' : 'hover:bg-success-soft hover:opacity-90 active:scale-[.98]'} md:justify-self-end`}
+                  className={`inline-flex items-center justify-center gap-2 rounded-xl bg-success px-3 py-2 text-sm text-inverse transition transform duration-150 ease-in-out ${habit.archived ? 'opacity-60 cursor-not-allowed' : 'hover-accent-fade active:scale-[.98]'} md:justify-self-end`}
                 >
                   <Check className="h-4 w-4" />
                   <span>Mark clean</span>
@@ -264,7 +264,7 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
                   disabled={habit.archived}
                   aria-disabled={habit.archived}
                   aria-label="Mark clean"
-                  className={`inline-flex items-center justify-center rounded-xl bg-success p-2 text-inverse transition transform duration-150 ease-in-out ${habit.archived ? 'opacity-60 cursor-not-allowed' : 'hover:bg-success-soft hover:opacity-90 active:scale-[.98]'} md:justify-self-end`}
+                  className={`inline-flex items-center justify-center rounded-xl bg-success p-2 text-inverse transition transform duration-150 ease-in-out ${habit.archived ? 'opacity-60 cursor-not-allowed' : 'hover-accent-fade active:scale-[.98]'} md:justify-self-end`}
                 >
                   <Check className="h-4 w-4" />
                   {/* Visible label on mobile, hidden on small+ so grid view buttons stay icon-only */}
@@ -277,7 +277,7 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
                   onClick={() => { if (!habit.archived) toggleCompletion(habit.id, new Date()) }}
                   disabled={habit.archived}
                   aria-disabled={habit.archived}
-                  className={`inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-3 py-2 text-sm text-inverse transition transform duration-150 ease-in-out ${habit.archived ? 'opacity-60 cursor-not-allowed' : 'hover:bg-accent-soft hover:opacity-90 active:scale-[.98]'} md:justify-self-end`}
+                  className={`inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-3 py-2 text-sm text-inverse transition transform duration-150 ease-in-out ${habit.archived ? 'opacity-60 cursor-not-allowed' : 'hover-accent-fade active:scale-[.98]'} md:justify-self-end`}
                 >
                   <Check className="h-4 w-4" />
                   <span>Done today</span>
@@ -288,7 +288,7 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
                   disabled={habit.archived}
                   aria-disabled={habit.archived}
                   aria-label="Done today"
-                  className={`inline-flex items-center justify-center rounded-xl bg-accent p-2 text-inverse transition transform duration-150 ease-in-out ${habit.archived ? 'opacity-60 cursor-not-allowed' : 'hover:bg-accent-soft hover:opacity-90 active:scale-[.98]'} md:justify-self-end`}
+                  className={`inline-flex items-center justify-center rounded-xl bg-accent p-2 text-inverse transition transform duration-150 ease-in-out ${habit.archived ? 'opacity-60 cursor-not-allowed' : 'hover-accent-fade active:scale-[.98]'} md:justify-self-end`}
                 >
                   <Check className="h-4 w-4" />
                   {/* Visible label on mobile, hidden on small+ so grid view buttons stay icon-only */}

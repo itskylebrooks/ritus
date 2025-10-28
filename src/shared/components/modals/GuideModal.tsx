@@ -196,7 +196,7 @@ export default function GuideModal({ open, onClose, onLoadExample }: GuideModalP
             // On final step: left -> Load data, right -> Finish (titles and actions swapped; styles unchanged)
             <div className="flex gap-3">
               <button onClick={async()=> { handleLoadClick() }} className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-subtle text-strong transition duration-200 hover:bg-subtle-hover">Load data</button>
-              <button onClick={()=> { if(!closing) onClose(); }} className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-accent text-inverse transition duration-200 hover:bg-accent-soft hover:opacity-90">Finish</button>
+              <button onClick={()=> { if(!closing) onClose(); }} className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-accent text-inverse transition duration-200 hover-accent-fade">Finish</button>
             </div>
           ) : (
             <div className="flex w-full items-center gap-3">
@@ -227,7 +227,7 @@ export default function GuideModal({ open, onClose, onLoadExample }: GuideModalP
                   transition={btnTransition}
                   onClick={()=> queueStep(Math.min(STEPS.length-1, step+1))}
                   // Restrict CSS transitions to color only so Framer Motion controls layout/transform
-                  className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-accent text-inverse transition-colors duration-200 hover:bg-accent-soft hover:opacity-90"
+                  className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-accent text-inverse transition-colors duration-200 hover-accent-fade"
                   style={{ willChange: 'transform, width', WebkitBackfaceVisibility: 'hidden' }}
                 >
                   Next

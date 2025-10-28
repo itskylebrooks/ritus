@@ -626,4 +626,8 @@ header button[aria-haspopup='menu'] {
   .text-emerald-500 {
     color: var(--color-success) !important;
   }
+
+  .hover-accent-fade:hover {
+    opacity: 0.9;
+  }
 }

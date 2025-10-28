@@ -227,14 +227,14 @@ export default function AddHabit() {
       <label className="block text-sm text-muted">I want to</label>
       <div className="mt-1 flex gap-2">
         <label
-          className={`px-3 py-2 rounded-xl border border-subtle cursor-pointer transition-all duration-150 ease-in-out ${mode === 'build' ? 'bg-accent text-inverse shadow-elevated hover:opacity-90' : 'bg-surface-elevated text-muted hover:bg-subtle hover:text-strong'}`}
+          className={`px-3 py-2 rounded-xl border border-subtle cursor-pointer transition-all duration-150 ease-in-out ${mode === 'build' ? 'bg-accent text-inverse shadow-elevated hover-accent-fade' : 'bg-surface-elevated text-muted hover:bg-subtle hover:text-strong'}`}
         >
           <input className="sr-only" type="radio" name="mode" checked={mode === 'build'} onChange={() => setMode('build')} />
           Build
         </label>
 
         <label
-          className={`px-3 py-2 rounded-xl border border-subtle cursor-pointer transition-all duration-150 ease-in-out ${mode === 'break' ? 'bg-accent text-inverse shadow-elevated hover:opacity-90' : 'bg-surface-elevated text-muted hover:bg-subtle hover:text-strong'}`}
+          className={`px-3 py-2 rounded-xl border border-subtle cursor-pointer transition-all duration-150 ease-in-out ${mode === 'break' ? 'bg-accent text-inverse shadow-elevated hover-accent-fade' : 'bg-surface-elevated text-muted hover:bg-subtle hover:text-strong'}`}
         >
           <input className="sr-only" type="radio" name="mode" checked={mode === 'break'} onChange={() => setMode('break')} />
           Break
@@ -315,7 +315,7 @@ export default function AddHabit() {
         transition={transitions.layoutSpring}
         style={{ minWidth: 0 }}
         type="submit"
-        className="inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-4 py-2 text-inverse transition-colors duration-150 ease-in-out hover:bg-accent-soft hover:opacity-90 active:scale-[.98]"
+        className="inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-4 py-2 text-inverse transition-colors duration-150 ease-in-out hover-accent-fade active:scale-[.98]"
         aria-label="Add habit"
       >
         <Plus className="h-4 w-4" /> Add
