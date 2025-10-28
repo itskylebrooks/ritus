@@ -115,6 +115,13 @@ body,
   --shadow-hover: 0 6px 14px rgba(2, 6, 23, 0.36);
 }
 
+:root {
+  --color-control-bg: var(--color-surface-alt);
+}
+.dark {
+  --color-control-bg: color-mix(in srgb, var(--color-text-primary) 10%, var(--color-app-bg));
+}
+
 body {
   background-color: var(--color-app-bg);
   color: var(--color-text-primary);
@@ -386,6 +393,9 @@ header button[aria-haspopup='menu'] {
   }
   .bg-subtle {
     background-color: var(--color-surface-alt);
+  }
+  .bg-control {
+    background-color: var(--color-control-bg);
   }
   .bg-tile {
     background-color: var(--color-tile);
