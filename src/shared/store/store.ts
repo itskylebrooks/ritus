@@ -10,7 +10,7 @@ import type { Frequency, Habit } from '@/shared/types'
 export interface HabitState {
   habits: Habit[]
   // progression / XP
-  progress: { essence: number; points: number; level: number; weekBonusKeys?: Record<string, true | undefined>; completionAwardKeys?: Record<string, true | undefined>; unlocked?: Record<string, true | undefined>; ownedCollectibles?: string[]; appliedCollectibles?: Record<string, string> }
+  progress: { essence: number; points: number; level: number; weekBonusKeys?: Record<string, true | undefined>; completionAwardKeys?: Record<string, true | undefined>; unlocked?: Record<string, true | undefined>; ownedCollectibles?: string[]; appliedCollectibles?: Record<string, string>; seenTrophies?: Record<string, true | undefined> }
   setEssence: (n: number) => void
   addEssence: (delta: number) => void
   setPoints: (n: number) => void
@@ -19,6 +19,7 @@ export interface HabitState {
   awardTrophies: (summary: { dailyBuildStreak: number; dailyBreakStreak: number; weeklyStreak: number; totalCompletions: number }) => string[]
   purchaseCollectible: (id: string, cost: number) => boolean
   applyCollectible: (id: string) => boolean
+  markTrophiesSeen: (ids: string[]) => void
   // display settings
   dateFormat: 'MDY' | 'DMY'
   setDateFormat: (f: 'MDY' | 'DMY') => void
@@ -52,7 +53,7 @@ export const useHabitStore = create<HabitState>()(
     (set, get) => ({
       habits: [],
   // Progression defaults (essence = lifetime XP that determines level)
-  progress: { essence: 0, points: 0, level: 1, weekBonusKeys: {}, completionAwardKeys: {}, unlocked: {}, ownedCollectibles: [], appliedCollectibles: {} },
+  progress: { essence: 0, points: 0, level: 1, weekBonusKeys: {}, completionAwardKeys: {}, unlocked: {}, ownedCollectibles: [], appliedCollectibles: {}, seenTrophies: {} },
   // display preferences
   dateFormat: 'MDY',
   setDateFormat: (f) => set({ dateFormat: f }),
@@ -214,6 +215,14 @@ export const useHabitStore = create<HabitState>()(
         if (owned.has(id) || (state.progress.points || 0) < cost) return false
         set((s) => ({ progress: { ...s.progress, points: Math.max(0, Math.floor((s.progress.points || 0) - cost)), ownedCollectibles: [...(s.progress.ownedCollectibles || []), id] } }))
         return true
+      },
+      markTrophiesSeen: (ids: string[]) => {
+        if (!ids || ids.length === 0) return
+        set((s) => {
+          const seen = { ...(s.progress.seenTrophies || {}) }
+          for (const id of ids) seen[id] = true
+          return { progress: { ...s.progress, seenTrophies: seen } }
+        })
       },
       // Apply an owned collectible. Records the applied collectible by its type so
       // UI and other modules can react. This does not implement the visual/functional
