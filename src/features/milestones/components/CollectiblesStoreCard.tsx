@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { COLLECTIBLES } from '@/shared/constants/collectibles'
 import { useHabitStore } from '@/shared/store/store'
 import type { CollectibleType } from '@/shared/constants/collectibles'
@@ -9,6 +10,17 @@ export default function CollectiblesStoreCard() {
   const applied = useHabitStore((s) => s.progress.appliedCollectibles || {})
   const buy = useHabitStore((s) => s.purchaseCollectible)
   const apply = useHabitStore((s) => (s as any).applyCollectible as (id: string) => boolean)
+
+  // transient icon flash state keyed by collectible id
+  const [flash, setFlash] = useState<Record<string, boolean>>({})
+
+  const triggerFlash = (id: string) => {
+    setFlash((prev) => ({ ...prev, [id]: true }))
+    // remove after animation completes to allow re-triggering
+    window.setTimeout(() => {
+      setFlash((prev) => ({ ...prev, [id]: false }))
+    }, 700)
+  }
 
   const groups: { label: string; type: CollectibleType }[] = [
     { label: 'Clock styles', type: 'clock' },
@@ -46,7 +58,9 @@ export default function CollectiblesStoreCard() {
                       style={{ willChange: 'transform' }}
                     >
                       <div className="flex items-center gap-2">
-                        <ItemIcon className="h-5 w-5 text-accent" />
+                        <span className={flash[item.id] ? 'collectible-flash' : undefined}>
+                          <ItemIcon className="h-5 w-5 text-accent" />
+                        </span>
                         <div className="font-medium text-strong">{item.title}</div>
                       </div>
                       <p className="mt-2 text-xs text-muted flex-1">{item.desc}</p>
@@ -60,14 +74,20 @@ export default function CollectiblesStoreCard() {
                           applied[item.type] === item.id ? (
                             // When already applied, show a button that allows the user to unapply
                             <button
-                              onClick={() => apply(item.id)}
+                              onClick={() => {
+                                const ok = apply(item.id)
+                                if (ok) triggerFlash(item.id)
+                              }}
                               className="inline-flex items-center justify-center rounded-lg border border-subtle h-8 px-3 text-xs text-muted hover-nonaccent"
                             >
                               Unapply
                             </button>
                           ) : (
                             <button
-                              onClick={() => apply(item.id)}
+                              onClick={() => {
+                                const ok = apply(item.id)
+                                if (ok) triggerFlash(item.id)
+                              }}
                               className="inline-flex items-center justify-center rounded-lg bg-accent border border-subtle h-8 px-3 text-xs text-inverse hover-accent-fade"
                             >
                               Apply
