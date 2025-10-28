@@ -122,7 +122,7 @@ export default function Inspiration() {
 					{/* Hero */}
 					<section>
 						<h2 className="text-xl font-semibold flex items-center gap-2"><Lightbulb className="w-5 h-5" /> Inspiration</h2>
-						<p className="mt-4 text-neutral-600 dark:text-neutral-300">Ritus isn’t about control. It’s about rhythm — the daily choices that quietly shape who you become. This page gathers small insights and examples to help you understand habits, build them with intention, and replace what holds you back.</p>
+						<p className="mt-4 text-neutral-600 dark:text-neutral-300">Ritus isn’t about control. It’s about rhythm — the daily choices that makes you better. This page gathers small insights and examples to help you understand habits, build them with intention, and replace what holds you back.</p>
 					</section>
 
 					{/* How habits form */}
