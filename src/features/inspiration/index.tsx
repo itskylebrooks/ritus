@@ -163,7 +163,7 @@ export default function Inspiration() {
 											<div>
 												<h3 className="text-lg font-semibold flex items-center gap-2">
 													<span className="text-xl text-neutral-600 dark:text-neutral-400">{set.arrow}</span>
-													<span>{set.title}</span>
+													<span className="text-neutral-800 dark:text-neutral-100">{set.title}</span>
 												</h3>
 												<p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">{set.note}</p>
 												<p className="mt-2 italic text-xs text-neutral-500">{set.disclaimer}</p>
