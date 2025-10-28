@@ -3,6 +3,7 @@ import { useHabitStore } from '@/shared/store/store'
 import type { Habit } from '@/shared/types'
 import { recalc } from './scoring'
 import { iso, fromISO } from './date'
+import { emojiIndex } from '@/shared/constants/emojis'
 
 export interface ImportResult {
   ok: true
@@ -37,6 +38,9 @@ export function exportAllData() {
     longestStreak: s.longestStreak,
     // progression state (essence/points/level and bookkeeping keys)
     progress: s.progress || { essence: 0, points: 0, level: 1, weekBonusKeys: {}, completionAwardKeys: {} },
+    // emoji data
+    emojiByDate: s.emojiByDate || {},
+    emojiRecents: Array.isArray(s.emojiRecents) ? s.emojiRecents : [],
   }
 }
 
@@ -47,11 +51,38 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
     if (parsed.app !== 'ritus') return { ok: false, reason: 'not_ritus' }
     const incomingHabits: Partial<Habit>[] = Array.isArray(parsed.habits) ? parsed.habits : []
     const incomingDateFormat: 'DMY' | 'MDY' | undefined = parsed.dateFormat === 'DMY' ? 'DMY' : parsed.dateFormat === 'MDY' ? 'MDY' : undefined
-  const incomingWeekStart: 'sunday' | 'monday' | undefined = parsed.weekStart === 'sunday' ? 'sunday' : parsed.weekStart === 'monday' ? 'monday' : undefined
-  const incomingShowArchived: boolean | undefined = typeof parsed.showArchived === 'boolean' ? parsed.showArchived : undefined
-  const incomingTotal = typeof parsed.totalPoints === 'number' ? parsed.totalPoints : 0
-  const incomingLongest = typeof parsed.longestStreak === 'number' ? parsed.longestStreak : 0
-  const incomingProgress = parsed && typeof parsed.progress === 'object' ? parsed.progress : undefined
+    const incomingWeekStart: 'sunday' | 'monday' | undefined = parsed.weekStart === 'sunday' ? 'sunday' : parsed.weekStart === 'monday' ? 'monday' : undefined
+    const incomingShowArchived: boolean | undefined = typeof parsed.showArchived === 'boolean' ? parsed.showArchived : undefined
+    const incomingTotal = typeof parsed.totalPoints === 'number' ? parsed.totalPoints : 0
+    const incomingLongest = typeof parsed.longestStreak === 'number' ? parsed.longestStreak : 0
+    const incomingProgress = parsed && typeof parsed.progress === 'object' ? parsed.progress : undefined
+    const incomingEmojiByDateRaw = parsed && typeof parsed.emojiByDate === 'object' ? (parsed.emojiByDate as Record<string, string>) : undefined
+    const normalizeId = (id: unknown) => (typeof id === 'string' && emojiIndex.has(id) ? id : null)
+    const incomingEmojiByDate = incomingEmojiByDateRaw
+      ? Object.entries(incomingEmojiByDateRaw).reduce<Record<string, string>>((acc, [key, value]) => {
+          const normalized = normalizeId(value)
+          if (normalized) acc[key] = normalized
+          return acc
+        }, {})
+      : undefined
+    let incomingEmojiRecents = Array.isArray(parsed.emojiRecents) ? (parsed.emojiRecents as unknown[]) : undefined
+    // Back-compat: if old exports had only emojiOfTheDay, map to today's date
+    if (!incomingEmojiByDate && (parsed as any).emojiOfTheDay) {
+      const candidate = typeof (parsed as any).emojiOfTheDay === 'string' ? (parsed as any).emojiOfTheDay : (parsed as any).emojiOfTheDay?.id
+      const normalized = normalizeId(candidate)
+      if (normalized) {
+        const today = new Date().toISOString().slice(0, 10)
+        incomingEmojiRecents = [normalized]
+        ;(parsed as any).emojiByDate = { [today]: normalized }
+      }
+    }
+    if (incomingEmojiRecents) {
+      incomingEmojiRecents = incomingEmojiRecents
+        .map((id) => normalizeId(id))
+        .filter((id): id is string => Boolean(id))
+        .filter((id, index, self) => self.indexOf(id) === index)
+        .slice(0, 10)
+    }
 
     const cur = useHabitStore.getState()
     const existingIds = new Set(cur.habits.map((h) => h.id))
@@ -102,6 +133,8 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
       showAdd: cur.showAdd,
       // include progress when persisting import
       progress: incomingProgress ?? cur.progress,
+      emojiByDate: incomingEmojiByDate ?? (cur as any).emojiByDate ?? {},
+      emojiRecents: incomingEmojiRecents ?? (cur as any).emojiRecents ?? [],
     }
 
     try {
@@ -122,6 +155,8 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
       weekStart: updated.weekStart,
       progress: updated.progress,
     }))
+
+    // No separate localStorage key; emoji data is part of the store snapshot above
 
     return {
       ok: true,

@@ -34,6 +34,11 @@ export interface HabitState {
   // display mode: grid (false) or list (true)
   showList: boolean
   setShowList: (v: boolean) => void
+  // emoji of the day mapping by date (YYYY-MM-DD) and recents list
+  emojiByDate?: Record<string, string | undefined>
+  emojiRecents?: string[]
+  setEmojiForDate?: (dateISO: string, emojiId: string | null) => void
+  clearEmojiData?: () => void
   archiveHabit: (id: string) => void
   unarchiveHabit: (id: string) => void
   reminders: { dailyEnabled: boolean; dailyTime: string }
@@ -63,10 +68,25 @@ export const useHabitStore = create<HabitState>()(
   showAdd: true,
   showArchived: false,
   // default to list view
-  showList: true,
-  setShowAdd: (v) => set({ showAdd: v }),
-  setShowArchived: (v) => set({ showArchived: v }),
-  setShowList: (v) => set({ showList: v }),
+      showList: true,
+      setShowAdd: (v) => set({ showAdd: v }),
+      setShowArchived: (v) => set({ showArchived: v }),
+      setShowList: (v) => set({ showList: v }),
+      // emoji of the day defaults
+      emojiByDate: {},
+      emojiRecents: [],
+      setEmojiForDate: (dateISO: string, emojiId: string | null) =>
+        set((s) => {
+          const by = { ...(s.emojiByDate || {}) }
+          if (emojiId) by[dateISO] = emojiId
+          else delete by[dateISO]
+          let recents = Array.isArray(s.emojiRecents) ? [...(s.emojiRecents as string[])] : []
+          if (emojiId) {
+            recents = [emojiId, ...recents.filter((x) => x !== emojiId)].slice(0, 10)
+          }
+          return { emojiByDate: by, emojiRecents: recents }
+        }),
+      clearEmojiData: () => set({ emojiByDate: {}, emojiRecents: [] }),
   // user / preferences (no username — removed)
       reminders: { dailyEnabled: false, dailyTime: '21:00' },
       setReminders: (r: { dailyEnabled: boolean; dailyTime: string }) => set({ reminders: r }),
@@ -468,7 +488,7 @@ export const useHabitStore = create<HabitState>()(
           }
         }),
   // clearing current habits resets longest streak so insights reflect empty state (totalPoints handled via resetStats)
-  clearAll: () => set({ habits: [], longestStreak: 0 }),
+  clearAll: () => set({ habits: [], longestStreak: 0, emojiByDate: {}, emojiRecents: [] }),
     }),
     {
       name: 'ritus-habits',
@@ -487,6 +507,8 @@ export const useHabitStore = create<HabitState>()(
         dateFormat: state.dateFormat,
         weekStart: state.weekStart,
         showAdd: state.showAdd,
+        emojiByDate: state.emojiByDate || {},
+        emojiRecents: state.emojiRecents || [],
       }),
     }
   )

@@ -487,6 +487,11 @@ header button[aria-haspopup='menu'] {
   .hover\:shadow-elevated:hover {
     box-shadow: var(--shadow-hover);
   }
+  .no-focus-ring:focus,
+  .no-focus-ring:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
   .hover\:bg-neutral-100:hover,
   .hover\:bg-neutral-50:hover,
   .hover\:bg-neutral-200:hover {

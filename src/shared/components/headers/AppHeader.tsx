@@ -6,6 +6,7 @@ import { createMobileMenuVariants, desktopDropdownVariants, submenuVariants, use
 import { useHabitStore } from '@/shared/store/store'
 import GuideModal from '@/shared/components/modals/GuideModal'
 import SettingsModal from '@/shared/components/modals/SettingsModal'
+import EmojiPicker from '@/shared/components/emoji/EmojiPicker'
 
 function DateDisplay() {
   const dateFormat = useHabitStore((s) => s.dateFormat)
@@ -14,6 +15,17 @@ function DateDisplay() {
   const dd = String(now.getDate()).padStart(2, '0')
   const yyyy = String(now.getFullYear())
   return <span>{dateFormat === 'MDY' ? `${mm}/${dd}/${yyyy}` : `${dd}/${mm}/${yyyy}`}</span>
+}
+
+function HeaderDateEmoji() {
+  return (
+    <div className="flex items-center gap-2 text-sm text-muted">
+      <span aria-hidden>
+        <DateDisplay />
+      </span>
+      <EmojiPicker />
+    </div>
+  )
 }
 
 export default function AppHeader() {
@@ -108,10 +120,8 @@ export default function AppHeader() {
   return (
     <header className="mb-6 flex items-center justify-between">
       <div className="flex items-baseline gap-4">
-  <Link to="/" aria-label="Go to home" className="text-2xl font-semibold tracking-tight hover-change-color transition-colors">Ritus</Link>
-        <div className="text-sm text-muted" aria-hidden>
-          <DateDisplay />
-        </div>
+        <Link to="/" aria-label="Go to home" className="text-2xl font-semibold tracking-tight hover-change-color transition-colors">Ritus</Link>
+        <HeaderDateEmoji />
       </div>
 
       <div className="flex items-center gap-4">
