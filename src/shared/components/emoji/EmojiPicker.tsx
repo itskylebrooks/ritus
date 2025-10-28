@@ -103,15 +103,15 @@ export default function EmojiPicker() {
       <button
         type="button"
         onClick={() => { setSearch(''); setActiveCategory(null); setOpen(true) }}
-        className="h-7 w-7 inline-flex items-center justify-center align-baseline rounded-md text-muted hover:text-strong transition-colors focus:outline-none no-focus-ring"
+        className="inline-flex items-center h-10 text-2xl leading-none text-muted hover:text-strong transition-colors focus:outline-none no-focus-ring"
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-label={emoji ? `Emoji of the day: ${emoji.label}. Click to change.` : 'Select emoji of the day'}
       >
         {emoji ? (
-          <span aria-hidden className="text-[1.5rem] leading-none">{emoji.emoji}</span>
+          <span aria-hidden className="inline-block align-baseline leading-none">{emoji.emoji}</span>
         ) : (
-          <CirclePlus className="h-6 w-6" />
+          <CirclePlus className="inline-block h-[1em] w-[1em] align-[-0.1em]" />
         )}
       </button>
 

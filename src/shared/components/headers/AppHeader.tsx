@@ -17,16 +17,7 @@ function DateDisplay() {
   return <span>{dateFormat === 'MDY' ? `${mm}/${dd}/${yyyy}` : `${dd}/${mm}/${yyyy}`}</span>
 }
 
-function HeaderDateEmoji() {
-  return (
-    <div className="flex items-center gap-4 text-sm text-muted">
-      <span aria-hidden>
-        <DateDisplay />
-      </span>
-      <EmojiPicker />
-    </div>
-  )
-}
+// Inline title + emoji + date layout handled directly in header
 
 export default function AppHeader() {
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -50,7 +41,7 @@ export default function AppHeader() {
   const isMilestones = location.pathname === '/milestones'
   const isInspiration = location.pathname === '/inspiration'
   const isArchiveHidden = isMilestones || isInspiration
-  const navLinkBase = 'rounded-lg border border-subtle px-3 py-2 text-sm transition-colors duration-150 ease-in-out'
+  const navLinkBase = 'rounded-lg border border-subtle px-3 text-sm transition-colors duration-150 ease-in-out inline-flex items-center h-10'
   const mobileNavLinkBase = 'block rounded-md px-3 py-2 text-base transition-colors duration-150 ease-in-out'
 
   const mobileMenuVariants = createMobileMenuVariants(prefersReducedMotion, overlayMotion)
@@ -118,62 +109,80 @@ export default function AppHeader() {
   }, [])
 
   return (
-    <header className="mb-6 flex items-center justify-between">
-      <div className="flex items-baseline gap-4">
-        <Link to="/" aria-label="Go to home" className="text-2xl font-semibold tracking-tight hover-change-color transition-colors">Ritus</Link>
-        <HeaderDateEmoji />
+    <header className="mb-6 relative flex items-center justify-between">
+      <div className="flex items-center gap-3">
+        <Link
+          to="/"
+          aria-label="Go to home"
+          className="inline-flex items-center h-10 text-2xl leading-none font-bold uppercase tracking-wider hover-change-color transition-colors"
+        >
+          Ritus
+        </Link>
+        <EmojiPicker />
       </div>
 
-      <div className="flex items-center gap-4">
-        <nav>
-          {/* Desktop-only page links — hidden on mobile, pages moved into mobile menu */}
-          <ul className="hidden md:flex items-center gap-2">
-            <li>
-              <NavLink
-                to="/"
-                end
-                className={({ isActive }: { isActive: boolean }) =>
-                  `${navLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover-accent-fade' : 'text-strong hover-nonaccent'}`
-                }
-              >
-                <Home className="inline-block w-4 h-4 mr-2" />Home
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/insight"
-                className={({ isActive }: { isActive: boolean }) =>
-                  `${navLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover-accent-fade' : 'text-strong hover-nonaccent'}`
-                }
-              >
-                <ChartPie className="inline-block w-4 h-4 mr-2" />Insight
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/milestones"
-                className={({ isActive }: { isActive: boolean }) =>
-                  `${navLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover-accent-fade' : 'text-strong hover-nonaccent'}`
-                }
-              >
-                <Trophy className="inline-block w-4 h-4 mr-2" />Milestones
-              </NavLink>
-            </li>
-          </ul>
-        </nav>
+      {/* Centered desktop nav with icons only (truly centered to header width) */}
+      <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 z-10">
+        {/* Desktop-only page links — centered, icons only */}
+        <ul className="flex items-center gap-2">
+          {/* Order icons so Home sits in the middle */}
+          <li>
+            <NavLink
+              to="/insight"
+              aria-label="Insight"
+              title="Insight"
+              className={({ isActive }: { isActive: boolean }) =>
+                `${navLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover-accent-fade' : 'text-strong hover-nonaccent'}`
+              }
+            >
+              <ChartPie className="w-4 h-4" />
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/"
+              end
+              aria-label="Home"
+              title="Home"
+              className={({ isActive }: { isActive: boolean }) =>
+                `${navLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover-accent-fade' : 'text-strong hover-nonaccent'}`
+              }
+            >
+              <Home className="w-4 h-4" />
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/milestones"
+              aria-label="Milestones"
+              title="Milestones"
+              className={({ isActive }: { isActive: boolean }) =>
+                `${navLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover-accent-fade' : 'text-strong hover-nonaccent'}`
+              }
+            >
+              <Trophy className="w-4 h-4" />
+            </NavLink>
+          </li>
+        </ul>
+      </nav>
 
-        {/* Desktop: page links + More dropdown (contains Add/Guide/Settings) */}
+      {/* Right side: date then More button */}
+      <div className="flex items-center gap-2">
+        <div className="hidden md:inline-flex items-center rounded-lg border border-subtle px-3 text-sm text-muted h-10">
+          <DateDisplay />
+        </div>
+        {/* Desktop: More dropdown (contains Add/Guide/Settings) */}
         <div className="hidden md:flex items-center gap-2 relative">
           <div className="flex items-center gap-2 relative">
             <button
               ref={moreButtonRef}
               type="button"
               onClick={() => setMoreDesktopOpen((v) => !v)}
-              className="rounded-lg border border-subtle px-3 py-2 text-sm inline-flex items-center gap-2 transition-colors duration-150 hover-nonaccent"
+              className="rounded-lg border border-subtle px-3 text-sm inline-flex items-center gap-2 h-10 transition-colors duration-150 hover-nonaccent"
               aria-haspopup="menu"
               aria-expanded={moreDesktopOpen}
             >
-              More
+              <span className="sr-only">More</span>
               <ChevronDown className="w-4 h-4" />
             </button>
 
