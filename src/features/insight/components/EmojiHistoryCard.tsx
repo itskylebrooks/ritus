@@ -1,5 +1,5 @@
-import { useMemo, useState, useRef, useEffect } from 'react'
-import { addDays, addYears, endOfYear, format, isSameDay, isAfter, startOfWeek, startOfYear } from 'date-fns'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { addDays, addYears, endOfYear, format, isAfter, isSameDay, startOfWeek, startOfYear } from 'date-fns'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useHabitStore } from '@/shared/store/store'
 import { iso } from '@/shared/utils/date'
@@ -15,17 +15,17 @@ export default function EmojiHistoryCard() {
 
   const today = new Date()
 
-  // Build week-column grid between start and end (inclusive) aligned to week start
   function buildCols(rangeStart: Date, rangeEnd: Date) {
-    const start = startOfWeek(rangeStart, { weekStartsOn: ws as 0 | 1 })
+    const startAligned = startOfWeek(rangeStart, { weekStartsOn: ws as 0 | 1 })
+    const minDate = rangeStart
     const end = rangeEnd
     const cols: (Date | null)[][] = []
-    let cur = new Date(start)
+    let cur = new Date(startAligned)
     while (cur <= end) {
       const col: (Date | null)[] = Array.from({ length: 7 }).map(() => null)
       for (let r = 0; r < 7; r++) {
         const d = addDays(cur, r)
-        if (d <= end) col[r] = d
+        if (d >= minDate && d <= end) col[r] = d
       }
       cols.push(col)
       cur = addDays(cur, 7)
@@ -33,7 +33,6 @@ export default function EmojiHistoryCard() {
     return cols
   }
 
-  // Year view: weeks for the entire year
   const yearCols = useMemo(() => buildCols(startOfYear(yearDate), endOfYear(yearDate)), [yearDate, ws])
 
   const weekdayLabels = useMemo(() => {
@@ -41,51 +40,68 @@ export default function EmojiHistoryCard() {
     return Array.from({ length: 7 }).map((_, r) => short[(ws + r) % 7])
   }, [ws])
 
-  // Sizes (slightly larger than habit cells)
   const CELL = 18 // px default
 
   const Container: React.FC<{ cols: (Date | null)[][]; showMonthLabels?: boolean; fillWidth?: boolean; baseYear?: number }> = ({ cols, showMonthLabels, fillWidth, baseYear }) => {
-    // Compute month labels exactly above the column that contains the 1st of each month in baseYear
+    const scrollerRef = useRef<HTMLDivElement | null>(null)
     const labels = useMemo(() => {
       if (!showMonthLabels) return [] as (string | null)[]
-      const year = typeof baseYear === 'number'
-        ? baseYear
-        : (() => {
-            // Fallback: pick the maximum year found in the grid to avoid previous December labeling
-            let y = new Date().getFullYear()
-            for (const col of cols) for (const d of col) if (d) { y = Math.max(y, d.getFullYear()) }
-            return y
-          })()
+      const year = typeof baseYear === 'number' ? baseYear : new Date().getFullYear()
       const out = Array(cols.length).fill(null) as (string | null)[]
-      for (let m = 0; m < 12; m++) {
-        const firstOfMonth = new Date(year, m, 1)
-        const idx = cols.findIndex((col) => col.some((d) => d && d.getFullYear() === year && d.getMonth() === m && d.getDate() === 1))
-        if (idx >= 0) out[idx] = format(firstOfMonth, 'MMM')
-      }
+      const positions1Based = [1, 6, 10, 15, 19, 23, 28, 32, 37, 41, 45, 50]
+      const monthNames = Array.from({ length: 12 }, (_, m) => format(new Date(year, m, 1), 'MMM'))
+      positions1Based.forEach((pos, idx) => {
+        const i = pos - 1
+        if (i >= 0 && i < out.length) out[i] = monthNames[idx]
+      })
       return out
-    }, [cols, showMonthLabels, baseYear])
+    }, [cols.length, showMonthLabels, baseYear])
 
-    // For fillWidth, scale cell size to fill available width
     const weeks = cols.length
     const gap = 4 // px (gap-1)
     const leftCol = 32 // px (w-8)
     const leftGap = 8 // px (mr-2)
     const cellVar = `calc((100% - ${leftCol}px - ${leftGap}px - ${(weeks - 1) * gap}px) / ${weeks})`
 
+    // Align scroller so the current week is visible (on current year)
+    useEffect(() => {
+      try {
+        const y = typeof baseYear === 'number' ? baseYear : startOfYear(new Date()).getFullYear()
+        if (y !== startOfYear(today).getFullYear()) return
+        const el = scrollerRef.current
+        if (!el) return
+        const colEls = Array.from(el.querySelectorAll('[data-col]')) as HTMLElement[]
+        const idx = cols.findIndex((col) => col.some((d) => d && isSameDay(d, today)))
+        const target = idx >= 0 ? colEls[idx] : null
+        if (target) {
+          const scrollLeft = target.offsetLeft + target.offsetWidth - el.clientWidth
+          el.scrollLeft = scrollLeft > 0 ? scrollLeft : 0
+        }
+      } catch {}
+    }, [cols.length, baseYear])
+
     return (
-      <div className="mt-2 overflow-y-hidden" style={fillWidth ? { overflowX: 'hidden' } : undefined}>
+      <div ref={scrollerRef} className={`mt-2 ${fillWidth ? 'overflow-y-hidden' : 'overflow-x-auto overflow-y-hidden'}`} style={fillWidth ? { overflowX: 'hidden' } : undefined}>
         {showMonthLabels && (
           <div className="mb-2 flex items-center gap-2">
             <div className="w-8 text-sm text-neutral-600 dark:text-neutral-300">&nbsp;</div>
             <div
               className="flex gap-1"
-              style={{ marginLeft: fillWidth ? `calc(${cellVar} * 2.5)` : `${18 * 2.5}px` }}
+              style={{ marginLeft: fillWidth ? `calc(${cellVar} / 2)` : `${18 / 2}px` }}
             >
-              {labels.map((lab, i) => (
-                <div key={i} className="text-[11px] text-neutral-600 dark:text-neutral-300 text-center" style={{ width: fillWidth ? `calc(${cellVar})` : 18 }}>
-                  {lab}
-                </div>
-              ))}
+              {(() => {
+                // Shift labels right by one column
+                const shifted = [null, ...labels].slice(0, cols.length)
+                return shifted.map((lab, i) => (
+                  <div
+                    key={i}
+                    className="text-[11px] text-neutral-600 dark:text-neutral-300 text-center"
+                    style={{ width: fillWidth ? `calc(${cellVar})` : 18 }}
+                  >
+                    {lab}
+                  </div>
+                ))
+              })()}
             </div>
           </div>
         )}
@@ -102,7 +118,7 @@ export default function EmojiHistoryCard() {
           {/* grid */}
           <div className="flex gap-1">
             {cols.map((col, colIdx) => (
-              <div key={colIdx} className="flex flex-col gap-1">
+              <div key={colIdx} className="flex flex-col gap-1" data-col>
                 {col.map((d, rIdx) => {
                   if (!d) return <div key={rIdx} style={{ height: CELL, width: CELL }} />
                   const key = iso(d)
