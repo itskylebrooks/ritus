@@ -655,6 +655,15 @@ header button[aria-haspopup='menu'] {
   .hover-accent-fade:hover {
     opacity: 0.9;
   }
+
+  /* Hide scrollbars where desired (e.g., EmojiPicker list) */
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
+  }
 }
 
 /* Collectible icon flash animations */

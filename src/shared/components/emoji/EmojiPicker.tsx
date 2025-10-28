@@ -161,7 +161,7 @@ export default function EmojiPicker() {
               </div>
             </div>
 
-            <div ref={listRef} className="max-h-[55vh] overflow-y-auto px-3 py-3">
+            <div ref={listRef} className="max-h-[55vh] overflow-y-auto no-scrollbar pl-3 pr-0 py-3">
               {filteredCategories.length === 0 ? (
                 <div className="flex h-32 items-center justify-center text-sm text-muted">
                   No emojis match "{search}".
