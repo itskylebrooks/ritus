@@ -6,6 +6,7 @@ import { useHabitStore } from '@/shared/store/store'
 import type { Habit } from '@/shared/types'
 import HeaderStats from './components/HeaderStats'
 import MonthGrid from './components/MonthGrid'
+import HistoryChart from './components/HistoryChart'
 
 export default function Insight() {
   const habits = useHabitStore((s) => s.habits)
@@ -40,6 +41,10 @@ export default function Insight() {
 
       <div className="mt-4">
         <HeaderStats />
+      </div>
+
+      <div className="mt-4">
+        <HistoryChart />
       </div>
 
       <div className="mt-4 space-y-4">
