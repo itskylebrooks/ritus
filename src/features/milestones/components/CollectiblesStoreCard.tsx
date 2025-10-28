@@ -42,7 +42,7 @@ export default function CollectiblesStoreCard() {
                   return (
                     <div
                       key={item.id}
-                      className="rounded-xl border border-subtle p-3 transform-gpu motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out hover:-translate-y-1 hover:shadow-elevated motion-reduce:transition-none motion-reduce:transform-none flex flex-col bg-[#f9fafb] dark:bg-[#0b0b0b]"
+                      className="rounded-xl border border-subtle p-3 transform-gpu motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out hover:-translate-y-1 motion-reduce:transition-none motion-reduce:transform-none flex flex-col bg-[#f9fafb] dark:bg-[#0b0b0b]"
                       style={{ willChange: 'transform' }}
                     >
                       <div className="flex items-center gap-2">
