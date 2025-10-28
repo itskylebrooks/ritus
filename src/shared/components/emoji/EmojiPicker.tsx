@@ -95,8 +95,7 @@ export default function EmojiPicker() {
       <button
         type="button"
         onClick={() => { setSearch(''); setActiveCategory(null); setOpen(true) }}
-        className="h-7 w-7 flex items-center justify-center rounded-md text-muted hover:text-strong transition-colors focus:outline-none focus-visible:outline-2 focus-visible:outline"
-        style={{ outlineColor: 'var(--color-accent)' }}
+        className="h-5 w-5 inline-flex items-center justify-center align-baseline rounded-md text-muted hover:text-strong transition-colors focus:outline-none no-focus-ring"
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-label={emoji ? `Emoji of the day: ${emoji.label}. Click to change.` : 'Select emoji of the day'}
@@ -105,11 +104,11 @@ export default function EmojiPicker() {
           <img
             src={emoji.path}
             alt={emoji.label}
-            className="h-5 w-5 transition-transform duration-150 ease-out"
+            className="h-5 w-5 transition-transform duration-150 ease-out align-baseline"
             style={imageStyle}
           />
         ) : (
-          <CirclePlus className="h-5 w-5" />
+          <CirclePlus className="h-4 w-4" />
         )}
       </button>
 
