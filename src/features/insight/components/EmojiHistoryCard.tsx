@@ -119,7 +119,8 @@ export default function EmojiHistoryCard() {
                 {col.map((d, rIdx) => {
                   if (!d) return <div key={rIdx} style={{ height: CELL, width: CELL }} />
                   const key = iso(d)
-                  const id = emojiByDate[key]
+                  const short = key.slice(0, 10)
+                  const id = emojiByDate[key] || emojiByDate[short]
                   const e = id ? emojiIndex.get(id) : null
                   const title = format(d, 'EEE, d MMM yyyy')
                   return (

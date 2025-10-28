@@ -14,7 +14,8 @@ export interface EmojiOfTheDayState {
 
 export function useEmojiOfTheDay(): EmojiOfTheDayState {
   const today = iso(new Date())
-  const rawEmojiId = useHabitStore((s) => (s.emojiByDate || {})[today] || null)
+  const todayShort = today.slice(0, 10)
+  const rawEmojiId = useHabitStore((s) => (s.emojiByDate || {})[today] || (s.emojiByDate || {})[todayShort] || null)
   const setEmojiForDate = useHabitStore((s) => (s as any).setEmojiForDate as (d: string, id: string | null) => void)
   const recentsIds = useHabitStore((s) => (Array.isArray(s.emojiRecents) ? s.emojiRecents : []))
   const emojiId = rawEmojiId ? resolveEmojiId(rawEmojiId) : null

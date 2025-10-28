@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import defaultHabits, { defaultProgress } from '@/shared/store/defaultHabits'
+import defaultHabits, { defaultProgress, defaultEmojiByDate, defaultEmojiRecents } from '@/shared/store/defaultHabits'
 import { useHabitStore } from '@/shared/store/store'
 import { useMotionPreferences, defaultEase } from '@/shared/animations'
 import ConfirmModal from './ConfirmModal'
@@ -26,8 +26,12 @@ const STEPS: GuideStep[] = [
     body: 'Mark days as Done from the card or use the week strip. Weekly habits count toward the weekly target — keep marking to maintain streaks.'
   },
   {
+    title: 'Emoji of the Day',
+    body: 'Set an emoji to capture your mood or a highlight for the day (tap the button in the header). Your emoji history appears in Insights.'
+  },
+  {
     title: 'Points, streaks & insights',
-    body: 'Each completion awards points and grows streaks. Check the header and Insights for totals, weekly percent, and milestone bonuses.'
+    body: 'Each completion awards points and grows streaks. Check Insights for totals, weekly percent, and Milestones for bonuses.'
   },
   {
     title: 'Import example data',
@@ -61,10 +65,12 @@ export default function GuideModal({ open, onClose, onLoadExample }: GuideModalP
       const total = (defaultHabits || []).reduce((s, h) => s + (h.points || 0), 0)
       const longest = (defaultHabits || []).reduce((m, h) => Math.max(m, h.streak || 0), 0)
       // also set example progress when loading sample data (essence/points/level)
+      const base = { habits: defaultHabits, totalPoints: total, longestStreak: longest }
+      const emoji = { emojiByDate: defaultEmojiByDate, emojiRecents: defaultEmojiRecents }
       if (defaultProgress) {
-        useHabitStore.setState({ habits: defaultHabits, totalPoints: total, longestStreak: longest, progress: defaultProgress })
+        useHabitStore.setState({ ...base, ...emoji, progress: defaultProgress })
       } else {
-        useHabitStore.setState({ habits: defaultHabits, totalPoints: total, longestStreak: longest })
+        useHabitStore.setState({ ...base, ...emoji })
       }
 
       // Compute trophy summary from the example habits and award any trophies idempotently
@@ -74,6 +80,15 @@ export default function GuideModal({ open, onClose, onLoadExample }: GuideModalP
           dailyBreakStreak: Math.max(0, ...defaultHabits.filter(h => h.frequency === 'daily' && h.mode === 'break').map(h => h.streak || 0)),
           weeklyStreak: Math.max(0, ...defaultHabits.filter(h => h.frequency === 'weekly').map(h => h.streak || 0)),
           totalCompletions: defaultHabits.reduce((acc, h) => acc + (h.completions ? h.completions.length : 0), 0),
+          emojiStreak: (() => {
+            const by = defaultEmojiByDate || {}
+            let s = 0
+            const today = new Date()
+            const toIso = (d: Date) => d.toISOString().slice(0,10)
+            let d = new Date(today)
+            while (by[toIso(d)]) { s++; d.setDate(d.getDate() - 1) }
+            return s
+          })()
         }
         try { useHabitStore.getState().awardTrophies(summary) } catch {}
       } catch {}

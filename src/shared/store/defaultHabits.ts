@@ -1,4 +1,5 @@
 import { computeLevel } from '@/shared/constants/progression'
+import { iso, lastNDays } from '@/shared/utils/date'
 import type { Habit } from '@/shared/types';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -297,3 +298,84 @@ export const defaultProgress = {
   // example unlocked trophies (empty by default)
   unlocked: {},
 }
+
+// Example emoji diary data: provide a rich, varied history across the year
+// Rotate through a diverse set of base emoji hexcodes and map from Jan 1 to today.
+// All IDs are plain base emojis present in Emojibase.
+const EMOJI_ROTATION = [
+  '1F600', // 😀 grinning
+  '1F603', // 😃
+  '1F604', // 😄
+  '1F60A', // 😊
+  '1F642', // 🙂
+  '1F60D', // 😍
+  '1F44D', // 👍
+  '1F389', // 🎉
+  '1F4A1', // 💡
+  '1F4DD', // 📝
+  '1F680', // 🚀
+  '1F525', // 🔥
+  '1F4DA', // 📚
+  '1F3C3', // 🏃
+  '1F3A8', // 🎨
+  '1F3B5', // 🎵
+  '26A1',  // ⚡
+  '1F4AA', // 💪
+  '1F4C8', // 📈
+  '1F6B6', // 🚶
+  '1F34E', // 🍎
+  '1F31E', // 🌞
+  '1F319', // 🌙
+  '1F33B', // 🌻
+]
+
+export const defaultEmojiByDate: Record<string, string> = (() => {
+  // Use the same end date as the rest of the example data for consistency
+  const endISO = '2025-10-26'
+  const days = dateRange('2025-01-01', endISO, 1)
+  const out: Record<string, string> = {}
+  const end = new Date(`${endISO}T00:00:00`)
+
+  const withinFinalStreak = (d: Date) => {
+    const diffMs = end.getTime() - d.getTime()
+    const diffDays = Math.floor(diffMs / (24 * 60 * 60 * 1000))
+    // Keep a solid 30+ day streak ending on endISO
+    return diffDays <= 34
+  }
+
+  days.forEach((ds, i) => {
+    const d = new Date(`${ds}T00:00:00`)
+    const m = d.getMonth() + 1 // 1..12
+    const dom = d.getDate()
+
+    let include = false
+    if (withinFinalStreak(d)) {
+      include = true
+    } else if (m === 1 || m === 2) {
+      // Winter: every other day
+      include = dom % 2 === 1
+    } else if (m === 3 || m === 4 || m === 5) {
+      // Spring: ~2/3 coverage
+      include = dom % 3 !== 0
+    } else if (m === 6 || m === 7) {
+      // Summer start: ~1/3 coverage
+      include = dom % 3 === 1
+    } else if (m === 8) {
+      // Late summer: every other day
+      include = dom % 2 === 1
+    } else if (m === 9) {
+      // September: daily to build into the October streak
+      include = true
+    } else {
+      // default: sparse
+      include = dom % 3 === 1
+    }
+
+    if (include) {
+      out[ds] = EMOJI_ROTATION[i % EMOJI_ROTATION.length]
+    }
+  })
+  return out
+})()
+
+export const defaultEmojiRecents: string[] = Array.from(new Set(Object.values(defaultEmojiByDate))).slice(0, 10)

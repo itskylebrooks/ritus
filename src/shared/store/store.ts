@@ -16,7 +16,7 @@ export interface HabitState {
   setPoints: (n: number) => void
   addPoints: (delta: number) => void
   tryAwardWeeklyBonus: (habitId: string, weekDate: Date, reached: boolean) => void
-  awardTrophies: (summary: { dailyBuildStreak: number; dailyBreakStreak: number; weeklyStreak: number; totalCompletions: number }) => string[]
+  awardTrophies: (summary: { dailyBuildStreak: number; dailyBreakStreak: number; weeklyStreak: number; totalCompletions: number; emojiStreak?: number }) => string[]
   purchaseCollectible: (id: string, cost: number) => boolean
   applyCollectible: (id: string) => boolean
   markTrophiesSeen: (ids: string[]) => void
@@ -162,6 +162,23 @@ export const useHabitStore = create<HabitState>()(
         const weeklyStreak = summary?.weeklyStreak ?? Math.max(0, ...allHabits.filter(h => h.frequency === 'weekly').map(h => h.streak || 0))
   const monthlyStreak = (summary as any)?.monthlyStreak ?? Math.max(0, ...allHabits.filter(h => h.frequency === 'monthly').map(h => h.streak || 0))
 
+        // Emoji-of-the-day longest recent streak (consecutive days ending today)
+        const computeEmojiStreak = (): number => {
+          const by = (get().emojiByDate || {}) as Record<string, string | undefined>
+          if (!by || Object.keys(by).length === 0) return 0
+          let streak = 0
+          const today = new Date()
+          let d = new Date(today)
+          while (true) {
+            const full = iso(d)
+            const short = full.slice(0, 10)
+            if (by[full] || by[short]) { streak++; d.setDate(d.getDate() - 1); continue }
+            break
+          }
+          return streak
+        }
+        const emojiStreak = summary?.emojiStreak ?? computeEmojiStreak()
+
         // compute unique days with at least one completion across all habits
         const uniqueDays = new Set<string>()
         for (const h of allHabits) for (const c of h.completions || []) uniqueDays.add(c)
@@ -197,6 +214,7 @@ export const useHabitStore = create<HabitState>()(
           if (t.group === 'weekly') return weeklyStreak >= t.threshold
           if (t.group === 'monthly') return monthlyStreak >= t.threshold
           if (t.group === 'milestone') return daysUsedCount >= t.threshold
+          if (t.group === 'emoji') return emojiStreak >= t.threshold
           if (t.group === 'meta') {
             // behavioral/meta trophies with custom logic
             switch (t.id) {
