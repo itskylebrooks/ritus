@@ -50,7 +50,7 @@ export const TROPHIES: TrophyDef[] = [
   { id: 'meta_180days',        label: 'Half-Year Light',   group: 'milestone',   threshold: 180,Icon: Hourglass,  reason: 'Used Ritus for 180 days' },
   { id: 'meta_365days',        label: 'Circle Complete',   group: 'milestone',   threshold: 365,Icon: Infinity,   reason: 'Used Ritus for a full year' },
   // Emoji journaling trophies (consecutive days with an emoji of the day)
-  { id: 'emoji_streak_1',      label: 'First Emoji',       group: 'emoji',       threshold: 1,  Icon: Smile, reason: 'First emoji of your journey' },
+  { id: 'emoji_streak_1',      label: 'First Emoji',       group: 'emoji',       threshold: 1,  Icon: Smile, reason: 'First vibe of your journey' },
   { id: 'emoji_streak_7',      label: 'Mood Starter',      group: 'emoji',       threshold: 7,  Icon: Smile, reason: '7 days of emojis' },
   { id: 'emoji_streak_14',     label: 'Mood Keeper',       group: 'emoji',       threshold: 14, Icon: Smile, reason: '14 days of emojis' },
   { id: 'emoji_streak_30',     label: 'Emoji Journaler',   group: 'emoji',       threshold: 30, Icon: Smile, reason: '30 days without a break' },
