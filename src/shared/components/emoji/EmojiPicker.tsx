@@ -171,7 +171,7 @@ export default function EmojiPicker() {
                   }}
                   placeholder="Search emoji..."
                   maxLength={50}
-                  className="w-full rounded-xl border border-subtle bg-transparent px-3 py-2 outline-none ring-0 placeholder:text-muted focus:border-accent no-focus-ring text-sm text-strong"
+                  className="w-full rounded-xl border border-subtle bg-transparent px-3 py-2 outline-none ring-0 placeholder:text-muted focus:border-accent no-focus-ring text-base sm:text-sm text-strong"
                 />
               </label>
             </div>
