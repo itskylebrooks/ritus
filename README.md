@@ -14,6 +14,8 @@ Create, edit, archive, and delete habits with ease. Choose frequencies—daily, 
 
 Mark completions quickly through a week strip (Monday through Sunday) or with a single tap. Each habit view offers insights like streaks, progress bars, completion counts, and preview charts.
 
+There is also an "Emoji of the day" feature that comes originally from my side-project Flowday. It surfaces a curated daily emoji and integrates with the emoji picker and history to add personality to your logs.
+
 Progression is rewarding: earn essence (lifetime XP) and level up as you progress. Points are awarded not only for completions but also for meeting weekly consistency goals, and these points can be spent in the collectibles store. Weekly bonuses and one-time trophies recognize your dedication and milestones.
 
 The collectibles store offers cosmetic customizations—clock styles, quote packs, accent themes, and relics—that personalize your experience without affecting gameplay. Purchases deduct points and mark items as owned.
