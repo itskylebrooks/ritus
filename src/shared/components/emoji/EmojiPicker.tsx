@@ -161,6 +161,14 @@ export default function EmojiPicker() {
                   ref={inputRef}
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      // End focus on the input without closing the picker
+                      inputRef.current?.blur()
+                    }
+                  }}
                   placeholder="Search emoji..."
                   maxLength={50}
                   className="w-full rounded-xl border border-subtle bg-transparent px-3 py-2 outline-none ring-0 placeholder:text-muted focus:border-accent no-focus-ring text-sm text-strong"
