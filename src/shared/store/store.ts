@@ -85,19 +85,26 @@ export const useHabitStore = create<HabitState>()(
             recents = [emojiId, ...recents.filter((x) => x !== emojiId)].slice(0, 10)
           }
 
-          // Compute longest emoji streak and idempotently unlock emoji trophies
+          // Compute longest emoji streak (UTC-safe) and idempotently unlock emoji trophies
           const keys = Object.keys(by)
           const norm = new Set(keys.map((k) => (k.length > 10 ? k.slice(0, 10) : k)))
+          const prevDay = (ds: string) => {
+            const d = new Date(`${ds}T00:00:00Z`)
+            d.setUTCDate(d.getUTCDate() - 1)
+            return d.toISOString().slice(0, 10)
+          }
+          const nextDay = (ds: string) => {
+            const d = new Date(`${ds}T00:00:00Z`)
+            d.setUTCDate(d.getUTCDate() + 1)
+            return d.toISOString().slice(0, 10)
+          }
           let longest = 0
           for (const ds of norm) {
-            const start = new Date(`${ds}T00:00:00`)
-            const prev = new Date(start)
-            prev.setDate(prev.getDate() - 1)
-            const prevKey = prev.toISOString().slice(0, 10)
+            const prevKey = prevDay(ds)
             if (norm.has(prevKey)) continue
             let cnt = 0
-            const cur = new Date(start)
-            while (norm.has(cur.toISOString().slice(0, 10))) { cnt++; cur.setDate(cur.getDate() + 1) }
+            let cur = ds
+            while (norm.has(cur)) { cnt++; cur = nextDay(cur) }
             if (cnt > longest) longest = cnt
           }
           const unlocked = { ...(s.progress.unlocked || {}) }
@@ -187,19 +194,23 @@ export const useHabitStore = create<HabitState>()(
           const keys = Object.keys(by || {})
           if (!keys.length) return 0
           const norm = new Set(keys.map((k) => (k.length > 10 ? k.slice(0, 10) : k)))
+          const prevDay = (ds: string) => {
+            const d = new Date(`${ds}T00:00:00Z`)
+            d.setUTCDate(d.getUTCDate() - 1)
+            return d.toISOString().slice(0, 10)
+          }
+          const nextDay = (ds: string) => {
+            const d = new Date(`${ds}T00:00:00Z`)
+            d.setUTCDate(d.getUTCDate() + 1)
+            return d.toISOString().slice(0, 10)
+          }
           let longest = 0
           for (const ds of norm) {
-            const start = new Date(`${ds}T00:00:00`)
-            const prev = new Date(start)
-            prev.setDate(prev.getDate() - 1)
-            const prevKey = prev.toISOString().slice(0, 10)
+            const prevKey = prevDay(ds)
             if (norm.has(prevKey)) continue // not a streak start
             let count = 0
-            const cur = new Date(start)
-            while (norm.has(cur.toISOString().slice(0, 10))) {
-              count++
-              cur.setDate(cur.getDate() + 1)
-            }
+            let cur = ds
+            while (norm.has(cur)) { count++; cur = nextDay(cur) }
             if (count > longest) longest = count
           }
           return longest
@@ -476,16 +487,23 @@ export const useHabitStore = create<HabitState>()(
                   const keys = Object.keys(by || {})
                   if (!keys.length) return 0
                   const norm = new Set(keys.map((k) => (k.length > 10 ? k.slice(0, 10) : k)))
+                  const prevDay = (ds: string) => {
+                    const d = new Date(`${ds}T00:00:00Z`)
+                    d.setUTCDate(d.getUTCDate() - 1)
+                    return d.toISOString().slice(0, 10)
+                  }
+                  const nextDay = (ds: string) => {
+                    const d = new Date(`${ds}T00:00:00Z`)
+                    d.setUTCDate(d.getUTCDate() + 1)
+                    return d.toISOString().slice(0, 10)
+                  }
                   let longest = 0
                   for (const ds of norm) {
-                    const start = new Date(`${ds}T00:00:00`)
-                    const prev = new Date(start)
-                    prev.setDate(prev.getDate() - 1)
-                    const prevKey = prev.toISOString().slice(0, 10)
+                    const prevKey = prevDay(ds)
                     if (norm.has(prevKey)) continue
                     let count = 0
-                    const cur = new Date(start)
-                    while (norm.has(cur.toISOString().slice(0, 10))) { count++; cur.setDate(cur.getDate() + 1) }
+                    let cur = ds
+                    while (norm.has(cur)) { count++; cur = nextDay(cur) }
                     if (count > longest) longest = count
                   }
                   return longest

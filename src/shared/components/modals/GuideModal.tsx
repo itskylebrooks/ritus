@@ -80,22 +80,21 @@ export default function GuideModal({ open, onClose, onLoadExample }: GuideModalP
           dailyBreakStreak: Math.max(0, ...defaultHabits.filter(h => h.frequency === 'daily' && h.mode === 'break').map(h => h.streak || 0)),
           weeklyStreak: Math.max(0, ...defaultHabits.filter(h => h.frequency === 'weekly').map(h => h.streak || 0)),
           totalCompletions: defaultHabits.reduce((acc, h) => acc + (h.completions ? h.completions.length : 0), 0),
-          // longest emoji streak across the dataset, not just trailing today
+          // longest emoji streak across the dataset (UTC-safe), not just trailing today
           emojiStreak: (() => {
             const by = defaultEmojiByDate || {}
             const keys = Object.keys(by)
             if (!keys.length) return 0
             const norm = new Set(keys.map((k) => (k.length > 10 ? k.slice(0,10) : k)))
+            const prevDay = (ds: string) => { const d = new Date(`${ds}T00:00:00Z`); d.setUTCDate(d.getUTCDate()-1); return d.toISOString().slice(0,10) }
+            const nextDay = (ds: string) => { const d = new Date(`${ds}T00:00:00Z`); d.setUTCDate(d.getUTCDate()+1); return d.toISOString().slice(0,10) }
             let longest = 0
             for (const ds of norm) {
-              const start = new Date(`${ds}T00:00:00`)
-              const prev = new Date(start)
-              prev.setDate(prev.getDate() - 1)
-              const prevKey = prev.toISOString().slice(0,10)
-              if (norm.has(prevKey)) continue
+              const pk = prevDay(ds)
+              if (norm.has(pk)) continue
               let count = 0
-              const cur = new Date(start)
-              while (norm.has(cur.toISOString().slice(0,10))) { count++; cur.setDate(cur.getDate()+1) }
+              let cur = ds
+              while (norm.has(cur)) { count++; cur = nextDay(cur) }
               if (count > longest) longest = count
             }
             return longest
