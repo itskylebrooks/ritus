@@ -65,6 +65,7 @@ export default function EmojiPicker() {
       if (event.key === 'Escape') beginClose()
     }
     window.addEventListener('keydown', handleKey)
+
     let raf: number | null = null
     try {
       const isCoarse = typeof window !== 'undefined' && 'matchMedia' in window && window.matchMedia('(pointer: coarse)').matches
@@ -79,12 +80,39 @@ export default function EmojiPicker() {
     } catch {
       // no-op: conservative fallback is to not auto-focus
     }
-    const prev = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
+
+    // Robust body scroll lock (works on mobile Safari)
+    const body = document.body as HTMLBodyElement
+    const prev = {
+      overflow: body.style.overflow,
+      position: body.style.position,
+      top: body.style.top,
+      left: body.style.left,
+      right: body.style.right,
+      width: body.style.width,
+    }
+    const scrollY = window.scrollY || window.pageYOffset
+    body.style.overflow = 'hidden'
+    body.style.position = 'fixed'
+    body.style.top = `-${scrollY}px`
+    body.style.left = '0'
+    body.style.right = '0'
+    body.style.width = '100%'
+
     return () => {
       if (raf !== null) cancelAnimationFrame(raf)
       window.removeEventListener('keydown', handleKey)
-      document.body.style.overflow = prev
+      // restore body styles and scroll position
+      body.style.overflow = prev.overflow
+      body.style.position = prev.position
+      body.style.top = prev.top
+      body.style.left = prev.left
+      body.style.right = prev.right
+      body.style.width = prev.width
+      if (prev.top) {
+        const y = -parseInt(prev.top || '0', 10) || 0
+        window.scrollTo(0, y)
+      }
       if (closeTimerRef.current) window.clearTimeout(closeTimerRef.current)
     }
   }, [open])
