@@ -165,8 +165,14 @@ export default function EmojiPicker() {
                     if (e.key === 'Enter') {
                       e.preventDefault()
                       e.stopPropagation()
-                      // End focus on the input without closing the picker
-                      inputRef.current?.blur()
+                      // Select the first result and close; if none, blur
+                      const firstCategory = filteredCategories[0]
+                      const firstItem = firstCategory?.items?.[0]
+                      if (firstItem) {
+                        handleSelect(firstItem)
+                      } else {
+                        inputRef.current?.blur()
+                      }
                     }
                   }}
                   placeholder="Search emoji..."
