@@ -84,7 +84,26 @@ export const useHabitStore = create<HabitState>()(
           if (emojiId) {
             recents = [emojiId, ...recents.filter((x) => x !== emojiId)].slice(0, 10)
           }
-          return { emojiByDate: by, emojiRecents: recents }
+
+          // Compute longest emoji streak and idempotently unlock emoji trophies
+          const keys = Object.keys(by)
+          const norm = new Set(keys.map((k) => (k.length > 10 ? k.slice(0, 10) : k)))
+          let longest = 0
+          for (const ds of norm) {
+            const start = new Date(`${ds}T00:00:00`)
+            const prev = new Date(start)
+            prev.setDate(prev.getDate() - 1)
+            const prevKey = prev.toISOString().slice(0, 10)
+            if (norm.has(prevKey)) continue
+            let cnt = 0
+            const cur = new Date(start)
+            while (norm.has(cur.toISOString().slice(0, 10))) { cnt++; cur.setDate(cur.getDate() + 1) }
+            if (cnt > longest) longest = cnt
+          }
+          const unlocked = { ...(s.progress.unlocked || {}) }
+          for (const t of TROPHIES) if (t.group === 'emoji' && !unlocked[t.id] && longest >= t.threshold) unlocked[t.id] = true
+
+          return { emojiByDate: by, emojiRecents: recents, progress: { ...s.progress, unlocked } }
         }),
       clearEmojiData: () => set({ emojiByDate: {}, emojiRecents: [] }),
   // user / preferences (no username — removed)
@@ -162,22 +181,30 @@ export const useHabitStore = create<HabitState>()(
         const weeklyStreak = summary?.weeklyStreak ?? Math.max(0, ...allHabits.filter(h => h.frequency === 'weekly').map(h => h.streak || 0))
   const monthlyStreak = (summary as any)?.monthlyStreak ?? Math.max(0, ...allHabits.filter(h => h.frequency === 'monthly').map(h => h.streak || 0))
 
-        // Emoji-of-the-day longest recent streak (consecutive days ending today)
-        const computeEmojiStreak = (): number => {
+        // Emoji-of-the-day: compute the LONGEST consecutive streak across all time
+        const computeLongestEmojiStreak = (): number => {
           const by = (get().emojiByDate || {}) as Record<string, string | undefined>
-          if (!by || Object.keys(by).length === 0) return 0
-          let streak = 0
-          const today = new Date()
-          let d = new Date(today)
-          while (true) {
-            const full = iso(d)
-            const short = full.slice(0, 10)
-            if (by[full] || by[short]) { streak++; d.setDate(d.getDate() - 1); continue }
-            break
+          const keys = Object.keys(by || {})
+          if (!keys.length) return 0
+          const norm = new Set(keys.map((k) => (k.length > 10 ? k.slice(0, 10) : k)))
+          let longest = 0
+          for (const ds of norm) {
+            const start = new Date(`${ds}T00:00:00`)
+            const prev = new Date(start)
+            prev.setDate(prev.getDate() - 1)
+            const prevKey = prev.toISOString().slice(0, 10)
+            if (norm.has(prevKey)) continue // not a streak start
+            let count = 0
+            const cur = new Date(start)
+            while (norm.has(cur.toISOString().slice(0, 10))) {
+              count++
+              cur.setDate(cur.getDate() + 1)
+            }
+            if (count > longest) longest = count
           }
-          return streak
+          return longest
         }
-        const emojiStreak = summary?.emojiStreak ?? computeEmojiStreak()
+        const emojiStreak = summary?.emojiStreak ?? computeLongestEmojiStreak()
 
         // compute unique days with at least one completion across all habits
         const uniqueDays = new Set<string>()
@@ -444,6 +471,25 @@ export const useHabitStore = create<HabitState>()(
                 const dailyBreakStreak = Math.max(0, ...allHabits.filter((hh) => hh.frequency === 'daily' && hh.mode === 'break').map((hh) => hh.streak || 0))
                 const weeklyStreak = Math.max(0, ...allHabits.filter((hh) => hh.frequency === 'weekly').map((hh) => hh.streak || 0))
                 const monthlyStreak = Math.max(0, ...allHabits.filter((hh) => hh.frequency === 'monthly').map((hh) => hh.streak || 0))
+                const emojiStreak = (() => {
+                  const by = (get().emojiByDate || {}) as Record<string, string | undefined>
+                  const keys = Object.keys(by || {})
+                  if (!keys.length) return 0
+                  const norm = new Set(keys.map((k) => (k.length > 10 ? k.slice(0, 10) : k)))
+                  let longest = 0
+                  for (const ds of norm) {
+                    const start = new Date(`${ds}T00:00:00`)
+                    const prev = new Date(start)
+                    prev.setDate(prev.getDate() - 1)
+                    const prevKey = prev.toISOString().slice(0, 10)
+                    if (norm.has(prevKey)) continue
+                    let count = 0
+                    const cur = new Date(start)
+                    while (norm.has(cur.toISOString().slice(0, 10))) { count++; cur.setDate(cur.getDate() + 1) }
+                    if (count > longest) longest = count
+                  }
+                  return longest
+                })()
 
                 const uniqueDays = new Set<string>()
                 for (const h of allHabits) for (const c of h.completions || []) uniqueDays.add(c)
@@ -477,6 +523,7 @@ export const useHabitStore = create<HabitState>()(
                   else if (t.group === 'weekly') meets = weeklyStreak >= t.threshold
                   else if (t.group === 'monthly') meets = monthlyStreak >= t.threshold
                   else if (t.group === 'milestone') meets = daysUsedCount >= t.threshold
+                  else if (t.group === 'emoji') meets = emojiStreak >= t.threshold
                   else if (t.group === 'meta') {
                     switch (t.id) {
                       case 'meta_balance':
