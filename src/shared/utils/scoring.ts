@@ -41,57 +41,50 @@ export function calcDailyStreak(h: Habit, ref: Date = new Date()) {
   return s
 }
 
-export function calcWeeklyStreak(h: Habit, ref: Date = new Date()) {
-  // Count consecutive weeks with at least `weeklyTarget` completions, backwards from current week
+export function calcWeeklyStreak(h: Habit) {
+  // Count total weeks with at least `weeklyTarget` completions
   const target = h.weeklyTarget ?? 1
-  let s = 0
-  let cursor = new Date(ref)
-  if (h.mode === 'break') {
-    // For break habits, count consecutive calendar weeks that have at least one completion (user marked week as clean)
-    while (true) {
-      const weekCount = h.completions.filter((c) => isSameCalendarWeek(fromISO(c), cursor)).length
-      if (weekCount > 0) {
-        s += 1
-        cursor = addDays(cursor, -7)
-      } else break
-    }
-  } else {
-    while (true) {
-      // count completions in the week of cursor
-      const weekCount = h.completions.filter((c) => isSameCalendarWeek(fromISO(c), cursor)).length
-      if (weekCount >= target) {
-        s += 1
-        cursor = addDays(cursor, -7)
-      } else break
+  const dates = [...h.completions].map(fromISO).sort((a, b) => a.getTime() - b.getTime())
+  const weeks = new Set<string>()
+
+  for (const d of dates) {
+    const weekStart = startOfWeek(d, { weekStartsOn: getWeekStartsOn() }).toISOString()
+    weeks.add(weekStart)
+  }
+
+  let streak = 0
+  for (const week of weeks) {
+    const weekDate = fromISO(week)
+    const completionsInWeek = h.completions.filter((c) => isSameCalendarWeek(fromISO(c), weekDate)).length
+    if (completionsInWeek >= target) {
+      streak++
     }
   }
-  return s
+
+  return streak
 }
 
-export function calcMonthlyStreak(h: Habit, ref: Date = new Date()) {
-  // Count consecutive months with at least `monthlyTarget` completions, backwards from current month
+export function calcMonthlyStreak(h: Habit) {
+  // Count total months with at least `monthlyTarget` completions
   const target = h.monthlyTarget ?? 1
-  let s = 0
-  let cursor = new Date(ref)
-  if (h.mode === 'break') {
-    // For break habits, count consecutive calendar months that have at least one completion
-    while (true) {
-      const monthCount = h.completions.filter((c) => isSameMonth(fromISO(c), cursor)).length
-      if (monthCount > 0) {
-        s += 1
-        cursor = addMonths(cursor, -1)
-      } else break
-    }
-  } else {
-    while (true) {
-      const monthCount = h.completions.filter((c) => isSameMonth(fromISO(c), cursor)).length
-      if (monthCount >= target) {
-        s += 1
-        cursor = addMonths(cursor, -1)
-      } else break
+  const dates = [...h.completions].map(fromISO).sort((a, b) => a.getTime() - b.getTime())
+  const months = new Set<string>()
+
+  for (const d of dates) {
+    const monthStart = startOfMonth(d).toISOString()
+    months.add(monthStart)
+  }
+
+  let streak = 0
+  for (const month of months) {
+    const monthDate = fromISO(month)
+    const completionsInMonth = h.completions.filter((c) => isSameMonth(fromISO(c), monthDate)).length
+    if (completionsInMonth >= target) {
+      streak++
     }
   }
-  return s
+
+  return streak
 }
 
 export function calcPoints(h: Habit): number {
