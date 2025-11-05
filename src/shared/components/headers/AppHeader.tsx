@@ -256,7 +256,7 @@ export default function AppHeader() {
                         to="/compass"
                         onClick={(e) => { if (location.pathname === '/compass') e.preventDefault(); setMoreDesktopOpen(false); }}
                         className={({ isActive }: { isActive: boolean }) =>
-                          `block w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 ${isActive ? 'bg-subtle' : 'hover-nonaccent'}`
+                          `block w-full text-left px-3 py-2 rounded-md transition-colors duration-150 ${isActive ? 'bg-accent text-inverse hover:bg-accent-soft' : 'text-strong hover-nonaccent'}`
                         }
                       >
                         <CompassIcon className="inline-block w-4 h-4 mr-2" />Compass
@@ -267,7 +267,7 @@ export default function AppHeader() {
                         to="/inspiration"
                         onClick={(e) => { if (location.pathname === '/inspiration') e.preventDefault(); setMoreDesktopOpen(false); }}
                         className={({ isActive }: { isActive: boolean }) =>
-                          `block w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 ${isActive ? 'bg-subtle' : 'hover-nonaccent'}`
+                          `block w-full text-left px-3 py-2 rounded-md transition-colors duration-150 ${isActive ? 'bg-accent text-inverse hover:bg-accent-soft' : 'text-strong hover-nonaccent'}`
                         }
                       >
                         <Lightbulb className="inline-block w-4 h-4 mr-2" />Inspiration
