@@ -236,6 +236,11 @@ export default function AppHeader() {
                       </li>
                     )}
 
+                    {/* Separator line before Guide - only show if there are options above */}
+                    {(isHome || !isArchiveHidden) && (
+                      <li className="my-1 border-t border-subtle"></li>
+                    )}
+
                     {/* Guide placed above Compass and Inspiration */}
                     <li>
                       <button
