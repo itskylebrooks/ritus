@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { exportAllData, importAllData } from '@/shared/utils/dataTransfer'
 import useThemeStore from '@/shared/store/theme'
 import { useHabitStore } from '@/shared/store/store'
+import { usePWA } from '@/shared/hooks/usePWA'
 import pkg from '../../../../package.json'
 import ConfirmModal from './ConfirmModal'
 function clearAllData() { localStorage.clear() }
@@ -31,6 +32,9 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
   const mode = useThemeStore((s) => s.mode)
   const setMode = useThemeStore((s) => s.setMode)
   const isSystemTheme = mode === 'system'
+  
+  // PWA installation
+  const { isInstalled, canInstall, install, isIosDevice } = usePWA()
   
   const [exporting, setExporting] = useState(false)
   const [importing, setImporting] = useState(false)
@@ -214,6 +218,41 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
               </div>
             </div>
           </div>
+
+          {/* PWA Install */}
+          {(canInstall || isInstalled) && (
+            <div className="p-4 rounded-2xl border border-subtle shadow-sm text-sm bg-surface">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex-1">
+                  <div className="text-sm font-semibold mb-0.5">Install App</div>
+                  <div className="text-[11px] text-muted">
+                    {isInstalled
+                      ? 'Ritus is ready to use offline.'
+                      : isIosDevice
+                        ? 'Tap the button to see install instructions'
+                        : 'Add Ritus to your home screen.'}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={isInstalled ? undefined : install}
+                  disabled={isInstalled}
+                  className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-colors whitespace-nowrap ${
+                    isInstalled
+                      ? 'cursor-default border border-subtle text-muted'
+                      : 'bg-accent text-inverse hover:opacity-90'
+                  }`}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                  </svg>
+                  {isInstalled ? 'Installed' : 'Install'}
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Format */}
           <div className="p-4 rounded-2xl border border-subtle shadow-sm text-sm bg-surface">
