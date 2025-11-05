@@ -15,27 +15,27 @@ type GuideStep = { title: string; body: string }
 const STEPS: GuideStep[] = [
   {
     title: 'Welcome to Ritus',
-    body: 'A simple, local-first habit tracker to help you build or break routines. Track completions, earn points, and see progress over time.'
+    body: 'A minimalist, local-first habit tracker to help you build or break routines. You can even install it as an app for quick access from Settings.'
   },
   {
     title: 'Create a habit',
-    body: 'Tap Add to create a habit, choose Daily, Weekly or Monthly, and set a weekly target when applicable. Give it a clear name and optional description.'
+    body: 'Tap Add to create a habit, give it a clear name, then choose Daily, Weekly or Monthly frequency, and Build or Break type.'
   },
   {
     title: 'Track completions',
-    body: 'Mark days as Done from the card or use the week strip. Weekly habits count toward the weekly target — keep marking to maintain streaks.'
+    body: 'Mark days as Done (or Clean) directly from the card or use the small week strip. Weekly and monthly habits count toward your set targets — stay consistent to grow your streaks.'
   },
   {
     title: 'Emoji of the Day',
-    body: 'Set an emoji to capture your mood or a highlight for the day (tap the button in the header). Your emoji history appears in Insights.'
+    body: 'Tap the emoji button in the header to record your mood or daily highlight. Over time, your emoji history will appear in Insights — a quick reflection of your days.'
   },
   {
-    title: 'Points, streaks & insights',
-    body: 'Each completion awards points and grows streaks. Check Insights for totals, weekly percent, and Milestones for bonuses.'
+    title: 'Points, levels & milestones',
+    body: 'Each completion earns points and strengthens streaks. Your total points and current level are visible in Milestones, while Insights show your consistency and trends.'
   },
   {
     title: 'Import example data',
-    body: "Click 'Load data' below to populate sample habits. If you already have data you'll be asked to confirm; loading will replace your current habits."
+    body: "Click 'Load data' below to explore Ritus with sample habits. If you already have data, you’ll be asked to confirm — importing replaces your current habits."
   }
 ]
 
