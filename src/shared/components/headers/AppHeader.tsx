@@ -132,6 +132,7 @@ export default function AppHeader() {
               to="/insight"
               aria-label="Insight"
               title="Insight"
+              onClick={(e) => { if (location.pathname === '/insight') e.preventDefault() }}
               className={({ isActive }: { isActive: boolean }) =>
                 `${navLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover-accent-fade' : 'text-strong hover-nonaccent'}`
               }
@@ -145,6 +146,7 @@ export default function AppHeader() {
               end
               aria-label="Home"
               title="Home"
+              onClick={(e) => { if (location.pathname === '/') e.preventDefault() }}
               className={({ isActive }: { isActive: boolean }) =>
                 `${navLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover-accent-fade' : 'text-strong hover-nonaccent'}`
               }
@@ -157,6 +159,7 @@ export default function AppHeader() {
               to="/milestones"
               aria-label="Milestones"
               title="Milestones"
+              onClick={(e) => { if (location.pathname === '/milestones') e.preventDefault() }}
               className={({ isActive }: { isActive: boolean }) =>
                 `${navLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover-accent-fade' : 'text-strong hover-nonaccent'}`
               }
@@ -246,7 +249,7 @@ export default function AppHeader() {
                     <li>
                       <NavLink
                         to="/compass"
-                        onClick={() => setMoreDesktopOpen(false)}
+                        onClick={(e) => { if (location.pathname === '/compass') e.preventDefault(); setMoreDesktopOpen(false); }}
                         className={({ isActive }: { isActive: boolean }) =>
                           `block w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 ${isActive ? 'bg-subtle' : 'hover-nonaccent'}`
                         }
@@ -257,7 +260,7 @@ export default function AppHeader() {
                     <li>
                       <NavLink
                         to="/inspiration"
-                        onClick={() => setMoreDesktopOpen(false)}
+                        onClick={(e) => { if (location.pathname === '/inspiration') e.preventDefault(); setMoreDesktopOpen(false); }}
                         className={({ isActive }: { isActive: boolean }) =>
                           `block w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 ${isActive ? 'bg-subtle' : 'hover-nonaccent'}`
                         }
@@ -313,7 +316,7 @@ export default function AppHeader() {
                 <li>
                   <NavLink
                     to="/"
-                    onClick={() => setMenuOpen(false)}
+                    onClick={(e) => { if (location.pathname === '/') e.preventDefault(); setMenuOpen(false); }}
                     className={({ isActive }: { isActive: boolean }) =>
                       `${mobileNavLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover:bg-accent-soft' : 'text-strong hover-nonaccent'}`
                     }
@@ -325,7 +328,7 @@ export default function AppHeader() {
                 <li>
                   <NavLink
                     to="/insight"
-                    onClick={() => setMenuOpen(false)}
+                    onClick={(e) => { if (location.pathname === '/insight') e.preventDefault(); setMenuOpen(false); }}
                     className={({ isActive }: { isActive: boolean }) =>
                       `${mobileNavLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover:bg-accent-soft' : 'text-strong hover-nonaccent'}`
                     }
@@ -336,7 +339,7 @@ export default function AppHeader() {
                 <li>
                   <NavLink
                     to="/milestones"
-                    onClick={() => setMenuOpen(false)}
+                    onClick={(e) => { if (location.pathname === '/milestones') e.preventDefault(); setMenuOpen(false); }}
                     className={({ isActive }: { isActive: boolean }) =>
                       `${mobileNavLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover:bg-accent-soft' : 'text-strong hover-nonaccent'}`
                     }
@@ -403,7 +406,7 @@ export default function AppHeader() {
                       <li>
                         <NavLink
                           to="/compass"
-                          onClick={() => { setMenuOpen(false); setMoreMobileOpen(false); }}
+                          onClick={(e) => { if (location.pathname === '/compass') e.preventDefault(); setMenuOpen(false); setMoreMobileOpen(false); }}
                           className={({ isActive }: { isActive: boolean }) =>
                             `${mobileNavLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover:bg-accent-soft' : 'text-strong hover-nonaccent'}`
                           }
@@ -414,7 +417,7 @@ export default function AppHeader() {
                       <li>
                         <NavLink
                           to="/inspiration"
-                          onClick={() => { setMenuOpen(false); setMoreMobileOpen(false); }}
+                          onClick={(e) => { if (location.pathname === '/inspiration') e.preventDefault(); setMenuOpen(false); setMoreMobileOpen(false); }}
                           className={({ isActive }: { isActive: boolean }) =>
                             `${mobileNavLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover:bg-accent-soft' : 'text-strong hover-nonaccent'}`
                           }
