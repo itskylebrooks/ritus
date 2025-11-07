@@ -13,11 +13,16 @@ const updateSW = registerSW({
   immediate: true,
   onRegisteredSW(swUrl, registration) {
     if (registration) {
-      // Check for updates periodically (every hour)
+      // Check for updates periodically (every 60 seconds in dev, every hour in prod)
+      const checkInterval = import.meta.env.DEV ? 60 * 1000 : 60 * 60 * 1000
       setInterval(() => {
         registration.update()
-      }, 60 * 60 * 1000)
+      }, checkInterval)
     }
+  },
+  onNeedRefresh() {
+    // Automatically update without prompting the user
+    updateSW(true)
   },
   onOfflineReady() {
     console.log('App ready to work offline')
