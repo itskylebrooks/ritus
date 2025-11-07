@@ -1,8 +1,7 @@
 import { useMemo, useState, useRef, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { emphasizeEase, transitions } from '@/shared/animations'
-import { hasCompletionOnDay, countCompletionsInWeek, countCompletionsInMonth } from '@/shared/utils/scoring'
-import { getWeekStartsOn } from '@/shared/utils/date'
+import { hasCompletionOnDay } from '@/shared/utils/scoring'
 import { fromISO } from '@/shared/utils/date'
 import { useHabitStore } from '@/shared/store/store'
 import AddHabit from './components/AddHabit'
@@ -71,28 +70,18 @@ export default function Home() {
     }
   }, [habits.length])
 
-  const weekStartsOn = useHabitStore((s) => s.weekStart === 'sunday' ? 0 : 1)
-
   const sortedHabits = useMemo(() => {
     const today = new Date()
     const source = showArchived ? habits : habits.filter((h) => !h.archived)
     return [...source].sort((a, b) => {
-      const aDone = a.frequency === 'daily'
-        ? hasCompletionOnDay(a.completions, today)
-        : a.frequency === 'weekly'
-          ? countCompletionsInWeek(a.completions, today, weekStartsOn) >= (a.weeklyTarget ?? 1)
-        : countCompletionsInMonth(a.completions, today) >= (a.monthlyTarget ?? 1)
-
-      const bDone = b.frequency === 'daily'
-        ? hasCompletionOnDay(b.completions, today)
-        : b.frequency === 'weekly'
-          ? countCompletionsInWeek(b.completions, today, weekStartsOn) >= (b.weeklyTarget ?? 1)
-        : countCompletionsInMonth(b.completions, today) >= (b.monthlyTarget ?? 1)
+      // Check if today specifically was marked done/clean for any frequency type
+      const aDone = hasCompletionOnDay(a.completions, today)
+      const bDone = hasCompletionOnDay(b.completions, today)
 
       if (aDone !== bDone) return aDone ? 1 : -1
       return fromISO(b.createdAt).getTime() - fromISO(a.createdAt).getTime()
     })
-  }, [habits, showArchived, weekStartsOn])
+  }, [habits, showArchived])
 
   return (
     <div>
