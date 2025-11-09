@@ -26,6 +26,7 @@ body,
 }
 
 :root {
+  color-scheme: light;
   /* Surface + background */
   --color-app-bg: #ffffff;
   --color-surface: #ffffff;
@@ -74,6 +75,7 @@ body,
 }
 
 .dark {
+  color-scheme: dark;
   --color-app-bg: #000000;
   --color-surface: #000000;
   --color-surface-elevated: #000000;
