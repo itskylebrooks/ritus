@@ -158,6 +158,8 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
       dateFormat: updated.dateFormat,
       weekStart: updated.weekStart,
       progress: updated.progress,
+      emojiByDate: updated.emojiByDate,
+      emojiRecents: updated.emojiRecents,
     }))
 
     // No separate localStorage key; emoji data is part of the store snapshot above
