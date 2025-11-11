@@ -5,6 +5,7 @@ import { useHabitStore } from '@/shared/store/store'
 import { usePWA } from '@/shared/hooks/usePWA'
 import pkg from '../../../../package.json'
 import ConfirmModal from './ConfirmModal'
+import { ChevronDown } from 'lucide-react'
 function clearAllData() { localStorage.clear() }
 
 interface SettingsModalProps {
@@ -182,7 +183,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
                 <div className="text-sm font-semibold mb-0.5">Theme</div>
                 <div className="hidden sm:block text-[11px] text-muted">Choose the app appearance.</div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 whitespace-nowrap">
                 <button
                   type="button"
                   onClick={() => applyTheme('system')}
@@ -261,47 +262,30 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
                 <div className="text-sm font-semibold mb-0.5">Format</div>
                 <div className="hidden sm:block text-[11px] text-muted">Date format and first day of week.</div>
               </div>
-              <div className="flex flex-col items-end gap-2">
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setDateFormat('MDY')}
-                    className={`relative rounded-lg w-20 px-3 py-2 border border-subtle text-sm text-center ${dateFormat === 'MDY' ? 'bg-accent text-inverse shadow-elevated' : 'text-muted hover-nonaccent'}`}
-                    aria-pressed={dateFormat === 'MDY'}
-                    title="Month/Day/Year"
+              <div className="flex items-center gap-2">
+                <div className="relative">
+                  <select
+                    aria-label="Date format"
+                    className="appearance-none rounded-lg border border-subtle bg-transparent px-3 py-2 pr-7 text-sm text-strong"
+                    value={dateFormat}
+                    onChange={(e) => setDateFormat(e.target.value as 'MDY' | 'DMY')}
                   >
-                    MM/DD
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setDateFormat('DMY')}
-                    className={`relative rounded-lg w-20 px-3 py-2 border border-subtle text-sm text-center ${dateFormat === 'DMY' ? 'bg-accent text-inverse shadow-elevated' : 'text-muted hover-nonaccent'}`}
-                    aria-pressed={dateFormat === 'DMY'}
-                    title="Day/Month/Year"
-                  >
-                    DD/MM
-                  </button>
+                    <option value="MDY">MM/DD</option>
+                    <option value="DMY">DD/MM</option>
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted" />
                 </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setWeekStart('sunday')}
-                    className={`relative rounded-lg w-20 px-3 py-2 border border-subtle text-sm text-center ${weekStart === 'sunday' ? 'bg-accent text-inverse shadow-elevated' : 'text-muted hover-nonaccent'}`}
-                    aria-pressed={weekStart === 'sunday'}
-                    title="Week starts on Sunday"
+                <div className="relative">
+                  <select
+                    aria-label="Week starts on"
+                    className="appearance-none rounded-lg border border-subtle bg-transparent px-3 py-2 pr-7 text-sm text-strong"
+                    value={weekStart}
+                    onChange={(e) => setWeekStart(e.target.value as 'sunday' | 'monday')}
                   >
-                    Sunday
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setWeekStart('monday')}
-                    className={`relative rounded-lg w-20 px-3 py-2 border border-subtle text-sm text-center ${weekStart === 'monday' ? 'bg-accent text-inverse shadow-elevated' : 'text-muted hover-nonaccent'}`}
-                    aria-pressed={weekStart === 'monday'}
-                    title="Week starts on Monday"
-                  >
-                    Monday
-                  </button>
+                    <option value="sunday">Sunday</option>
+                    <option value="monday">Monday</option>
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted" />
                 </div>
               </div>
             </div>
