@@ -178,10 +178,9 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
         <div className="space-y-4">
           {/* Theme */}
           <div className="p-4 rounded-2xl border border-subtle shadow-sm text-sm bg-surface">
-            <div className="flex items-center sm:items-start justify-between gap-3">
+            <div className="flex items-center justify-between gap-3">
               <div>
                 <div className="text-sm font-semibold mb-0.5">Theme</div>
-                <div className="hidden sm:block text-[11px] text-muted">Choose the app appearance.</div>
               </div>
               <div className="flex items-center gap-2 whitespace-nowrap">
                 <button
@@ -226,13 +225,6 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
               <div className="flex items-center justify-between gap-3">
                 <div className="flex-1">
                   <div className="text-sm font-semibold mb-0.5">Install App</div>
-                  <div className="hidden sm:block text-[11px] text-muted">
-                    {isInstalled
-                      ? 'Ritus is ready to use offline.'
-                      : isIosDevice
-                        ? 'Tap the button to see install instructions'
-                        : 'Add Ritus to your home screen.'}
-                  </div>
                 </div>
                 <button
                   type="button"
@@ -257,10 +249,9 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
 
           {/* Format */}
           <div className="p-4 rounded-2xl border border-subtle shadow-sm text-sm bg-surface">
-            <div className="flex items-center sm:items-start justify-between gap-3">
+            <div className="flex items-center justify-between gap-3">
               <div>
                 <div className="text-sm font-semibold mb-0.5">Format</div>
-                <div className="hidden sm:block text-[11px] text-muted">Date format and first day of week.</div>
               </div>
               <div className="flex items-center gap-2">
                 <div className="relative">
