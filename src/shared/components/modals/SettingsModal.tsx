@@ -436,7 +436,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
 
   <div className="mt-6 text-center text-[12px] text-muted relative">
           <a
-            href="https://itskylebrooks.vercel.app/"
+            href="https://itskylebrooks.tech/"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Kyle Brooks personal website"
