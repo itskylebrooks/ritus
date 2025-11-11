@@ -161,15 +161,15 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
   return (
     <div className={`fixed inset-0 z-[80] flex items-center justify-center p-5 transition-colors duration-200 ${closing ? 'bg-transparent' : 'bg-overlay backdrop-blur-sm'}`} onClick={beginClose}>
   <div
-  className={`w-full max-w-sm rounded-2xl bg-surface-elevated p-6 pt-7 pb-8 ring-1 ring-black/5 dark:ring-neutral-700/5 border border-subtle overflow-y-auto settings-panel ${closing ? 'closing' : ''}`}
+  className={`w-full max-w-sm rounded-2xl bg-surface-elevated p-6 pt-3 pb-8 ring-1 ring-black/5 dark:ring-neutral-700/5 border border-subtle overflow-y-auto settings-panel ${closing ? 'closing' : ''}`}
         style={{ WebkitOverflowScrolling: 'touch', paddingBottom: 'max(env(safe-area-inset-bottom), 32px)' }}
         onClick={(e)=>e.stopPropagation()}
         role="dialog"
         aria-modal="true"
         aria-labelledby="settings-title"
       >
-        <div className="mb-4">
-                <div className="relative h-10 flex items-center justify-center">
+        <div className="mb-2">
+                <div className="relative h-8 flex items-center justify-center">
                   <span id="settings-title" className="text-lg font-semibold tracking-wide text-strong">Settings</span>
                 </div>
               </div>
