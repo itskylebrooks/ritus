@@ -170,14 +170,14 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
         aria-labelledby="settings-title"
       >
         <div className="mb-2">
-                <div className="relative h-8 flex items-center justify-center">
+                <div className="relative h-12 flex items-center justify-center">
                   <span id="settings-title" className="text-lg font-semibold tracking-wide text-strong">Settings</span>
                 </div>
               </div>
 
         <div className="space-y-4">
           {/* Theme */}
-          <div className="p-4 rounded-2xl border border-subtle shadow-sm text-sm bg-surface">
+          <div className="text-sm">
             <div className="flex items-center justify-between gap-3">
               <div>
                 <div className="text-sm font-semibold mb-0.5">Theme</div>
@@ -218,19 +218,21 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
               </div>
             </div>
           </div>
+          <div className="border-t border-subtle" />
 
           {/* PWA Install */}
           {(canInstall || isInstalled) && (
-            <div className="p-4 rounded-2xl border border-subtle shadow-sm text-sm bg-surface">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex-1">
+            <>
+            <div className="text-sm">
+              <div className="grid grid-cols-3 items-center gap-2">
+                <div className="col-span-2">
                   <div className="text-sm font-semibold mb-0.5">Install App</div>
                 </div>
                 <button
                   type="button"
                   onClick={isInstalled ? undefined : install}
                   disabled={isInstalled}
-                  className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-colors whitespace-nowrap ${
+                  className={`w-full flex items-center justify-center gap-1.5 rounded-lg h-10 px-3 text-xs font-medium transition-colors whitespace-nowrap ${
                     isInstalled
                       ? 'cursor-default border border-subtle text-muted'
                       : 'bg-accent text-inverse hover:opacity-90'
@@ -245,42 +247,43 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
                 </button>
               </div>
             </div>
+            <div className="border-t border-subtle" />
+            </>
           )}
 
           {/* Format */}
-          <div className="p-4 rounded-2xl border border-subtle shadow-sm text-sm bg-surface">
-            <div className="flex items-center justify-between gap-3">
+          <div className="text-sm">
+            <div className="grid grid-cols-3 items-center gap-2">
               <div>
                 <div className="text-sm font-semibold mb-0.5">Format</div>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="relative">
-                  <select
-                    aria-label="Date format"
-                    className="appearance-none rounded-lg border border-subtle bg-transparent px-3 py-2 pr-7 text-sm text-strong"
-                    value={dateFormat}
-                    onChange={(e) => setDateFormat(e.target.value as 'MDY' | 'DMY')}
-                  >
-                    <option value="MDY">MM/DD</option>
-                    <option value="DMY">DD/MM</option>
-                  </select>
-                  <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted" />
-                </div>
-                <div className="relative">
-                  <select
-                    aria-label="Week starts on"
-                    className="appearance-none rounded-lg border border-subtle bg-transparent px-3 py-2 pr-7 text-sm text-strong"
-                    value={weekStart}
-                    onChange={(e) => setWeekStart(e.target.value as 'sunday' | 'monday')}
-                  >
-                    <option value="sunday">Sunday</option>
-                    <option value="monday">Monday</option>
-                  </select>
-                  <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted" />
-                </div>
+              <div className="relative w-full">
+                <select
+                  aria-label="Date format"
+                  className="appearance-none w-full rounded-lg border border-subtle bg-transparent px-3 h-10 pr-7 text-sm text-strong"
+                  value={dateFormat}
+                  onChange={(e) => setDateFormat(e.target.value as 'MDY' | 'DMY')}
+                >
+                  <option value="MDY">MM/DD</option>
+                  <option value="DMY">DD/MM</option>
+                </select>
+                <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted" />
+              </div>
+              <div className="relative w-full">
+                <select
+                  aria-label="Week starts on"
+                  className="appearance-none w-full rounded-lg border border-subtle bg-transparent px-3 h-10 pr-7 text-sm text-strong"
+                  value={weekStart}
+                  onChange={(e) => setWeekStart(e.target.value as 'sunday' | 'monday')}
+                >
+                  <option value="sunday">Sunday</option>
+                  <option value="monday">Monday</option>
+                </select>
+                <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted" />
               </div>
             </div>
           </div>
+          <div className="border-t border-subtle" />
 
           <div className="grid grid-cols-3 gap-2">
             {/* Import - left */}
@@ -290,7 +293,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
               disabled={importing || exporting}
               aria-label="Import from file"
               title="Import from file"
-              className="w-full flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium border border-subtle text-strong hover:bg-subtle transition disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+              className="w-full flex items-center justify-center gap-1.5 rounded-lg h-10 px-3 text-xs font-medium border border-subtle text-strong hover:bg-subtle transition disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-folder-input-icon lucide-folder-input">
                 <path d="M2 9V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-1"/>
@@ -306,7 +309,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
               onClick={handleDeleteAllLocal}
               aria-label="Reset local data"
               title="Reset local data"
-              className="w-full flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium border border-danger text-danger hover:bg-danger-soft transition whitespace-nowrap"
+              className="w-full flex items-center justify-center gap-1.5 rounded-lg h-10 px-3 text-xs font-medium border border-danger text-danger hover:bg-danger-soft transition whitespace-nowrap"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-eraser-icon lucide-eraser"><path d="M21 21H8a2 2 0 0 1-1.42-.587l-3.994-3.999a2 2 0 0 1 0-2.828l10-10a2 2 0 0 1 2.829 0l5.999 6a2 2 0 0 1 0 2.828L12.834 21"/><path d="m5.082 11.09 8.828 8.828"/></svg>
               <span>Reset</span>
@@ -319,7 +322,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
               disabled={exporting}
               aria-label="Export data"
               title="Export data"
-              className="w-full flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium border border-subtle text-strong hover:bg-subtle transition disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+              className="w-full flex items-center justify-center gap-1.5 rounded-lg h-10 px-3 text-xs font-medium border border-subtle text-strong hover:bg-subtle transition disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-folder-output-icon lucide-folder-output">
                 <path d="M2 7.5V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-1.5"/>
@@ -332,7 +335,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
           <input ref={fileRef} type="file" accept="application/json" onChange={handleFileChosen} className="hidden" />
 
           {false && (
-            <div className="p-4 rounded-2xl border border-subtle shadow-sm text-sm bg-surface">
+            <div className="text-sm">
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-sm font-semibold">Daily reminder</div>
