@@ -398,6 +398,9 @@ export default function AppHeader() {
                           </button>
                         </li>
                       )}
+                      {(isHome || !isArchiveHidden) && (
+                        <li className="my-1 border-t border-subtle"></li>
+                      )}
                       {/* Guide placed above Compass and Inspiration */}
                       <li>
                         <button
