@@ -88,7 +88,7 @@ export default function Home() {
 
       <div className="mt-4 grid gap-4">
         <div className="order-last sm:order-first">
-          <div className="grid gap-4 sm:[grid-template-columns:minmax(0,2.5fr)_minmax(0,1fr)] items-stretch">
+          <div className="grid gap-4 sm:[grid-template-columns:minmax(0,1fr)_minmax(0,160px)] items-stretch">
             <div className="h-full min-w-0">
               <QuoteCard />
             </div>

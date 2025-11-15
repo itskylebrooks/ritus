@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Check, Quote } from 'lucide-react'
 import { QUOTES } from '@/shared/utils/quotes'
 
@@ -9,6 +9,15 @@ export default function QuoteCard() {
   )
 
   const [copied, setCopied] = useState(false)
+
+  const sizeClass = useMemo(() => {
+    const len = selectedQuote.text.length
+    // Match the habit title size as the default, then shrink only for long quotes.
+    // Habit title uses `text-lg font-semibold leading-tight` — we match `text-lg`.
+    if (len > 420) return 'text-sm leading-tight'
+    if (len > 260) return 'text-base leading-relaxed'
+    return 'text-lg leading-tight'
+  }, [selectedQuote.text])
 
   const copyQuote = async () => {
   const formatted = `"${selectedQuote.text}" — ${selectedQuote.author}`
@@ -38,14 +47,13 @@ export default function QuoteCard() {
   }
 
   return (
-  <article className="rounded-2xl border dark:border-neutral-700 p-4 shadow-sm h-full w-full max-w-full">
+  <article className="rounded-2xl border dark:border-neutral-700 p-4 shadow-sm w-full max-w-full sm:h-[160px] relative">
       <div className="flex h-full flex-col gap-3">
-        <div className="flex-1">
           <button
             type="button"
             onClick={copyQuote}
             aria-label="Copy quote"
-            className="group rounded-md p-0.5 transition-colors duration-150 ease-in-out"
+            className="group rounded-md p-0.5 transition-colors duration-150 ease-in-out absolute right-3 top-3 z-10"
             title="Copy quote"
           >
                 <span className="relative inline-block w-5 h-5">
@@ -66,10 +74,11 @@ export default function QuoteCard() {
                   />
               </span>
           </button>
-          <p className="mt-1.5 text-lg leading-relaxed text-neutral-800 dark:text-neutral-100 italic break-words">{selectedQuote.text}</p>
+        <div className="flex-1 relative overflow-auto">
+          {/* Reduce font-size for long quotes to keep the layout fixed */}
+          <p className={`mt-1.5 text-neutral-800 dark:text-neutral-100 italic break-words pr-10 ${sizeClass}`}>{selectedQuote.text}</p>
         </div>
-
-        <footer className="mt-4 text-sm text-neutral-600 dark:text-neutral-400 text-right">— {selectedQuote.author}</footer>
+        <footer className="mt-4 text-sm text-neutral-600 dark:text-neutral-400 text-right absolute right-3 bottom-3">— {selectedQuote.author}</footer>
       </div>
     </article>
   )
