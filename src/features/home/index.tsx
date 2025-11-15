@@ -87,22 +87,18 @@ export default function Home() {
   return (
     <div>
 
-      <div className="mt-4 grid gap-4">
+      <div className="mt-4 grid gap-4 sm:[grid-template-columns:minmax(0,1fr)_minmax(0,160px)] items-stretch">
         {showHomeCards && (
-          <div className="order-last sm:order-first">
-            <div className="grid gap-4 sm:[grid-template-columns:minmax(0,1fr)_minmax(0,160px)] items-stretch">
-              <div className="h-full min-w-0">
-                <QuoteCard />
-              </div>
-
-              <div className="h-full">
-                <ClockCard />
-              </div>
-            </div>
+          <div className="h-full min-w-0 sm:row-start-1 sm:col-start-1 sm:col-span-1">
+            <QuoteCard />
           </div>
         )}
 
-        <div className="order-first sm:order-last space-y-4">
+        <div
+          className={`space-y-4 ${
+            showHomeCards ? 'sm:col-span-2 sm:row-start-2' : 'sm:col-span-2 sm:row-start-1'
+          }`}
+        >
           {showAdd && (
             <div>
               <AddHabit />
@@ -128,6 +124,12 @@ export default function Home() {
             </AnimatePresence>
           </motion.main>
         </div>
+
+        {showHomeCards && (
+          <div className="h-full sm:row-start-1 sm:col-start-2 sm:col-span-1">
+            <ClockCard />
+          </div>
+        )}
       </div>
 
     </div>
