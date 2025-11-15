@@ -47,8 +47,8 @@ export default function QuoteCard() {
   }
 
   return (
-  <article className="rounded-2xl border dark:border-neutral-700 p-4 shadow-sm w-full max-w-full sm:h-[160px] relative">
-      <div className="flex h-full flex-col gap-3">
+    <article className="rounded-2xl border dark:border-neutral-700 p-4 shadow-sm w-full max-w-full h-[180px] sm:h-[160px] relative">
+      <div className="flex h-full flex-col gap-3 justify-center sm:justify-start">
           <button
             type="button"
             onClick={copyQuote}
@@ -74,9 +74,9 @@ export default function QuoteCard() {
                   />
               </span>
           </button>
-        <div className="flex-1 relative overflow-auto">
+        <div className="flex-1 relative flex items-center sm:items-start overflow-auto">
           {/* Reduce font-size for long quotes to keep the layout fixed */}
-          <p className={`mt-1.5 text-neutral-800 dark:text-neutral-100 italic break-words pr-10 ${sizeClass}`}>{selectedQuote.text}</p>
+          <p className={`text-neutral-800 dark:text-neutral-100 italic break-words pr-10 ${sizeClass}`}>{selectedQuote.text}</p>
         </div>
         <footer className="mt-4 text-sm text-neutral-600 dark:text-neutral-400 text-right absolute right-3 bottom-3">— {selectedQuote.author}</footer>
       </div>
