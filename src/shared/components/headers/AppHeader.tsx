@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Archive, ChartPie, ChevronDown, CircleHelp, Compass as CompassIcon, Home, LayoutGrid, LayoutList, Lightbulb, Menu, MinusCircle, PlusCircle, Settings as SettingsIcon, Trophy } from 'lucide-react'
+import { Archive, ChartPie, ChevronDown, CircleHelp, Compass as CompassIcon, Home, LayoutGrid, LayoutList, Lightbulb, Menu, MinusCircle, PlusCircle, Settings as SettingsIcon, Trophy, Moon, Sun } from 'lucide-react'
 import { createMobileMenuVariants, desktopDropdownVariants, submenuVariants, useMotionPreferences } from '@/shared/animations'
 import { useHabitStore } from '@/shared/store/store'
 import GuideModal from '@/shared/components/modals/GuideModal'
@@ -27,6 +27,8 @@ export default function AppHeader() {
   const [moreMobileOpen, setMoreMobileOpen] = useState(false)
   const showAdd = useHabitStore((s) => s.showAdd)
   const setShowAdd = useHabitStore((s) => s.setShowAdd)
+  const showHomeCards = useHabitStore((s) => (s as any).showHomeCards ?? true)
+  const setShowHomeCards = useHabitStore((s) => (s as any).setShowHomeCards)
   const showArchived = useHabitStore((s) => (s as any).showArchived)
   const setShowArchived = useHabitStore((s) => (s as any).setShowArchived)
   const showList = useHabitStore((s) => (s as any).showList)
@@ -212,6 +214,17 @@ export default function AppHeader() {
                         </button>
                       </li>
                     )}
+                    {isHome && (
+                      <li>
+                        <button
+                          type="button"
+                          onClick={() => { setMoreDesktopOpen(false); setShowHomeCards(!showHomeCards) }}
+                          className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent"
+                        >
+                          <span className="flex items-center gap-2">{showHomeCards ? <Moon className="w-4 h-4" /> : <Sun  className="w-4 h-4" />}<span>{showHomeCards ? 'Hide rituals' : 'Show rituals'}</span></span>
+                        </button>
+                      </li>
+                    )}
                     {/* Guide (moved closer to Inspiration) */}
                     {!isArchiveHidden && (
                       <li>
@@ -384,6 +397,17 @@ export default function AppHeader() {
                             className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent"
                           >
                             <span className="flex items-center gap-2">{showAdd ? <MinusCircle className="w-4 h-4" /> : <PlusCircle className="w-4 h-4" />}<span>{showAdd ? 'Hide add' : 'Show add'}</span></span>
+                          </button>
+                        </li>
+                      )}
+                      {isHome && (
+                        <li>
+                          <button
+                            type="button"
+                            onClick={() => { setMenuOpen(false); setMoreMobileOpen(false); setShowHomeCards(!showHomeCards) }}
+                            className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent"
+                          >
+                            <span className="flex items-center gap-2">{showHomeCards ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}<span>{showHomeCards ? 'Hide rituals' : 'Show rituals'}</span></span>
                           </button>
                         </li>
                       )}

@@ -28,6 +28,8 @@ export interface HabitState {
   // UI visibility
   showAdd: boolean
   setShowAdd: (v: boolean) => void
+  showHomeCards: boolean
+  setShowHomeCards: (v: boolean) => void
   // archived visibility toggle (hide archived by default)
   showArchived: boolean
   setShowArchived: (v: boolean) => void
@@ -65,11 +67,13 @@ export const useHabitStore = create<HabitState>()(
   weekStart: 'monday',
   setWeekStart: (w) => set({ weekStart: w }),
   // UI visibility
-  showAdd: true,
-  showArchived: false,
-  // default to list view
+      showAdd: true,
+      showHomeCards: true,
+      showArchived: false,
+      // default to list view
       showList: true,
       setShowAdd: (v) => set({ showAdd: v }),
+      setShowHomeCards: (v) => set({ showHomeCards: v }),
       setShowArchived: (v) => set({ showArchived: v }),
       setShowList: (v) => set({ showList: v }),
       // emoji of the day defaults
@@ -590,6 +594,7 @@ export const useHabitStore = create<HabitState>()(
         dateFormat: state.dateFormat,
         weekStart: state.weekStart,
         showAdd: state.showAdd,
+        showHomeCards: state.showHomeCards,
         emojiByDate: state.emojiByDate || {},
         emojiRecents: state.emojiRecents || [],
       }),

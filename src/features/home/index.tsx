@@ -40,6 +40,7 @@ export default function Home() {
   const setShowAdd = useHabitStore((s) => s.setShowAdd)
 
   const showList = useHabitStore((s) => (s as any).showList)
+  const showHomeCards = useHabitStore((s) => (s as any).showHomeCards ?? true)
 
   const habits = useHabitStore((s) => s.habits)
   const showArchived = useHabitStore((s) => (s as any).showArchived)
@@ -87,17 +88,19 @@ export default function Home() {
     <div>
 
       <div className="mt-4 grid gap-4">
-        <div className="order-last sm:order-first">
-          <div className="grid gap-4 sm:[grid-template-columns:minmax(0,1fr)_minmax(0,160px)] items-stretch">
-            <div className="h-full min-w-0">
-              <QuoteCard />
-            </div>
+        {showHomeCards && (
+          <div className="order-last sm:order-first">
+            <div className="grid gap-4 sm:[grid-template-columns:minmax(0,1fr)_minmax(0,160px)] items-stretch">
+              <div className="h-full min-w-0">
+                <QuoteCard />
+              </div>
 
-            <div className="h-full">
-              <ClockCard />
+              <div className="h-full">
+                <ClockCard />
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         <div className="order-first sm:order-last space-y-4">
           {showAdd && (
