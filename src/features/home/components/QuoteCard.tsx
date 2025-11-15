@@ -12,11 +12,11 @@ export default function QuoteCard() {
 
   const sizeClass = useMemo(() => {
     const len = selectedQuote.text.length
-    // Match the habit title size as the default, then shrink only for long quotes.
-    // Habit title uses `text-lg font-semibold leading-tight` — we match `text-lg`.
-    if (len > 420) return 'text-sm leading-tight'
-    if (len > 260) return 'text-base leading-relaxed'
-    return 'text-lg leading-tight'
+    // Single resizing rule across mobile and desktop: if the quote length
+    // exceeds 160 characters, reduce the font size by two steps so the
+    // entire quote is still readable without overflowing the fixed card.
+    // Default keeps the same size as habit titles (`text-lg`).
+    return len > 160 ? 'text-sm leading-tight' : 'text-lg leading-tight'
   }, [selectedQuote.text])
 
   const copyQuote = async () => {
@@ -48,12 +48,12 @@ export default function QuoteCard() {
 
   return (
     <article className="rounded-2xl border dark:border-neutral-700 p-4 shadow-sm w-full max-w-full h-[180px] sm:h-[160px] relative">
-      <div className="flex h-full flex-col gap-3 justify-center sm:justify-start">
+      <div className="flex h-full flex-col gap-3 justify-center">
           <button
             type="button"
             onClick={copyQuote}
             aria-label="Copy quote"
-            className="group rounded-md p-0.5 transition-colors duration-150 ease-in-out absolute right-3 top-3 z-10"
+            className="group rounded-md p-0.5 transition-colors duration-150 ease-in-out absolute left-3 top-3 z-10"
             title="Copy quote"
           >
                 <span className="relative inline-block w-5 h-5">
@@ -74,7 +74,7 @@ export default function QuoteCard() {
                   />
               </span>
           </button>
-        <div className="flex-1 relative flex items-center sm:items-start overflow-auto">
+        <div className="flex-1 relative flex items-center overflow-auto">
           {/* Reduce font-size for long quotes to keep the layout fixed */}
           <p className={`text-neutral-800 dark:text-neutral-100 italic break-words pr-10 ${sizeClass}`}>{selectedQuote.text}</p>
         </div>
