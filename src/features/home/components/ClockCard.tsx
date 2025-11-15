@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useHabitStore } from '@/shared/store/store'
 
 export default function ClockCard() {
@@ -20,12 +20,34 @@ export default function ClockCard() {
   // subscribe to applied collectibles so the clock updates reactively
   const applied = useHabitStore((s) => s.progress.appliedCollectibles || {})
   const nocturne = applied['clock'] === 'clock_nocturne'
+  const accentApplied = !!applied['accent']
+
+  const dayLabelColorClass = accentApplied
+    ? 'text-accent'
+    : nocturne
+      ? 'text-[var(--color-text-primary)] opacity-80'
+      : 'text-[var(--color-border-subtle)] opacity-70'
+
+  const dayChunks = useMemo(() => {
+    const idx = now.getDay()
+    // Hand-tuned splits for readability (max 3 lines)
+    switch (idx) {
+      case 0: return ['SUN', 'DAY']
+      case 1: return ['MON', 'DAY']
+      case 2: return ['TUES', 'DAY']
+      case 3: return ['WED', 'NES', 'DAY']
+      case 4: return ['THURS', 'DAY']
+      case 5: return ['FRI', 'DAY']
+      case 6: return ['SA', 'TUR', 'DAY']
+      default: return []
+    }
+  }, [now])
 
   return (
-    <div className="rounded-2xl border dark:border-neutral-700 shadow-sm overflow-hidden w-full h-[160px] sm:h-[160px] sm:w-[160px] sm:aspect-square sm:justify-self-end">
+    <div className="rounded-2xl border dark:border-neutral-700 shadow-sm overflow-hidden w-full h-[200px] sm:h-[160px] sm:w-[160px] sm:aspect-square sm:justify-self-end">
       <div className="p-2 h-full flex items-center justify-center">
-        <div className="w-full h-full max-w-full max-h-full">
-          <div className="aspect-[4/3] sm:aspect-square w-full h-full">
+        <div className="w-full h-full max-w-full max-h-full flex items-center sm:block">
+          <div className="h-full aspect-square max-h-full sm:aspect-square sm:w-full sm:h-full">
             <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" aria-label="Analog clock">
               <defs>
                 <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
@@ -35,16 +57,16 @@ export default function ClockCard() {
               <g transform="translate(0,0)" filter="url(#soft)">
                 {/* ticks: 60 marks around a circular ring; longer every 5th (hour) */}
                 {Array.from({ length: 60 }).map((_, i) => {
-                  const angle = (i / 60) * Math.PI * 2;
-                  const isHour = i % 5 === 0;
+                  const angle = (i / 60) * Math.PI * 2
+                  const isHour = i % 5 === 0
                   // Increase radii so ticks sit closer to the card edge (clock fills more)
-                  const inner = isHour ? 38 : 42; // distance from center where tick begins
-                  const outer = 48; // distance from center where tick ends (near card edge)
-                  const x1 = 50 + Math.sin(angle) * inner;
-                  const y1 = 50 - Math.cos(angle) * inner;
-                  const x2 = 50 + Math.sin(angle) * outer;
-                  const y2 = 50 - Math.cos(angle) * outer;
-                  const width = isHour ? 1.6 : 0.8;
+                  const inner = isHour ? 38 : 42 // distance from center where tick begins
+                  const outer = 48 // distance from center where tick ends (near card edge)
+                  const x1 = 50 + Math.sin(angle) * inner
+                  const y1 = 50 - Math.cos(angle) * inner
+                  const x2 = 50 + Math.sin(angle) * outer
+                  const y2 = 50 - Math.cos(angle) * outer
+                  const width = isHour ? 1.6 : 0.8
                   // Use CSS tokens for subtle greys in normal mode (they adapt to .dark)
                   // When nocturne collectible is applied, keep high-contrast monochrome ticks.
                   const strokeColor = nocturne
@@ -63,7 +85,7 @@ export default function ClockCard() {
                       stroke={strokeColor}
                       strokeWidth={width}
                     />
-                  );
+                  )
                 })}
 
                 {/* hour, minute, second hands: adjust when nocturne collectible is applied */}
@@ -98,6 +120,17 @@ export default function ClockCard() {
               </g>
             </svg>
           </div>
+          {dayChunks.length > 0 && (
+            <div
+              className="ml-4 h-full flex-1 flex flex-col items-end justify-center text-right text-4xl font-black tracking-[0.15em] leading-tight uppercase sm:hidden"
+            >
+              {dayChunks.map((chunk) => (
+                <div key={chunk} className={dayLabelColorClass}>
+                  {chunk}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
