@@ -38,7 +38,7 @@ export default function QuoteCard() {
   }
 
   return (
-  <article className="rounded-2xl border dark:border-neutral-700 p-6 shadow-sm h-full">
+  <article className="rounded-2xl border dark:border-neutral-700 p-6 shadow-sm h-full w-full max-w-full">
       <div className="flex h-full flex-col">
         <div className="flex-1">
           <button
@@ -66,7 +66,7 @@ export default function QuoteCard() {
                   />
                 </span>
           </button>
-          <p className="mt-2 text-lg leading-relaxed text-neutral-800 dark:text-neutral-100 italic">{selectedQuote.text}</p>
+          <p className="mt-2 text-lg leading-relaxed text-neutral-800 dark:text-neutral-100 italic break-words">{selectedQuote.text}</p>
         </div>
 
         <footer className="mt-4 text-sm text-neutral-600 dark:text-neutral-400 text-right">— {selectedQuote.author}</footer>

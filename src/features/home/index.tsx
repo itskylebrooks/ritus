@@ -88,12 +88,12 @@ export default function Home() {
 
       <div className="mt-4 grid gap-4">
         <div className="order-last sm:order-first">
-          <div className="grid gap-4 sm:grid-cols-3 items-stretch">
-            <div className="sm:col-span-2 h-full">
+          <div className="grid gap-4 sm:[grid-template-columns:minmax(0,2.5fr)_minmax(0,1fr)] items-stretch">
+            <div className="h-full min-w-0">
               <QuoteCard />
             </div>
 
-            <div className="sm:col-span-1 h-full">
+            <div className="h-full">
               <ClockCard />
             </div>
           </div>
