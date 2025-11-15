@@ -85,44 +85,46 @@ export default function Home() {
 
   return (
     <div>
-      
 
       <div className="mt-4 grid gap-4">
-        <div className="grid gap-4 sm:grid-cols-3 items-stretch">
-          <div className="sm:col-span-2 h-full">
-            <QuoteCard />
-          </div>
+        <div className="order-last sm:order-first">
+          <div className="grid gap-4 sm:grid-cols-3 items-stretch">
+            <div className="sm:col-span-2 h-full">
+              <QuoteCard />
+            </div>
 
-          <div className="sm:col-span-1 h-full">
-            <ClockCard />
+            <div className="sm:col-span-1 h-full">
+              <ClockCard />
+            </div>
           </div>
         </div>
 
-        {showAdd && (
-          <div>
-            <AddHabit />
-          </div>
-        )}
+        <div className="order-first sm:order-last space-y-4">
+          {showAdd && (
+            <div>
+              <AddHabit />
+            </div>
+          )}
 
-  <motion.main layout className={`grid gap-4 ${showList ? '' : 'sm:grid-cols-2'}`}>
-          <AnimatePresence initial={false} mode="popLayout">
-            {sortedHabits.length === 0 ? (
-              emptyReady ? <EmptyState disableAnim={initialListRender.current} /> : null
-            ) : (
-              sortedHabits.map((h) => (
-                <motion.div
-                  key={h.id}
-                  layout
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={transitions.fadeXl}
-                >
-                  <HabitCard habit={h} disableEntryAnim={initialListRender.current} />
-                </motion.div>
-              ))
-            )}
-          </AnimatePresence>
-        </motion.main>
-
+          <motion.main layout className={`grid gap-4 ${showList ? '' : 'sm:grid-cols-2'}`}>
+            <AnimatePresence initial={false} mode="popLayout">
+              {sortedHabits.length === 0 ? (
+                emptyReady ? <EmptyState disableAnim={initialListRender.current} /> : null
+              ) : (
+                sortedHabits.map((h) => (
+                  <motion.div
+                    key={h.id}
+                    layout
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={transitions.fadeXl}
+                  >
+                    <HabitCard habit={h} disableEntryAnim={initialListRender.current} />
+                  </motion.div>
+                ))
+              )}
+            </AnimatePresence>
+          </motion.main>
+        </div>
       </div>
 
     </div>
