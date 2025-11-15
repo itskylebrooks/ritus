@@ -38,21 +38,21 @@ export default function QuoteCard() {
   }
 
   return (
-  <article className="rounded-2xl border dark:border-neutral-700 p-6 shadow-sm h-full w-full max-w-full">
-      <div className="flex h-full flex-col">
+  <article className="rounded-2xl border dark:border-neutral-700 p-4 shadow-sm h-full w-full max-w-full">
+      <div className="flex h-full flex-col gap-3">
         <div className="flex-1">
           <button
             type="button"
             onClick={copyQuote}
             aria-label="Copy quote"
-            className="group -ml-1 rounded-md p-1 transition-colors duration-150 ease-in-out"
+            className="group rounded-md p-0.5 transition-colors duration-150 ease-in-out"
             title="Copy quote"
           >
-                <span className="relative inline-block w-6 h-6">
+                <span className="relative inline-block w-5 h-5">
                   {/* Quote icon (fades out when copied) */}
                   <Quote
                     className={
-                      `absolute inset-0 m-auto w-6 h-6 transition-all duration-200 ease-out text-neutral-400 dark:text-neutral-600 pointer-events-none group-hover:text-neutral-600 dark:group-hover:text-neutral-300 ` +
+                      `absolute inset-0 m-auto w-5 h-5 transition-all duration-200 ease-out text-neutral-400 dark:text-neutral-600 pointer-events-none group-hover:text-neutral-600 dark:group-hover:text-neutral-300 ` +
                       (copied ? 'opacity-0 scale-95' : 'opacity-100 scale-100')
                     }
                   />
@@ -60,13 +60,13 @@ export default function QuoteCard() {
                   {/* Check icon (fades in when copied). Uses same base color as quote icon */}
                   <Check
                     className={
-                      `absolute inset-0 m-auto w-6 h-6 transition-all duration-200 ease-out text-neutral-400 dark:text-neutral-600 pointer-events-none group-hover:text-neutral-600 dark:group-hover:text-neutral-300 ` +
+                      `absolute inset-0 m-auto w-5 h-5 transition-all duration-200 ease-out text-neutral-400 dark:text-neutral-600 pointer-events-none group-hover:text-neutral-600 dark:group-hover:text-neutral-300 ` +
                       (copied ? 'opacity-100 scale-100' : 'opacity-0 scale-95')
                     }
                   />
-                </span>
+              </span>
           </button>
-          <p className="mt-2 text-lg leading-relaxed text-neutral-800 dark:text-neutral-100 italic break-words">{selectedQuote.text}</p>
+          <p className="mt-1.5 text-lg leading-relaxed text-neutral-800 dark:text-neutral-100 italic break-words">{selectedQuote.text}</p>
         </div>
 
         <footer className="mt-4 text-sm text-neutral-600 dark:text-neutral-400 text-right">— {selectedQuote.author}</footer>
