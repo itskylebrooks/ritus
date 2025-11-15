@@ -19,7 +19,9 @@ export default function ClockCard() {
 
   // subscribe to applied collectibles so the clock updates reactively
   const applied = useHabitStore((s) => s.progress.appliedCollectibles || {})
-  const nocturne = applied['clock'] === 'clock_nocturne'
+  const clockStyle = applied['clock']
+  const nocturne = clockStyle === 'clock_nocturne'
+  const hasClockStyle = !!clockStyle
   const accentApplied = !!applied['accent']
 
   const dayLabelColorClass = accentApplied
@@ -96,6 +98,22 @@ export default function ClockCard() {
                   // user switches accent collectibles. Otherwise, fall back to the
                   // existing neutral/monochrome styling.
                   const armColorClass = nocturne ? 'text-accent' : ''
+
+                  // Second hand color:
+                  // - If a custom clock style is applied, keep existing behavior.
+                  // - If no custom clock style but an accent is applied, use accent.
+                  // - If no accent is applied, fall back to red (danger).
+                  const secondStroke = nocturne
+                    ? 'currentColor'
+                    : !hasClockStyle && accentApplied
+                      ? 'var(--color-accent)'
+                      : 'var(--color-danger)'
+
+                  const secondClassName = nocturne
+                    ? armColorClass
+                    : !hasClockStyle && accentApplied
+                      ? 'text-accent'
+                      : ''
                   return (
                     <>
                       <g transform={`rotate(${hourDeg} 50 50)`} className={nocturne ? 'text-accent' : ''}>
@@ -109,7 +127,16 @@ export default function ClockCard() {
 
                       {/* second hand */}
                       <g transform={`rotate(${secondDeg} 50 50)`} className={nocturne ? 'text-accent' : ''}>
-                        <line x1="50" y1="54" x2="50" y2="14" stroke={nocturne ? 'currentColor' : 'var(--color-danger)'} strokeWidth={1.4} strokeLinecap="round" className={nocturne ? armColorClass : ''} />
+                        <line
+                          x1="50"
+                          y1="54"
+                          x2="50"
+                          y2="14"
+                          stroke={secondStroke}
+                          strokeWidth={1.4}
+                          strokeLinecap="round"
+                          className={secondClassName}
+                        />
                       </g>
 
                       {/* center */}
