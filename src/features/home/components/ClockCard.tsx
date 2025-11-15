@@ -25,7 +25,7 @@ export default function ClockCard() {
   <div className="rounded-2xl border dark:border-neutral-700 shadow-sm overflow-hidden h-full">
       <div className="p-2 h-full flex items-center justify-center">
         <div className="w-full h-full max-w-full max-h-full">
-          <div className="aspect-square w-full h-full">
+          <div className="aspect-[4/3] sm:aspect-square w-full h-full">
             <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" aria-label="Analog clock">
               <defs>
                 <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
