@@ -118,6 +118,8 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
   const archiveHabit = useHabitStore((s) => (s as any).archiveHabit)
   const unarchiveHabit = useHabitStore((s) => (s as any).unarchiveHabit)
   const showList = useHabitStore((s) => (s as any).showList)
+  const appliedCollectibles = useHabitStore((s) => s.progress.appliedCollectibles || {})
+  const accentApplied = !!appliedCollectibles['accent']
 
   const [editing, setEditing] = useState(false)
   const [name, setName] = useState(habit.name)
@@ -145,6 +147,7 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
 
   // If points are large, render the number smaller so it fits the card
   const pointsClass = habit.points && habit.points > 999 ? 'text-sm font-semibold tabular-nums' : 'text-base font-semibold tabular-nums'
+  const breakPrimaryBgClass = accentApplied ? 'bg-accent' : 'bg-success'
 
   function saveEdit() {
     const trimmed = name.trim()
@@ -253,7 +256,7 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
                   onClick={() => { if (!habit.archived) toggleCompletion(habit.id, new Date()) }}
                   disabled={habit.archived}
                   aria-disabled={habit.archived}
-                  className={`inline-flex items-center justify-center gap-2 rounded-xl bg-success px-3 py-2 text-sm text-inverse transition transform duration-150 ease-in-out ${habit.archived ? 'opacity-60 cursor-not-allowed' : 'hover-accent-fade active:scale-[.98]'} md:justify-self-end`}
+                  className={`inline-flex items-center justify-center gap-2 rounded-xl ${breakPrimaryBgClass} px-3 py-2 text-sm text-inverse transition transform duration-150 ease-in-out ${habit.archived ? 'opacity-60 cursor-not-allowed' : 'hover-accent-fade active:scale-[.98]'} md:justify-self-end`}
                 >
                   <Check className="h-4 w-4" />
                   <span>Mark clean</span>
@@ -264,7 +267,7 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
                   disabled={habit.archived}
                   aria-disabled={habit.archived}
                   aria-label="Mark clean"
-                  className={`inline-flex items-center justify-center rounded-xl bg-success p-2 text-inverse transition transform duration-150 ease-in-out ${habit.archived ? 'opacity-60 cursor-not-allowed' : 'hover-accent-fade active:scale-[.98]'} md:justify-self-end`}
+                  className={`inline-flex items-center justify-center rounded-xl ${breakPrimaryBgClass} p-2 text-inverse transition transform duration-150 ease-in-out ${habit.archived ? 'opacity-60 cursor-not-allowed' : 'hover-accent-fade active:scale-[.98]'} md:justify-self-end`}
                 >
                   <Check className="h-4 w-4" />
                   {/* Visible label on mobile, hidden on small+ so grid view buttons stay icon-only */}
