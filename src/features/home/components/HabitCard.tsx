@@ -179,7 +179,7 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
                         value={name}
                         onChange={(e) => setName(e.target.value.slice(0, 60))}
                         maxLength={60}
-                        className="w-full rounded-xl border dark:border-neutral-700 bg-white px-3 py-2 dark:bg-neutral-950"
+                        className="w-full rounded-xl border dark:border-neutral-700 bg-white px-3 py-2 dark:bg-neutral-950 text-strong dark:text-neutral-100 placeholder:text-muted dark:placeholder:text-neutral-300"
                       />
                     </div>
                   </motion.div>
