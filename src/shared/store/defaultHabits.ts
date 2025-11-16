@@ -1,34 +1,36 @@
 import { computeLevel } from '@/shared/constants/progression'
-import { iso, lastNDays } from '@/shared/utils/date'
-import type { Habit } from '@/shared/types';
+import { lastNDays } from '@/shared/utils/date'
+import type { Habit } from '@/shared/types'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers to generate realistic completion timelines without hand‑typing dates
 // ─────────────────────────────────────────────────────────────────────────────
-const toISO = (d: Date) => d.toISOString().slice(0, 10);
+const toISO = (d: Date) => d.toISOString().slice(0, 10)
 function dateRange(start: string, end: string, stepDays = 1): string[] {
-  const out: string[] = [];
-  let d = new Date(`${start}T00:00:00`);
-  const e = new Date(`${end}T00:00:00`);
+  const out: string[] = []
+  let d = new Date(`${start}T00:00:00`)
+  const e = new Date(`${end}T00:00:00`)
   while (d <= e) {
-    out.push(toISO(d));
-    d.setDate(d.getDate() + stepDays);
+    out.push(toISO(d))
+    d.setDate(d.getDate() + stepDays)
   }
-  return out;
+  return out
 }
-function dailyStreakEndingOn(dates: string[], today = '2025-10-26'): number {
-  const set = new Set(dates);
-  let streak = 0;
-  let d = new Date(`${today}T00:00:00`);
+const REFERENCE_END_ISO = '2025-10-26'
+
+function dailyStreakEndingOn(dates: string[], today = REFERENCE_END_ISO): number {
+  const set = new Set(dates)
+  let streak = 0
+  let d = new Date(`${today}T00:00:00`)
   while (set.has(toISO(d))) {
-    streak++;
-    d.setDate(d.getDate() - 1);
+    streak++
+    d.setDate(d.getDate() - 1)
   }
-  return streak;
+  return streak
 }
 
-// Precomputed sequences for 2025 based on the current date (2025‑10‑26)
-const NO_ALCOHOL_COMPLETIONS_2025 = dateRange('2025-01-01', '2025-10-26');
+// Precomputed sequences for 2025 based on the reference example end date (2025‑10‑26)
+const NO_ALCOHOL_COMPLETIONS_2025 = dateRange('2025-01-01', REFERENCE_END_ISO);
 // Journal cadence: early year every other day, spring/summer every 3 days,
 // August every other day, then daily for whole September and first two weeks of October
 const JOURNAL_COMPLETIONS_2025 = [
@@ -43,18 +45,18 @@ const JOURNAL_STREAK = dailyStreakEndingOn(JOURNAL_COMPLETIONS_2025);
 
 // Aikido: every Tuesday & Thursday through the year, and additionally Fridays during August
 const AIKIDO_COMPLETIONS_2025 = (() => {
-  const out: string[] = [];
-  const start = new Date('2025-01-01T00:00:00');
-  const end = new Date('2025-10-26T00:00:00');
+  const out: string[] = []
+  const start = new Date('2025-01-01T00:00:00')
+  const end = new Date(`${REFERENCE_END_ISO}T00:00:00`)
   for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-    const dow = d.getDay(); // 0 Sun .. 6 Sat
+    const dow = d.getDay() // 0 Sun .. 6 Sat
     // Tuesday (2) or Thursday (4)
-    if (dow === 3 || dow === 5) out.push(toISO(new Date(d)));
+    if (dow === 3 || dow === 5) out.push(toISO(new Date(d)))
     // Fridays during August (month 7)
-    if (d.getMonth() === 7 && dow === 6) out.push(toISO(new Date(d)));
+    if (d.getMonth() === 7 && dow === 6) out.push(toISO(new Date(d)))
   }
-  return Array.from(new Set(out)).sort();
-})();
+  return Array.from(new Set(out)).sort()
+})()
 
 // No-sugar: keep earlier weekly checks, but add a full week in May, a full week in July,
 // and a set of ~15 other scattered days across the year
@@ -81,6 +83,37 @@ const NO_SUGAR_COMPLETIONS_2025 = (() => {
 // points per‑day heuristics (kept simple to avoid touching scoring logic elsewhere)
 const PPD_NO_ALCOHOL = 50;  // consistent with prior sample (18 days → 900)
 const PPD_JOURNAL = 25;     // consistent with prior sample (12 entries → 300)
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Adapt example dates so the latest completions are always "yesterday"
+// relative to the current environment when the module is evaluated.
+// This keeps the imported example data feeling fresh regardless of real date.
+// ─────────────────────────────────────────────────────────────────────────────
+const MS_PER_DAY = 24 * 60 * 60 * 1000
+const REFERENCE_END_DATE = new Date(`${REFERENCE_END_ISO}T00:00:00`)
+
+const EXAMPLE_END_DATE = (() => {
+  const d = new Date()
+  d.setHours(0, 0, 0, 0)
+  d.setDate(d.getDate() - 1)
+  return d
+})()
+
+const EXAMPLE_END_ISO = toISO(EXAMPLE_END_DATE)
+
+function shiftISODateToExampleEnd(dateISO: string): string {
+  const original = new Date(`${dateISO}T00:00:00`)
+  const diffDays = Math.round((REFERENCE_END_DATE.getTime() - original.getTime()) / MS_PER_DAY)
+  const shifted = new Date(EXAMPLE_END_DATE)
+  shifted.setDate(shifted.getDate() - diffDays)
+  return toISO(shifted)
+}
+
+function shiftISOArrayToExampleEnd(dates: string[]): string[] {
+  const shifted = dates.map(shiftISODateToExampleEnd)
+  // sort & dedupe to avoid any accidental overlaps
+  return Array.from(new Set(shifted)).sort()
+}
 
 // Realistic default dataset for Kyle Brooks (creative developer & student)
 export const defaultHabits: Habit[] = [
@@ -114,21 +147,26 @@ export const defaultHabits: Habit[] = [
     frequency: 'daily',
     mode: 'build',
     createdAt: '2025-01-12',
-    // consistent habit with a few longer breaks (late Apr, mid-Aug)
+    // consistent habit with a few longer breaks (late Apr, mid-Aug) and denser streaks later in the year
     completions: [
-      '2025-01-13','2025-01-14','2025-01-15','2025-01-17','2025-01-20',
-      '2025-02-03','2025-02-10','2025-02-17','2025-02-24',
-      '2025-03-03','2025-03-10','2025-03-17','2025-03-24','2025-03-31',
-      '2025-04-05','2025-04-06','2025-04-07',
+      '2025-01-13','2025-01-14','2025-01-15','2025-01-16','2025-01-17','2025-01-18','2025-01-20',
+      '2025-01-22','2025-01-24','2025-01-26','2025-01-28','2025-01-30',
+      '2025-02-01','2025-02-03','2025-02-05','2025-02-07','2025-02-10','2025-02-13','2025-02-17','2025-02-20','2025-02-24',
+      '2025-03-01','2025-03-03','2025-03-05','2025-03-07','2025-03-10','2025-03-13','2025-03-17','2025-03-20','2025-03-24','2025-03-27','2025-03-31',
+      '2025-04-01','2025-04-02','2025-04-03','2025-04-05','2025-04-06','2025-04-07',
       // gap in late April
-      '2025-05-02','2025-05-03','2025-05-04','2025-05-05','2025-05-12',
-      '2025-06-01','2025-06-02','2025-06-03','2025-06-10','2025-06-17',
-      '2025-07-01','2025-07-02','2025-07-03','2025-07-15','2025-07-16',
-      '2025-09-01','2025-09-02','2025-09-03','2025-09-15',
-      // recent small streak
+      '2025-05-02','2025-05-03','2025-05-04','2025-05-05','2025-05-08','2025-05-12','2025-05-15','2025-05-20',
+      '2025-06-01','2025-06-02','2025-06-03','2025-06-05','2025-06-07','2025-06-10','2025-06-14','2025-06-17','2025-06-21',
+      '2025-07-01','2025-07-02','2025-07-03','2025-07-06','2025-07-09','2025-07-12','2025-07-15','2025-07-16','2025-07-20',
+      // lighter August with a mid‑month break
+      '2025-08-01','2025-08-03','2025-08-05','2025-08-07','2025-08-18','2025-08-20','2025-08-22',
+      '2025-09-01','2025-09-02','2025-09-03','2025-09-05','2025-09-08','2025-09-11','2025-09-15','2025-09-18','2025-09-22',
+      // recent strong streak into the current end date
+      '2025-10-10','2025-10-11','2025-10-12','2025-10-13','2025-10-14','2025-10-15','2025-10-16',
+      '2025-10-18','2025-10-19','2025-10-20','2025-10-21','2025-10-22',
       '2025-10-23','2025-10-24','2025-10-25','2025-10-26'
     ],
-    streak: 4,
+    streak: 17,
     points: 860
   },
 
@@ -138,17 +176,20 @@ export const defaultHabits: Habit[] = [
     frequency: 'daily',
     mode: 'build',
     createdAt: '2025-06-10',
-    // started mid-year, steady reading with some gaps while traveling
+    // started mid-year, steady reading most evenings with some gaps while traveling
     completions: [
       '2025-06-11','2025-06-12','2025-06-13','2025-06-17','2025-06-18',
-      '2025-07-01','2025-07-02','2025-07-03','2025-07-10','2025-07-11',
-      '2025-08-05','2025-08-06','2025-08-07','2025-09-10','2025-09-11',
-      // current moderate streak (~9 days)
-      '2025-10-18','2025-10-19','2025-10-20','2025-10-21','2025-10-22',
-      '2025-10-23','2025-10-24','2025-10-25','2025-10-26'
+      '2025-06-20','2025-06-21','2025-06-23',
+      '2025-07-01','2025-07-02','2025-07-03','2025-07-05','2025-07-07','2025-07-09','2025-07-10','2025-07-11','2025-07-13',
+      '2025-07-20','2025-07-22',
+      '2025-08-01','2025-08-03','2025-08-05','2025-08-06','2025-08-07','2025-08-09','2025-08-11',
+      '2025-09-01','2025-09-03','2025-09-05','2025-09-07','2025-09-10','2025-09-11','2025-09-13','2025-09-15',
+      // current moderate streak (~12 days) into the end date
+      '2025-10-15','2025-10-16','2025-10-17','2025-10-18','2025-10-19','2025-10-20',
+      '2025-10-21','2025-10-22','2025-10-23','2025-10-24','2025-10-25','2025-10-26'
     ],
-    streak: 9,
-    points: 210
+    streak: 12,
+    points: 260
   },
 
   {
@@ -159,7 +200,7 @@ export const defaultHabits: Habit[] = [
     createdAt: '2025-01-15',
     // Weekly aikido in 2025: Tuesdays & Thursdays, plus Fridays during August
     completions: AIKIDO_COMPLETIONS_2025,
-    weeklyTarget: 1,
+    weeklyTarget: 2,
     streak: 38,
     points: 520
   },
@@ -194,18 +235,23 @@ export const defaultHabits: Habit[] = [
     frequency: 'daily',
     mode: 'break',
     createdAt: '2025-01-20',
-    // more scattered, random days through the year with light return in October
+    // scattered break days through the year with a few larger pushes to stay off
     completions: [
       '2025-01-21','2025-01-22','2025-01-23','2025-01-24','2025-01-25',
-      '2025-02-01','2025-02-02','2025-02-03','2025-03-01','2025-03-02',
-      '2025-04-01','2025-04-02','2025-04-03','2025-05-01','2025-05-02',
-      '2025-06-14','2025-07-03','2025-07-21','2025-08-15','2025-08-28',
-      '2025-09-10','2025-09-11',
+      '2025-01-27','2025-01-28',
+      '2025-02-01','2025-02-02','2025-02-03','2025-02-05','2025-02-07',
+      '2025-03-01','2025-03-02','2025-03-04','2025-03-06',
+      '2025-04-01','2025-04-02','2025-04-03','2025-04-05','2025-04-07',
+      '2025-05-01','2025-05-02','2025-05-03','2025-05-05',
+      '2025-06-10','2025-06-11','2025-06-14','2025-06-18',
+      '2025-07-01','2025-07-03','2025-07-05','2025-07-08','2025-07-12','2025-07-21',
+      '2025-08-01','2025-08-03','2025-08-07','2025-08-10','2025-08-15','2025-08-18','2025-08-22','2025-08-28',
+      '2025-09-05','2025-09-08','2025-09-10','2025-09-11','2025-09-15',
       // small resume in October — current short streak
-      '2025-10-25','2025-10-26'
+      '2025-10-20','2025-10-22','2025-10-24','2025-10-25','2025-10-26'
     ],
-    streak: 2,
-    points: 120
+    streak: 5,
+    points: 160
   },
 
   {
@@ -217,7 +263,7 @@ export const defaultHabits: Habit[] = [
     // consistent early weekly checks; add a full week in May, a full week in July,
     // and ~15 scattered other days through the year
     completions: NO_SUGAR_COMPLETIONS_2025,
-    weeklyTarget: 1,
+    weeklyTarget: 3,
     archived: true,
     streak: 0,
     points: 70
@@ -249,15 +295,20 @@ export const defaultHabits: Habit[] = [
     frequency: 'daily',
     mode: 'build',
     createdAt: '2025-02-20',
-    // strong spring streaks, then inactive after summer (stops around Aug)
+    // strong spring streaks, then lighter but still occasional stretching sessions into autumn
     completions: [
       '2025-03-01','2025-03-02','2025-03-03','2025-03-04','2025-03-05',
-      '2025-04-01','2025-04-02','2025-04-03','2025-04-04','2025-05-01',
-      '2025-05-02','2025-05-03','2025-06-10','2025-06-11','2025-06-12',
-      '2025-07-05','2025-07-06','2025-07-07','2025-08-01'
+      '2025-03-06','2025-03-07',
+      '2025-04-01','2025-04-02','2025-04-03','2025-04-04','2025-04-06','2025-04-08',
+      '2025-05-01','2025-05-02','2025-05-03','2025-05-05','2025-05-07',
+      '2025-06-01','2025-06-03','2025-06-05','2025-06-10','2025-06-11','2025-06-12',
+      '2025-07-01','2025-07-03','2025-07-05','2025-07-06','2025-07-07',
+      '2025-08-01','2025-08-03','2025-08-05',
+      '2025-09-01','2025-09-03','2025-09-05',
+      '2025-10-01','2025-10-03','2025-10-05','2025-10-07'
     ],
     streak: 0,
-    points: 95,
+    points: 130,
     archived: false
   }
   ,
@@ -276,6 +327,21 @@ export const defaultHabits: Habit[] = [
     points: 50
   }
 ];
+
+// Shift all example habit dates so that the latest completions land on EXAMPLE_END_ISO (yesterday).
+defaultHabits.forEach((habit) => {
+  if (habit.createdAt) {
+    habit.createdAt = shiftISODateToExampleEnd(habit.createdAt)
+  }
+  if (habit.completions && habit.completions.length) {
+    const shifted = shiftISOArrayToExampleEnd(habit.completions)
+    habit.completions = shifted
+    // Recompute streaks for daily habits so they match the shifted data and end at EXAMPLE_END_ISO
+    if (habit.frequency === 'daily') {
+      habit.streak = dailyStreakEndingOn(shifted, EXAMPLE_END_ISO)
+    }
+  }
+})
 
 export default defaultHabits;
 
@@ -330,21 +396,20 @@ const EMOJI_ROTATION = [
 ]
 
 export const defaultEmojiByDate: Record<string, string> = (() => {
-  // Use the same end date as the rest of the example data for consistency
-  const endISO = '2025-10-26'
-  const days = dateRange('2025-01-01', endISO, 1)
+  // Use the same moving end date as the rest of the example data (yesterday)
+  const end = new Date(EXAMPLE_END_DATE)
+  // Provide a rich history window (roughly the last 10 months)
+  const days = lastNDays(300, end)
   const out: Record<string, string> = {}
-  const end = new Date(`${endISO}T00:00:00`)
 
   const withinFinalStreak = (d: Date) => {
     const diffMs = end.getTime() - d.getTime()
-    const diffDays = Math.floor(diffMs / (24 * 60 * 60 * 1000))
-    // Keep a solid 30+ day streak ending on endISO
+    const diffDays = Math.floor(diffMs / MS_PER_DAY)
+    // Keep a solid 30+ day streak ending on the end date
     return diffDays <= 34
   }
 
-  days.forEach((ds, i) => {
-    const d = new Date(`${ds}T00:00:00`)
+  days.forEach((d, i) => {
     const m = d.getMonth() + 1 // 1..12
     const dom = d.getDate()
 
@@ -372,7 +437,8 @@ export const defaultEmojiByDate: Record<string, string> = (() => {
     }
 
     if (include) {
-      out[ds] = EMOJI_ROTATION[i % EMOJI_ROTATION.length]
+      const key = toISO(d)
+      out[key] = EMOJI_ROTATION[i % EMOJI_ROTATION.length]
     }
   })
   return out
