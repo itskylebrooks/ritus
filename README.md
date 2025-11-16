@@ -88,13 +88,3 @@ Contributions are welcome. Please open an issue or submit a pull request with sm
 ## License and Copyright
 
 This project is original work by Kyle Brooks. See the `LICENSE` and `NOTICE` files in the project root for details.
-
----
-
-If you’d like, I can also help with:
-
-- Adding a brief screenshots or GIF section to the README  
-- Creating a small usage example or demo data to ease first-time use  
-- Generating a concise CONTRIBUTING.md and a PR checklist  
-
-Just let me know which you'd prefer next, and I’ll update the repository accordingly.
