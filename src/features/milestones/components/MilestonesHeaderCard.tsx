@@ -24,15 +24,15 @@ export default function MilestonesHeaderCard() {
         </div>
         <div className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-300">
           <HeartPulse className="h-4 w-4" />
-          <span>{essence.toLocaleString()} essence</span>
+          <span>{essence.toLocaleString()} progress</span>
           <Coins className="h-4 w-4" />
-          <span>{points.toLocaleString()} points</span>
+          <span>{points.toLocaleString()} tokens</span>
         </div>
       </div>
 
       <div className="mt-4">
         <div className="flex items-center justify-between text-xs text-neutral-600 dark:text-neutral-300">
-          <span>Essence to next level</span>
+          <span>Progress to next level</span>
           <span>{within.toLocaleString()} / {needed.toLocaleString()}</span>
         </div>
         <div className="mt-1">

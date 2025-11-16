@@ -36,7 +36,7 @@ export function exportAllData() {
     // no reminders in export
     totalPoints: s.totalPoints,
     longestStreak: s.longestStreak,
-    // progression state (essence/points/level and bookkeeping keys)
+    // progression state (progress/tokens/level and bookkeeping keys)
     progress: s.progress || { essence: 0, points: 0, level: 1, weekBonusKeys: {}, completionAwardKeys: {} },
     // emoji data
     emojiByDate: s.emojiByDate || {},

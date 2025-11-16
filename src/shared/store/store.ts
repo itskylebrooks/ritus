@@ -59,7 +59,7 @@ export const useHabitStore = create<HabitState>()(
   persist(
     (set, get) => ({
       habits: [],
-  // Progression defaults (essence = lifetime XP that determines level)
+  // Progression defaults (progress XP determines level)
   progress: { essence: 0, points: 0, level: 1, weekBonusKeys: {}, completionAwardKeys: {}, unlocked: {}, ownedCollectibles: [], appliedCollectibles: {}, seenTrophies: {} },
   // display preferences
   dateFormat: 'MDY',

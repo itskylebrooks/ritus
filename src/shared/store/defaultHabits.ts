@@ -347,9 +347,9 @@ export default defaultHabits;
 
 // Example default progress that pairs with the example habits above.
 export const defaultProgress = {
-  // lifetime essence (example)
+  // lifetime progress XP (example)
   essence: 4320,
-  // spendable points
+  // spendable tokens
   points: 200,
   // derived level
   level: computeLevel(4320),

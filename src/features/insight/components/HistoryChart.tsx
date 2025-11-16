@@ -4,7 +4,7 @@ import { addMonths, endOfMonth, endOfWeek, format, startOfMonth, startOfWeek, su
 import { useHabitStore } from '@/shared/store/store'
 import { fromISO, isSameCalendarWeek } from '@/shared/utils/date'
 
-// Essence accrual constants (mirror store toggle logic)
+// Progress accrual constants (mirror store toggle logic)
 const ESSENCE_PER_COMPLETION = 5
 const WEEKLY_BONUS = 10
 
@@ -132,7 +132,7 @@ export default function HistoryChart() {
               wrapperStyle={{ outline: 'none' }}
               contentStyle={{ background: 'var(--color-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: 8 }}
               labelFormatter={(l) => `${l}`}
-              formatter={(v: any) => [`${v} essence`, mode === 'week' ? 'Week' : 'Month']}
+              formatter={(v: any) => [`${v} progress`, mode === 'week' ? 'Week' : 'Month']}
             />
             <Area type="monotone" dataKey="value" stroke={accent} strokeWidth={2} fill="url(#histFill)" />
           </AreaChart>

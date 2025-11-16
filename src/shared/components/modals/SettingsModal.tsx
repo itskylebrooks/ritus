@@ -120,7 +120,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
           if (res.invalidHabits > 0) changes.push(`Ignored ${res.invalidHabits} invalid item${res.invalidHabits === 1 ? '' : 's'}`)
         }
   // username no longer used
-        if (res.totalPointsNew !== res.totalPointsPrev) changes.push(`Total points: ${res.totalPointsPrev} → ${res.totalPointsNew}`)
+        if (res.totalPointsNew !== res.totalPointsPrev) changes.push(`Total tokens: ${res.totalPointsPrev} → ${res.totalPointsNew}`)
         if (res.longestStreakNew !== res.longestStreakPrev) changes.push(`Longest streak: ${res.longestStreakPrev} → ${res.longestStreakNew}`)
         changes.push(`Now tracking ${res.totalHabits} habit${res.totalHabits === 1 ? '' : 's'}`)
 
@@ -370,7 +370,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
                 const st = useHabitStore.getState()
                 st.clearAll()
                 st.resetStats()
-                    // reset progression (essence/points/level and award keys)
+                    // reset progression (progress/tokens/level and award keys)
                     try {
                       useHabitStore.setState({ progress: { essence: 0, points: 0, level: 1, weekBonusKeys: {}, completionAwardKeys: {} } })
                     } catch {}

@@ -145,7 +145,7 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
     [habit.completions, habit.frequency, weekStartsOn]
   )
 
-  // If points are large, render the number smaller so it fits the card
+  // If tokens are large, render the number smaller so it fits the card
   const pointsClass = habit.points && habit.points > 999 ? 'text-sm font-semibold tabular-nums' : 'text-base font-semibold tabular-nums'
   const breakPrimaryBgClass = accentApplied ? 'bg-accent' : 'bg-success'
 
@@ -302,7 +302,7 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
       </div>
 
       <div className="mt-4">
-        {/* Mobile top row: streak (left) and points (right, icon beside number) */}
+        {/* Mobile top row: streak (left) and tokens (right, icon beside number) */}
         <div className="flex items-center justify-between sm:hidden">
       <div className="flex items-center gap-2">
         <Flame className="h-4 w-4 text-accent" aria-hidden />
@@ -312,7 +312,7 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
           <div className="flex items-center gap-2">
             <Diamond className="h-4 w-4 text-accent" aria-hidden />
             <div className={pointsClass}>{habit.points}</div>
-            <span className="sr-only">Points</span>
+            <span className="sr-only">Tokens</span>
           </div>
         </div>
 
@@ -338,13 +338,13 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
 
           <div className="flex items-center justify-end gap-2">
             <Diamond className="h-4 w-4 text-accent" aria-hidden />
-            <div className="sr-only">Points</div>
+            <div className="sr-only">Tokens</div>
             <div className={pointsClass}>{habit.points}</div>
           </div>
         </div>
       </div>
 
-      {/* Points text moved to the quick guide modal per UX request */}
+      {/* Tokens text moved to the quick guide modal per UX request */}
       <ConfirmModal
         open={confirmDeleteOpen}
         onClose={() => setConfirmDeleteOpen(false)}
