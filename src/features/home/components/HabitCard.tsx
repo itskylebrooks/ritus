@@ -246,7 +246,7 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
         </div>
       </div>
 
-  <div className="mt-3 grid gap-3 md:grid-cols-[1fr_auto] md:items-center">
+  <div className="mt-0 grid gap-3 md:grid-cols-[1fr_auto] md:items-center">
         <div className="flex justify-center md:justify-start">
           <WeekStrip habit={habit} onToggle={(d) => toggleCompletion(habit.id, d)} />
         </div>
