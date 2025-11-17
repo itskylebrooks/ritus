@@ -182,7 +182,7 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
                         value={name}
                         onChange={(e) => setName(e.target.value.slice(0, 60))}
                         maxLength={60}
-                        className="w-full rounded-xl border dark:border-neutral-700 bg-white px-3 py-2 dark:bg-neutral-950 text-strong dark:text-neutral-100 placeholder:text-muted dark:placeholder:text-neutral-300"
+                        className="w-full rounded-xl border dark:border-neutral-700 bg-white px-3 py-2 dark:bg-neutral-950 text-sm text-strong dark:text-neutral-100 placeholder:text-muted dark:placeholder:text-neutral-300"
                       />
                     </div>
                   </motion.div>
@@ -221,8 +221,8 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
                 transition={transitions.fadeMd}
                 className="flex items-center gap-2"
               >
-                <button onClick={saveEdit} className="rounded-xl bg-accent px-3 py-2 text-inverse hover-accent-fade">Save</button>
-                <button onClick={() => { setEditing(false); setName(habit.name) }} className="rounded-xl border dark:border-neutral-700 px-3 py-2 hover-nonaccent">Cancel</button>
+                <button onClick={saveEdit} className="rounded-xl bg-accent px-3 py-2 text-sm text-inverse hover-accent-fade">Save</button>
+                <button onClick={() => { setEditing(false); setName(habit.name) }} className="rounded-xl border dark:border-neutral-700 px-3 py-2 text-sm hover-nonaccent">Cancel</button>
               </motion.div>
             ) : (
               <motion.div
