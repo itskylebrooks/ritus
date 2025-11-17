@@ -322,7 +322,7 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
           <div className="text-sm text-neutral-600 dark:text-neutral-300 tabular-nums">{progressVal}/{progressMax}</div>
         </div>
 
-        {/* Desktop/tablet: three-column centered layout */}
+        {/* Desktop/tablet: layout adjusted in list view to bring progress bar closer to streak/points */}
         <div className="hidden sm:grid sm:grid-cols-[auto_1fr_auto] sm:items-center sm:gap-3">
           <div className="flex items-center gap-2">
             <Flame className="h-4 w-4 text-accent" aria-hidden />
@@ -330,9 +330,13 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
             <span className="sr-only">{habit.mode === 'break' ? 'Clean streak' : 'Streak'}</span>
           </div>
 
-            <div className="flex items-center gap-1 justify-center justify-self-center">
-            <div className="w-56 md:w-40"><ProgressBar value={progressVal} max={progressMax} /></div>
-            <div className="text-sm text-neutral-600 dark:text-neutral-300 tabular-nums ml-1">{progressVal}/{progressMax}</div>
+          <div className={`flex items-center gap-2 ${showList ? 'justify-between' : 'justify-center justify-self-center'}`}>
+            <div className={`${showList ? 'flex-1' : 'w-56 md:w-40'}`}>
+              <ProgressBar value={progressVal} max={progressMax} />
+            </div>
+            <div className="text-sm text-neutral-600 dark:text-neutral-300 tabular-nums ml-1">
+              {progressVal}/{progressMax}
+            </div>
             <span className="sr-only">Weekly progress</span>
           </div>
 

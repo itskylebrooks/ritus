@@ -8,6 +8,7 @@ import type { Habit } from '@/shared/types'
 export default function WeekStrip({ habit, onToggle }: { habit: Habit; onToggle: (d: Date) => void }) {
   // subscribe to weekStart so the component re-renders when user changes first day of week
   const weekStart = useHabitStore((s) => s.weekStart)
+  const showList = useHabitStore((s) => (s as any).showList ?? false)
   const week = daysThisWeek(new Date(), weekStart === 'sunday' ? 0 : 1)
   const todayStart = new Date()
   todayStart.setHours(0, 0, 0, 0)
@@ -15,16 +16,16 @@ export default function WeekStrip({ habit, onToggle }: { habit: Habit; onToggle:
   return (
     <div className="flex gap-1.5">
       {week.map((d) => {
-        const label = format(d, 'EE')
+        const shortLabel = format(d, 'EE')
+        const fullLabel = format(d, 'EEEE')
         const done = hasCompletionOnDay(habit.completions, d)
         const isPast = d < todayStart
         const isFuture = d > todayStart
         const disabled = isFuture || habit.archived
 
-  if (habit.mode === 'break') {
+        if (habit.mode === 'break') {
           const isMarked = hasCompletionOnDay(habit.completions, d)
-          // Always show the first letter for break-mode days; use bg color to indicate state
-          const content = label[0]
+          const contentShort = shortLabel[0]
           const cls = isMarked
             ? 'border-transparent bg-emerald-600 text-white'
             : isPast
@@ -38,12 +39,21 @@ export default function WeekStrip({ habit, onToggle }: { habit: Habit; onToggle:
               disabled={disabled}
               aria-disabled={disabled}
               aria-label={`${format(d, 'EEEE, d MMM')}: ${isMarked ? 'Marked clean' : isPast ? 'Missed' : 'Not set'}`}
-              className={`grid h-8 w-8 place-items-center rounded-full border text-xs font-medium ${cls} ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`}
-              title={`${label} ${format(d, 'd MMM')}`}
+              className={`grid h-8 place-items-center border text-xs font-medium ${
+                showList ? 'w-8 rounded-full sm:w-auto sm:px-3 sm:rounded-lg' : 'w-8 rounded-full'
+              } ${cls} ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`}
+              title={`${shortLabel} ${format(d, 'd MMM')}`}
               whileHover={{ scale: disabled ? 1 : 1.1 }}
               whileTap={{ scale: disabled ? 1 : 0.95 }}
             >
-              {content}
+              {showList ? (
+                <>
+                  <span className="sm:hidden">{contentShort}</span>
+                  <span className="hidden sm:inline whitespace-nowrap">{fullLabel}</span>
+                </>
+              ) : (
+                contentShort
+              )}
             </motion.button>
           )
         }
@@ -54,17 +64,26 @@ export default function WeekStrip({ habit, onToggle }: { habit: Habit; onToggle:
             onClick={() => { if (!disabled) onToggle(d) }}
             disabled={disabled}
             aria-disabled={disabled}
-            className={`grid h-8 w-8 place-items-center rounded-full border text-xs font-medium ${
-          done
-            ? 'weekstrip-done border-transparent bg-black dark:bg-white'
-            : 'border-neutral-300 text-neutral-700 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-900'
+            className={`grid h-8 place-items-center border text-xs font-medium ${
+              showList ? 'w-8 rounded-full sm:w-auto sm:px-3 sm:rounded-lg' : 'w-8 rounded-full'
+            } ${
+              done
+                ? 'weekstrip-done border-transparent bg-black dark:bg-white'
+                : 'border-neutral-300 text-neutral-700 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-900'
             } ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`}
             aria-label={`${format(d, 'EEEE, d MMM')}: ${done ? 'Completed' : disabled ? 'Not available' : 'Not completed'}`}
-            title={`${label} ${format(d, 'd MMM')}`}
+            title={`${shortLabel} ${format(d, 'd MMM')}`}
             whileHover={{ scale: disabled ? 1 : 1.1 }}
             whileTap={{ scale: disabled ? 1 : 0.95 }}
           >
-            {label[0]}
+            {showList ? (
+              <>
+                <span className="sm:hidden">{shortLabel[0]}</span>
+                <span className="hidden sm:inline whitespace-nowrap">{fullLabel}</span>
+              </>
+            ) : (
+              shortLabel[0]
+            )}
           </motion.button>
         )
       })}
