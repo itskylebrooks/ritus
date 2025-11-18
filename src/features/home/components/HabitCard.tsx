@@ -302,24 +302,28 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
       </div>
 
       <div className="mt-4">
-        {/* Mobile top row: streak (left) and tokens (right, icon beside number) */}
-        <div className="flex items-center justify-between sm:hidden">
-      <div className="flex items-center gap-2">
-        <Flame className="h-4 w-4 text-accent" aria-hidden />
-        <div className="text-base font-semibold">{habit.streak}</div>
+        {/* Mobile: streak, compact progress bar, and tokens all on one row */}
+        <div className="flex items-center justify-between gap-2 sm:hidden">
+          <div className="flex items-center gap-2">
+            <Flame className="h-4 w-4 text-accent" aria-hidden />
+            <div className="text-base font-semibold">{habit.streak}</div>
             <span className="sr-only">{habit.mode === 'break' ? 'Clean streak' : 'Streak'}</span>
           </div>
+
+          <div className="flex items-center justify-center flex-1">
+            <div className="flex-1">
+              <ProgressBar value={progressVal} max={progressMax} />
+            </div>
+            <div className="ml-1 text-xs text-neutral-600 dark:text-neutral-300 tabular-nums">
+              {progressVal}/{progressMax}
+            </div>
+          </div>
+
           <div className="flex items-center gap-2">
             <Diamond className="h-4 w-4 text-accent" aria-hidden />
             <div className={pointsClass}>{habit.points}</div>
             <span className="sr-only">Tokens</span>
           </div>
-        </div>
-
-        {/* Mobile progress bar full width */}
-          <div className="mt-2 sm:hidden flex items-center gap-1">
-          <div className="flex-1"><ProgressBar value={progressVal} max={progressMax} /></div>
-          <div className="text-sm text-neutral-600 dark:text-neutral-300 tabular-nums">{progressVal}/{progressMax}</div>
         </div>
 
         {/* Desktop/tablet: layout adjusted in list view to bring progress bar closer to streak/points */}
