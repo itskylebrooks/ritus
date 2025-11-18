@@ -71,17 +71,23 @@ export default function Home() {
     }
   }, [habits.length])
 
-  const sortedHabits = useMemo(() => {
+  const groupedHabits = useMemo(() => {
     const today = new Date()
-    const source = showArchived ? habits : habits.filter((h) => !h.archived)
-    return [...source].sort((a, b) => {
-      // Check if today specifically was marked done/clean for any frequency type
-      const aDone = hasCompletionOnDay(a.completions, today)
-      const bDone = hasCompletionOnDay(b.completions, today)
+    const normalize = (name: string) => name.toLocaleLowerCase()
+    const byName = (a: typeof habits[number], b: typeof habits[number]) =>
+      normalize(a.name).localeCompare(normalize(b.name))
 
-      if (aDone !== bDone) return aDone ? 1 : -1
-      return fromISO(b.createdAt).getTime() - fromISO(a.createdAt).getTime()
-    })
+    const active = habits.filter((h) => !h.archived)
+    const archived = habits.filter((h) => h.archived)
+
+    const incompleteToday = active.filter((h) => !hasCompletionOnDay(h.completions, today))
+    const completedToday = active.filter((h) => hasCompletionOnDay(h.completions, today))
+
+    return {
+      incompleteToday: [...incompleteToday].sort(byName),
+      completedToday: [...completedToday].sort(byName),
+      archived: [...archived].sort(byName),
+    }
   }, [habits, showArchived])
 
   return (
@@ -107,19 +113,69 @@ export default function Home() {
 
           <motion.main layout className={`grid gap-4 ${showList ? '' : 'sm:grid-cols-2'}`}>
             <AnimatePresence initial={false} mode="popLayout">
-              {sortedHabits.length === 0 ? (
+              {groupedHabits.incompleteToday.length === 0 &&
+              groupedHabits.completedToday.length === 0 &&
+              (!showArchived || groupedHabits.archived.length === 0) ? (
                 emptyReady ? <EmptyState disableAnim={initialListRender.current} /> : null
               ) : (
-                sortedHabits.map((h) => (
-                  <motion.div
-                    key={h.id}
-                    layout
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={transitions.fadeXl}
-                  >
-                    <HabitCard habit={h} disableEntryAnim={initialListRender.current} />
-                  </motion.div>
-                ))
+                <>
+                  {groupedHabits.incompleteToday.map((h) => (
+                    <motion.div
+                      key={h.id}
+                      layout
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={transitions.fadeXl}
+                    >
+                      <HabitCard habit={h} disableEntryAnim={initialListRender.current} />
+                    </motion.div>
+                  ))}
+
+                  {groupedHabits.completedToday.length > 0 && groupedHabits.incompleteToday.length > 0 && (
+                    <motion.div
+                      key="divider-completed"
+                      layout
+                      className="col-span-full text-xs font-semibold tracking-[0.6em] text-neutral-400 dark:text-neutral-500 text-center uppercase"
+                    >
+                      COMPLETED
+                    </motion.div>
+                  )}
+
+                  {groupedHabits.completedToday.map((h) => (
+                    <motion.div
+                      key={h.id}
+                      layout
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={transitions.fadeXl}
+                    >
+                      <HabitCard habit={h} disableEntryAnim={initialListRender.current} />
+                    </motion.div>
+                  ))}
+
+                  {showArchived && groupedHabits.archived.length > 0 && (
+                    <>
+                      {(groupedHabits.incompleteToday.length > 0 || groupedHabits.completedToday.length > 0) && (
+                        <motion.div
+                          key="divider-archived"
+                          layout
+                          className="col-span-full text-xs font-semibold tracking-[0.6em] text-neutral-400 dark:text-neutral-500 text-center uppercase"
+                        >
+                          ARCHIVED
+                        </motion.div>
+                      )}
+
+                      {groupedHabits.archived.map((h) => (
+                        <motion.div
+                          key={h.id}
+                          layout
+                          exit={{ opacity: 0, scale: 0.95 }}
+                          transition={transitions.fadeXl}
+                        >
+                          <HabitCard habit={h} disableEntryAnim={initialListRender.current} />
+                        </motion.div>
+                      ))}
+                    </>
+                  )}
+                </>
               )}
             </AnimatePresence>
           </motion.main>
