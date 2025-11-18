@@ -256,22 +256,22 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
                   onClick={() => { if (!habit.archived) toggleCompletion(habit.id, new Date()) }}
                   disabled={habit.archived}
                   aria-disabled={habit.archived}
-                  className={`inline-flex items-center justify-center gap-2 rounded-xl ${breakPrimaryBgClass} px-3 py-2 text-sm text-inverse transition transform duration-150 ease-in-out ${habit.archived ? 'opacity-60 cursor-not-allowed' : 'hover-accent-fade active:scale-[.98]'} md:justify-self-end`}
+                  className={`inline-flex items-center justify-center gap-1.5 rounded-xl ${breakPrimaryBgClass} px-3 py-2 text-sm text-inverse transition transform duration-150 ease-in-out sm:w-[124px] ${habit.archived ? 'opacity-60 cursor-not-allowed' : 'hover-accent-fade active:scale-[.98]'} md:justify-self-end`}
                 >
                   <Check className="h-4 w-4" />
-                  <span>Mark clean</span>
+                  <span>Clean today</span>
                 </button>
               ) : (
                 <button
                   onClick={() => { if (!habit.archived) toggleCompletion(habit.id, new Date()) }}
                   disabled={habit.archived}
                   aria-disabled={habit.archived}
-                  aria-label="Mark clean"
+                  aria-label="Clean today"
                   className={`inline-flex items-center justify-center rounded-xl ${breakPrimaryBgClass} p-2 text-inverse transition transform duration-150 ease-in-out ${habit.archived ? 'opacity-60 cursor-not-allowed' : 'hover-accent-fade active:scale-[.98]'} md:justify-self-end`}
                 >
                   <Check className="h-4 w-4" />
                   {/* Visible label on mobile, hidden on small+ so grid view buttons stay icon-only */}
-                  <span className="ml-2 inline sm:hidden">Mark clean</span>
+                  <span className="ml-2 inline sm:hidden">Clean today</span>
                 </button>
               )
             ) : (
@@ -280,7 +280,7 @@ export default function HabitCard({ habit, disableEntryAnim = false }: { habit: 
                   onClick={() => { if (!habit.archived) toggleCompletion(habit.id, new Date()) }}
                   disabled={habit.archived}
                   aria-disabled={habit.archived}
-                  className={`inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-3 py-2 text-sm text-inverse transition transform duration-150 ease-in-out ${habit.archived ? 'opacity-60 cursor-not-allowed' : 'hover-accent-fade active:scale-[.98]'} md:justify-self-end`}
+                  className={`inline-flex items-center justify-center gap-1.5 rounded-xl bg-accent px-3 py-2 text-sm text-inverse transition transform duration-150 ease-in-out sm:w-[124px] ${habit.archived ? 'opacity-60 cursor-not-allowed' : 'hover-accent-fade active:scale-[.98]'} md:justify-self-end`}
                 >
                   <Check className="h-4 w-4" />
                   <span>Done today</span>
