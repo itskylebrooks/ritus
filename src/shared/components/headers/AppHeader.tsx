@@ -111,6 +111,29 @@ export default function AppHeader() {
     }
   }, [])
 
+  // When header switches to mobile layout (< md), automatically switch habit view to list
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const mq = window.matchMedia('(min-width: 768px)')
+
+    const handleChange = (e: MediaQueryListEvent | MediaQueryList) => {
+      if (!e.matches && isHome) {
+        try { setShowList(true) } catch {}
+      }
+    }
+
+    // Ensure correct mode on initial load
+    handleChange(mq)
+
+    if (typeof mq.addEventListener === 'function') {
+      mq.addEventListener('change', handleChange as any)
+      return () => mq.removeEventListener('change', handleChange as any)
+    } else {
+      mq.addListener(handleChange as any)
+      return () => mq.removeListener(handleChange as any)
+    }
+  }, [isHome, setShowList])
+
   return (
     <header className="mb-6 relative flex items-center justify-between">
       <div className="flex items-center gap-3">
