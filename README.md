@@ -4,8 +4,6 @@ A calm habit tracker focused on simplicity and privacy. Track daily/weekly/month
 
 **Local‑only:** no accounts • no cloud sync • no analytics
 
-> **Note on storage:** Ritus persists data in your browser via `localStorage`. It’s private (stays on your device) but not encrypted. Use **Export** to keep backups.
-
 ## Demo
 
 - Live app: https://ritus.itskylebrooks.tech/
@@ -113,7 +111,7 @@ A calm habit tracker focused on simplicity and privacy. Track daily/weekly/month
 - No analytics
 - Data is stored locally in your browser via a persisted Zustand store (`localStorage`)
 
-If you use private browsing or clear site data, your Ritus data may be removed. Export JSON backups if you care about long‑term retention.
+> **Note on storage:** Ritus persists data in your browser via `localStorage`. It’s private (stays on your device) but not encrypted. Use **Export** to keep backups.
 
 ## Tech stack
 
