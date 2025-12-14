@@ -1,25 +1,36 @@
-# Ritus — A Minimal, Local-First Habit Tracker
+# Ritus — Minimal, Local‑Only Habit Tracker
 
-Ritus invites you to build better days with a habit tracker designed for simplicity, privacy, and local-first reliability. It helps you create and maintain habits, track completions and streaks, and reward your progress with tokens you can spend on cosmetic collectibles — all stored securely in your browser.
+A calm habit tracker focused on simplicity and privacy. Track daily/weekly/monthly habits, streaks, and milestones. Earn tokens to unlock cosmetic collectibles — all stored locally in your browser.
 
-## Overview
+**Local‑only:** no accounts • no cloud sync • no analytics
 
-Ritus embraces a local-first approach: your data stays with you, saved directly in your browser’s `localStorage`. There are no accounts, no analytics, and no cloud syncing. It supports daily, weekly, and monthly habits, with flexible modes to either build new habits or break old ones. Progression is meaningful, with progress XP that translates into levels and spendable tokens. You’ll find trophies to celebrate milestones and a small collectibles store for personalization.
+> **Note on storage:** Ritus persists data in your browser via `localStorage`. It’s private (stays on your device) but not encrypted. Use **Export** to keep backups.
 
-Data management is straightforward: export and import your data as JSON, or clear it entirely from the app’s Settings.
+## Demo
+
+- Live app: https://ritus.itskylebrooks.tech/
+
+## Table of contents
+
+- [Screenshots](#screenshots)
+- [Features](#features)
+- [Privacy & data](#privacy--data)
+- [Tech stack](#tech-stack)
+- [Getting started](#getting-started)
+- [Project structure](#project-structure)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Screenshots
 
-Here are a few highlights — click to expand additional screenshots.
-
-#### Desktop Version
+#### Desktop
 ![Home view](public/images/home-page.png)
 
-#### Mobile Version
+#### Mobile
 ![Mobile view](public/images/mobile-all.png)
 
 <details>
-<summary>Pages (Insight & Milestones)</summary>
+<summary>Pages (Insight &amp; Milestones)</summary>
 
 ![Insight page](public/images/insight-page.png)
 
@@ -28,7 +39,7 @@ Here are a few highlights — click to expand additional screenshots.
 </details>
 
 <details>
-<summary>Stats Cards & Grid View</summary>
+<summary>Stats Cards &amp; Grid View</summary>
 
 ![Stats Cards](public/images/stats-cards.png)
 
@@ -54,83 +65,116 @@ Here are a few highlights — click to expand additional screenshots.
 
 </details>
 
-## Features at a Glance
+## Features
 
-Create, edit, archive, and delete habits with ease. Choose frequencies—daily, weekly, or monthly—and modes that help you either build habits or break them. Weekly and monthly habits support numeric targets, such as completing a habit three times per week.
+### Habit tracking
 
-Mark completions quickly through a week strip (Monday through Sunday) or with a single tap. Each habit view offers insights like streaks, progress bars, completion counts, and preview charts.
+- Create, edit, archive, and delete habits
+- Frequencies: **daily**, **weekly**, **monthly**
+- Modes: **Build** (do the habit) and **Break** (avoid the habit)
+- Weekly/monthly habits support **numeric targets** (e.g., 3× per week)
+- Fast logging via a weekday strip (Mon–Sun) and one‑tap “done” actions
 
-There is also an "Emoji of the day" feature that comes originally from my side-project Flowday. It surfaces a curated daily emoji and integrates with the emoji picker and history to add personality to your logs.
+### Insights
 
-Progression is rewarding: earn progress XP (lifetime XP) and level up as you progress. Tokens are awarded not only for completions but also for meeting weekly consistency goals, and these tokens can be spent in the collectibles store. Weekly bonuses and one-time trophies recognize your dedication and milestones.
+- Streaks and completion counts
+- Practice Arc with weekly/monthly overview of earned XP
+- Year grid view for completion history
+- Year grid view for emoji history
 
-The collectibles store offers cosmetic customizations—clock styles, quote packs, accent themes, and relics—that personalize your experience without affecting gameplay. Purchases deduct tokens and mark items as owned.
+### Progression (cosmetic)
 
-Manage your data and preferences easily: export and import JSON with robust deduplication and summaries, clear local data to start fresh, and customize themes (system, light, or dark), date formats (MM/DD or DD/MM), and week start days (Sunday or Monday). While reminders are part of the data model, the on-screen reminder UI is reserved for future updates.
+- Earn **progress XP** (lifetime) and level up
+- Earn **tokens** from completions and consistency bonuses
+- Spend tokens in the **Collectibles Store** (cosmetic only)
+  - Clock styles
+  - Quote packs
+  - Accent themes
+  - Relics
+- Unlock **trophies** for milestones (streaks, consistency, totals, etc.)
 
-## Privacy and Data Ownership
+### Emoji of the day
 
-Your data belongs to you. Ritus requires no login, no cloud sync, and collects no analytics. All information is stored locally in your browser via a persisted Zustand store. You can export your data at any time and re-import it locally. Clearing data removes it completely from your browser.
+- Curated “emoji of the day” + emoji picker
+- Emoji history view for playful journaling context
 
-## Technology Stack
+### Data management & preferences
 
-Ritus is built with modern, efficient tools:
+- Export / import your data as JSON (with merge/dedup summaries)
+- Clear local data from Settings
+- Theme: system / light / dark
+- Date format: MM/DD or DD/MM
+- Week start day: Sunday or Monday
 
-- React 18 and TypeScript for a robust UI
-- Vite for fast development and production builds
-- Tailwind CSS for styling
-- Zustand for local persisted state management
-- Framer Motion for smooth UI animations
-- Date-fns for reliable date utilities
-- Lucide-react for crisp icons
-- Recharts for compact, informative charts
+## Privacy & data
 
-All dependencies are declared in `package.json`.
+- No login, no accounts
+- No cloud sync
+- No analytics
+- Data is stored locally in your browser via a persisted Zustand store (`localStorage`)
 
-## Getting Started
+If you use private browsing or clear site data, your Ritus data may be removed. Export JSON backups if you care about long‑term retention.
 
-Clone the repository and install dependencies with your preferred package manager:
+## Tech stack
+
+- React 18 + TypeScript
+- Vite
+- Tailwind CSS
+- Zustand (with `persist`)
+- Framer Motion
+- Recharts
+- date-fns
+- Lucide-react
+
+## Getting started
 
 ```bash
-pnpm install    # or npm install / yarn
-pnpm run dev    # start the development server (Vite)
+pnpm install
+pnpm run dev
 ```
 
-To build and preview the production version:
+Build + preview production:
 
 ```bash
 pnpm run build
 pnpm run preview
 ```
 
-## Project Structure
+## Project structure
 
-Here’s a high-level overview of key files and folders:
+High-level layout:
 
-- `src/pages/` — main app pages: `Home.tsx`, `Insight.tsx`, `Inspiration.tsx`, `Milestones.tsx`
-- `src/components/` — reusable UI elements such as cards, charts, modals, and forms
-  - `components/forms/AddHabit.tsx` — form to add or edit habits
-  - `components/cards/HabitCard.tsx` — habit display with streaks, editing, and completion toggles
-  - `components/cards/CollectiblesStoreCard.tsx` — the in-app collectibles store UI
-  - `components/cards/TrophiesBoard.tsx` — display unlocked trophies
-  - `components/layout/WeekStrip.tsx` and `MonthGrid.tsx` — calendar and week views
-  - `components/modals/SettingsModal.tsx` — export/import, theme settings, and data clearing
-- `src/store/store.ts` — main Zustand store managing habits, progression, purchases, and persistence
-- `src/utils/` — utilities for date handling, scoring, data transfer, and quotes
-- `src/data/` — sample data for collectibles, trophies, progression, and habit suggestions
+- `src/`
+  - `App.tsx`, `main.tsx` — app bootstrap and routing
+  - `features/` — feature pages and page-level components
+    - `home/` — habit list, add/edit flows, quick completion actions
+    - `insight/` — stats + charts + history views
+    - `milestones/` — progression, trophies, collectibles store
+    - `inspiration/` — inspiration/quote-related UI (feature page)
+    - `compass/` — compass feature page
+  - `shared/`
+    - `store/` — Zustand store + persisted state (`store.ts`, `theme.ts`, defaults)
+    - `types/` — canonical app types
+    - `constants/` — collectibles, trophies, progression, emoji pools, suggestions
+    - `utils/` — scoring, dates, data transfer (import/export), quotes, confetti
+    - `components/` — reusable UI (header, modals, week strip, picker, etc.)
+    - `theme/` — accent theme logic
+- `public/` — icons, fonts, manifest, README screenshots
+- `dev-dist/` — service worker artifacts (PWA)
 
-If you modify persisted state shapes, remember to update the storage partialization in `src/store/store.ts`.
+### Persistence details
 
-## Implementation Details
-
-The habit model supports daily, weekly, and monthly frequencies, with numeric targets for weekly and monthly habits. Completions are recorded as ISO dates; toggling a completion updates habit tokens, streaks, and global progression. The store manages progress XP and tokens, awarding bonuses for completions and weekly consistency, and calculates trophies idempotently.
-
-The import process merges data safely, adding new habits, skipping duplicates, and providing a summary. The collectibles store remains cosmetic, with placeholder items defined in `src/data/collectibles.ts`.
+The app persists a partial snapshot of the Zustand store to `localStorage` under a single key. If you change persisted shapes, update the `partialize` configuration in `src/shared/store/store.ts` and consider adding migrations.
 
 ## Contributing
 
-Contributions are welcome. Please open an issue or submit a pull request with small, focused changes. Follow existing style conventions and aim for concise, reviewable commits. For any added third-party quotes, ensure they are public domain or properly licensed; the app ships with placeholder packs only.
+PRs are welcome.
 
-## License and Copyright
+- Keep changes small and focused
+- Prefer adding or adjusting logic via store actions (single source of truth)
+- If you touch reward rules or scoring, consider adding unit tests around the relevant utilities
+- For quotes, ensure sources are public domain or properly licensed
 
-This project is original work by Kyle Brooks. See the `LICENSE` and `NOTICE` files in the project root for details.
+## License
+
+Original work by Kyle Brooks. See `LICENSE` and `NOTICE`.
