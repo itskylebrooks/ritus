@@ -2,23 +2,6 @@
 
 A calm habit tracker focused on simplicity and privacy. Track daily/weekly/monthly habits, streaks, and milestones. Earn tokens to unlock cosmetic collectibles — all stored locally in your browser.
 
-**Local‑only:** no accounts • no cloud sync • no analytics
-
-## Demo
-
-- Live app: https://ritus.itskylebrooks.tech/
-
-## Table of contents
-
-- [Screenshots](#screenshots)
-- [Features](#features)
-- [Privacy & data](#privacy--data)
-- [Tech stack](#tech-stack)
-- [Getting started](#getting-started)
-- [Project structure](#project-structure)
-- [Contributing](#contributing)
-- [License](#license)
-
 ## Screenshots
 
 #### Desktop
