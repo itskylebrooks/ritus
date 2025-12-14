@@ -8,6 +8,52 @@ Ritus embraces a local-first approach: your data stays with you, saved directly 
 
 Data management is straightforward: export and import your data as JSON, or clear it entirely from the app’s Settings.
 
+## Screenshots
+
+Here are a few highlights — click to expand additional screenshots.
+
+#### Desktop Version
+![Home view](public/images/home-page.png)
+
+#### Mobile Version
+![Mobile view](public/images/mobile-all.png)
+
+<details>
+<summary>Pages (Insight & Milestones)</summary>
+
+![Insight page](public/images/insight-page.png)
+
+![Milestones page](public/images/milestones-page.png)
+
+</details>
+
+<details>
+<summary>Stats Cards & Grid View</summary>
+
+![Stats Cards](public/images/stats-cards.png)
+
+![Grid View](public/images/grid-view.png)
+
+</details>
+
+<details>
+<summary>Trophy Board</summary>
+
+![Trophy board 1](public/images/trophy-board-1.png)
+
+![Trophy board 2](public/images/trophy-board-2.png)
+
+</details>
+
+<details>
+<summary>Collectibles Store</summary>
+
+![Store 1](public/images/collectibles-store-1.png)
+
+![Store 2](public/images/collectibles-store-2.png)
+
+</details>
+
 ## Features at a Glance
 
 Create, edit, archive, and delete habits with ease. Choose frequencies—daily, weekly, or monthly—and modes that help you either build habits or break them. Weekly and monthly habits support numeric targets, such as completing a habit three times per week.
