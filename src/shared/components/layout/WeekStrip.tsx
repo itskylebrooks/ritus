@@ -8,7 +8,7 @@ import type { Habit } from '@/shared/types'
 export default function WeekStrip({ habit, onToggle }: { habit: Habit; onToggle: (d: Date) => void }) {
   // subscribe to weekStart so the component re-renders when user changes first day of week
   const weekStart = useHabitStore((s) => s.weekStart)
-  const showList = useHabitStore((s) => (s as any).showList ?? false)
+  const showList = useHabitStore((s) => s.showList ?? false)
   const week = daysThisWeek(new Date(), weekStart === 'sunday' ? 0 : 1)
   const todayStart = new Date()
   todayStart.setHours(0, 0, 0, 0)
