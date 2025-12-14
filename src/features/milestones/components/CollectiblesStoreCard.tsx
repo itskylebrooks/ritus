@@ -50,7 +50,8 @@ export default function CollectiblesStoreCard() {
                 {items.map((item) => {
                   const ItemIcon = item.icon
                   const Owned = owned.has(item.id)
-                  const canBuy = !Owned && points >= item.cost
+                  const isImplemented = item.implemented ?? true
+                  const canBuy = !Owned && isImplemented && points >= item.cost
                   return (
                     <div
                       key={item.id}
@@ -104,9 +105,10 @@ export default function CollectiblesStoreCard() {
                                 }
                               }}
                               disabled={!canBuy}
-                              className="inline-flex items-center justify-center rounded-lg bg-accent h-8 px-3 text-xs text-inverse hover-accent-fade disabled:opacity-50"
+                              title={isImplemented ? undefined : 'Coming soon'}
+                              className={isImplemented ? "inline-flex items-center justify-center rounded-lg bg-accent h-8 px-3 text-xs text-inverse hover-accent-fade disabled:opacity-50" : "inline-flex items-center justify-center rounded-lg border border-subtle h-8 px-3 text-xs text-muted disabled:opacity-50"}
                             >
-                              Unlock
+                              {isImplemented ? 'Unlock' : 'Soon'}
                             </button>
                         )}
                       </div>

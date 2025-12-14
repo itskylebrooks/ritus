@@ -12,6 +12,7 @@ export interface CollectibleDef {
   icon: ComponentType<any>
   rarity: Rarity
   cost: number
+  implemented?: boolean
 }
 
 export const COLLECTIBLES: CollectibleDef[] = [
@@ -27,6 +28,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     icon: Gauge,
     rarity: 'rare',
     cost: 600,
+    implemented: false,
   },
   {
     id: 'clock_nocturne',
@@ -36,6 +38,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     icon: Moon,
     rarity: 'common',
     cost: 300,
+    implemented: false,
   },
   {
     id: 'clock_sector',
@@ -45,6 +48,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     icon: Target,
     rarity: 'epic',
     cost: 3000,
+    implemented: false,
   },
   {
     id: 'clock_orbit_subdial',
@@ -54,6 +58,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     icon: SunMoon,
     rarity: 'epic',
     cost: 2500,
+    implemented: false,
   },
   {
     id: 'clock_radar_sweep',
@@ -63,6 +68,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     icon: Radar,
     rarity: 'rare',
     cost: 800,
+    implemented: false,
   },
 
   // ────────────────────────────────────────────────────────────────────────────
@@ -78,6 +84,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     icon: Star,
     rarity: 'epic',
     cost: 3500,
+    implemented: false,
   },
   {
     id: 'quotes_author_kyle',
@@ -87,6 +94,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     icon: Feather,
     rarity: 'rare',
     cost: 770,
+    implemented: false,
   },
   {
     id: 'quotes_creators',
@@ -96,6 +104,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     icon: PlayCircle,
     rarity: 'common',
     cost: 300,
+    implemented: false,
   },
   {
     id: 'quotes_athletes',
@@ -105,6 +114,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     icon: Medal,
     rarity: 'common',
     cost: 250,
+    implemented: false,
   },
   {
     id: 'quotes_christianity',
@@ -114,6 +124,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     icon: BookOpen,
     rarity: 'rare',
     cost: 1000,
+    implemented: false,
   },
 
   // ────────────────────────────────────────────────────────────────────────────
@@ -127,6 +138,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     icon: Waves,
     rarity: 'epic',
     cost: 4000,
+    implemented: true,
   },
   {
     id: 'accent_ember',
@@ -136,6 +148,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     icon: Flame,
     rarity: 'common',
     cost: 500,
+    implemented: true,
   },
   {
     id: 'accent_sage',
@@ -145,6 +158,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     icon: Leaf,
     rarity: 'rare',
     cost: 800,
+    implemented: true,
   },
 
   // ────────────────────────────────────────────────────────────────────────────
@@ -159,6 +173,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     icon: Compass,
     rarity: 'epic',
     cost: 2500,
+    implemented: false,
   },
   {
     id: 'relic_eclipse_ring',
@@ -168,6 +183,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     icon: Gem,
     rarity: 'epic',
     cost: 2500,
+    implemented: false,
   },
   {
     id: 'relic_lamp',
@@ -177,6 +193,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     icon: Lamp,
     rarity: 'epic',
     cost: 2500,
+    implemented: false,
   },
   {
     id: 'relic_phoenix_thread',
@@ -186,6 +203,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     icon: Feather,
     rarity: 'epic',
     cost: 5000,
+    implemented: false,
   },
     {
     id: 'relic_moon_dial',
@@ -195,6 +213,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     icon: Moon,
     rarity: 'rare',
     cost: 1700,
+    implemented: false,
   },
   {
     id: 'relic_obsidian_hourglass',
@@ -204,6 +223,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     icon: Hourglass,
     rarity: 'rare',
     cost: 1300,
+    implemented: false,
   },
   {
     id: 'relic_quiet_bell',
@@ -213,6 +233,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     icon: Bell,
     rarity: 'rare',
     cost: 1500,
+    implemented: false,
   },
   {
     id: 'relic_anchor_resolve',
@@ -222,6 +243,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     icon: Anchor,
     rarity: 'common',
     cost: 700,
+    implemented: false,
   },
   {
     id: 'relic_vow_seal',
@@ -231,6 +253,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     icon: Stamp,
     rarity: 'rare',
     cost: 1200,
+    implemented: false,
   },
 ]
 
