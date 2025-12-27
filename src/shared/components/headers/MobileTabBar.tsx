@@ -1,16 +1,8 @@
 import { NavLink, useLocation } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import type { Transition } from 'framer-motion'
 import { ChartPie, Home, Trophy } from 'lucide-react'
-import { useMotionPreferences } from '@/shared/animations'
 
 export default function MobileTabBar() {
-  const { prefersReducedMotion } = useMotionPreferences()
   const location = useLocation()
-
-  const tabTransition: Transition = prefersReducedMotion
-    ? { duration: 0 }
-    : { type: 'spring', stiffness: 300, damping: 20 }
 
   return (
     <nav
@@ -35,14 +27,12 @@ export default function MobileTabBar() {
             {({ isActive }) => (
               <>
                 {isActive && (
-                  <motion.span
-                    layoutId="mobile-tab-pill"
+                  <span
                     className="absolute inset-0 rounded-full bg-[var(--color-text-primary)]"
-                    transition={tabTransition}
                   />
                 )}
                 <span
-                  className={`relative z-10 flex h-5 w-5 items-center justify-center transition-colors duration-150 ${
+                  className={`relative z-10 flex h-5 w-5 items-center justify-center ${
                     isActive ? 'text-[var(--color-surface)]' : 'text-[var(--color-text-primary)]'
                   }`}
                 >
