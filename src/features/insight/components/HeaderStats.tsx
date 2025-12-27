@@ -34,22 +34,22 @@ export default function HeaderStats() {
   const totalCompletions = habits.reduce((acc, h) => acc + (h.completions ? h.completions.length : 0), 0)
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-  <div className="rounded-2xl border dark:border-neutral-700 p-4 shadow-sm">
+    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+      <div className="rounded-2xl border dark:border-neutral-700 p-4 shadow-sm">
         <div className="flex items-center justify-between text-sm text-neutral-600 dark:text-neutral-300">
           <span>Total completions</span>
           <ChartNoAxesColumnIncreasing className="h-4 w-4" />
         </div>
         <div className="mt-1 text-2xl font-semibold">{totalCompletions}</div>
       </div>
-  <div className="rounded-2xl border dark:border-neutral-700 p-4 shadow-sm">
+      <div className="rounded-2xl border dark:border-neutral-700 p-4 shadow-sm">
         <div className="flex items-center justify-between text-sm text-neutral-600 dark:text-neutral-300">
           <span>Longest streak</span>
           <Flame className="h-4 w-4" />
         </div>
         <div className="mt-1 text-2xl font-semibold">{longestStreak}d</div>
       </div>
-  <div className="rounded-2xl border dark:border-neutral-700 p-4 shadow-sm">
+      <div className="col-span-2 rounded-2xl border dark:border-neutral-700 p-4 shadow-sm sm:col-span-1">
         <div className="flex items-center justify-between text-sm text-neutral-600 dark:text-neutral-300">
           <span>Weekly completion</span>
           <Info className="h-4 w-4" />

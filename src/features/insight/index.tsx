@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ChartPie, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { addYears, isAfter, startOfMonth, startOfYear } from 'date-fns'
 import Badge from '@/shared/components/cards/Badge'
 import { useHabitStore } from '@/shared/store/store'
@@ -82,8 +82,6 @@ export default function Insight() {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold flex items-center gap-2"><ChartPie className="w-5 h-5" /> Insight</h2>
-
       <div className="mt-4">
         <HeaderStats />
       </div>
