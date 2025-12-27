@@ -1,4 +1,5 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
 import Home from '@/features/home'
 import Insight from '@/features/insight'
 import Milestones from '@/features/milestones'
@@ -14,6 +15,11 @@ export default function App() {
 
   const { initial, animate, transition } = createPageMotion(shouldReduceMotion)
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+  }, [location.pathname])
+
   const Page = ({ children }: { children: React.ReactNode }) => (
     <motion.main className="w-full" initial={initial} animate={animate} transition={transition}>
       {children}
@@ -21,7 +27,7 @@ export default function App() {
   )
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-6">
+    <div className="mx-auto max-w-3xl px-4 pt-6 pb-24 sm:pb-6">
       <AppHeader />
 
       <main>

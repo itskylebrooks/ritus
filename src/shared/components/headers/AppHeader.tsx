@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Archive, ChartPie, ChevronDown, CircleHelp, Compass as CompassIcon, Home, LayoutGrid, LayoutList, Lightbulb, Menu, MinusCircle, PlusCircle, Settings as SettingsIcon, Trophy, Moon, Sun } from 'lucide-react'
-import { createMobileMenuVariants, desktopDropdownVariants, submenuVariants, useMotionPreferences } from '@/shared/animations'
+import { Archive, ChartPie, ChevronDown, CircleHelp, Compass as CompassIcon, Home, LayoutGrid, LayoutList, Lightbulb, MinusCircle, PlusCircle, Settings as SettingsIcon, Trophy, Moon, Sun } from 'lucide-react'
+import { desktopDropdownVariants } from '@/shared/animations'
 import { useHabitStore } from '@/shared/store/store'
 import GuideModal from '@/shared/components/modals/GuideModal'
 import SettingsModal from '@/shared/components/modals/SettingsModal'
 import EmojiPicker from '@/shared/components/emoji/EmojiPicker'
+import MobileTabBar from './MobileTabBar'
 
 function DateDisplay() {
   const dateFormat = useHabitStore((s) => s.dateFormat)
@@ -23,8 +24,6 @@ export default function AppHeader() {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [guideOpen, setGuideOpen] = useState(false)
   const [moreDesktopOpen, setMoreDesktopOpen] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [moreMobileOpen, setMoreMobileOpen] = useState(false)
   const showAdd = useHabitStore((s) => s.showAdd)
   const setShowAdd = useHabitStore((s) => s.setShowAdd)
   const showHomeCards = useHabitStore((s) => (s as any).showHomeCards ?? true)
@@ -35,9 +34,6 @@ export default function AppHeader() {
   const setShowList = useHabitStore((s) => (s as any).setShowList)
   const moreRef = useRef<HTMLDivElement | null>(null)
   const moreButtonRef = useRef<HTMLButtonElement | null>(null)
-  const menuRef = useRef<HTMLDivElement | null>(null)
-  const menuButtonRef = useRef<HTMLButtonElement | null>(null)
-  const { overlayMotion, prefersReducedMotion } = useMotionPreferences()
   const location = useLocation()
   const isHome = location.pathname === '/'
   const isMilestones = location.pathname === '/milestones'
@@ -45,9 +41,6 @@ export default function AppHeader() {
   const isCompass = location.pathname === '/compass'
   const isArchiveHidden = isMilestones || isInspiration || isCompass
   const navLinkBase = 'rounded-lg border border-subtle px-3 text-sm transition-colors duration-150 ease-in-out inline-flex items-center h-10'
-  const mobileNavLinkBase = 'block rounded-md px-3 py-2 text-base transition-colors duration-150 ease-in-out'
-
-  const mobileMenuVariants = createMobileMenuVariants(prefersReducedMotion, overlayMotion)
 
   // Close desktop More on outside click / Esc
   useEffect(() => {
@@ -78,26 +71,6 @@ export default function AppHeader() {
     }
   }, [moreDesktopOpen])
 
-  // Close mobile menu on outside click
-  useEffect(() => {
-    if (!menuOpen) return
-
-    const handleClick = (e: MouseEvent | TouchEvent) => {
-      const t = e.target as Node | null
-      if (!t) return
-      if (menuRef.current?.contains(t) || menuButtonRef.current?.contains(t)) return
-      setMenuOpen(false)
-    }
-
-    document.addEventListener('mousedown', handleClick)
-    document.addEventListener('touchstart', handleClick)
-
-    return () => {
-      document.removeEventListener('mousedown', handleClick)
-      document.removeEventListener('touchstart', handleClick)
-    }
-  }, [menuOpen])
-
   // Show guide automatically for first-time visitors (persisted in localStorage)
   useEffect(() => {
     try {
@@ -111,10 +84,10 @@ export default function AppHeader() {
     }
   }, [])
 
-  // When header switches to mobile layout (< md), automatically switch habit view to list
+  // When header switches to mobile layout (< sm), automatically switch habit view to list
   useEffect(() => {
     if (typeof window === 'undefined') return
-    const mq = window.matchMedia('(min-width: 768px)')
+    const mq = window.matchMedia('(min-width: 640px)')
 
     const handleChange = (e: MediaQueryListEvent | MediaQueryList) => {
       if (!e.matches && isHome) {
@@ -135,288 +108,103 @@ export default function AppHeader() {
   }, [isHome, setShowList])
 
   return (
-    <header className="mb-6 relative flex items-center justify-between">
-      <div className="flex items-center gap-3">
-        <Link
-          to="/"
-          aria-label="Go to home"
-          className="inline-flex items-center h-10 text-2xl leading-none font-bold uppercase tracking-wider hover-change-color transition-colors"
-        >
-          Ritus
-        </Link>
-        <EmojiPicker />
-      </div>
-
-      {/* Centered desktop nav with icons only (truly centered to header width) */}
-      <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 z-10">
-        {/* Desktop-only page links — centered, icons only */}
-        <ul className="flex items-center gap-2">
-          {/* Order icons so Home sits in the middle */}
-          <li>
-            <NavLink
-              to="/insight"
-              aria-label="Insight"
-              title="Insight"
-              onClick={(e) => { if (location.pathname === '/insight') e.preventDefault() }}
-              className={({ isActive }: { isActive: boolean }) =>
-                `${navLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover-accent-fade' : 'text-strong hover-nonaccent'}`
-              }
-            >
-              <ChartPie className="w-4 h-4" />
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/"
-              end
-              aria-label="Home"
-              title="Home"
-              onClick={(e) => { if (location.pathname === '/') e.preventDefault() }}
-              className={({ isActive }: { isActive: boolean }) =>
-                `${navLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover-accent-fade' : 'text-strong hover-nonaccent'}`
-              }
-            >
-              <Home className="w-4 h-4" />
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/milestones"
-              aria-label="Milestones"
-              title="Milestones"
-              onClick={(e) => { if (location.pathname === '/milestones') e.preventDefault() }}
-              className={({ isActive }: { isActive: boolean }) =>
-                `${navLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover-accent-fade' : 'text-strong hover-nonaccent'}`
-              }
-            >
-              <Trophy className="w-4 h-4" />
-            </NavLink>
-          </li>
-        </ul>
-      </nav>
-
-      {/* Right side: date then More button */}
-      <div className="flex items-center gap-2">
-        <div className="hidden md:inline-flex items-center px-3 text-sm text-muted h-10">
-          <DateDisplay />
-        </div>
-        {/* Desktop: More dropdown (contains Add/Guide/Settings) */}
-        <div className="hidden md:flex items-center gap-2 relative">
-          <div className="flex items-center gap-2 relative">
-            <button
-              ref={moreButtonRef}
-              type="button"
-              onClick={() => setMoreDesktopOpen((v) => !v)}
-              className="rounded-lg border border-subtle px-3 text-sm inline-flex items-center gap-2 h-10 transition-colors duration-150 hover-nonaccent"
-              aria-haspopup="menu"
-              aria-expanded={moreDesktopOpen}
-            >
-              <span className="sr-only">More</span>
-              <ChevronDown className="w-4 h-4" />
-            </button>
-
-            <AnimatePresence>
-              {moreDesktopOpen && (
-                <motion.div
-                  ref={moreRef as any}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  variants={desktopDropdownVariants}
-                  className="absolute right-0 top-full mt-2 w-44 rounded-lg border border-subtle bg-surface-elevated text-strong shadow-elevated z-30"
-                >
-                  <ul className="p-2">
-                    {isHome && (
-                      <li>
-                        <button
-                          type="button"
-                          onClick={() => { setMoreDesktopOpen(false); setShowAdd(!showAdd); }}
-                          className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent"
-                        >
-                          <span className="flex items-center gap-2">{showAdd ? <MinusCircle className="w-4 h-4" /> : <PlusCircle className="w-4 h-4" />}<span>{showAdd ? 'Hide add' : 'Show add'}</span></span>
-                        </button>
-                      </li>
-                    )}
-                    {isHome && (
-                      <li>
-                        <button
-                          type="button"
-                          onClick={() => { setMoreDesktopOpen(false); setShowHomeCards(!showHomeCards) }}
-                          className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent"
-                        >
-                          <span className="flex items-center gap-2">{showHomeCards ? <Moon className="w-4 h-4" /> : <Sun  className="w-4 h-4" />}<span>{showHomeCards ? 'Hide rituals' : 'Show rituals'}</span></span>
-                        </button>
-                      </li>
-                    )}
-                    {/* Guide (moved closer to Inspiration) */}
-                    {!isArchiveHidden && (
-                      <li>
-                        <button
-                          type="button"
-                          onClick={() => { setMoreDesktopOpen(false); setShowArchived(!showArchived); }}
-                          className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent"
-                        >
-                          <span className="flex items-center gap-2"><Archive className="w-4 h-4" />{showArchived ? 'Hide archived' : 'Show archived'}</span>
-                        </button>
-                      </li>
-                    )}
-                    {isHome && (
-                      <li>
-                        <button
-                          type="button"
-                          onClick={() => { setMoreDesktopOpen(false); setShowList(!showList); }}
-                          className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent"
-                        >
-                          <span className="flex items-center gap-2">{showList ? <LayoutGrid className="w-4 h-4" /> : <LayoutList className="w-4 h-4" />}{showList ? 'Show as grid' : 'Show as list'}</span>
-                        </button>
-                      </li>
-                    )}
-
-                    {/* Separator line before Guide - only show if there are options above */}
-                    {(isHome || !isArchiveHidden) && (
-                      <li className="my-1 border-t border-subtle"></li>
-                    )}
-
-                    {/* Guide placed above Compass and Inspiration */}
-                    <li>
-                      <button
-                        type="button"
-                        onClick={() => { setMoreDesktopOpen(false); setGuideOpen(true); }}
-                        className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent"
-                      >
-                        <span className="flex items-center gap-2"><CircleHelp className="w-4 h-4" />Guide</span>
-                      </button>
-                    </li>
-                    <li>
-                      <NavLink
-                        to="/compass"
-                        onClick={(e) => { if (location.pathname === '/compass') e.preventDefault(); setMoreDesktopOpen(false); }}
-                        className={({ isActive }: { isActive: boolean }) =>
-                          `block w-full text-left px-3 py-2 rounded-md transition-colors duration-150 ${isActive ? 'bg-accent text-inverse hover:bg-accent-soft' : 'text-strong hover-nonaccent'}`
-                        }
-                      >
-                        <CompassIcon className="inline-block w-4 h-4 mr-2" />Compass
-                      </NavLink>
-                    </li>
-                    <li>
-                      <NavLink
-                        to="/inspiration"
-                        onClick={(e) => { if (location.pathname === '/inspiration') e.preventDefault(); setMoreDesktopOpen(false); }}
-                        className={({ isActive }: { isActive: boolean }) =>
-                          `block w-full text-left px-3 py-2 rounded-md transition-colors duration-150 ${isActive ? 'bg-accent text-inverse hover:bg-accent-soft' : 'text-strong hover-nonaccent'}`
-                        }
-                      >
-                        <Lightbulb className="inline-block w-4 h-4 mr-2" />Inspiration
-                      </NavLink>
-                    </li>
-                    <li>
-                      <button
-                        type="button"
-                        onClick={() => { setMoreDesktopOpen(false); setSettingsOpen(true); }}
-                        className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent"
-                      >
-                        <span className="flex items-center gap-2"><SettingsIcon className="w-4 h-4" />Settings</span>
-                      </button>
-                    </li>
-                  </ul>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+    <>
+      <header className="mb-6 relative flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Link
+            to="/"
+            aria-label="Go to home"
+            className="inline-flex items-center h-10 text-2xl leading-none font-bold uppercase tracking-wider hover-change-color transition-colors"
+          >
+            Ritus
+          </Link>
+          <EmojiPicker />
         </div>
 
-        {/* Mobile: hamburger menu which contains page links and a More submenu */}
-        <div className="md:hidden relative">
-          <div className="flex items-center gap-2">
-            <div className="inline-flex items-center h-10 px-2 text-sm text-muted">
-              <DateDisplay />
-            </div>
-            <button
-              ref={menuButtonRef}
-              type="button"
-              onClick={() => setMenuOpen((v) => !v)}
-              className="px-2 py-1.5 rounded-lg border border-subtle text-sm inline-flex items-center gap-2 transition-colors duration-150 hover-nonaccent"
-              aria-expanded={menuOpen}
-              aria-label="Open menu"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
-          </div>
-
-          <AnimatePresence>
-            {menuOpen && (
-                <motion.div
-                ref={menuRef as any}
-                initial="initial"
-                animate="animate"
-                exit="exit"
-                variants={mobileMenuVariants}
-                  className="absolute right-0 mt-2 w-56 rounded-lg border border-subtle bg-surface-elevated text-strong shadow-elevated z-30"
+        {/* Centered desktop nav with icons only (truly centered to header width) */}
+        <nav className="hidden sm:flex absolute left-1/2 -translate-x-1/2 z-10">
+          {/* Desktop-only page links — centered, icons only */}
+          <ul className="flex items-center gap-2">
+            {/* Order icons so Home sits in the middle */}
+            <li>
+              <NavLink
+                to="/insight"
+                aria-label="Insight"
+                title="Insight"
+                onClick={(e) => { if (location.pathname === '/insight') e.preventDefault() }}
+                className={({ isActive }: { isActive: boolean }) =>
+                  `${navLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover-accent-fade' : 'text-strong hover-nonaccent'}`
+                }
               >
-                <ul className="p-2">
-                <li>
-                  <NavLink
-                    to="/"
-                    onClick={(e) => { if (location.pathname === '/') e.preventDefault(); setMenuOpen(false); }}
-                    className={({ isActive }: { isActive: boolean }) =>
-                      `${mobileNavLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover:bg-accent-soft' : 'text-strong hover-nonaccent'}`
-                    }
-                    end
-                  >
-                    <Home className="inline-block w-4 h-4 mr-2" />Home
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/insight"
-                    onClick={(e) => { if (location.pathname === '/insight') e.preventDefault(); setMenuOpen(false); }}
-                    className={({ isActive }: { isActive: boolean }) =>
-                      `${mobileNavLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover:bg-accent-soft' : 'text-strong hover-nonaccent'}`
-                    }
-                  >
-                    <ChartPie className="inline-block w-4 h-4 mr-2" />Insight
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/milestones"
-                    onClick={(e) => { if (location.pathname === '/milestones') e.preventDefault(); setMenuOpen(false); }}
-                    className={({ isActive }: { isActive: boolean }) =>
-                      `${mobileNavLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover:bg-accent-soft' : 'text-strong hover-nonaccent'}`
-                    }
-                  >
-                    <Trophy className="inline-block w-4 h-4 mr-2" />Milestones
-                  </NavLink>
-                </li>
+                <ChartPie className="w-4 h-4" />
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/"
+                end
+                aria-label="Home"
+                title="Home"
+                onClick={(e) => { if (location.pathname === '/') e.preventDefault() }}
+                className={({ isActive }: { isActive: boolean }) =>
+                  `${navLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover-accent-fade' : 'text-strong hover-nonaccent'}`
+                }
+              >
+                <Home className="w-4 h-4" />
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/milestones"
+                aria-label="Milestones"
+                title="Milestones"
+                onClick={(e) => { if (location.pathname === '/milestones') e.preventDefault() }}
+                className={({ isActive }: { isActive: boolean }) =>
+                  `${navLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover-accent-fade' : 'text-strong hover-nonaccent'}`
+                }
+              >
+                <Trophy className="w-4 h-4" />
+              </NavLink>
+            </li>
+          </ul>
+        </nav>
 
-                {/* More trigger inside mobile list */}
-                <li>
-                  <button
-                    type="button"
-                    onClick={() => setMoreMobileOpen((v) => !v)}
-                    className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent flex items-center justify-between"
-                    aria-expanded={moreMobileOpen}
-                  >
-                    <span className="flex items-center gap-2">More</span>
-                    <ChevronDown className={`w-4 h-4 ${moreMobileOpen ? 'rotate-180' : ''}`} />
-                  </button>
+        {/* Right side: date then More button */}
+        <div className="flex items-center gap-2">
+          <div className="inline-flex items-center px-3 text-sm text-muted h-10">
+            <DateDisplay />
+          </div>
+          {/* More dropdown (contains Add/Guide/Settings) */}
+          <div className="flex items-center gap-2 relative">
+            <div className="flex items-center gap-2 relative">
+              <button
+                ref={moreButtonRef}
+                type="button"
+                onClick={() => setMoreDesktopOpen((v) => !v)}
+                className="rounded-lg border border-subtle px-3 text-sm inline-flex items-center gap-2 h-10 transition-colors duration-150 hover-nonaccent"
+                aria-haspopup="menu"
+                aria-expanded={moreDesktopOpen}
+              >
+                <span className="sr-only">More</span>
+                <ChevronDown className="w-4 h-4" />
+              </button>
 
-                  <AnimatePresence initial={false}>
-                    {moreMobileOpen && (
-                      <motion.ul
-                        id="mobile-more-submenu"
-                        initial="initial"
-                        animate="animate"
-                        exit="exit"
-                        variants={submenuVariants}
-                        className="mt-1 pl-2 overflow-hidden"
-                      >
-                      {/* Inspiration will be placed just above Settings in the mobile More submenu */}
+              <AnimatePresence>
+                {moreDesktopOpen && (
+                  <motion.div
+                    ref={moreRef as any}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                    variants={desktopDropdownVariants}
+                    className="absolute right-0 top-full mt-2 w-44 rounded-lg border border-subtle bg-surface-elevated text-strong shadow-elevated z-30"
+                  >
+                    <ul className="p-2">
                       {isHome && (
                         <li>
                           <button
                             type="button"
-                            onClick={() => { setMenuOpen(false); setMoreMobileOpen(false); setShowAdd(!showAdd); }}
+                            onClick={() => { setMoreDesktopOpen(false); setShowAdd(!showAdd); }}
                             className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent"
                           >
                             <span className="flex items-center gap-2">{showAdd ? <MinusCircle className="w-4 h-4" /> : <PlusCircle className="w-4 h-4" />}<span>{showAdd ? 'Hide add' : 'Show add'}</span></span>
@@ -427,32 +215,47 @@ export default function AppHeader() {
                         <li>
                           <button
                             type="button"
-                            onClick={() => { setMenuOpen(false); setMoreMobileOpen(false); setShowHomeCards(!showHomeCards) }}
+                            onClick={() => { setMoreDesktopOpen(false); setShowHomeCards(!showHomeCards) }}
                             className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent"
                           >
-                            <span className="flex items-center gap-2">{showHomeCards ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}<span>{showHomeCards ? 'Hide rituals' : 'Show rituals'}</span></span>
+                            <span className="flex items-center gap-2">{showHomeCards ? <Moon className="w-4 h-4" /> : <Sun  className="w-4 h-4" />}<span>{showHomeCards ? 'Hide rituals' : 'Show rituals'}</span></span>
                           </button>
                         </li>
                       )}
+                      {/* Guide (moved closer to Inspiration) */}
                       {!isArchiveHidden && (
                         <li>
                           <button
                             type="button"
-                            onClick={() => { setMenuOpen(false); setMoreMobileOpen(false); setShowArchived(!showArchived); }}
+                            onClick={() => { setMoreDesktopOpen(false); setShowArchived(!showArchived); }}
                             className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent"
                           >
                             <span className="flex items-center gap-2"><Archive className="w-4 h-4" />{showArchived ? 'Hide archived' : 'Show archived'}</span>
                           </button>
                         </li>
                       )}
+                      {isHome && (
+                        <li>
+                          <button
+                            type="button"
+                            onClick={() => { setMoreDesktopOpen(false); setShowList(!showList); }}
+                            className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent"
+                          >
+                            <span className="flex items-center gap-2">{showList ? <LayoutGrid className="w-4 h-4" /> : <LayoutList className="w-4 h-4" />}{showList ? 'Show as grid' : 'Show as list'}</span>
+                          </button>
+                        </li>
+                      )}
+
+                      {/* Separator line before Guide - only show if there are options above */}
                       {(isHome || !isArchiveHidden) && (
                         <li className="my-1 border-t border-subtle"></li>
                       )}
+
                       {/* Guide placed above Compass and Inspiration */}
                       <li>
                         <button
                           type="button"
-                          onClick={() => { setMenuOpen(false); setMoreMobileOpen(false); setGuideOpen(true); }}
+                          onClick={() => { setMoreDesktopOpen(false); setGuideOpen(true); }}
                           className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent"
                         >
                           <span className="flex items-center gap-2"><CircleHelp className="w-4 h-4" />Guide</span>
@@ -461,9 +264,9 @@ export default function AppHeader() {
                       <li>
                         <NavLink
                           to="/compass"
-                          onClick={(e) => { if (location.pathname === '/compass') e.preventDefault(); setMenuOpen(false); setMoreMobileOpen(false); }}
+                          onClick={(e) => { if (location.pathname === '/compass') e.preventDefault(); setMoreDesktopOpen(false); }}
                           className={({ isActive }: { isActive: boolean }) =>
-                            `${mobileNavLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover:bg-accent-soft' : 'text-strong hover-nonaccent'}`
+                            `block w-full text-left px-3 py-2 rounded-md transition-colors duration-150 ${isActive ? 'bg-accent text-inverse hover:bg-accent-soft' : 'text-strong hover-nonaccent'}`
                           }
                         >
                           <CompassIcon className="inline-block w-4 h-4 mr-2" />Compass
@@ -472,9 +275,9 @@ export default function AppHeader() {
                       <li>
                         <NavLink
                           to="/inspiration"
-                          onClick={(e) => { if (location.pathname === '/inspiration') e.preventDefault(); setMenuOpen(false); setMoreMobileOpen(false); }}
+                          onClick={(e) => { if (location.pathname === '/inspiration') e.preventDefault(); setMoreDesktopOpen(false); }}
                           className={({ isActive }: { isActive: boolean }) =>
-                            `${mobileNavLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover:bg-accent-soft' : 'text-strong hover-nonaccent'}`
+                            `block w-full text-left px-3 py-2 rounded-md transition-colors duration-150 ${isActive ? 'bg-accent text-inverse hover:bg-accent-soft' : 'text-strong hover-nonaccent'}`
                           }
                         >
                           <Lightbulb className="inline-block w-4 h-4 mr-2" />Inspiration
@@ -483,22 +286,22 @@ export default function AppHeader() {
                       <li>
                         <button
                           type="button"
-                          onClick={() => { setMenuOpen(false); setMoreMobileOpen(false); setSettingsOpen(true); }}
+                          onClick={() => { setMoreDesktopOpen(false); setSettingsOpen(true); }}
                           className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent"
                         >
                           <span className="flex items-center gap-2"><SettingsIcon className="w-4 h-4" />Settings</span>
                         </button>
                       </li>
-                      </motion.ul>
-                    )}
-                  </AnimatePresence>
-                </li>
-              </ul>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                    </ul>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
         </div>
-      </div>
+      </header>
+
+      <MobileTabBar />
 
       <SettingsModal
         open={settingsOpen}
@@ -509,6 +312,6 @@ export default function AppHeader() {
         open={guideOpen}
         onClose={() => { setGuideOpen(false); try { localStorage.setItem('ritus_seen_guide', '1') } catch {} }}
       />
-    </header>
+    </>
   )
 }
