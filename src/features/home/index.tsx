@@ -1,8 +1,7 @@
 import { useMemo, useState, useRef, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { emphasizeEase, transitions } from '@/shared/animations'
-import { hasCompletionOnDay } from '@/shared/utils/scoring'
-import { fromISO } from '@/shared/utils/date'
+import { fromISO, startOfDay } from '@/shared/utils/date'
 import { useHabitStore } from '@/shared/store/store'
 import AddHabit from './components/AddHabit'
 import QuoteCard from './components/QuoteCard'
@@ -49,6 +48,13 @@ export default function Home() {
   const [emptyReady, setEmptyReady] = useState(habits.length === 0)
   const emptyTimer = useRef<number | null>(null)
   const prevCount = useRef(habits.length)
+  const completionLookup = useMemo(() => {
+    const map = new Map<string, Set<number>>()
+    for (const h of habits) {
+      map.set(h.id, new Set((h.completions || []).map((c) => fromISO(c).getTime())))
+    }
+    return map
+  }, [habits])
 
   useEffect(() => {
     const cur = habits.length
@@ -73,6 +79,7 @@ export default function Home() {
 
   const groupedHabits = useMemo(() => {
     const today = new Date()
+    const todayKey = startOfDay(today).getTime()
     const normalize = (name: string) => name.toLocaleLowerCase()
     const byName = (a: typeof habits[number], b: typeof habits[number]) =>
       normalize(a.name).localeCompare(normalize(b.name))
@@ -80,15 +87,20 @@ export default function Home() {
     const active = habits.filter((h) => !h.archived)
     const archived = habits.filter((h) => h.archived)
 
-    const incompleteToday = active.filter((h) => !hasCompletionOnDay(h.completions, today))
-    const completedToday = active.filter((h) => hasCompletionOnDay(h.completions, today))
+    const hasCompletionToday = (h: typeof habits[number]) => {
+      const set = completionLookup.get(h.id)
+      return set ? set.has(todayKey) : false
+    }
+
+    const incompleteToday = active.filter((h) => !hasCompletionToday(h))
+    const completedToday = active.filter((h) => hasCompletionToday(h))
 
     return {
       incompleteToday: [...incompleteToday].sort(byName),
       completedToday: [...completedToday].sort(byName),
       archived: [...archived].sort(byName),
     }
-  }, [habits, showArchived])
+  }, [habits, showArchived, completionLookup])
 
   return (
     <div>

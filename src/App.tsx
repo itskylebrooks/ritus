@@ -1,5 +1,5 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Home from '@/features/home'
 import Insight from '@/features/insight'
 import Milestones from '@/features/milestones'
@@ -12,8 +12,30 @@ import { createPageMotion } from '@/shared/animations'
 export default function App() {
   const location = useLocation()
   const shouldReduceMotion = useReducedMotion()
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false
+    return window.matchMedia('(max-width: 639px)').matches
+  })
 
-  const { initial, animate, transition } = createPageMotion(shouldReduceMotion)
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return
+    const mq = window.matchMedia('(max-width: 639px)')
+    const handleChange = (e: MediaQueryListEvent | MediaQueryList) => {
+      setIsMobile(e.matches)
+    }
+
+    handleChange(mq)
+
+    if (typeof mq.addEventListener === 'function') {
+      mq.addEventListener('change', handleChange as any)
+      return () => mq.removeEventListener('change', handleChange as any)
+    } else {
+      mq.addListener(handleChange as any)
+      return () => mq.removeListener(handleChange as any)
+    }
+  }, [])
+
+  const { initial, animate, transition } = createPageMotion(shouldReduceMotion || isMobile)
 
   useEffect(() => {
     if (typeof window === 'undefined') return

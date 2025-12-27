@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react'
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { addMonths, endOfMonth, endOfWeek, format, startOfMonth, startOfWeek, subMonths, subWeeks } from 'date-fns'
+import { endOfMonth, format, startOfMonth, startOfWeek, subMonths, subWeeks } from 'date-fns'
+import type { Habit } from '@/shared/types'
 import { useHabitStore } from '@/shared/store/store'
-import { fromISO, isSameCalendarWeek } from '@/shared/utils/date'
+import { fromISO } from '@/shared/utils/date'
 
 // Progress accrual constants (mirror store toggle logic)
 const ESSENCE_PER_COMPLETION = 5
@@ -10,24 +11,28 @@ const WEEKLY_BONUS = 10
 
 type Mode = 'week' | 'month'
 
-function computeWeeklySeries(habits: ReturnType<typeof useHabitStore.getState>['habits'], weekStartsOn: 0 | 1, count: number = 12) {
+type PreparedHabit = {
+  habit: Habit
+  weekCounts: Map<number, number>
+  monthCounts: Map<number, number>
+}
+
+function computeWeeklySeries(habits: PreparedHabit[], weekStartsOn: 0 | 1, count: number = 12) {
   const now = new Date()
   const weeks: { start: Date; label: string; value: number }[] = []
   // Build from oldest to newest
   for (let i = count - 1; i >= 0; i--) {
     const ref = subWeeks(now, i)
     const start = startOfWeek(ref, { weekStartsOn })
-    const end = endOfWeek(ref, { weekStartsOn })
+    const key = start.getTime()
     let total = 0
-    for (const h of habits) {
-      // sum per-completion points within this week
-      const compCount = (h.completions || []).map(fromISO).filter((d) => d >= start && d <= end).length
+    for (const { habit, weekCounts } of habits) {
+      const compCount = weekCounts.get(key) ?? 0
       total += compCount * ESSENCE_PER_COMPLETION
       // weekly bonus applies for weekly-frequency habits when target met
-      if (h.frequency === 'weekly') {
-        const weekCount = (h.completions || []).map(fromISO).filter((d) => d >= start && d <= end).length
-        const target = h.weeklyTarget ?? 1
-        if (weekCount >= target) total += WEEKLY_BONUS
+      if (habit.frequency === 'weekly') {
+        const target = habit.weeklyTarget ?? 1
+        if (compCount >= target) total += WEEKLY_BONUS
       }
     }
     weeks.push({ start, label: format(start, 'MMM d'), value: total })
@@ -35,34 +40,24 @@ function computeWeeklySeries(habits: ReturnType<typeof useHabitStore.getState>['
   return weeks
 }
 
-function computeMonthlySeries(habits: ReturnType<typeof useHabitStore.getState>['habits'], weekStartsOn: 0 | 1, count: number = 12) {
+function computeMonthlySeries(habits: PreparedHabit[], count: number = 12) {
   const now = new Date()
   const months: { start: Date; label: string; value: number }[] = []
   for (let i = count - 1; i >= 0; i--) {
     const ref = subMonths(now, i)
     const start = startOfMonth(ref)
     const end = endOfMonth(ref)
+    const startMs = start.getTime()
+    const endMs = end.getTime()
     let total = 0
-    for (const h of habits) {
-      // completion points inside the month
-      const compCount = (h.completions || []).map(fromISO).filter((d) => d >= start && d <= end).length
+    for (const { habit, monthCounts, weekCounts } of habits) {
+      const compCount = monthCounts.get(startMs) ?? 0
       total += compCount * ESSENCE_PER_COMPLETION
-      // add weekly bonuses that fall within this month: check each week-start represented in the habit
-      // Approach: deduplicate week-starts across the habit's completions; if a given week meets target and its week-start lies in this month, award +10
-      if (h.frequency === 'weekly') {
-        const seenWeeks = new Set<number>()
-        for (const c of h.completions || []) {
-          const d = fromISO(c)
-          const wkStart = startOfWeek(d, { weekStartsOn })
-          const key = wkStart.getTime()
-          if (seenWeeks.has(key)) continue
-          seenWeeks.add(key)
-          // include only if the week-start lies within the month window
-          if (wkStart < start || wkStart > end) continue
-          const weekCount = (h.completions || []).map(fromISO).filter((dd) => isSameCalendarWeek(dd, wkStart)).length
-          const target = h.weeklyTarget ?? 1
-          if (weekCount >= target) total += WEEKLY_BONUS
-        }
+      if (habit.frequency === 'weekly') {
+        const target = habit.weeklyTarget ?? 1
+        weekCounts.forEach((count, wkStart) => {
+          if (wkStart >= startMs && wkStart <= endMs && count >= target) total += WEEKLY_BONUS
+        })
       }
     }
     months.push({ start, label: format(start, 'MMM'), value: total })
@@ -76,11 +71,26 @@ export default function HistoryChart() {
   const weekStartsOn: 0 | 1 = weekStart === 'sunday' ? 0 : 1
   const [mode, setMode] = useState<Mode>('week')
 
+  const preparedHabits = useMemo<PreparedHabit[]>(() => {
+    return habits.map((h) => {
+      const weekCounts = new Map<number, number>()
+      const monthCounts = new Map<number, number>()
+      for (const c of h.completions || []) {
+        const d = fromISO(c)
+        const wkKey = startOfWeek(d, { weekStartsOn }).getTime()
+        const mKey = startOfMonth(d).getTime()
+        weekCounts.set(wkKey, (weekCounts.get(wkKey) ?? 0) + 1)
+        monthCounts.set(mKey, (monthCounts.get(mKey) ?? 0) + 1)
+      }
+      return { habit: h, weekCounts, monthCounts }
+    })
+  }, [habits, weekStartsOn])
+
   const data = useMemo(() => {
     return mode === 'week'
-      ? computeWeeklySeries(habits, weekStartsOn, 12)
-      : computeMonthlySeries(habits, weekStartsOn, 12)
-  }, [habits, weekStartsOn, mode])
+      ? computeWeeklySeries(preparedHabits, weekStartsOn, 12)
+      : computeMonthlySeries(preparedHabits, 12)
+  }, [preparedHabits, weekStartsOn, mode])
 
   const accent = 'var(--color-accent)'
   const grid = 'rgba(148, 163, 184, 0.25)'

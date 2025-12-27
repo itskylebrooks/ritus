@@ -1,13 +1,18 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { addDays, endOfYear, format, isSameDay, startOfWeek, startOfYear } from 'date-fns'
 import { useHabitStore } from '@/shared/store/store'
 import type { Habit } from '@/shared/types'
+import { fromISO } from '@/shared/utils/date'
 
 // Render a GitHub-style contributions heatmap: columns = weeks, rows = weekdays.
 // Non-interactive (read-only) view. Shows ~52 weeks ending at the provided month reference.
-export default function MonthGrid({ habit, month, allowScroll = true, alignToNow = false }: { habit: Habit; month: Date; allowScroll?: boolean; alignToNow?: boolean }) {
+export default function MonthGrid({ habit, month, allowScroll = true, alignToNow = false, completionDays }: { habit: Habit; month: Date; allowScroll?: boolean; alignToNow?: boolean; completionDays?: Set<number> }) {
   const weekStart = useHabitStore((s) => s.weekStart)
   const ws = weekStart === 'sunday' ? 0 : 1
+  const completionSet = useMemo(() => {
+    if (completionDays) return completionDays
+    return new Set((habit.completions || []).map((c) => fromISO(c).getTime()))
+  }, [completionDays, habit.completions])
 
   // Build columns for the calendar year where each column has 7 rows (weekdays).
   // The top row corresponds to the user's selected weekStart (0 = Sunday, 1 = Monday).
@@ -63,7 +68,7 @@ export default function MonthGrid({ habit, month, allowScroll = true, alignToNow
     requestAnimationFrame(() => {
       try {
         const colEls = Array.from(el.querySelectorAll('[data-col]')) as HTMLElement[]
-  const idx = cols.findIndex((col) => col.some((d) => d !== null && isSameDay(d, today)))
+        const idx = cols.findIndex((col) => col.some((d) => d !== null && isSameDay(d, today)))
         const target = colEls[idx]
         if (target) {
           const scrollLeft = target.offsetLeft + target.offsetWidth - el.clientWidth
@@ -124,7 +129,7 @@ export default function MonthGrid({ habit, month, allowScroll = true, alignToNow
             <div key={colIdx} data-col className="flex flex-col gap-1">
               {Array.from({ length: 7 }).map((_, row) => {
                 const d = col[row]
-                const done = d ? habit.completions.some((c) => isSameDay(new Date(c), d)) : false
+                const done = d ? completionSet.has(d.getTime()) : false
                 const inFuture = d ? d > today : false
 
                 const base = 'h-3 w-3 rounded-sm transition'
