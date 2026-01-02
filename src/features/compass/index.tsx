@@ -230,14 +230,17 @@ export default function Compass() {
 
       {COMPASS_SETS.map((set) => (
         <section key={set.dir}>
-          <div className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-4 bg-white dark:bg-black shadow-sm">
+          <div
+            className="rounded-lg border border-subtle p-4 shadow-sm"
+            style={{ backgroundColor: 'var(--color-surface)' }}
+          >
             <div>
               <h3 className="text-lg font-semibold flex items-center gap-2">
-                <span className="text-xl text-neutral-600 dark:text-neutral-400">{set.arrow}</span>
-                <span className="text-neutral-800 dark:text-neutral-100">{set.title}</span>
+                <span className="text-xl text-muted">{set.arrow}</span>
+                <span className="text-strong">{set.title}</span>
               </h3>
-              <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">{set.note}</p>
-              <p className="mt-2 italic text-xs text-neutral-500">{set.disclaimer}</p>
+              <p className="mt-2 text-sm text-muted">{set.note}</p>
+              <p className="mt-2 italic text-xs text-soft">{set.disclaimer}</p>
             </div>
 
             <div className="mt-4">
@@ -247,7 +250,7 @@ export default function Compass() {
                     key={h.name}
                     type="button"
                     onClick={() => handleAdd(h)}
-                    className={`relative inline-flex items-center gap-2 px-3 py-1 rounded-full border text-sm transition-colors duration-150 transform-gpu align-middle ${h.mode === 'build' ? 'border-emerald-600 dark:border-emerald-500' : 'border-red-500 dark:border-red-500'} text-neutral-800 dark:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-900 ${recentlyAdded.includes(h.name) ? 'cursor-not-allowed' : ''}`}
+                    className={`relative inline-flex items-center gap-2 px-3 py-1 rounded-full border text-sm transition-colors duration-150 transform-gpu align-middle ${h.mode === 'build' ? 'border-success' : 'border-danger'} text-strong hover:bg-surface-alt ${recentlyAdded.includes(h.name) ? 'cursor-not-allowed' : ''}`}
                     title={`${h.name} — ${h.mode} · ${h.frequency}`}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -276,7 +279,7 @@ export default function Compass() {
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.98 }}
                             transition={transitions.fadeSm}
-                            className="absolute inset-0 flex items-center justify-center pointer-events-none text-neutral-800 dark:text-neutral-100"
+                            className="absolute inset-0 flex items-center justify-center pointer-events-none text-strong"
                           >
                             <Check className="w-4 h-4 mr-1" />
                             <span className="text-sm">Added</span>

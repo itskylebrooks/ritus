@@ -141,7 +141,6 @@ export default function ClockCard() {
                           stroke={nocturne ? 'currentColor' : 'var(--color-text-primary)'}
                           strokeWidth={3.8}
                           strokeLinecap="round"
-                          className={nocturne ? armColorClass : 'dark:stroke-neutral-100'}
                         />
                       </g>
 
@@ -158,7 +157,6 @@ export default function ClockCard() {
                           stroke={nocturne ? 'currentColor' : 'var(--color-text-secondary)'}
                           strokeWidth={2.4}
                           strokeLinecap="round"
-                          className={nocturne ? armColorClass : 'dark:stroke-neutral-200'}
                         />
                       </g>
 
@@ -185,7 +183,6 @@ export default function ClockCard() {
                         cy="50"
                         r="2"
                         fill={nocturne ? 'currentColor' : 'var(--color-text-primary)'}
-                        className={nocturne ? armColorClass : 'dark:fill-neutral-100'}
                       />
                     </>
                   );

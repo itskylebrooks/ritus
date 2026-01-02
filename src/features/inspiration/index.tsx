@@ -1,4 +1,3 @@
-import React from 'react';
 import { Lightbulb } from 'lucide-react';
 
 export default function Inspiration() {
@@ -25,8 +24,11 @@ export default function Inspiration() {
           once a week. Most habits fail because people expect motivation to last forever. But
           discipline isn’t about feeling ready — it’s about making action easier than resistance.
         </p>
-        <div className="mt-4 rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black p-3">
-          <p className="text-sm italic text-center text-neutral-600 dark:text-neutral-300">
+        <div
+          className="mt-4 rounded-md border border-subtle p-3"
+          style={{ backgroundColor: 'var(--color-surface)' }}
+        >
+          <p className="text-sm italic text-center text-muted">
             “Make it obvious, make it easy, make it rewarding.” — three quiet laws of behavioral
             design.
           </p>
