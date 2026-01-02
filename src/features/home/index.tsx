@@ -1,21 +1,12 @@
-import { useMemo, useState, useRef, useEffect } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
 import { emphasizeEase, transitions } from '@/shared/animations';
-import { fromISO, startOfDay } from '@/shared/utils/date';
 import { useHabitStore } from '@/shared/store/store';
+import { fromISO, startOfDay } from '@/shared/utils/date';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import AddHabit from './components/AddHabit';
-import QuoteCard from './components/QuoteCard';
 import ClockCard from './components/ClockCard';
 import HabitCard from './components/HabitCard';
-
-function DateDisplay() {
-  const dateFormat = useHabitStore((s) => s.dateFormat);
-  const now = new Date();
-  const mm = String(now.getMonth() + 1).padStart(2, '0');
-  const dd = String(now.getDate()).padStart(2, '0');
-  const yyyy = String(now.getFullYear());
-  return <span>{dateFormat === 'MDY' ? `${mm}/${dd}/${yyyy}` : `${dd}/${mm}/${yyyy}`}</span>;
-}
+import QuoteCard from './components/QuoteCard';
 
 function EmptyState({ disableAnim = false }: { disableAnim?: boolean }) {
   return (
@@ -36,16 +27,16 @@ function EmptyState({ disableAnim = false }: { disableAnim?: boolean }) {
 
 export default function Home() {
   const showAdd = useHabitStore((s) => s.showAdd);
-  const setShowAdd = useHabitStore((s) => s.setShowAdd);
 
-  const showList = useHabitStore((s) => (s as any).showList);
-  const showHomeCards = useHabitStore((s) => (s as any).showHomeCards ?? true);
+  const showList = useHabitStore((s) => s.showList);
+  const showHomeCards = useHabitStore((s) => s.showHomeCards ?? true);
 
   const habits = useHabitStore((s) => s.habits);
-  const showArchived = useHabitStore((s) => (s as any).showArchived);
-  const initialListRender = useRef(true);
+  const showArchived = useHabitStore((s) => s.showArchived);
+  const [initialListRender, setInitialListRender] = useState(true);
   useEffect(() => {
-    initialListRender.current = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setInitialListRender(false);
   }, []);
   const [emptyReady, setEmptyReady] = useState(habits.length === 0);
   const emptyTimer = useRef<number | null>(null);
@@ -64,6 +55,7 @@ export default function Home() {
     prevCount.current = cur;
     if (cur === 0) {
       if (prev > 0) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setEmptyReady(false);
         if (emptyTimer.current) window.clearTimeout(emptyTimer.current);
         emptyTimer.current = window.setTimeout(() => {
@@ -111,7 +103,7 @@ export default function Home() {
       completedToday: [...completedToday].sort(byName),
       archived: [...archived].sort(byName),
     };
-  }, [habits, showArchived, completionLookup]);
+  }, [habits, completionLookup]);
 
   return (
     <div>
@@ -139,7 +131,7 @@ export default function Home() {
               groupedHabits.completedToday.length === 0 &&
               (!showArchived || groupedHabits.archived.length === 0) ? (
                 emptyReady ? (
-                  <EmptyState disableAnim={initialListRender.current} />
+                  <EmptyState disableAnim={initialListRender} />
                 ) : null
               ) : (
                 <>
@@ -150,7 +142,7 @@ export default function Home() {
                       exit={{ opacity: 0, scale: 0.95 }}
                       transition={transitions.fadeXl}
                     >
-                      <HabitCard habit={h} disableEntryAnim={initialListRender.current} />
+                      <HabitCard habit={h} disableEntryAnim={initialListRender} />
                     </motion.div>
                   ))}
 
@@ -172,7 +164,7 @@ export default function Home() {
                       exit={{ opacity: 0, scale: 0.95 }}
                       transition={transitions.fadeXl}
                     >
-                      <HabitCard habit={h} disableEntryAnim={initialListRender.current} />
+                      <HabitCard habit={h} disableEntryAnim={initialListRender} />
                     </motion.div>
                   ))}
 
@@ -196,7 +188,7 @@ export default function Home() {
                           exit={{ opacity: 0, scale: 0.95 }}
                           transition={transitions.fadeXl}
                         >
-                          <HabitCard habit={h} disableEntryAnim={initialListRender.current} />
+                          <HabitCard habit={h} disableEntryAnim={initialListRender} />
                         </motion.div>
                       ))}
                     </>

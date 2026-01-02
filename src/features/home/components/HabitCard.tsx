@@ -1,22 +1,14 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
 import { transitions } from '@/shared/animations';
-import { Archive, Check, Diamond, Flame, Inbox, Pencil, Settings2, Trash2 } from 'lucide-react';
-import {
-  DAILY_MILESTONE,
-  MILESTONE_BONUS,
-  POINTS_PER_COMPLETION,
-  WEEKLY_MILESTONE,
-  countCompletionsInWeek,
-  countCompletionsInMonth,
-} from '@/shared/utils/scoring';
-import { getWeekStartsOn } from '@/shared/utils/date';
-import ConfirmModal from '@/shared/components/modals/ConfirmModal';
-import ProgressBar from '@/shared/components/charts/ProgressBar';
 import Badge from '@/shared/components/cards/Badge';
+import ProgressBar from '@/shared/components/charts/ProgressBar';
 import WeekStrip from '@/shared/components/layout/WeekStrip';
+import ConfirmModal from '@/shared/components/modals/ConfirmModal';
 import { useHabitStore } from '@/shared/store/store';
 import type { Habit } from '@/shared/types';
+import { countCompletionsInMonth, countCompletionsInWeek } from '@/shared/utils/scoring';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Archive, Check, Diamond, Flame, Inbox, Pencil, Settings2, Trash2 } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 type ButtonsMenuProps = {
   habit: Habit;
@@ -104,7 +96,11 @@ function ButtonsMenu({
             <motion.button
               onClick={() => {
                 setOpen(false);
-                habit.archived ? unarchiveHabit(habit.id) : archiveHabit(habit.id);
+                if (habit.archived) {
+                  unarchiveHabit(habit.id);
+                } else {
+                  archiveHabit(habit.id);
+                }
               }}
               className="rounded-xl border dark:border-neutral-700 p-2 hover-nonaccent"
               aria-label={habit.archived ? 'Unarchive habit' : 'Archive habit'}
@@ -145,9 +141,9 @@ export default function HabitCard({
   const toggleCompletion = useHabitStore((s) => s.toggleCompletion);
   const editHabit = useHabitStore((s) => s.editHabit);
   const deleteHabit = useHabitStore((s) => s.deleteHabit);
-  const archiveHabit = useHabitStore((s) => (s as any).archiveHabit);
-  const unarchiveHabit = useHabitStore((s) => (s as any).unarchiveHabit);
-  const showList = useHabitStore((s) => (s as any).showList);
+  const archiveHabit = useHabitStore((s) => s.archiveHabit);
+  const unarchiveHabit = useHabitStore((s) => s.unarchiveHabit);
+  const showList = useHabitStore((s) => s.showList);
   const appliedCollectibles = useHabitStore((s) => s.progress.appliedCollectibles || {});
   const accentApplied = !!appliedCollectibles['accent'];
 
@@ -159,9 +155,10 @@ export default function HabitCard({
   // Capture the initial value of disableEntryAnim so it doesn't flip
   // on the first parent-triggered re-render (which caused the entry
   // animation to run for all cards after any button click).
-  const initialDisableEntry = useRef(disableEntryAnim);
+  const [initialDisableEntry] = useState(disableEntryAnim);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setName(habit.name);
   }, [habit.name]);
 
@@ -204,7 +201,7 @@ export default function HabitCard({
 
   return (
     <div
-      className={`rounded-2xl border dark:border-neutral-700 p-4 shadow-sm ${isRemoving ? 'habit-remove' : initialDisableEntry.current ? '' : 'habit-add'}`}
+      className={`rounded-2xl border dark:border-neutral-700 p-4 shadow-sm ${isRemoving ? 'habit-remove' : initialDisableEntry ? '' : 'habit-add'}`}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1 min-h-[48px]">

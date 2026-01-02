@@ -1,5 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+/* eslint-disable no-empty */
+import { desktopDropdownVariants } from '@/shared/animations';
+import EmojiPicker from '@/shared/components/emoji/EmojiPicker';
+import GuideModal from '@/shared/components/modals/GuideModal';
+import SettingsModal from '@/shared/components/modals/SettingsModal';
+import { useHabitStore } from '@/shared/store/store';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   Archive,
@@ -12,17 +16,14 @@ import {
   LayoutList,
   Lightbulb,
   MinusCircle,
+  Moon,
   PlusCircle,
   Settings as SettingsIcon,
-  Trophy,
-  Moon,
   Sun,
+  Trophy,
 } from 'lucide-react';
-import { desktopDropdownVariants } from '@/shared/animations';
-import { useHabitStore } from '@/shared/store/store';
-import GuideModal from '@/shared/components/modals/GuideModal';
-import SettingsModal from '@/shared/components/modals/SettingsModal';
-import EmojiPicker from '@/shared/components/emoji/EmojiPicker';
+import { useEffect, useRef, useState } from 'react';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import MobileTabBar from './MobileTabBar';
 
 function DateDisplay() {
@@ -42,12 +43,12 @@ export default function AppHeader() {
   const [moreDesktopOpen, setMoreDesktopOpen] = useState(false);
   const showAdd = useHabitStore((s) => s.showAdd);
   const setShowAdd = useHabitStore((s) => s.setShowAdd);
-  const showHomeCards = useHabitStore((s) => (s as any).showHomeCards ?? true);
-  const setShowHomeCards = useHabitStore((s) => (s as any).setShowHomeCards);
-  const showArchived = useHabitStore((s) => (s as any).showArchived);
-  const setShowArchived = useHabitStore((s) => (s as any).setShowArchived);
-  const showList = useHabitStore((s) => (s as any).showList);
-  const setShowList = useHabitStore((s) => (s as any).setShowList);
+  const showHomeCards = useHabitStore((s) => s.showHomeCards ?? true);
+  const setShowHomeCards = useHabitStore((s) => s.setShowHomeCards);
+  const showArchived = useHabitStore((s) => s.showArchived);
+  const setShowArchived = useHabitStore((s) => s.setShowArchived);
+  const showList = useHabitStore((s) => s.showList);
+  const setShowList = useHabitStore((s) => s.setShowList);
   const moreRef = useRef<HTMLDivElement | null>(null);
   const moreButtonRef = useRef<HTMLButtonElement | null>(null);
   const location = useLocation();
@@ -94,9 +95,10 @@ export default function AppHeader() {
       const seen = localStorage.getItem('ritus_seen_guide');
       if (!seen) {
         // show guide on first visit
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setGuideOpen(true);
       }
-    } catch (e) {
+    } catch {
       // ignore localStorage errors
     }
   }, []);
@@ -118,11 +120,11 @@ export default function AppHeader() {
     handleChange(mq);
 
     if (typeof mq.addEventListener === 'function') {
-      mq.addEventListener('change', handleChange as any);
-      return () => mq.removeEventListener('change', handleChange as any);
+      mq.addEventListener('change', handleChange);
+      return () => mq.removeEventListener('change', handleChange);
     } else {
-      mq.addListener(handleChange as any);
-      return () => mq.removeListener(handleChange as any);
+      mq.addListener(handleChange);
+      return () => mq.removeListener(handleChange);
     }
   }, [isHome, setShowList]);
 
@@ -217,7 +219,7 @@ export default function AppHeader() {
               <AnimatePresence>
                 {moreDesktopOpen && (
                   <motion.div
-                    ref={moreRef as any}
+                    ref={moreRef}
                     initial="initial"
                     animate="animate"
                     exit="exit"

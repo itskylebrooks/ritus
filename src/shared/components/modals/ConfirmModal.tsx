@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 interface ConfirmModalProps {
@@ -36,6 +36,7 @@ export default function ConfirmModal({
         closeTimer.current = null;
       }
       if (enterRaf.current) cancelAnimationFrame(enterRaf.current);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setVisible(true);
       setClosing(false);
       setEntering(true);

@@ -1,6 +1,6 @@
 import { computeLevel } from '@/shared/constants/progression';
-import { lastNDays } from '@/shared/utils/date';
 import type { Habit } from '@/shared/types';
+import { lastNDays } from '@/shared/utils/date';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers to generate realistic completion timelines without hand‑typing dates
@@ -8,7 +8,7 @@ import type { Habit } from '@/shared/types';
 const toISO = (d: Date) => d.toISOString().slice(0, 10);
 function dateRange(start: string, end: string, stepDays = 1): string[] {
   const out: string[] = [];
-  let d = new Date(`${start}T00:00:00`);
+  const d = new Date(`${start}T00:00:00`);
   const e = new Date(`${end}T00:00:00`);
   while (d <= e) {
     out.push(toISO(d));
@@ -21,7 +21,7 @@ const REFERENCE_END_ISO = '2025-10-26';
 function dailyStreakEndingOn(dates: string[], today = REFERENCE_END_ISO): number {
   const set = new Set(dates);
   let streak = 0;
-  let d = new Date(`${today}T00:00:00`);
+  const d = new Date(`${today}T00:00:00`);
   while (set.has(toISO(d))) {
     streak++;
     d.setDate(d.getDate() - 1);

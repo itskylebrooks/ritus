@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { Check, Compass as CompassIcon } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
 import { transitions } from '@/shared/animations';
 import { useHabitStore } from '@/shared/store/store';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Check, Compass as CompassIcon } from 'lucide-react';
+import { useState } from 'react';
 
 interface HabitDef {
   name: string;
@@ -22,17 +22,47 @@ const COMPASS_SETS = [
     disclaimer:
       'I share these from personal experience — not all forms of “freedom” feel the same to everyone. Take what fits your rhythm.',
     habits: [
-      { name: 'Morning Silence', mode: 'build', frequency: 'daily' },
-      { name: 'No Social Media in Morning', mode: 'break', frequency: 'daily' },
-      { name: 'Inbox Once a Day', mode: 'break', frequency: 'daily' },
-      { name: 'Deep Work Session', mode: 'build', frequency: 'weekly', weeklyTarget: 3 },
-      { name: 'Digital Sabbath', mode: 'break', frequency: 'weekly', weeklyTarget: 1 },
-      { name: 'Plan Tomorrow Before Sleep', mode: 'build', frequency: 'daily' },
-      { name: 'Declutter Workspace', mode: 'build', frequency: 'weekly', weeklyTarget: 1 },
-      { name: 'Monthly Reflection', mode: 'build', frequency: 'monthly', monthlyTarget: 1 },
-      { name: 'No Multitasking', mode: 'break', frequency: 'daily' },
-      { name: 'Walk Without Headphones', mode: 'build', frequency: 'weekly', weeklyTarget: 2 },
-      { name: 'Minimal Day', mode: 'break', frequency: 'weekly', weeklyTarget: 1 },
+      { name: 'Morning Silence', mode: 'build' as const, frequency: 'daily' as const },
+      { name: 'No Social Media in Morning', mode: 'break' as const, frequency: 'daily' as const },
+      { name: 'Inbox Once a Day', mode: 'break' as const, frequency: 'daily' as const },
+      {
+        name: 'Deep Work Session',
+        mode: 'build' as const,
+        frequency: 'weekly' as const,
+        weeklyTarget: 3,
+      },
+      {
+        name: 'Digital Sabbath',
+        mode: 'break' as const,
+        frequency: 'weekly' as const,
+        weeklyTarget: 1,
+      },
+      { name: 'Plan Tomorrow Before Sleep', mode: 'build' as const, frequency: 'daily' as const },
+      {
+        name: 'Declutter Workspace',
+        mode: 'build' as const,
+        frequency: 'weekly' as const,
+        weeklyTarget: 1,
+      },
+      {
+        name: 'Monthly Reflection',
+        mode: 'build' as const,
+        frequency: 'monthly' as const,
+        monthlyTarget: 1,
+      },
+      { name: 'No Multitasking', mode: 'break' as const, frequency: 'daily' as const },
+      {
+        name: 'Walk Without Headphones',
+        mode: 'build' as const,
+        frequency: 'weekly' as const,
+        weeklyTarget: 2,
+      },
+      {
+        name: 'Minimal Day',
+        mode: 'break' as const,
+        frequency: 'weekly' as const,
+        weeklyTarget: 1,
+      },
     ],
   },
   {
@@ -43,21 +73,36 @@ const COMPASS_SETS = [
     disclaimer:
       'My reflections here come from a Christian frame, but the point is not religion — it’s faith in something that lifts you beyond yourself.',
     habits: [
-      { name: 'Read Before Bed', mode: 'build', frequency: 'daily' },
-      { name: 'Pray or Meditate', mode: 'build', frequency: 'daily' },
-      { name: 'No Alcohol', mode: 'break', frequency: 'daily' },
-      { name: 'Write a Blessing', mode: 'build', frequency: 'weekly', weeklyTarget: 1 },
-      { name: 'Attend Aikido', mode: 'build', frequency: 'weekly', weeklyTarget: 2 },
-      { name: 'Morning Walk', mode: 'build', frequency: 'daily' },
-      { name: 'Gratitude Prayer', mode: 'build', frequency: 'daily' },
-      { name: 'Limit News Intake', mode: 'break', frequency: 'daily' },
+      { name: 'Read Before Bed', mode: 'build' as const, frequency: 'daily' as const },
+      { name: 'Pray or Meditate', mode: 'build' as const, frequency: 'daily' as const },
+      { name: 'No Alcohol', mode: 'break' as const, frequency: 'daily' as const },
+      {
+        name: 'Write a Blessing',
+        mode: 'build' as const,
+        frequency: 'weekly' as const,
+        weeklyTarget: 1,
+      },
+      {
+        name: 'Attend Aikido',
+        mode: 'build' as const,
+        frequency: 'weekly' as const,
+        weeklyTarget: 2,
+      },
+      { name: 'Morning Walk', mode: 'build' as const, frequency: 'daily' as const },
+      { name: 'Gratitude Prayer', mode: 'build' as const, frequency: 'daily' as const },
+      { name: 'Limit News Intake', mode: 'break' as const, frequency: 'daily' as const },
       {
         name: 'Reflect on Scripture / Wisdom Text',
-        mode: 'build',
-        frequency: 'weekly',
+        mode: 'build' as const,
+        frequency: 'weekly' as const,
         weeklyTarget: 3,
       },
-      { name: 'Act of Service', mode: 'build', frequency: 'weekly', weeklyTarget: 1 },
+      {
+        name: 'Act of Service',
+        mode: 'build' as const,
+        frequency: 'weekly' as const,
+        weeklyTarget: 1,
+      },
     ],
   },
   {
@@ -68,17 +113,42 @@ const COMPASS_SETS = [
     disclaimer:
       'Discipline means different things to different people. Don’t use it to punish yourself — it’s meant to build trust with your future self.',
     habits: [
-      { name: 'Code for 1 Hour', mode: 'build', frequency: 'daily' },
-      { name: 'Study English', mode: 'build', frequency: 'weekly', weeklyTarget: 2 },
-      { name: 'Journal Reflection', mode: 'build', frequency: 'daily' },
-      { name: 'Cold Shower', mode: 'build', frequency: 'daily' },
-      { name: 'Sunday Review', mode: 'build', frequency: 'weekly', weeklyTarget: 1 },
-      { name: 'Read 30 Minutes', mode: 'build', frequency: 'daily' },
-      { name: 'Practice a Skill', mode: 'build', frequency: 'daily' },
-      { name: 'Limit Distractions', mode: 'break', frequency: 'daily' },
-      { name: 'Weekly Sprint', mode: 'build', frequency: 'weekly', weeklyTarget: 1 },
-      { name: 'Teach What You Learn', mode: 'build', frequency: 'weekly', weeklyTarget: 1 },
-      { name: 'Monthly Review', mode: 'build', frequency: 'monthly', monthlyTarget: 1 },
+      { name: 'Code for 1 Hour', mode: 'build' as const, frequency: 'daily' as const },
+      {
+        name: 'Study English',
+        mode: 'build' as const,
+        frequency: 'weekly' as const,
+        weeklyTarget: 2,
+      },
+      { name: 'Journal Reflection', mode: 'build' as const, frequency: 'daily' as const },
+      { name: 'Cold Shower', mode: 'build' as const, frequency: 'daily' as const },
+      {
+        name: 'Sunday Review',
+        mode: 'build' as const,
+        frequency: 'weekly' as const,
+        weeklyTarget: 1,
+      },
+      { name: 'Read 30 Minutes', mode: 'build' as const, frequency: 'daily' as const },
+      { name: 'Practice a Skill', mode: 'build' as const, frequency: 'daily' as const },
+      { name: 'Limit Distractions', mode: 'break' as const, frequency: 'daily' as const },
+      {
+        name: 'Weekly Sprint',
+        mode: 'build' as const,
+        frequency: 'weekly' as const,
+        weeklyTarget: 1,
+      },
+      {
+        name: 'Teach What You Learn',
+        mode: 'build' as const,
+        frequency: 'weekly' as const,
+        weeklyTarget: 1,
+      },
+      {
+        name: 'Monthly Review',
+        mode: 'build' as const,
+        frequency: 'monthly' as const,
+        monthlyTarget: 1,
+      },
     ],
   },
   {
@@ -89,17 +159,42 @@ const COMPASS_SETS = [
     disclaimer:
       'I’m not good at this every day. These habits are simply my practice in learning gentleness — yours might look very different.',
     habits: [
-      { name: 'Gratitude Note', mode: 'build', frequency: 'daily' },
-      { name: 'Evening Stretch', mode: 'build', frequency: 'daily' },
-      { name: 'No Complaining', mode: 'break', frequency: 'daily' },
-      { name: 'Call a Friend', mode: 'build', frequency: 'weekly', weeklyTarget: 1 },
-      { name: 'Cook Mindfully', mode: 'build', frequency: 'weekly', weeklyTarget: 1 },
-      { name: 'Listen Without Fixing', mode: 'build', frequency: 'daily' },
-      { name: 'Compliment Someone', mode: 'build', frequency: 'daily' },
-      { name: 'Family Dinner', mode: 'build', frequency: 'weekly', weeklyTarget: 1 },
-      { name: 'Random Kindness', mode: 'build', frequency: 'weekly', weeklyTarget: 2 },
-      { name: 'Family Budget Review', mode: 'build', frequency: 'monthly', monthlyTarget: 1 },
-      { name: 'No Gossip', mode: 'break', frequency: 'daily' },
+      { name: 'Gratitude Note', mode: 'build' as const, frequency: 'daily' as const },
+      { name: 'Evening Stretch', mode: 'build' as const, frequency: 'daily' as const },
+      { name: 'No Complaining', mode: 'break' as const, frequency: 'daily' as const },
+      {
+        name: 'Call a Friend',
+        mode: 'build' as const,
+        frequency: 'weekly' as const,
+        weeklyTarget: 1,
+      },
+      {
+        name: 'Cook Mindfully',
+        mode: 'build' as const,
+        frequency: 'weekly' as const,
+        weeklyTarget: 1,
+      },
+      { name: 'Listen Without Fixing', mode: 'build' as const, frequency: 'daily' as const },
+      { name: 'Compliment Someone', mode: 'build' as const, frequency: 'daily' as const },
+      {
+        name: 'Family Dinner',
+        mode: 'build' as const,
+        frequency: 'weekly' as const,
+        weeklyTarget: 1,
+      },
+      {
+        name: 'Random Kindness',
+        mode: 'build' as const,
+        frequency: 'weekly' as const,
+        weeklyTarget: 2,
+      },
+      {
+        name: 'Family Budget Review',
+        mode: 'build' as const,
+        frequency: 'monthly' as const,
+        monthlyTarget: 1,
+      },
+      { name: 'No Gossip', mode: 'break' as const, frequency: 'daily' as const },
     ],
   },
 ];
@@ -112,7 +207,7 @@ export default function Compass() {
     const freq = h.frequency;
     const weekly = h.weeklyTarget ?? 1;
     const monthly = h.monthlyTarget ?? 1;
-    addHabit(h.name, freq as any, weekly, monthly, h.mode);
+    addHabit(h.name, freq, weekly, monthly, h.mode);
     setRecentlyAdded((s) => [...s, h.name]);
     setTimeout(() => setRecentlyAdded((s) => s.filter((n) => n !== h.name)), 1400);
   };
@@ -133,7 +228,7 @@ export default function Compass() {
         </p>
       </section>
 
-      {COMPASS_SETS.map((set: any) => (
+      {COMPASS_SETS.map((set) => (
         <section key={set.dir}>
           <div className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-4 bg-white dark:bg-black shadow-sm">
             <div>
@@ -147,7 +242,7 @@ export default function Compass() {
 
             <div className="mt-4">
               <div className="flex flex-wrap gap-3 justify-center">
-                {set.habits.map((h: any) => (
+                {set.habits.map((h) => (
                   <motion.button
                     key={h.name}
                     type="button"

@@ -1,19 +1,19 @@
-import type { ComponentType } from 'react';
 import {
-  Zap,
-  ShieldCheck,
-  Sunrise,
+  BatteryFull,
   CalendarRange,
-  Smile,
+  Clock,
+  Focus,
+  HeartPulse,
+  Hourglass,
+  Infinity as InfinityIcon,
   Medal,
   Scale,
-  HeartPulse,
-  Focus,
-  BatteryFull,
-  Clock,
-  Hourglass,
-  Infinity,
+  ShieldCheck,
+  Smile,
+  Sunrise,
+  Zap,
 } from 'lucide-react';
+import type { ComponentType } from 'react';
 
 export type TrophyGroup =
   | 'daily_build'
@@ -29,7 +29,7 @@ export interface TrophyDef {
   label: string;
   group: TrophyGroup;
   threshold: number;
-  Icon: ComponentType<any>;
+  Icon: ComponentType<React.SVGProps<SVGSVGElement>>;
   // short reason/description shown under the title (e.g. "7-day streak")
   reason?: string;
 }
@@ -271,7 +271,7 @@ export const TROPHIES: TrophyDef[] = [
     label: 'Circle Complete',
     group: 'milestone',
     threshold: 365,
-    Icon: Infinity,
+    Icon: InfinityIcon,
     reason: 'Used Ritus for a full year',
   },
   // Emoji journaling trophies (consecutive days with an emoji of the day)

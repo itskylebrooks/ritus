@@ -1,14 +1,14 @@
-import { Coins, HeartPulse } from 'lucide-react';
 import ProgressBar from '@/shared/components/charts/ProgressBar';
 import { LEVEL_TITLES, levelWindow } from '@/shared/constants/progression';
 import { useHabitStore } from '@/shared/store/store';
+import { Coins, HeartPulse } from 'lucide-react';
 
 export default function MilestonesHeaderCard() {
   const essence = useHabitStore((s) => s.progress.essence);
   const points = useHabitStore((s) => s.progress.points);
   const level = useHabitStore((s) => s.progress.level);
 
-  const { curMin, nextMin, within, needed, pct } = levelWindow(essence);
+  const { within, needed } = levelWindow(essence);
   const levelTitle = LEVEL_TITLES[level - 1] ?? '—';
 
   // points progress bar removed per design; keep top-right display only

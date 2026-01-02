@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useRef, useState, useDeferredValue } from 'react';
-import { CirclePlus } from 'lucide-react';
+import { useMotionPreferences } from '@/shared/animations';
 import { emojiCategories, emojiIndex, EmojiItem } from '@/shared/constants/emojis';
 import { useEmojiOfTheDay } from '@/shared/hooks/useEmojiOfTheDay';
-import { useMotionPreferences } from '@/shared/animations';
+import { CirclePlus } from 'lucide-react';
+import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 
 function normalizeQuery(value: string) {
   return value
@@ -54,14 +54,14 @@ export default function EmojiPicker() {
 
   // Modal open/close helpers (match Settings modal behavior)
   const CLOSE_DURATION = 280;
-  function beginClose() {
+  const beginClose = useCallback(() => {
     if (!open || closing) return;
     setClosing(true);
     closeTimerRef.current = window.setTimeout(() => {
       setClosing(false);
       setOpen(false);
     }, CLOSE_DURATION + 40);
-  }
+  }, [open, closing]);
 
   useEffect(() => {
     if (!open) return;
@@ -125,7 +125,7 @@ export default function EmojiPicker() {
       }
       if (closeTimerRef.current) window.clearTimeout(closeTimerRef.current);
     };
-  }, [open]);
+  }, [open, beginClose]);
 
   // keep emoji selection valid even if assets change
   useEffect(() => {
@@ -133,7 +133,7 @@ export default function EmojiPicker() {
     if (!emojiIndex.has(emojiId)) {
       clearEmoji();
     }
-  }, [emojiId, clearEmoji]);
+  }, [emojiId, clearEmoji, beginClose]);
 
   return (
     <div className="relative" ref={containerRef}>

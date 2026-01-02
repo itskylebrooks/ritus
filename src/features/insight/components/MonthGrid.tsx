@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useRef } from 'react';
-import { addDays, endOfYear, format, isSameDay, startOfWeek, startOfYear } from 'date-fns';
 import { useHabitStore } from '@/shared/store/store';
 import type { Habit } from '@/shared/types';
 import { fromISO } from '@/shared/utils/date';
+import { addDays, endOfYear, format, isSameDay, startOfYear } from 'date-fns';
+import { useEffect, useMemo, useRef } from 'react';
 
 // Render a GitHub-style contributions heatmap: columns = weeks, rows = weekdays.
 // Non-interactive (read-only) view. Shows ~52 weeks ending at the provided month reference.
@@ -33,41 +33,45 @@ export default function MonthGrid({
   // Dec 31 is placed; the remaining cells in the final column are null placeholders.
   const yearStartDate = startOfYear(month);
   const yearEndDate = endOfYear(month);
-  const cols: (Date | null)[][] = [];
-  let cur = new Date(yearStartDate);
-  // Determine row index in column for Jan 1 relative to weekStart
-  const jan1 = new Date(yearStartDate);
-  const jan1Weekday = jan1.getDay(); // 0..6
-  const jan1Row = (jan1Weekday - ws + 7) % 7;
 
-  // First column: fill placeholders until jan1Row, then fill with dates
-  let col: (Date | null)[] = Array.from({ length: 7 }).map(() => null);
-  // place jan1 at jan1Row
-  // fill preceding rows with null (already null)
-  col[jan1Row] = new Date(cur);
-  cur = addDays(cur, 1);
-  // fill remaining rows in first col
-  for (let r = jan1Row + 1; r < 7; r++) {
-    if (cur <= yearEndDate) {
-      col[r] = new Date(cur);
-      cur = addDays(cur, 1);
-    } else col[r] = null;
-  }
-  cols.push(col);
+  const cols = useMemo(() => {
+    const cols: (Date | null)[][] = [];
+    let cur = new Date(yearStartDate);
+    // Determine row index in column for Jan 1 relative to weekStart
+    const jan1 = new Date(yearStartDate);
+    const jan1Weekday = jan1.getDay(); // 0..6
+    const jan1Row = (jan1Weekday - ws + 7) % 7;
 
-  // subsequent columns
-  while (cur <= yearEndDate) {
-    const c: (Date | null)[] = Array.from({ length: 7 }).map(() => null);
-    for (let r = 0; r < 7; r++) {
+    // First column: fill placeholders until jan1Row, then fill with dates
+    const col: (Date | null)[] = Array.from({ length: 7 }).map(() => null);
+    // place jan1 at jan1Row
+    // fill preceding rows with null (already null)
+    col[jan1Row] = new Date(cur);
+    cur = addDays(cur, 1);
+    // fill remaining rows in first col
+    for (let r = jan1Row + 1; r < 7; r++) {
       if (cur <= yearEndDate) {
-        c[r] = new Date(cur);
+        col[r] = new Date(cur);
         cur = addDays(cur, 1);
-      } else c[r] = null;
+      } else col[r] = null;
     }
-    cols.push(c);
-  }
+    cols.push(col);
 
-  const today = new Date();
+    // subsequent columns
+    while (cur <= yearEndDate) {
+      const c: (Date | null)[] = Array.from({ length: 7 }).map(() => null);
+      for (let r = 0; r < 7; r++) {
+        if (cur <= yearEndDate) {
+          c[r] = new Date(cur);
+          cur = addDays(cur, 1);
+        } else c[r] = null;
+      }
+      cols.push(c);
+    }
+    return cols;
+  }, [yearStartDate, yearEndDate, ws]);
+
+  const today = useMemo(() => new Date(), []);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   // when alignToNow is requested, scroll the container so the week containing `today`
@@ -86,11 +90,12 @@ export default function MonthGrid({
           const scrollLeft = target.offsetLeft + target.offsetWidth - el.clientWidth;
           el.scrollLeft = scrollLeft > 0 ? scrollLeft : 0;
         }
-      } catch {}
+      } catch {
+        // Ignore scroll errors
+      }
     });
-  }, [alignToNow, cols.length]);
+  }, [alignToNow, cols, today]);
 
-  // compute month labels: show the month only on the first column where that month appears
   const targetYear = startOfYear(month).getFullYear();
   const rawLabels: (string | null)[] = cols.map((col) => {
     const first = col.find((d) => d && d.getFullYear() === targetYear) ?? null;

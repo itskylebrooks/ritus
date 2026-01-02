@@ -1,5 +1,6 @@
+/* eslint-disable no-empty */
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 type ThemeMode = 'system' | 'light' | 'dark';
 type Theme = 'light' | 'dark';
@@ -35,7 +36,7 @@ function readSystemPref(): Theme {
 
 export const useThemeStore = create<ThemeState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       mode: 'system',
       theme: readSystemPref(),
       setMode: (m: ThemeMode) => {
@@ -54,8 +55,12 @@ export const useThemeStore = create<ThemeState>()(
         try {
           if (mq && mqListener && mq.removeEventListener)
             mq.removeEventListener('change', mqListener);
-          else if (mq && mqListener && (mq as any).removeListener)
-            (mq as any).removeListener(mqListener);
+          else if (mq && mqListener && 'removeListener' in mq)
+            (
+              mq as MediaQueryList & {
+                removeListener: (listener: (e: MediaQueryListEvent) => void) => void;
+              }
+            ).removeListener(mqListener);
         } catch {}
 
         mq = null;
@@ -73,7 +78,12 @@ export const useThemeStore = create<ThemeState>()(
               } catch {}
             };
             if (mq && mq.addEventListener) mq.addEventListener('change', mqListener);
-            else if (mq && (mq as any).addListener) (mq as any).addListener(mqListener);
+            else if (mq && 'addListener' in mq)
+              (
+                mq as MediaQueryList & {
+                  addListener: (listener: (e: MediaQueryListEvent) => void) => void;
+                }
+              ).addListener(mqListener);
           } catch {}
         } else {
           // write last-resolved theme
@@ -120,7 +130,7 @@ if (typeof window !== 'undefined') {
         if (last) {
           const st = useThemeStore.getState();
           if (st.theme !== last) {
-            (useThemeStore as any).setState({ theme: last });
+            useThemeStore.setState({ theme: last });
             applyThemeClass(last);
           }
         }

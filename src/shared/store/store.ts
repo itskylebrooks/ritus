@@ -1,11 +1,11 @@
+import { COLLECTIBLES } from '@/shared/constants/collectibles';
+import { computeLevel } from '@/shared/constants/progression';
+import { TROPHIES } from '@/shared/constants/trophies';
+import type { Frequency, Habit } from '@/shared/types';
+import { daysThisWeek, fromISO, iso, isSameDay, lastNDays, startOfWeek } from '@/shared/utils/date';
+import { recalc } from '@/shared/utils/scoring';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { COLLECTIBLES } from '@/shared/constants/collectibles';
-import { TROPHIES } from '@/shared/constants/trophies';
-import { computeLevel } from '@/shared/constants/progression';
-import { fromISO, iso, isSameDay, lastNDays, startOfWeek, daysThisWeek } from '@/shared/utils/date';
-import { recalc } from '@/shared/utils/scoring';
-import type { Frequency, Habit } from '@/shared/types';
 
 export interface HabitState {
   habits: Habit[];
@@ -256,7 +256,7 @@ export const useHabitStore = create<HabitState>()(
             ...allHabits.filter((h) => h.frequency === 'weekly').map((h) => h.streak || 0),
           );
         const monthlyStreak =
-          (summary as any)?.monthlyStreak ??
+          (summary as { monthlyStreak?: number } | undefined)?.monthlyStreak ??
           Math.max(
             0,
             ...allHabits.filter((h) => h.frequency === 'monthly').map((h) => h.streak || 0),

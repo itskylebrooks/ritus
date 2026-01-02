@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useMemo } from 'react';
+/* eslint-disable no-empty */
 import { emojiIndex, EmojiItem, resolveEmojiId } from '@/shared/constants/emojis';
 import { useHabitStore } from '@/shared/store/store';
 import { iso } from '@/shared/utils/date';
+import { useCallback, useEffect, useMemo } from 'react';
 
 export interface EmojiOfTheDayState {
   emoji: EmojiItem | null;
@@ -18,16 +19,14 @@ export function useEmojiOfTheDay(): EmojiOfTheDayState {
   const rawEmojiId = useHabitStore(
     (s) => (s.emojiByDate || {})[today] || (s.emojiByDate || {})[todayShort] || null,
   );
-  const setEmojiForDate = useHabitStore(
-    (s) => (s as any).setEmojiForDate as (d: string, id: string | null) => void,
-  );
+  const setEmojiForDate = useHabitStore((s) => s.setEmojiForDate);
   const recentsIds = useHabitStore((s) => (Array.isArray(s.emojiRecents) ? s.emojiRecents : []));
   const emojiId = rawEmojiId ? resolveEmojiId(rawEmojiId) : null;
 
   useEffect(() => {
     if (!rawEmojiId || !emojiId || rawEmojiId === emojiId) return;
     try {
-      setEmojiForDate(today, emojiId);
+      setEmojiForDate?.(today, emojiId);
     } catch {}
   }, [rawEmojiId, emojiId, setEmojiForDate, today]);
 
@@ -41,7 +40,7 @@ export function useEmojiOfTheDay(): EmojiOfTheDayState {
       normalizedRecents.some((id, idx) => id !== recentsIds[idx]);
     if (!hasDiff) return;
     try {
-      useHabitStore.setState((state) => ({
+      useHabitStore.setState?.((state) => ({
         ...state,
         emojiRecents: normalizedRecents,
       }));
@@ -51,7 +50,7 @@ export function useEmojiOfTheDay(): EmojiOfTheDayState {
   const setEmojiId = useCallback(
     (id: string | null) => {
       try {
-        setEmojiForDate(today, id);
+        setEmojiForDate?.(today, id);
       } catch {}
     },
     [setEmojiForDate, today],

@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 import { useHabitStore } from '@/shared/store/store';
 
 type AccentId = 'accent_ocean' | 'accent_ember' | 'accent_sage' | 'default';
@@ -50,7 +51,7 @@ function resolveCurrentAccentId(): AccentId {
   try {
     const s = useHabitStore.getState();
     const id = s.progress?.appliedCollectibles?.accent as AccentId | undefined;
-    return id && (ACCENTS as any)[id] ? id : 'default';
+    return id && id in ACCENTS ? id : 'default';
   } catch {
     return 'default';
   }
@@ -75,7 +76,7 @@ export function initAccentSync() {
       } catch {}
     });
     // Expose a teardown on window for debugging; optional and safe
-    (window as any).__ritusAccentUnsub = unsub;
+    (window as Window & { __ritusAccentUnsub?: () => void }).__ritusAccentUnsub = unsub;
   } catch {}
 }
 

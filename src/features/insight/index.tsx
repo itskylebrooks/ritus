@@ -1,19 +1,18 @@
-import { useMemo, useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { addYears, isAfter, startOfMonth, startOfYear } from 'date-fns';
 import Badge from '@/shared/components/cards/Badge';
 import { useHabitStore } from '@/shared/store/store';
 import type { Habit } from '@/shared/types';
 import { fromISO } from '@/shared/utils/date';
-import HeaderStats from './components/HeaderStats';
-import MonthGrid from './components/MonthGrid';
-import HistoryChart from './components/HistoryChart';
+import { addYears, isAfter } from 'date-fns';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import EmojiHistoryCard from './components/EmojiHistoryCard';
+import HeaderStats from './components/HeaderStats';
+import HistoryChart from './components/HistoryChart';
+import MonthGrid from './components/MonthGrid';
 
 export default function Insight() {
   const habits = useHabitStore((s) => s.habits);
   const showArchived = useHabitStore((s) => s.showArchived);
-  const toggleCompletion = useHabitStore((s) => s.toggleCompletion);
 
   // local month state per habit keyed by habit id
   const [months, setMonths] = useState<Record<string, Date>>({});

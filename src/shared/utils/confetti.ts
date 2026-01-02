@@ -39,7 +39,7 @@ export async function fireConfetti(particleCount: number = 120) {
       ticks: 200,
       zIndex: 9999,
     });
-  } catch (e) {
+  } catch {
     // Silently ignore if module fails; non-critical UX
   }
 }

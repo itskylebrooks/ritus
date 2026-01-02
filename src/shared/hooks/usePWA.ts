@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -26,13 +26,14 @@ export function usePWA() {
     // Check device type
     const iosDevice = isIOS();
     const androidDevice = isAndroid();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsIosDevice(iosDevice);
     setIsAndroidDevice(androidDevice);
 
     // Check if already installed
     if (
       window.matchMedia('(display-mode: standalone)').matches ||
-      (window.navigator as any).standalone === true
+      (window.navigator as Navigator & { standalone?: boolean }).standalone === true
     ) {
       setIsInstalled(true);
       return;

@@ -1,11 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
-import { exportAllData, importAllData } from '@/shared/utils/dataTransfer';
-import useThemeStore from '@/shared/store/theme';
-import { useHabitStore } from '@/shared/store/store';
+/* eslint-disable no-empty */
 import { usePWA } from '@/shared/hooks/usePWA';
+import { useHabitStore } from '@/shared/store/store';
+import useThemeStore from '@/shared/store/theme';
+import { exportAllData, importAllData } from '@/shared/utils/dataTransfer';
+import { ChevronDown, Linkedin, User } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import pkg from '../../../../package.json';
 import ConfirmModal from './ConfirmModal';
-import { ChevronDown, Linkedin, User } from 'lucide-react';
 function clearAllData() {
   localStorage.clear();
 }
@@ -29,6 +30,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
   const weekStart = useHabitStore((s) => s.weekStart);
   const setWeekStart = useHabitStore((s) => s.setWeekStart);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [reminders, setReminders] = useState(
     () => storeReminders || { dailyEnabled: false, dailyTime: '21:00' },
   );
@@ -39,7 +41,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
   const isSystemTheme = mode === 'system';
 
   // PWA installation
-  const { isInstalled, canInstall, install, isIosDevice } = usePWA();
+  const { isInstalled, canInstall, install } = usePWA();
 
   const [exporting, setExporting] = useState(false);
   const [importing, setImporting] = useState(false);
@@ -78,13 +80,19 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
     timeoutRef.current = window.setTimeout(() => {
       try {
         onClose();
-      } catch {}
+      } catch {
+        // Ignore close errors
+      }
       if (pendingRef.current === 'guide') {
         // little buffer so the settings overlay/panel fully finishes animating
         window.setTimeout(() => {
           try {
-            onShowGuide && onShowGuide();
-          } catch {}
+            if (onShowGuide) {
+              onShowGuide();
+            }
+          } catch {
+            // Ignore errors
+          }
           pendingRef.current = 'none';
         }, 80);
       } else {
@@ -93,18 +101,11 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
     }, CLOSE_DURATION + 40);
   }
 
-  function handleShowGuide() {
-    if (!onShowGuide) return;
-    pendingRef.current = 'guide';
-    // start the close animation; onClose will be called after CLOSE_DURATION, then we'll trigger guide from the parent via pendingRef in beginClose
-    beginClose();
-  }
-
   useEffect(() => {
     if (open) {
       setReminders(storeReminders || { dailyEnabled: false, dailyTime: '21:00' });
     }
-  }, [open]);
+  }, [open, storeReminders]);
 
   // useThemeStore.setMode handles persistence, syncing and applying class
   function applyTheme(next: ThemeMode) {
@@ -212,10 +213,6 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
   function handleDeleteAllLocal() {
     setConfirmClearOpen(true);
   }
-
-  // reserved for potential future design accents
-
-  const dailyEnabled = reminders.dailyEnabled;
 
   if (!open && !closing) return null;
   return (
@@ -491,43 +488,43 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
             className="hidden"
           />
 
-          {false && (
-            <div className="text-sm">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-sm font-semibold">Daily reminder</div>
-                  <div className="text-[12px] text-muted mt-1">
-                    Will be implemented in a future update.
-                  </div>
-                </div>
-                <div>
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={dailyEnabled}
-                    onClick={() => {
-                      const v = { ...reminders, dailyEnabled: !dailyEnabled };
-                      setReminders(v);
-                      try {
-                        storeSetReminders(v);
-                      } catch {}
-                    }}
-                    className={`inline-flex items-center px-3 py-2 rounded-full transition ${dailyEnabled ? 'bg-success text-inverse' : 'bg-subtle text-muted'}`}
-                  >
-                    <span className="mr-3 text-sm">{dailyEnabled ? 'On' : 'Off'}</span>
-                    <span
-                      className={`relative inline-block w-11 h-6 rounded-full ${dailyEnabled ? 'bg-success' : 'bg-chip'}`}
-                    >
-                      <span
-                        className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-surface shadow transform"
-                        style={{ transform: dailyEnabled ? 'translateX(1.4rem)' : 'translateX(0)' }}
-                      />
-                    </span>
-                  </button>
+          {/* Future feature: Daily reminder - temporarily disabled
+          <div className="text-sm">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-sm font-semibold">Daily reminder</div>
+                <div className="text-[12px] text-muted mt-1">
+                  Will be implemented in a future update.
                 </div>
               </div>
+              <div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={dailyEnabled}
+                  onClick={() => {
+                    const v = { ...reminders, dailyEnabled: !dailyEnabled };
+                    setReminders(v);
+                    try {
+                      storeSetReminders(v);
+                    } catch {}
+                  }}
+                  className={`inline-flex items-center px-3 py-2 rounded-full transition ${dailyEnabled ? 'bg-success text-inverse' : 'bg-subtle text-muted'}`}
+                >
+                  <span className="mr-3 text-sm">{dailyEnabled ? 'On' : 'Off'}</span>
+                  <span
+                    className={`relative inline-block w-11 h-6 rounded-full ${dailyEnabled ? 'bg-success' : 'bg-chip'}`}
+                  >
+                    <span
+                      className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-surface shadow transform"
+                      style={{ transform: dailyEnabled ? 'translateX(1.4rem)' : 'translateX(0)' }}
+                    />
+                  </span>
+                </button>
+              </div>
             </div>
-          )}
+          </div>
+          */}
         </div>
 
         <div className="mt-5">

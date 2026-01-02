@@ -1,12 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+/* eslint-disable no-empty */
+import { defaultEase, useMotionPreferences } from '@/shared/animations';
 import defaultHabits, {
-  defaultProgress,
   defaultEmojiByDate,
   defaultEmojiRecents,
+  defaultProgress,
 } from '@/shared/store/defaultHabits';
 import { useHabitStore } from '@/shared/store/store';
-import { useMotionPreferences, defaultEase } from '@/shared/animations';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
 import ConfirmModal from './ConfirmModal';
 
 interface GuideModalProps {
@@ -176,6 +177,7 @@ export default function GuideModal({ open, onClose, onLoadExample }: GuideModalP
         closeTimer.current = null;
       }
       if (enterRaf.current) cancelAnimationFrame(enterRaf.current);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setVisible(true);
       setClosing(false);
       setEntering(true);

@@ -1,3 +1,7 @@
+import { useHabitStore } from '@/shared/store/store';
+import type { Habit } from '@/shared/types';
+import { fromISO } from '@/shared/utils/date';
+import { endOfMonth, format, startOfMonth, startOfWeek, subMonths, subWeeks } from 'date-fns';
 import { useMemo, useState } from 'react';
 import {
   Area,
@@ -8,10 +12,6 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { endOfMonth, format, startOfMonth, startOfWeek, subMonths, subWeeks } from 'date-fns';
-import type { Habit } from '@/shared/types';
-import { useHabitStore } from '@/shared/store/store';
-import { fromISO } from '@/shared/utils/date';
 
 // Progress accrual constants (mirror store toggle logic)
 const ESSENCE_PER_COMPLETION = 5;
@@ -159,7 +159,10 @@ export default function HistoryChart() {
                 borderRadius: 8,
               }}
               labelFormatter={(l) => `${l}`}
-              formatter={(v: any) => [`${v} progress`, mode === 'week' ? 'Week' : 'Month']}
+              formatter={(v: number | string) => [
+                `${v} progress`,
+                mode === 'week' ? 'Week' : 'Month',
+              ]}
             />
             <Area
               type="monotone"

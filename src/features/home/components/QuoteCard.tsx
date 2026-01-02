@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
-import { Check, Quote } from 'lucide-react';
 import { QUOTES } from '@/shared/utils/quotes';
+import { Check, Quote } from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 export default function QuoteCard() {
   // Choose a random quote once and keep it so copying doesn't change it
@@ -25,7 +25,7 @@ export default function QuoteCard() {
       await navigator.clipboard.writeText(formatted);
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1400);
-    } catch (err) {
+    } catch {
       // fallback: try execCommand (older browsers) or log
       try {
         const textarea = document.createElement('textarea');
@@ -39,9 +39,8 @@ export default function QuoteCard() {
         document.body.removeChild(textarea);
         setCopied(true);
         window.setTimeout(() => setCopied(false), 1400);
-      } catch (err2) {
-        // eslint-disable-next-line no-console
-        console.error('Copy failed', err2);
+      } catch {
+        console.error('Copy failed');
       }
     }
   };

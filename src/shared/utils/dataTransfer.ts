@@ -1,9 +1,9 @@
-import pkg from '../../../package.json';
+import { resolveEmojiId } from '@/shared/constants/emojis';
 import { useHabitStore } from '@/shared/store/store';
 import type { Habit } from '@/shared/types';
+import pkg from '../../../package.json';
+import { fromISO, iso } from './date';
 import { recalc } from './scoring';
-import { iso, fromISO } from './date';
-import { emojiIndex, resolveEmojiId } from '@/shared/constants/emojis';
 
 export interface ImportResult {
   ok: true;
@@ -92,16 +92,21 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
       ? (parsed.emojiRecents as unknown[])
       : undefined;
     // Back-compat: if old exports had only emojiOfTheDay, map to today's date
-    if (!incomingEmojiByDate && (parsed as any).emojiOfTheDay) {
+    const parsedUnknown = parsed as Record<string, unknown>;
+    if (!incomingEmojiByDate && parsedUnknown.emojiOfTheDay) {
       const candidate =
-        typeof (parsed as any).emojiOfTheDay === 'string'
-          ? (parsed as any).emojiOfTheDay
-          : (parsed as any).emojiOfTheDay?.id;
+        typeof parsedUnknown.emojiOfTheDay === 'string'
+          ? parsedUnknown.emojiOfTheDay
+          : typeof parsedUnknown.emojiOfTheDay === 'object' &&
+              parsedUnknown.emojiOfTheDay !== null &&
+              'id' in parsedUnknown.emojiOfTheDay
+            ? (parsedUnknown.emojiOfTheDay as { id: string }).id
+            : undefined;
       const normalized = normalizeId(candidate);
       if (normalized) {
         const today = new Date().toISOString().slice(0, 10);
         incomingEmojiRecents = [normalized];
-        (parsed as any).emojiByDate = { [today]: normalized };
+        parsedUnknown.emojiByDate = { [today]: normalized };
       }
     }
     if (incomingEmojiRecents) {
@@ -132,7 +137,7 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
         mode: (h as Habit).mode ?? 'build',
         weeklyTarget: (h as Habit).weeklyTarget,
         monthlyTarget: (h as Habit).monthlyTarget,
-        archived: Boolean((h as any).archived ?? false),
+        archived: Boolean((h as Habit & { archived?: boolean }).archived ?? false),
         streak: Number((h as Habit).streak ?? 0),
         points: Number((h as Habit).points ?? 0),
       }),
@@ -165,8 +170,14 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
       showAdd: cur.showAdd,
       // include progress when persisting import
       progress: incomingProgress ?? cur.progress,
-      emojiByDate: incomingEmojiByDate ?? (cur as any).emojiByDate ?? {},
-      emojiRecents: incomingEmojiRecents ?? (cur as any).emojiRecents ?? [],
+      emojiByDate:
+        incomingEmojiByDate ??
+        (cur as typeof cur & { emojiByDate?: Record<string, string> }).emojiByDate ??
+        {},
+      emojiRecents:
+        incomingEmojiRecents ??
+        (cur as typeof cur & { emojiRecents?: string[] }).emojiRecents ??
+        [],
     };
 
     try {
@@ -179,7 +190,7 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
 
     // Update in-memory store so the UI reflects the import immediately.
     // Use setState to update only the persisted fields; keep other funcs intact.
-    useHabitStore.setState((s) => ({
+    useHabitStore.setState(() => ({
       habits: updated.habits,
       totalPoints: updated.totalPoints,
       longestStreak: updated.longestStreak,
@@ -187,7 +198,9 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
       weekStart: updated.weekStart,
       progress: updated.progress,
       emojiByDate: updated.emojiByDate,
-      emojiRecents: updated.emojiRecents,
+      emojiRecents: Array.isArray(updated.emojiRecents)
+        ? updated.emojiRecents.filter((id): id is string => typeof id === 'string')
+        : [],
     }));
 
     // No separate localStorage key; emoji data is part of the store snapshot above

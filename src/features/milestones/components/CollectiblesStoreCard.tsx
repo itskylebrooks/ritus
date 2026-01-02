@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import type { CollectibleType } from '@/shared/constants/collectibles';
 import { COLLECTIBLES } from '@/shared/constants/collectibles';
 import { useHabitStore } from '@/shared/store/store';
-import type { CollectibleType } from '@/shared/constants/collectibles';
+import { useState } from 'react';
 
 export default function CollectiblesStoreCard() {
   const points = useHabitStore((s) => s.progress.points || 0);
@@ -9,7 +9,7 @@ export default function CollectiblesStoreCard() {
   const owned = new Set(ownedArr);
   const applied = useHabitStore((s) => s.progress.appliedCollectibles || {});
   const buy = useHabitStore((s) => s.purchaseCollectible);
-  const apply = useHabitStore((s) => (s as any).applyCollectible as (id: string) => boolean);
+  const apply = useHabitStore((s) => s.applyCollectible);
 
   // transient icon flash state keyed by collectible id
   const [flash, setFlash] = useState<Record<string, boolean>>({});

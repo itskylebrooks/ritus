@@ -1,19 +1,18 @@
-import { ChartNoAxesColumnIncreasing, Flame, Info } from 'lucide-react';
 import ProgressBar from '@/shared/components/charts/ProgressBar';
 import { useHabitStore } from '@/shared/store/store';
+import { daysThisWeek } from '@/shared/utils/date';
 import {
-  countCompletionsInWeek,
   countCompletionsInMonth,
+  countCompletionsInWeek,
   hasCompletionOnDay,
 } from '@/shared/utils/scoring';
-import { daysThisWeek } from '@/shared/utils/date';
+import { ChartNoAxesColumnIncreasing, Flame, Info } from 'lucide-react';
 
 export default function HeaderStats() {
   const habits = useHabitStore((s) => s.habits);
   // subscribe to weekStart so weekly totals update when user changes first day of week
   const weekStart = useHabitStore((s) => s.weekStart);
   // use cumulative totals from the store so they persist across deletions
-  const totalPoints = useHabitStore((s) => s.totalPoints);
   const longestStreak = useHabitStore((s) => s.longestStreak);
 
   const weekStartsOn = weekStart === 'sunday' ? 0 : 1;

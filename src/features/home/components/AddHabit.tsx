@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
 import { transitions } from '@/shared/animations';
-import { ChevronDown, Plus } from 'lucide-react';
 import { HABIT_SUGGESTIONS } from '@/shared/constants/habitSuggestions';
 import { useHabitStore } from '@/shared/store/store';
 import type { Frequency } from '@/shared/types';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ChevronDown, Plus } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function AddHabit() {
   const addHabit = useHabitStore((s) => s.addHabit);
@@ -37,7 +37,6 @@ export default function AddHabit() {
       // surface to console and avoid crashing the UI
       // keep reset of inputs only if add succeeded; here we still reset so user can retry
       // developer can inspect errors via remote debugging
-      // eslint-disable-next-line no-console
       console.error('Failed to add habit', err);
     }
     setName('');
@@ -109,6 +108,7 @@ export default function AddHabit() {
         typingTimer.current = null;
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, name]);
 
   return (

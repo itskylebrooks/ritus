@@ -1,26 +1,26 @@
-import type { ComponentType } from 'react';
 import {
-  SunMoon,
+  Anchor,
+  Bell,
   BookOpen,
-  Waves,
-  Flame,
-  Leaf,
-  Star,
   Compass,
-  Gem,
   Feather,
+  Flame,
   Gauge,
-  Radar,
-  Target,
-  PlayCircle,
+  Gem,
+  Hourglass,
+  Lamp,
+  Leaf,
   Medal,
   Moon,
-  Hourglass,
-  Bell,
-  Anchor,
-  Lamp,
+  PlayCircle,
+  Radar,
   Stamp,
+  Star,
+  SunMoon,
+  Target,
+  Waves,
 } from 'lucide-react';
+import type { ComponentType } from 'react';
 
 export type CollectibleType = 'clock' | 'quotes' | 'accent' | 'relic';
 export type Rarity = 'common' | 'rare' | 'epic';
@@ -30,7 +30,7 @@ export interface CollectibleDef {
   type: CollectibleType;
   title: string;
   desc: string;
-  icon: ComponentType<any>;
+  icon: ComponentType<React.SVGProps<SVGSVGElement>>;
   rarity: Rarity;
   cost: number;
   implemented?: boolean;

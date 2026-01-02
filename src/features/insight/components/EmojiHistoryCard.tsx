@@ -1,4 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { emojiIndex } from '@/shared/constants/emojis';
+import { useHabitStore } from '@/shared/store/store';
+import { iso } from '@/shared/utils/date';
 import {
   addDays,
   addYears,
@@ -10,9 +12,7 @@ import {
   startOfYear,
 } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useHabitStore } from '@/shared/store/store';
-import { iso } from '@/shared/utils/date';
-import { emojiIndex } from '@/shared/constants/emojis';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 export default function EmojiHistoryCard() {
   const emojiByDate = useHabitStore((s) => s.emojiByDate || {});
@@ -21,6 +21,7 @@ export default function EmojiHistoryCard() {
 
   const today = new Date();
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   function buildCols(rangeStart: Date, rangeEnd: Date) {
     const startAligned = startOfWeek(rangeStart, { weekStartsOn: ws as 0 | 1 });
     const minDate = rangeStart;
@@ -41,7 +42,7 @@ export default function EmojiHistoryCard() {
 
   const yearCols = useMemo(
     () => buildCols(startOfYear(yearDate), endOfYear(yearDate)),
-    [yearDate, ws],
+    [yearDate, buildCols],
   );
 
   const weekdayLabels = useMemo(() => {
@@ -91,7 +92,10 @@ export default function EmojiHistoryCard() {
           const scrollLeft = target.offsetLeft + target.offsetWidth - el.clientWidth;
           el.scrollLeft = scrollLeft > 0 ? scrollLeft : 0;
         }
-      } catch {}
+      } catch {
+        // Ignore scroll errors
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [cols.length, baseYear]);
 
     return (
@@ -123,7 +127,10 @@ export default function EmojiHistoryCard() {
             </div>
           </div>
         )}
-        <div className="flex gap-3" style={fillWidth ? { ['--cell' as any]: cellVar } : undefined}>
+        <div
+          className="flex gap-3"
+          style={fillWidth ? ({ '--cell': cellVar } as React.CSSProperties) : undefined}
+        >
           {/* weekday labels */}
           <div className="flex flex-col items-end gap-1 mr-2">
             {weekdayLabels.map((d) => {

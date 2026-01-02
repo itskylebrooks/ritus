@@ -1,9 +1,10 @@
+/* eslint-disable no-empty */
+import '@/shared/styles/index.css';
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { registerSW } from 'virtual:pwa-register';
 import App from './App';
-import '@/shared/styles/index.css';
 // Ensure theme store is initialized early so it can apply the resolved theme and listeners
 import '@/shared/store/theme';
 import initAccentSync from '@/shared/theme/accent';
