@@ -1,9 +1,12 @@
-import { useHabitStore } from '@/shared/store/store'
+import { useHabitStore } from '@/shared/store/store';
 
-type AccentId = 'accent_ocean' | 'accent_ember' | 'accent_sage' | 'default'
+type AccentId = 'accent_ocean' | 'accent_ember' | 'accent_sage' | 'default';
 
 // Define light/dark pairs with appropriate text contrast
-const ACCENTS: Record<AccentId, { light: string; lightContrast: string; dark: string; darkContrast: string }> = {
+const ACCENTS: Record<
+  AccentId,
+  { light: string; lightContrast: string; dark: string; darkContrast: string }
+> = {
   default: {
     light: '#111827',
     lightContrast: '#ffffff',
@@ -31,47 +34,49 @@ const ACCENTS: Record<AccentId, { light: string; lightContrast: string; dark: st
     dark: '#31ed76',
     darkContrast: '#050505',
   },
-}
+};
 
 function applyAccentVars(id: AccentId) {
-  if (typeof document === 'undefined') return
-  const def = ACCENTS[id] || ACCENTS.default
-  const root = document.documentElement
-  root.style.setProperty('--accent-light', def.light)
-  root.style.setProperty('--accent-contrast-light', def.lightContrast)
-  root.style.setProperty('--accent-dark', def.dark)
-  root.style.setProperty('--accent-contrast-dark', def.darkContrast)
+  if (typeof document === 'undefined') return;
+  const def = ACCENTS[id] || ACCENTS.default;
+  const root = document.documentElement;
+  root.style.setProperty('--accent-light', def.light);
+  root.style.setProperty('--accent-contrast-light', def.lightContrast);
+  root.style.setProperty('--accent-dark', def.dark);
+  root.style.setProperty('--accent-contrast-dark', def.darkContrast);
 }
 
 function resolveCurrentAccentId(): AccentId {
   try {
-    const s = useHabitStore.getState()
-    const id = s.progress?.appliedCollectibles?.accent as AccentId | undefined
-    return (id && (ACCENTS as any)[id]) ? id : 'default'
+    const s = useHabitStore.getState();
+    const id = s.progress?.appliedCollectibles?.accent as AccentId | undefined;
+    return id && (ACCENTS as any)[id] ? id : 'default';
   } catch {
-    return 'default'
+    return 'default';
   }
 }
 
 export function initAccentSync() {
   // Apply once on init
-  try { applyAccentVars(resolveCurrentAccentId()) } catch {}
+  try {
+    applyAccentVars(resolveCurrentAccentId());
+  } catch {}
 
   // Subscribe to changes in the applied accent collectible
   try {
-    let prev: AccentId = resolveCurrentAccentId()
+    let prev: AccentId = resolveCurrentAccentId();
     const unsub = useHabitStore.subscribe((s) => {
       try {
-        const next = (s.progress?.appliedCollectibles?.accent as AccentId | undefined) || 'default'
+        const next = (s.progress?.appliedCollectibles?.accent as AccentId | undefined) || 'default';
         if (next !== prev) {
-          prev = next
-          applyAccentVars(prev)
+          prev = next;
+          applyAccentVars(prev);
         }
       } catch {}
-    })
+    });
     // Expose a teardown on window for debugging; optional and safe
-    ;(window as any).__ritusAccentUnsub = unsub
+    (window as any).__ritusAccentUnsub = unsub;
   } catch {}
 }
 
-export default initAccentSync
+export default initAccentSync;

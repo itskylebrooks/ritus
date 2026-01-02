@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
-import type { Transition, Variants } from 'framer-motion'
+import { useEffect, useState } from 'react';
+import type { Transition, Variants } from 'framer-motion';
 
-export const defaultEase = [0.2, 0.8, 0.2, 1] as const
-export const emphasizeEase = [0.4, 0, 0.2, 1] as const
+export const defaultEase = [0.2, 0.8, 0.2, 1] as const;
+export const emphasizeEase = [0.4, 0, 0.2, 1] as const;
 
 export const durations = {
   xxs: 0.06,
@@ -11,7 +11,7 @@ export const durations = {
   md: 0.22,
   lg: 0.24,
   xl: 0.3,
-} as const
+} as const;
 
 export const transitions = {
   fadeXs: { duration: durations.xs },
@@ -21,14 +21,14 @@ export const transitions = {
   fadeXl: { duration: durations.xl },
   layoutSpring: { layout: { type: 'spring', stiffness: 300, damping: 30 } },
   spring: { type: 'spring', stiffness: 300, damping: 30 },
-} as const
+} as const;
 
 export const pageVariants = {
   initial: { opacity: 0, y: 8 },
   animate: { opacity: 1, y: 0 },
-} as const
+} as const;
 
-export const pageTransition = transitions.fadeMd
+export const pageTransition = transitions.fadeMd;
 
 /**
  * Centralized motion settings used across the app.
@@ -38,54 +38,72 @@ export const pageTransition = transitions.fadeMd
 export const createOverlayMotion = (prefersReducedMotion: boolean) => {
   const panelTransition: Transition = prefersReducedMotion
     ? { duration: durations.xxs }
-    : { type: 'spring', stiffness: 700, damping: 30, mass: 0.6 }
+    : { type: 'spring', stiffness: 700, damping: 30, mass: 0.6 };
 
   const backdropTransition: Transition = prefersReducedMotion
     ? { duration: durations.xxs }
-    : { duration: durations.sm, ease: defaultEase }
+    : { duration: durations.sm, ease: defaultEase };
 
-  return { panelTransition, backdropTransition } as const
-}
+  return { panelTransition, backdropTransition } as const;
+};
 
 export function useMotionPreferences() {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
-    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const handler = () => setPrefersReducedMotion(!!mq.matches)
-    handler()
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const handler = () => setPrefersReducedMotion(!!mq.matches);
+    handler();
     if (mq.addEventListener) {
-      mq.addEventListener('change', handler)
-      return () => mq.removeEventListener('change', handler)
+      mq.addEventListener('change', handler);
+      return () => mq.removeEventListener('change', handler);
     } else {
-      mq.addListener(handler)
-      return () => mq.removeListener(handler)
+      mq.addListener(handler);
+      return () => mq.removeListener(handler);
     }
-  }, [])
+  }, []);
 
   return {
     prefersReducedMotion,
     overlayMotion: createOverlayMotion(prefersReducedMotion),
-  } as const
+  } as const;
 }
 
-export type OverlayMotion = ReturnType<typeof createOverlayMotion>
+export type OverlayMotion = ReturnType<typeof createOverlayMotion>;
 
 export const desktopDropdownVariants: Variants = {
   initial: { opacity: 0, y: 6, scale: 0.98 },
-  animate: { opacity: 1, y: 0, scale: 1, transition: { duration: durations.sm, ease: defaultEase } },
-  exit: { opacity: 0, y: -6, scale: 0.98, transition: { duration: durations.sm, ease: defaultEase } },
-} as const
+  animate: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: durations.sm, ease: defaultEase },
+  },
+  exit: {
+    opacity: 0,
+    y: -6,
+    scale: 0.98,
+    transition: { duration: durations.sm, ease: defaultEase },
+  },
+} as const;
 
 export const submenuVariants: Variants = {
   initial: { opacity: 0, y: -4, height: 0 },
-  animate: { opacity: 1, y: 0, height: 'auto', transition: { duration: durations.md, ease: defaultEase } },
+  animate: {
+    opacity: 1,
+    y: 0,
+    height: 'auto',
+    transition: { duration: durations.md, ease: defaultEase },
+  },
   exit: { opacity: 0, y: -4, height: 0, transition: { duration: durations.sm, ease: defaultEase } },
-} as const
+} as const;
 
-export const createMobileMenuVariants = (prefersReducedMotion: boolean, overlayMotion?: OverlayMotion): Variants => {
-  const motion = overlayMotion ?? createOverlayMotion(prefersReducedMotion)
+export const createMobileMenuVariants = (
+  prefersReducedMotion: boolean,
+  overlayMotion?: OverlayMotion,
+): Variants => {
+  const motion = overlayMotion ?? createOverlayMotion(prefersReducedMotion);
   return {
     initial: prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.98 },
     animate: prefersReducedMotion
@@ -93,9 +111,14 @@ export const createMobileMenuVariants = (prefersReducedMotion: boolean, overlayM
       : { opacity: 1, y: 0, scale: 1, transition: motion.panelTransition },
     exit: prefersReducedMotion
       ? { opacity: 0, transition: { duration: durations.xs } }
-      : { opacity: 0, y: -8, scale: 0.98, transition: { duration: durations.xl, ease: defaultEase } },
-  } as const
-}
+      : {
+          opacity: 0,
+          y: -8,
+          scale: 0.98,
+          transition: { duration: durations.xl, ease: defaultEase },
+        },
+  } as const;
+};
 
 export const createPageMotion = (prefersReducedMotion: boolean | null) => {
   if (prefersReducedMotion) {
@@ -103,11 +126,11 @@ export const createPageMotion = (prefersReducedMotion: boolean | null) => {
       initial: undefined,
       animate: undefined,
       transition: undefined,
-    } as const
+    } as const;
   }
   return {
     initial: pageVariants.initial,
     animate: pageVariants.animate,
     transition: pageTransition,
-  } as const
-}
+  } as const;
+};

@@ -1,7 +1,6 @@
 export const QUOTES = [
   {
-    text:
-      "No matter how many mistakes you make or how slow you progress, you are still way ahead of everyone who isn't trying.",
+    text: "No matter how many mistakes you make or how slow you progress, you are still way ahead of everyone who isn't trying.",
     author: 'Tony Robbins',
   },
   {
@@ -9,12 +8,11 @@ export const QUOTES = [
     author: 'Zig Ziglar',
   },
   {
-    text: "Nothing is impossible, the word itself says ‘I’m possible.’",
+    text: 'Nothing is impossible, the word itself says ‘I’m possible.’',
     author: 'Audrey Hepburn',
   },
   {
-    text:
-      'For there is always light. If only we’re brave enough to see it. If only we’re brave enough to be it.',
+    text: 'For there is always light. If only we’re brave enough to see it. If only we’re brave enough to be it.',
     author: 'Amanda Gorman',
   },
   {
@@ -34,26 +32,23 @@ export const QUOTES = [
     author: 'Naomi Judd',
   },
   {
-    text: "Be yourself; everyone else is already taken.",
+    text: 'Be yourself; everyone else is already taken.',
     author: 'Oscar Wilde',
   },
   {
-    text:
-      "Live as if you were to die tomorrow. Learn as if you were to live forever.",
+    text: 'Live as if you were to die tomorrow. Learn as if you were to live forever.',
     author: 'Mahatma Gandhi',
   },
   {
-    text:
-      "I have not failed. I've just found 10,000 ways that won't work.",
+    text: "I have not failed. I've just found 10,000 ways that won't work.",
     author: 'Thomas A. Edison',
   },
   {
-    text: "It is never too late to be what you might have been.",
+    text: 'It is never too late to be what you might have been.',
     author: 'George Eliot',
   },
   {
-    text:
-      "There is no greater agony than bearing an untold story inside you.",
+    text: 'There is no greater agony than bearing an untold story inside you.',
     author: 'Maya Angelou',
   },
   {
@@ -61,18 +56,15 @@ export const QUOTES = [
     author: 'Pablo Picasso',
   },
   {
-    text:
-      "Life isn't about finding yourself. Life is about creating yourself.",
+    text: "Life isn't about finding yourself. Life is about creating yourself.",
     author: 'George Bernard Shaw',
   },
   {
-    text:
-      "Your time is limited, so don’t waste it living someone else’s life.",
+    text: 'Your time is limited, so don’t waste it living someone else’s life.',
     author: 'Steve Jobs',
   },
   {
-    text:
-      "It always seemed to me: if something happened, then it happened. Who cares why the sky collapsed on my head again? It collapsed, therefore I must endure.",
+    text: 'It always seemed to me: if something happened, then it happened. Who cares why the sky collapsed on my head again? It collapsed, therefore I must endure.',
     author: 'Max Frei',
   },
   {
@@ -80,8 +72,7 @@ export const QUOTES = [
     author: 'Karl Marx',
   },
   {
-    text:
-      "Ability to think, like the violin or piano, requires daily practice.",
+    text: 'Ability to think, like the violin or piano, requires daily practice.',
     author: 'Charlie Chaplin',
   },
   {
@@ -93,8 +84,7 @@ export const QUOTES = [
     author: 'Nelson Mandela',
   },
   {
-    text:
-      'The people who are crazy enough to think they can change the world are the ones who do.',
+    text: 'The people who are crazy enough to think they can change the world are the ones who do.',
     author: 'Steve Jobs',
   },
   {
@@ -102,8 +92,7 @@ export const QUOTES = [
     author: 'Steve Jobs',
   },
   {
-    text:
-      "If you clear away the digital junk, imposed opinions, useless tasks, and other people’s ideas, what remains is what truly matters: who we want to be.",
+    text: 'If you clear away the digital junk, imposed opinions, useless tasks, and other people’s ideas, what remains is what truly matters: who we want to be.',
     author: 'Anastasia Ryzhina',
   },
   {
@@ -111,8 +100,7 @@ export const QUOTES = [
     author: 'Steve Jobs',
   },
   {
-    text:
-      'Remembering that you are going to die is the best way to avoid the trap of thinking you have something to lose.',
+    text: 'Remembering that you are going to die is the best way to avoid the trap of thinking you have something to lose.',
     author: 'Steve Jobs',
   },
   {
@@ -120,8 +108,7 @@ export const QUOTES = [
     author: 'John Maxwell',
   },
   {
-    text:
-      'The greatest moments in life are not about selfish achievements, but about what we do for the people we love and respect.',
+    text: 'The greatest moments in life are not about selfish achievements, but about what we do for the people we love and respect.',
     author: 'Walt Disney',
   },
   {
@@ -149,7 +136,7 @@ export const QUOTES = [
     author: 'Pablo Picasso',
   },
   {
-    text: "It’s no use going back to yesterday, because I was a different person then.",
+    text: 'It’s no use going back to yesterday, because I was a different person then.',
     author: 'Lewis Carroll',
   },
   {
@@ -185,7 +172,7 @@ export const QUOTES = [
     author: 'Thomas Szasz',
   },
   {
-    text: "If opportunity doesn’t knock, build a door.",
+    text: 'If opportunity doesn’t knock, build a door.',
     author: 'Milton Berle',
   },
   {
@@ -209,7 +196,7 @@ export const QUOTES = [
     author: 'Ralph Waldo Emerson',
   },
   {
-    text: "Everything you’ve ever wanted is sitting on the other side of fear.",
+    text: 'Everything you’ve ever wanted is sitting on the other side of fear.',
     author: 'George Addair',
   },
   {
@@ -217,7 +204,7 @@ export const QUOTES = [
     author: 'Martin Luther King Jr.',
   },
   {
-    text: "Don’t count the days, make the days count.",
+    text: 'Don’t count the days, make the days count.',
     author: 'Muhammad Ali',
   },
   {
@@ -241,12 +228,11 @@ export const QUOTES = [
     author: 'Wayne Dyer',
   },
   {
-    text:
-      "Great things in business are never done by one person, they're done by a team of people.",
+    text: "Great things in business are never done by one person, they're done by a team of people.",
     author: 'Steve Jobs',
   },
   {
-    text: "Don’t limit your challenges — challenge your limits.",
+    text: 'Don’t limit your challenges — challenge your limits.',
     author: 'Jerry Dunn',
   },
   {
@@ -270,12 +256,11 @@ export const QUOTES = [
     author: 'Steve Jobs',
   },
   {
-    text: "Dreams don’t work unless you do.",
+    text: 'Dreams don’t work unless you do.',
     author: 'John C. Maxwell',
   },
   {
-    text:
-      'The most important decisions you make are not the things you do, but the things you decide not to do.',
+    text: 'The most important decisions you make are not the things you do, but the things you decide not to do.',
     author: 'Steve Jobs',
   },
   {
@@ -291,7 +276,7 @@ export const QUOTES = [
     author: 'R.S. Grey',
   },
   {
-    text: "Learn continually - there's always \"one more thing\" to learn!",
+    text: 'Learn continually - there\'s always "one more thing" to learn!',
     author: 'Steve Jobs',
   },
   {
@@ -307,8 +292,7 @@ export const QUOTES = [
     author: 'Bruce Lee',
   },
   {
-    text:
-      "The only way to do great work is to love what you do. If you haven't found it yet, keep looking. Don't settle.",
+    text: "The only way to do great work is to love what you do. If you haven't found it yet, keep looking. Don't settle.",
     author: 'Steve Jobs',
   },
   {
@@ -316,8 +300,7 @@ export const QUOTES = [
     author: 'Bruce Lee',
   },
   {
-    text:
-      "Again, you can't connect the dots looking forward; you can only connect them looking backwards. So you have to trust that the dots will somehow connect in your future.",
+    text: "Again, you can't connect the dots looking forward; you can only connect them looking backwards. So you have to trust that the dots will somehow connect in your future.",
     author: 'Steve Jobs',
   },
   {
@@ -325,7 +308,7 @@ export const QUOTES = [
     author: 'Bruce Lee',
   },
   {
-    text: "If you wish to conquer the whole world, conquer yourself.",
+    text: 'If you wish to conquer the whole world, conquer yourself.',
     author: 'Fyodor Dostoevsky',
   },
   {
@@ -337,7 +320,7 @@ export const QUOTES = [
     author: 'Leo Tolstoy',
   },
   {
-    text: "If you want to be respected, first and foremost — respect yourself.",
+    text: 'If you want to be respected, first and foremost — respect yourself.',
     author: 'Fyodor Dostoevsky',
   },
   {
@@ -349,7 +332,7 @@ export const QUOTES = [
     author: 'Anton Chekhov',
   },
   {
-    text: "It’s easier to live without love. But without it, there’s no meaning.",
+    text: 'It’s easier to live without love. But without it, there’s no meaning.',
     author: 'Leo Tolstoy',
   },
   {
@@ -376,9 +359,9 @@ export const QUOTES = [
     text: 'Why chase after the traces of something that has long since ended?',
     author: 'Mikhail Bulgakov',
   },
-]
+];
 
 export type Quote = {
-  text: string
-  author: string
-}
+  text: string;
+  author: string;
+};

@@ -1,16 +1,16 @@
-import React, { useState } from 'react'
-import { Check, Compass as CompassIcon } from 'lucide-react'
-import { AnimatePresence, motion } from 'framer-motion'
-import { transitions } from '@/shared/animations'
-import { useHabitStore } from '@/shared/store/store'
+import React, { useState } from 'react';
+import { Check, Compass as CompassIcon } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { transitions } from '@/shared/animations';
+import { useHabitStore } from '@/shared/store/store';
 
 interface HabitDef {
-  name: string
-  mode: 'build' | 'break'
-  frequency: 'daily' | 'weekly' | 'monthly'
-  weeklyTarget?: number
-  monthlyTarget?: number
-  description?: string
+  name: string;
+  mode: 'build' | 'break';
+  frequency: 'daily' | 'weekly' | 'monthly';
+  weeklyTarget?: number;
+  monthlyTarget?: number;
+  description?: string;
 }
 
 const COMPASS_SETS = [
@@ -19,7 +19,8 @@ const COMPASS_SETS = [
     arrow: '↑',
     title: 'Truth & Freedom',
     note: 'I’ve always felt lies and manipulation like static in the air. My North is about honesty, independence, and mental clarity — the kind that lets you breathe. These habits remind me to live by choice, not by autopilot.',
-    disclaimer: 'I share these from personal experience — not all forms of “freedom” feel the same to everyone. Take what fits your rhythm.',
+    disclaimer:
+      'I share these from personal experience — not all forms of “freedom” feel the same to everyone. Take what fits your rhythm.',
     habits: [
       { name: 'Morning Silence', mode: 'build', frequency: 'daily' },
       { name: 'No Social Media in Morning', mode: 'break', frequency: 'daily' },
@@ -39,7 +40,8 @@ const COMPASS_SETS = [
     arrow: '→',
     title: 'Faith & Hope',
     note: 'The East is light. For me, faith isn’t dogma — it’s the quiet certainty that meaning still exists, even when logic fails. These habits help me stay open, anchored in something higher than achievement.',
-    disclaimer: 'My reflections here come from a Christian frame, but the point is not religion — it’s faith in something that lifts you beyond yourself.',
+    disclaimer:
+      'My reflections here come from a Christian frame, but the point is not religion — it’s faith in something that lifts you beyond yourself.',
     habits: [
       { name: 'Read Before Bed', mode: 'build', frequency: 'daily' },
       { name: 'Pray or Meditate', mode: 'build', frequency: 'daily' },
@@ -49,7 +51,12 @@ const COMPASS_SETS = [
       { name: 'Morning Walk', mode: 'build', frequency: 'daily' },
       { name: 'Gratitude Prayer', mode: 'build', frequency: 'daily' },
       { name: 'Limit News Intake', mode: 'break', frequency: 'daily' },
-      { name: 'Reflect on Scripture / Wisdom Text', mode: 'build', frequency: 'weekly', weeklyTarget: 3 },
+      {
+        name: 'Reflect on Scripture / Wisdom Text',
+        mode: 'build',
+        frequency: 'weekly',
+        weeklyTarget: 3,
+      },
       { name: 'Act of Service', mode: 'build', frequency: 'weekly', weeklyTarget: 1 },
     ],
   },
@@ -58,7 +65,8 @@ const COMPASS_SETS = [
     arrow: '←',
     title: 'Growth & Mastery',
     note: 'I see discipline as art — something built brick by brick. My West keeps me grounded in work, study, and effort that actually changes who I am. It’s not about perfection, just the next small proof that I’m learning.',
-    disclaimer: 'Discipline means different things to different people. Don’t use it to punish yourself — it’s meant to build trust with your future self.',
+    disclaimer:
+      'Discipline means different things to different people. Don’t use it to punish yourself — it’s meant to build trust with your future self.',
     habits: [
       { name: 'Code for 1 Hour', mode: 'build', frequency: 'daily' },
       { name: 'Study English', mode: 'build', frequency: 'weekly', weeklyTarget: 2 },
@@ -78,7 +86,8 @@ const COMPASS_SETS = [
     arrow: '↓',
     title: 'Love & Care',
     note: 'Even in frustration, I always return to the wish that people around me feel safe. The South reminds me that strength without tenderness becomes armor — and armor isolates.',
-    disclaimer: 'I’m not good at this every day. These habits are simply my practice in learning gentleness — yours might look very different.',
+    disclaimer:
+      'I’m not good at this every day. These habits are simply my practice in learning gentleness — yours might look very different.',
     habits: [
       { name: 'Gratitude Note', mode: 'build', frequency: 'daily' },
       { name: 'Evening Stretch', mode: 'build', frequency: 'daily' },
@@ -93,27 +102,35 @@ const COMPASS_SETS = [
       { name: 'No Gossip', mode: 'break', frequency: 'daily' },
     ],
   },
-]
+];
 
 export default function Compass() {
-  const addHabit = useHabitStore((s) => s.addHabit)
-  const [recentlyAdded, setRecentlyAdded] = useState<string[]>([])
+  const addHabit = useHabitStore((s) => s.addHabit);
+  const [recentlyAdded, setRecentlyAdded] = useState<string[]>([]);
 
   const handleAdd = (h: HabitDef) => {
-    const freq = h.frequency
-    const weekly = h.weeklyTarget ?? 1
-    const monthly = h.monthlyTarget ?? 1
-    addHabit(h.name, freq as any, weekly, monthly, h.mode)
-    setRecentlyAdded((s) => [...s, h.name])
-    setTimeout(() => setRecentlyAdded((s) => s.filter((n) => n !== h.name)), 1400)
-  }
+    const freq = h.frequency;
+    const weekly = h.weeklyTarget ?? 1;
+    const monthly = h.monthlyTarget ?? 1;
+    addHabit(h.name, freq as any, weekly, monthly, h.mode);
+    setRecentlyAdded((s) => [...s, h.name]);
+    setTimeout(() => setRecentlyAdded((s) => s.filter((n) => n !== h.name)), 1400);
+  };
 
   return (
     <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8">
       {/* Hero */}
       <section>
-        <h2 className="text-xl font-semibold flex items-center gap-2"><CompassIcon className="w-5 h-5" /> The Compass</h2>
-        <p className="mt-4 text-neutral-600 dark:text-neutral-300">Ritus is more than a tracker. It’s a way to stay oriented when life feels scattered. Over time, I noticed that my own habits follow a kind of compass — four directions that keep me balanced when I drift too far toward work, pressure, or noise. This isn’t a system or a rulebook. It’s just how I’ve learned to stay grounded. Maybe some of it will resonate with you, maybe not — and that’s perfectly fine.</p>
+        <h2 className="text-xl font-semibold flex items-center gap-2">
+          <CompassIcon className="w-5 h-5" /> The Compass
+        </h2>
+        <p className="mt-4 text-neutral-600 dark:text-neutral-300">
+          Ritus is more than a tracker. It’s a way to stay oriented when life feels scattered. Over
+          time, I noticed that my own habits follow a kind of compass — four directions that keep me
+          balanced when I drift too far toward work, pressure, or noise. This isn’t a system or a
+          rulebook. It’s just how I’ve learned to stay grounded. Maybe some of it will resonate with
+          you, maybe not — and that’s perfectly fine.
+        </p>
       </section>
 
       {COMPASS_SETS.map((set: any) => (
@@ -143,8 +160,20 @@ export default function Compass() {
                   >
                     <>
                       {/* Keep name and frequency in DOM to preserve pill width; fade them when showing the added overlay */}
-                      <span className={`${recentlyAdded.includes(h.name) ? 'opacity-0' : 'opacity-100'} whitespace-normal leading-tight transition-opacity duration-150`}>{h.name}</span>
-                      <span className={`${recentlyAdded.includes(h.name) ? 'opacity-0' : 'opacity-60'} text-[10px] ml-1 flex-none transition-opacity duration-150`}>{h.frequency === 'daily' ? 'D' : h.frequency === 'weekly' ? `W${h.weeklyTarget ? h.weeklyTarget : ''}` : `M${h.monthlyTarget ?? 1}`}</span>
+                      <span
+                        className={`${recentlyAdded.includes(h.name) ? 'opacity-0' : 'opacity-100'} whitespace-normal leading-tight transition-opacity duration-150`}
+                      >
+                        {h.name}
+                      </span>
+                      <span
+                        className={`${recentlyAdded.includes(h.name) ? 'opacity-0' : 'opacity-60'} text-[10px] ml-1 flex-none transition-opacity duration-150`}
+                      >
+                        {h.frequency === 'daily'
+                          ? 'D'
+                          : h.frequency === 'weekly'
+                            ? `W${h.weeklyTarget ? h.weeklyTarget : ''}`
+                            : `M${h.monthlyTarget ?? 1}`}
+                      </span>
                       <AnimatePresence>
                         {recentlyAdded.includes(h.name) && (
                           <motion.span
@@ -171,10 +200,12 @@ export default function Compass() {
       {/* Center Balance */}
       <section>
         <div className="text-center">
-          <p className="italic text-neutral-500">Freedom without love turns into loneliness. Love without freedom turns into dependency. Growth without faith turns into burnout. Faith without growth turns into stagnation.</p>
+          <p className="italic text-neutral-500">
+            Freedom without love turns into loneliness. Love without freedom turns into dependency.
+            Growth without faith turns into burnout. Faith without growth turns into stagnation.
+          </p>
         </div>
       </section>
     </div>
-  )
+  );
 }
-

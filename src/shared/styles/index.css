@@ -22,7 +22,17 @@
 html,
 body,
 #root {
-  font-family: 'IBM Plex Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+  font-family:
+    'IBM Plex Sans',
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    Arial,
+    'Noto Sans',
+    sans-serif;
 }
 
 :root {
@@ -96,7 +106,6 @@ body,
   --color-accent: var(--accent-dark);
   --color-accent-contrast: var(--accent-contrast-dark);
   --color-accent-soft: color-mix(in srgb, var(--color-accent) 30%, var(--color-text-primary));
-
 
   --color-success: #34d399;
   --color-danger: #f87171;

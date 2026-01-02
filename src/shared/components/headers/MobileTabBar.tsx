@@ -1,8 +1,8 @@
-import { NavLink, useLocation } from 'react-router-dom'
-import { ChartPie, Home, Trophy } from 'lucide-react'
+import { NavLink, useLocation } from 'react-router-dom';
+import { ChartPie, Home, Trophy } from 'lucide-react';
 
 export default function MobileTabBar() {
-  const location = useLocation()
+  const location = useLocation();
 
   return (
     <nav
@@ -11,9 +11,25 @@ export default function MobileTabBar() {
     >
       <div className="flex items-center gap-4 rounded-full border border-subtle bg-surface-elevated px-3 py-2 shadow-elevated">
         {[
-          { id: 'insight', to: '/insight', label: 'Insight', icon: <ChartPie className="h-5 w-5" aria-hidden /> },
-          { id: 'home', to: '/', label: 'Home', icon: <Home className="h-5 w-5" aria-hidden />, end: true },
-          { id: 'milestones', to: '/milestones', label: 'Milestones', icon: <Trophy className="h-5 w-5" aria-hidden /> },
+          {
+            id: 'insight',
+            to: '/insight',
+            label: 'Insight',
+            icon: <ChartPie className="h-5 w-5" aria-hidden />,
+          },
+          {
+            id: 'home',
+            to: '/',
+            label: 'Home',
+            icon: <Home className="h-5 w-5" aria-hidden />,
+            end: true,
+          },
+          {
+            id: 'milestones',
+            to: '/milestones',
+            label: 'Milestones',
+            icon: <Trophy className="h-5 w-5" aria-hidden />,
+          },
         ].map((tab) => (
           <NavLink
             key={tab.id}
@@ -21,15 +37,15 @@ export default function MobileTabBar() {
             end={tab.end}
             aria-label={tab.label}
             title={tab.label}
-            onClick={(e) => { if (location.pathname === tab.to) e.preventDefault() }}
+            onClick={(e) => {
+              if (location.pathname === tab.to) e.preventDefault();
+            }}
             className="relative flex h-12 w-14 items-center justify-center rounded-full"
           >
             {({ isActive }) => (
               <>
                 {isActive && (
-                  <span
-                    className="absolute inset-0 rounded-full bg-[var(--color-text-primary)]"
-                  />
+                  <span className="absolute inset-0 rounded-full bg-[var(--color-text-primary)]" />
                 )}
                 <span
                   className={`relative z-10 flex h-5 w-5 items-center justify-center ${
@@ -44,5 +60,5 @@ export default function MobileTabBar() {
         ))}
       </div>
     </nav>
-  )
+  );
 }

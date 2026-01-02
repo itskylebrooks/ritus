@@ -1,15 +1,15 @@
-import { Coins, HeartPulse } from 'lucide-react'
-import ProgressBar from '@/shared/components/charts/ProgressBar'
-import { LEVEL_TITLES, levelWindow } from '@/shared/constants/progression'
-import { useHabitStore } from '@/shared/store/store'
+import { Coins, HeartPulse } from 'lucide-react';
+import ProgressBar from '@/shared/components/charts/ProgressBar';
+import { LEVEL_TITLES, levelWindow } from '@/shared/constants/progression';
+import { useHabitStore } from '@/shared/store/store';
 
 export default function MilestonesHeaderCard() {
-  const essence = useHabitStore((s) => s.progress.essence)
-  const points = useHabitStore((s) => s.progress.points)
-  const level = useHabitStore((s) => s.progress.level)
+  const essence = useHabitStore((s) => s.progress.essence);
+  const points = useHabitStore((s) => s.progress.points);
+  const level = useHabitStore((s) => s.progress.level);
 
-  const { curMin, nextMin, within, needed, pct } = levelWindow(essence)
-  const levelTitle = LEVEL_TITLES[level - 1] ?? '—'
+  const { curMin, nextMin, within, needed, pct } = levelWindow(essence);
+  const levelTitle = LEVEL_TITLES[level - 1] ?? '—';
 
   // points progress bar removed per design; keep top-right display only
 
@@ -33,7 +33,9 @@ export default function MilestonesHeaderCard() {
       <div className="mt-4">
         <div className="flex items-center justify-between text-xs text-neutral-600 dark:text-neutral-300">
           <span>Progress to next level</span>
-          <span>{within.toLocaleString()} / {needed.toLocaleString()}</span>
+          <span>
+            {within.toLocaleString()} / {needed.toLocaleString()}
+          </span>
         </div>
         <div className="mt-1">
           <ProgressBar value={within} max={needed} />
@@ -42,5 +44,5 @@ export default function MilestonesHeaderCard() {
 
       {/* Points progress removed; top-right displays current spendable points */}
     </div>
-  )
+  );
 }

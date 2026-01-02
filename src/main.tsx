@@ -1,12 +1,12 @@
-import { StrictMode } from 'react'
-import ReactDOM from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'
-import { registerSW } from 'virtual:pwa-register'
-import App from './App'
-import '@/shared/styles/index.css'
+import { StrictMode } from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import { registerSW } from 'virtual:pwa-register';
+import App from './App';
+import '@/shared/styles/index.css';
 // Ensure theme store is initialized early so it can apply the resolved theme and listeners
-import '@/shared/store/theme'
-import initAccentSync from '@/shared/theme/accent'
+import '@/shared/store/theme';
+import initAccentSync from '@/shared/theme/accent';
 
 // Register service worker
 const updateSW = registerSW({
@@ -14,34 +14,36 @@ const updateSW = registerSW({
   onRegisteredSW(swUrl, registration) {
     if (registration) {
       // Check for updates periodically (every 60 seconds in dev, every hour in prod)
-      const checkInterval = import.meta.env.DEV ? 60 * 1000 : 60 * 60 * 1000
+      const checkInterval = import.meta.env.DEV ? 60 * 1000 : 60 * 60 * 1000;
       setInterval(() => {
-        registration.update()
-      }, checkInterval)
+        registration.update();
+      }, checkInterval);
     }
   },
   onNeedRefresh() {
     // Automatically update without prompting the user
-    updateSW(true)
+    updateSW(true);
   },
   onOfflineReady() {
-    console.log('App ready to work offline')
+    console.log('App ready to work offline');
   },
-})
+});
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <App />
     </BrowserRouter>
-  </StrictMode>
-)
+  </StrictMode>,
+);
 
 // Re-enable animations after initial paint
 // Use rAF to wait until the first frame renders
 requestAnimationFrame(() => {
-  document.body.classList.remove('preload')
-})
+  document.body.classList.remove('preload');
+});
 
 // Initialize accent sync after hydration kicks off
-try { initAccentSync() } catch {}
+try {
+  initAccentSync();
+} catch {}

@@ -1,18 +1,39 @@
-import type { ComponentType } from 'react'
-import {SunMoon, BookOpen, Waves, Flame, Leaf, Star, Compass, Gem, Feather, Gauge, Radar, Target, PlayCircle, Medal, Moon, Hourglass, Bell, Anchor, Lamp, Stamp } from 'lucide-react'
+import type { ComponentType } from 'react';
+import {
+  SunMoon,
+  BookOpen,
+  Waves,
+  Flame,
+  Leaf,
+  Star,
+  Compass,
+  Gem,
+  Feather,
+  Gauge,
+  Radar,
+  Target,
+  PlayCircle,
+  Medal,
+  Moon,
+  Hourglass,
+  Bell,
+  Anchor,
+  Lamp,
+  Stamp,
+} from 'lucide-react';
 
-export type CollectibleType = 'clock' | 'quotes' | 'accent' | 'relic'
-export type Rarity = 'common' | 'rare' | 'epic'
+export type CollectibleType = 'clock' | 'quotes' | 'accent' | 'relic';
+export type Rarity = 'common' | 'rare' | 'epic';
 
 export interface CollectibleDef {
-  id: string
-  type: CollectibleType
-  title: string
-  desc: string
-  icon: ComponentType<any>
-  rarity: Rarity
-  cost: number
-  implemented?: boolean
+  id: string;
+  type: CollectibleType;
+  title: string;
+  desc: string;
+  icon: ComponentType<any>;
+  rarity: Rarity;
+  cost: number;
+  implemented?: boolean;
 }
 
 export const COLLECTIBLES: CollectibleDef[] = [
@@ -205,7 +226,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     cost: 5000,
     implemented: false,
   },
-    {
+  {
     id: 'relic_moon_dial',
     type: 'relic',
     title: 'Moon Dial',
@@ -255,6 +276,6 @@ export const COLLECTIBLES: CollectibleDef[] = [
     cost: 1200,
     implemented: false,
   },
-]
+];
 
-export default COLLECTIBLES
+export default COLLECTIBLES;

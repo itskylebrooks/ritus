@@ -1,111 +1,130 @@
-import { useEffect, useRef, useState } from 'react'
-import { Link, NavLink, useLocation } from 'react-router-dom'
-import { AnimatePresence, motion } from 'framer-motion'
-import { Archive, ChartPie, ChevronDown, CircleHelp, Compass as CompassIcon, Home, LayoutGrid, LayoutList, Lightbulb, MinusCircle, PlusCircle, Settings as SettingsIcon, Trophy, Moon, Sun } from 'lucide-react'
-import { desktopDropdownVariants } from '@/shared/animations'
-import { useHabitStore } from '@/shared/store/store'
-import GuideModal from '@/shared/components/modals/GuideModal'
-import SettingsModal from '@/shared/components/modals/SettingsModal'
-import EmojiPicker from '@/shared/components/emoji/EmojiPicker'
-import MobileTabBar from './MobileTabBar'
+import { useEffect, useRef, useState } from 'react';
+import { Link, NavLink, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
+import {
+  Archive,
+  ChartPie,
+  ChevronDown,
+  CircleHelp,
+  Compass as CompassIcon,
+  Home,
+  LayoutGrid,
+  LayoutList,
+  Lightbulb,
+  MinusCircle,
+  PlusCircle,
+  Settings as SettingsIcon,
+  Trophy,
+  Moon,
+  Sun,
+} from 'lucide-react';
+import { desktopDropdownVariants } from '@/shared/animations';
+import { useHabitStore } from '@/shared/store/store';
+import GuideModal from '@/shared/components/modals/GuideModal';
+import SettingsModal from '@/shared/components/modals/SettingsModal';
+import EmojiPicker from '@/shared/components/emoji/EmojiPicker';
+import MobileTabBar from './MobileTabBar';
 
 function DateDisplay() {
-  const dateFormat = useHabitStore((s) => s.dateFormat)
-  const now = new Date()
-  const mm = String(now.getMonth() + 1).padStart(2, '0')
-  const dd = String(now.getDate()).padStart(2, '0')
-  const yyyy = String(now.getFullYear())
-  return <span>{dateFormat === 'MDY' ? `${mm}/${dd}/${yyyy}` : `${dd}/${mm}/${yyyy}`}</span>
+  const dateFormat = useHabitStore((s) => s.dateFormat);
+  const now = new Date();
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  const yyyy = String(now.getFullYear());
+  return <span>{dateFormat === 'MDY' ? `${mm}/${dd}/${yyyy}` : `${dd}/${mm}/${yyyy}`}</span>;
 }
 
 // Inline title + emoji + date layout handled directly in header
 
 export default function AppHeader() {
-  const [settingsOpen, setSettingsOpen] = useState(false)
-  const [guideOpen, setGuideOpen] = useState(false)
-  const [moreDesktopOpen, setMoreDesktopOpen] = useState(false)
-  const showAdd = useHabitStore((s) => s.showAdd)
-  const setShowAdd = useHabitStore((s) => s.setShowAdd)
-  const showHomeCards = useHabitStore((s) => (s as any).showHomeCards ?? true)
-  const setShowHomeCards = useHabitStore((s) => (s as any).setShowHomeCards)
-  const showArchived = useHabitStore((s) => (s as any).showArchived)
-  const setShowArchived = useHabitStore((s) => (s as any).setShowArchived)
-  const showList = useHabitStore((s) => (s as any).showList)
-  const setShowList = useHabitStore((s) => (s as any).setShowList)
-  const moreRef = useRef<HTMLDivElement | null>(null)
-  const moreButtonRef = useRef<HTMLButtonElement | null>(null)
-  const location = useLocation()
-  const isHome = location.pathname === '/'
-  const isMilestones = location.pathname === '/milestones'
-  const isInspiration = location.pathname === '/inspiration'
-  const isCompass = location.pathname === '/compass'
-  const isArchiveHidden = isMilestones || isInspiration || isCompass
-  const navLinkBase = 'rounded-lg border border-subtle px-3 text-sm transition-colors duration-150 ease-in-out inline-flex items-center h-10'
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
+  const [moreDesktopOpen, setMoreDesktopOpen] = useState(false);
+  const showAdd = useHabitStore((s) => s.showAdd);
+  const setShowAdd = useHabitStore((s) => s.setShowAdd);
+  const showHomeCards = useHabitStore((s) => (s as any).showHomeCards ?? true);
+  const setShowHomeCards = useHabitStore((s) => (s as any).setShowHomeCards);
+  const showArchived = useHabitStore((s) => (s as any).showArchived);
+  const setShowArchived = useHabitStore((s) => (s as any).setShowArchived);
+  const showList = useHabitStore((s) => (s as any).showList);
+  const setShowList = useHabitStore((s) => (s as any).setShowList);
+  const moreRef = useRef<HTMLDivElement | null>(null);
+  const moreButtonRef = useRef<HTMLButtonElement | null>(null);
+  const location = useLocation();
+  const isHome = location.pathname === '/';
+  const isMilestones = location.pathname === '/milestones';
+  const isInspiration = location.pathname === '/inspiration';
+  const isCompass = location.pathname === '/compass';
+  const isArchiveHidden = isMilestones || isInspiration || isCompass;
+  const navLinkBase =
+    'rounded-lg border border-subtle px-3 text-sm transition-colors duration-150 ease-in-out inline-flex items-center h-10';
 
   // Close desktop More on outside click / Esc
   useEffect(() => {
-    if (!moreDesktopOpen) return
+    if (!moreDesktopOpen) return;
 
     const handleClick = (e: MouseEvent | TouchEvent) => {
-      const t = e.target as Node | null
-      if (!t) return
-      if (moreRef.current?.contains(t) || moreButtonRef.current?.contains(t)) return
-      setMoreDesktopOpen(false)
-    }
+      const t = e.target as Node | null;
+      if (!t) return;
+      if (moreRef.current?.contains(t) || moreButtonRef.current?.contains(t)) return;
+      setMoreDesktopOpen(false);
+    };
 
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        setMoreDesktopOpen(false)
-        moreButtonRef.current?.focus()
+        setMoreDesktopOpen(false);
+        moreButtonRef.current?.focus();
       }
-    }
+    };
 
-    document.addEventListener('mousedown', handleClick)
-    document.addEventListener('touchstart', handleClick)
-    window.addEventListener('keydown', handleKey)
+    document.addEventListener('mousedown', handleClick);
+    document.addEventListener('touchstart', handleClick);
+    window.addEventListener('keydown', handleKey);
 
     return () => {
-      document.removeEventListener('mousedown', handleClick)
-      document.removeEventListener('touchstart', handleClick)
-      window.removeEventListener('keydown', handleKey)
-    }
-  }, [moreDesktopOpen])
+      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('touchstart', handleClick);
+      window.removeEventListener('keydown', handleKey);
+    };
+  }, [moreDesktopOpen]);
 
   // Show guide automatically for first-time visitors (persisted in localStorage)
   useEffect(() => {
     try {
-      const seen = localStorage.getItem('ritus_seen_guide')
+      const seen = localStorage.getItem('ritus_seen_guide');
       if (!seen) {
         // show guide on first visit
-        setGuideOpen(true)
+        setGuideOpen(true);
       }
     } catch (e) {
       // ignore localStorage errors
     }
-  }, [])
+  }, []);
 
   // When header switches to mobile layout (< sm), automatically switch habit view to list
   useEffect(() => {
-    if (typeof window === 'undefined') return
-    const mq = window.matchMedia('(min-width: 640px)')
+    if (typeof window === 'undefined') return;
+    const mq = window.matchMedia('(min-width: 640px)');
 
     const handleChange = (e: MediaQueryListEvent | MediaQueryList) => {
       if (!e.matches && isHome) {
-        try { setShowList(true) } catch {}
+        try {
+          setShowList(true);
+        } catch {}
       }
-    }
+    };
 
     // Ensure correct mode on initial load
-    handleChange(mq)
+    handleChange(mq);
 
     if (typeof mq.addEventListener === 'function') {
-      mq.addEventListener('change', handleChange as any)
-      return () => mq.removeEventListener('change', handleChange as any)
+      mq.addEventListener('change', handleChange as any);
+      return () => mq.removeEventListener('change', handleChange as any);
     } else {
-      mq.addListener(handleChange as any)
-      return () => mq.removeListener(handleChange as any)
+      mq.addListener(handleChange as any);
+      return () => mq.removeListener(handleChange as any);
     }
-  }, [isHome, setShowList])
+  }, [isHome, setShowList]);
 
   return (
     <>
@@ -131,7 +150,9 @@ export default function AppHeader() {
                 to="/insight"
                 aria-label="Insight"
                 title="Insight"
-                onClick={(e) => { if (location.pathname === '/insight') e.preventDefault() }}
+                onClick={(e) => {
+                  if (location.pathname === '/insight') e.preventDefault();
+                }}
                 className={({ isActive }: { isActive: boolean }) =>
                   `${navLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover-accent-fade' : 'text-strong hover-nonaccent'}`
                 }
@@ -145,7 +166,9 @@ export default function AppHeader() {
                 end
                 aria-label="Home"
                 title="Home"
-                onClick={(e) => { if (location.pathname === '/') e.preventDefault() }}
+                onClick={(e) => {
+                  if (location.pathname === '/') e.preventDefault();
+                }}
                 className={({ isActive }: { isActive: boolean }) =>
                   `${navLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover-accent-fade' : 'text-strong hover-nonaccent'}`
                 }
@@ -158,7 +181,9 @@ export default function AppHeader() {
                 to="/milestones"
                 aria-label="Milestones"
                 title="Milestones"
-                onClick={(e) => { if (location.pathname === '/milestones') e.preventDefault() }}
+                onClick={(e) => {
+                  if (location.pathname === '/milestones') e.preventDefault();
+                }}
                 className={({ isActive }: { isActive: boolean }) =>
                   `${navLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover-accent-fade' : 'text-strong hover-nonaccent'}`
                 }
@@ -204,10 +229,20 @@ export default function AppHeader() {
                         <li>
                           <button
                             type="button"
-                            onClick={() => { setMoreDesktopOpen(false); setShowAdd(!showAdd); }}
+                            onClick={() => {
+                              setMoreDesktopOpen(false);
+                              setShowAdd(!showAdd);
+                            }}
                             className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent"
                           >
-                            <span className="flex items-center gap-2">{showAdd ? <MinusCircle className="w-4 h-4" /> : <PlusCircle className="w-4 h-4" />}<span>{showAdd ? 'Hide add' : 'Show add'}</span></span>
+                            <span className="flex items-center gap-2">
+                              {showAdd ? (
+                                <MinusCircle className="w-4 h-4" />
+                              ) : (
+                                <PlusCircle className="w-4 h-4" />
+                              )}
+                              <span>{showAdd ? 'Hide add' : 'Show add'}</span>
+                            </span>
                           </button>
                         </li>
                       )}
@@ -215,10 +250,20 @@ export default function AppHeader() {
                         <li>
                           <button
                             type="button"
-                            onClick={() => { setMoreDesktopOpen(false); setShowHomeCards(!showHomeCards) }}
+                            onClick={() => {
+                              setMoreDesktopOpen(false);
+                              setShowHomeCards(!showHomeCards);
+                            }}
                             className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent"
                           >
-                            <span className="flex items-center gap-2">{showHomeCards ? <Moon className="w-4 h-4" /> : <Sun  className="w-4 h-4" />}<span>{showHomeCards ? 'Hide rituals' : 'Show rituals'}</span></span>
+                            <span className="flex items-center gap-2">
+                              {showHomeCards ? (
+                                <Moon className="w-4 h-4" />
+                              ) : (
+                                <Sun className="w-4 h-4" />
+                              )}
+                              <span>{showHomeCards ? 'Hide rituals' : 'Show rituals'}</span>
+                            </span>
                           </button>
                         </li>
                       )}
@@ -227,10 +272,16 @@ export default function AppHeader() {
                         <li>
                           <button
                             type="button"
-                            onClick={() => { setMoreDesktopOpen(false); setShowArchived(!showArchived); }}
+                            onClick={() => {
+                              setMoreDesktopOpen(false);
+                              setShowArchived(!showArchived);
+                            }}
                             className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent"
                           >
-                            <span className="flex items-center gap-2"><Archive className="w-4 h-4" />{showArchived ? 'Hide archived' : 'Show archived'}</span>
+                            <span className="flex items-center gap-2">
+                              <Archive className="w-4 h-4" />
+                              {showArchived ? 'Hide archived' : 'Show archived'}
+                            </span>
                           </button>
                         </li>
                       )}
@@ -238,10 +289,20 @@ export default function AppHeader() {
                         <li>
                           <button
                             type="button"
-                            onClick={() => { setMoreDesktopOpen(false); setShowList(!showList); }}
+                            onClick={() => {
+                              setMoreDesktopOpen(false);
+                              setShowList(!showList);
+                            }}
                             className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent"
                           >
-                            <span className="flex items-center gap-2">{showList ? <LayoutGrid className="w-4 h-4" /> : <LayoutList className="w-4 h-4" />}{showList ? 'Show as grid' : 'Show as list'}</span>
+                            <span className="flex items-center gap-2">
+                              {showList ? (
+                                <LayoutGrid className="w-4 h-4" />
+                              ) : (
+                                <LayoutList className="w-4 h-4" />
+                              )}
+                              {showList ? 'Show as grid' : 'Show as list'}
+                            </span>
                           </button>
                         </li>
                       )}
@@ -255,41 +316,61 @@ export default function AppHeader() {
                       <li>
                         <button
                           type="button"
-                          onClick={() => { setMoreDesktopOpen(false); setGuideOpen(true); }}
+                          onClick={() => {
+                            setMoreDesktopOpen(false);
+                            setGuideOpen(true);
+                          }}
                           className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent"
                         >
-                          <span className="flex items-center gap-2"><CircleHelp className="w-4 h-4" />Guide</span>
+                          <span className="flex items-center gap-2">
+                            <CircleHelp className="w-4 h-4" />
+                            Guide
+                          </span>
                         </button>
                       </li>
                       <li>
                         <NavLink
                           to="/compass"
-                          onClick={(e) => { if (location.pathname === '/compass') e.preventDefault(); setMoreDesktopOpen(false); }}
+                          onClick={(e) => {
+                            if (location.pathname === '/compass') e.preventDefault();
+                            setMoreDesktopOpen(false);
+                          }}
                           className={({ isActive }: { isActive: boolean }) =>
                             `block w-full text-left px-3 py-2 rounded-md transition-colors duration-150 ${isActive ? 'bg-accent text-inverse hover:bg-accent-soft' : 'text-strong hover-nonaccent'}`
                           }
                         >
-                          <CompassIcon className="inline-block w-4 h-4 mr-2" />Compass
+                          <CompassIcon className="inline-block w-4 h-4 mr-2" />
+                          Compass
                         </NavLink>
                       </li>
                       <li>
                         <NavLink
                           to="/inspiration"
-                          onClick={(e) => { if (location.pathname === '/inspiration') e.preventDefault(); setMoreDesktopOpen(false); }}
+                          onClick={(e) => {
+                            if (location.pathname === '/inspiration') e.preventDefault();
+                            setMoreDesktopOpen(false);
+                          }}
                           className={({ isActive }: { isActive: boolean }) =>
                             `block w-full text-left px-3 py-2 rounded-md transition-colors duration-150 ${isActive ? 'bg-accent text-inverse hover:bg-accent-soft' : 'text-strong hover-nonaccent'}`
                           }
                         >
-                          <Lightbulb className="inline-block w-4 h-4 mr-2" />Inspiration
+                          <Lightbulb className="inline-block w-4 h-4 mr-2" />
+                          Inspiration
                         </NavLink>
                       </li>
                       <li>
                         <button
                           type="button"
-                          onClick={() => { setMoreDesktopOpen(false); setSettingsOpen(true); }}
+                          onClick={() => {
+                            setMoreDesktopOpen(false);
+                            setSettingsOpen(true);
+                          }}
                           className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent"
                         >
-                          <span className="flex items-center gap-2"><SettingsIcon className="w-4 h-4" />Settings</span>
+                          <span className="flex items-center gap-2">
+                            <SettingsIcon className="w-4 h-4" />
+                            Settings
+                          </span>
                         </button>
                       </li>
                     </ul>
@@ -306,12 +387,20 @@ export default function AppHeader() {
       <SettingsModal
         open={settingsOpen}
         onClose={() => setSettingsOpen(false)}
-        onShowGuide={() => { setGuideOpen(true); setSettingsOpen(false); }}
+        onShowGuide={() => {
+          setGuideOpen(true);
+          setSettingsOpen(false);
+        }}
       />
       <GuideModal
         open={guideOpen}
-        onClose={() => { setGuideOpen(false); try { localStorage.setItem('ritus_seen_guide', '1') } catch {} }}
+        onClose={() => {
+          setGuideOpen(false);
+          try {
+            localStorage.setItem('ritus_seen_guide', '1');
+          } catch {}
+        }}
       />
     </>
-  )
+  );
 }

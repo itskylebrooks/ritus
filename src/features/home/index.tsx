@@ -1,20 +1,20 @@
-import { useMemo, useState, useRef, useEffect } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
-import { emphasizeEase, transitions } from '@/shared/animations'
-import { fromISO, startOfDay } from '@/shared/utils/date'
-import { useHabitStore } from '@/shared/store/store'
-import AddHabit from './components/AddHabit'
-import QuoteCard from './components/QuoteCard'
-import ClockCard from './components/ClockCard'
-import HabitCard from './components/HabitCard'
+import { useMemo, useState, useRef, useEffect } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { emphasizeEase, transitions } from '@/shared/animations';
+import { fromISO, startOfDay } from '@/shared/utils/date';
+import { useHabitStore } from '@/shared/store/store';
+import AddHabit from './components/AddHabit';
+import QuoteCard from './components/QuoteCard';
+import ClockCard from './components/ClockCard';
+import HabitCard from './components/HabitCard';
 
 function DateDisplay() {
-  const dateFormat = useHabitStore((s) => s.dateFormat)
-  const now = new Date()
-  const mm = String(now.getMonth() + 1).padStart(2, '0')
-  const dd = String(now.getDate()).padStart(2, '0')
-  const yyyy = String(now.getFullYear())
-  return <span>{dateFormat === 'MDY' ? `${mm}/${dd}/${yyyy}` : `${dd}/${mm}/${yyyy}`}</span>
+  const dateFormat = useHabitStore((s) => s.dateFormat);
+  const now = new Date();
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  const yyyy = String(now.getFullYear());
+  return <span>{dateFormat === 'MDY' ? `${mm}/${dd}/${yyyy}` : `${dd}/${mm}/${yyyy}`}</span>;
 }
 
 function EmptyState({ disableAnim = false }: { disableAnim?: boolean }) {
@@ -31,80 +31,90 @@ function EmptyState({ disableAnim = false }: { disableAnim?: boolean }) {
       <p className="text-lg font-medium">No habits yet</p>
       <p className="mt-1 text-sm">Create your first habit to get started.</p>
     </motion.div>
-  )
+  );
 }
 
 export default function Home() {
-  const showAdd = useHabitStore((s) => s.showAdd)
-  const setShowAdd = useHabitStore((s) => s.setShowAdd)
+  const showAdd = useHabitStore((s) => s.showAdd);
+  const setShowAdd = useHabitStore((s) => s.setShowAdd);
 
-  const showList = useHabitStore((s) => (s as any).showList)
-  const showHomeCards = useHabitStore((s) => (s as any).showHomeCards ?? true)
+  const showList = useHabitStore((s) => (s as any).showList);
+  const showHomeCards = useHabitStore((s) => (s as any).showHomeCards ?? true);
 
-  const habits = useHabitStore((s) => s.habits)
-  const showArchived = useHabitStore((s) => (s as any).showArchived)
-  const initialListRender = useRef(true)
-  useEffect(() => { initialListRender.current = false }, [])
-  const [emptyReady, setEmptyReady] = useState(habits.length === 0)
-  const emptyTimer = useRef<number | null>(null)
-  const prevCount = useRef(habits.length)
+  const habits = useHabitStore((s) => s.habits);
+  const showArchived = useHabitStore((s) => (s as any).showArchived);
+  const initialListRender = useRef(true);
+  useEffect(() => {
+    initialListRender.current = false;
+  }, []);
+  const [emptyReady, setEmptyReady] = useState(habits.length === 0);
+  const emptyTimer = useRef<number | null>(null);
+  const prevCount = useRef(habits.length);
   const completionLookup = useMemo(() => {
-    const map = new Map<string, Set<number>>()
+    const map = new Map<string, Set<number>>();
     for (const h of habits) {
-      map.set(h.id, new Set((h.completions || []).map((c) => fromISO(c).getTime())))
+      map.set(h.id, new Set((h.completions || []).map((c) => fromISO(c).getTime())));
     }
-    return map
-  }, [habits])
+    return map;
+  }, [habits]);
 
   useEffect(() => {
-    const cur = habits.length
-    const prev = prevCount.current
-    prevCount.current = cur
+    const cur = habits.length;
+    const prev = prevCount.current;
+    prevCount.current = cur;
     if (cur === 0) {
       if (prev > 0) {
-        setEmptyReady(false)
-        if (emptyTimer.current) window.clearTimeout(emptyTimer.current)
-        emptyTimer.current = window.setTimeout(() => { setEmptyReady(true); emptyTimer.current = null }, 300)
+        setEmptyReady(false);
+        if (emptyTimer.current) window.clearTimeout(emptyTimer.current);
+        emptyTimer.current = window.setTimeout(() => {
+          setEmptyReady(true);
+          emptyTimer.current = null;
+        }, 300);
       } else {
-        setEmptyReady(true)
+        setEmptyReady(true);
       }
     } else {
-      if (emptyTimer.current) { window.clearTimeout(emptyTimer.current); emptyTimer.current = null }
-      setEmptyReady(false)
+      if (emptyTimer.current) {
+        window.clearTimeout(emptyTimer.current);
+        emptyTimer.current = null;
+      }
+      setEmptyReady(false);
     }
     return () => {
-      if (emptyTimer.current) { window.clearTimeout(emptyTimer.current); emptyTimer.current = null }
-    }
-  }, [habits.length])
+      if (emptyTimer.current) {
+        window.clearTimeout(emptyTimer.current);
+        emptyTimer.current = null;
+      }
+    };
+  }, [habits.length]);
 
   const groupedHabits = useMemo(() => {
-    const today = new Date()
-    const todayKey = startOfDay(today).getTime()
-    const normalize = (name: string) => name.toLocaleLowerCase()
-    const byName = (a: typeof habits[number], b: typeof habits[number]) =>
-      normalize(a.name).localeCompare(normalize(b.name))
+    const today = new Date();
+    const todayKey = startOfDay(today).getTime();
+    const normalize = (name: string) => name.toLocaleLowerCase();
+    const byName = (a: (typeof habits)[number], b: (typeof habits)[number]) =>
+      normalize(a.name).localeCompare(normalize(b.name));
 
-    const active = habits.filter((h) => !h.archived)
-    const archived = habits.filter((h) => h.archived)
+    const active = habits.filter((h) => !h.archived);
+    const archived = habits.filter((h) => h.archived);
 
-    const hasCompletionToday = (h: typeof habits[number]) => {
-      const set = completionLookup.get(h.id)
-      return set ? set.has(todayKey) : false
-    }
+    const hasCompletionToday = (h: (typeof habits)[number]) => {
+      const set = completionLookup.get(h.id);
+      return set ? set.has(todayKey) : false;
+    };
 
-    const incompleteToday = active.filter((h) => !hasCompletionToday(h))
-    const completedToday = active.filter((h) => hasCompletionToday(h))
+    const incompleteToday = active.filter((h) => !hasCompletionToday(h));
+    const completedToday = active.filter((h) => hasCompletionToday(h));
 
     return {
       incompleteToday: [...incompleteToday].sort(byName),
       completedToday: [...completedToday].sort(byName),
       archived: [...archived].sort(byName),
-    }
-  }, [habits, showArchived, completionLookup])
+    };
+  }, [habits, showArchived, completionLookup]);
 
   return (
     <div>
-
       <div className="mt-4 grid gap-4 sm:[grid-template-columns:minmax(0,1fr)_minmax(0,160px)] items-stretch">
         {showHomeCards && (
           <div className="h-full min-w-0 sm:row-start-1 sm:col-start-1 sm:col-span-1">
@@ -128,7 +138,9 @@ export default function Home() {
               {groupedHabits.incompleteToday.length === 0 &&
               groupedHabits.completedToday.length === 0 &&
               (!showArchived || groupedHabits.archived.length === 0) ? (
-                emptyReady ? <EmptyState disableAnim={initialListRender.current} /> : null
+                emptyReady ? (
+                  <EmptyState disableAnim={initialListRender.current} />
+                ) : null
               ) : (
                 <>
                   {groupedHabits.incompleteToday.map((h) => (
@@ -142,15 +154,16 @@ export default function Home() {
                     </motion.div>
                   ))}
 
-                  {groupedHabits.completedToday.length > 0 && groupedHabits.incompleteToday.length > 0 && (
-                    <motion.div
-                      key="divider-completed"
-                      layout
-                      className="col-span-full text-xs font-semibold tracking-[0.6em] text-neutral-400 dark:text-neutral-500 text-center uppercase"
-                    >
-                      COMPLETED
-                    </motion.div>
-                  )}
+                  {groupedHabits.completedToday.length > 0 &&
+                    groupedHabits.incompleteToday.length > 0 && (
+                      <motion.div
+                        key="divider-completed"
+                        layout
+                        className="col-span-full text-xs font-semibold tracking-[0.6em] text-neutral-400 dark:text-neutral-500 text-center uppercase"
+                      >
+                        COMPLETED
+                      </motion.div>
+                    )}
 
                   {groupedHabits.completedToday.map((h) => (
                     <motion.div
@@ -165,7 +178,8 @@ export default function Home() {
 
                   {showArchived && groupedHabits.archived.length > 0 && (
                     <>
-                      {(groupedHabits.incompleteToday.length > 0 || groupedHabits.completedToday.length > 0) && (
+                      {(groupedHabits.incompleteToday.length > 0 ||
+                        groupedHabits.completedToday.length > 0) && (
                         <motion.div
                           key="divider-archived"
                           layout
@@ -199,7 +213,6 @@ export default function Home() {
           </div>
         )}
       </div>
-
     </div>
-  )
+  );
 }

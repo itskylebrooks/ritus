@@ -1,7 +1,7 @@
 export const LEVEL_THRESHOLDS = [
-  0,    // L1
-  200,  // L2
-  600,  // L3
+  0, // L1
+  200, // L2
+  600, // L3
   1200, // L4
   2000, // L5
   3000, // L6
@@ -29,37 +29,61 @@ export const LEVEL_THRESHOLDS = [
   75600, // L28
   81200, // L29
   87000, // L30
-]
+];
 
 export const LEVEL_TITLES = [
-  'Seed','Spark','Routine','Rhythm','Flow',
-  'Focus','Steady','Consistent','Clarity','Balance',
-  'Resolve','Momentum','Craft','Resilience','Mastery',
-  'Insight','Harmony','Endurance','Integrity','Compass',
-  'Presence','Discipline','Patience','Fortitude','Devotion',
-  'Equanimity','Wisdom','Serenity','Constancy','Zenith',
-] as const
+  'Seed',
+  'Spark',
+  'Routine',
+  'Rhythm',
+  'Flow',
+  'Focus',
+  'Steady',
+  'Consistent',
+  'Clarity',
+  'Balance',
+  'Resolve',
+  'Momentum',
+  'Craft',
+  'Resilience',
+  'Mastery',
+  'Insight',
+  'Harmony',
+  'Endurance',
+  'Integrity',
+  'Compass',
+  'Presence',
+  'Discipline',
+  'Patience',
+  'Fortitude',
+  'Devotion',
+  'Equanimity',
+  'Wisdom',
+  'Serenity',
+  'Constancy',
+  'Zenith',
+] as const;
 
-export const DEFAULT_POINTS_TARGET = 100 // for the points progress bar
+export const DEFAULT_POINTS_TARGET = 100; // for the points progress bar
 
 export function computeLevel(essence: number): number {
-  const T = LEVEL_THRESHOLDS
-  let lvl = 1
+  const T = LEVEL_THRESHOLDS;
+  let lvl = 1;
   for (let i = T.length - 1; i >= 0; i--) {
     if (essence >= T[i]) {
-      lvl = i + 1
-      break
+      lvl = i + 1;
+      break;
     }
   }
-  return lvl
+  return lvl;
 }
 
 export function levelWindow(essence: number) {
-  const lvl = computeLevel(essence)
-  const curMin = LEVEL_THRESHOLDS[lvl - 1] ?? 0
-  const nextMin = LEVEL_THRESHOLDS[lvl] ?? curMin
-  const within = Math.max(0, essence - curMin)
-  const needed = Math.max(1, nextMin - curMin)
-  const pct = Math.max(0, Math.min(100, Math.round((within / needed) * 100)))
-  return { lvl, curMin, nextMin, within, needed, pct }
+  const lvl = computeLevel(essence);
+  const curMin = LEVEL_THRESHOLDS[lvl - 1] ?? 0;
+  const nextMin = LEVEL_THRESHOLDS[lvl] ?? curMin;
+  const within = Math.max(0, essence - curMin);
+  const needed = Math.max(1, nextMin - curMin);
+  const pct = Math.max(0, Math.min(100, Math.round((within / needed) * 100)));
+  return { lvl, curMin, nextMin, within, needed, pct };
 }

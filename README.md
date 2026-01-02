@@ -5,9 +5,11 @@ A calm habit tracker focused on simplicity and privacy. Track daily/weekly/month
 ## Screenshots
 
 #### Desktop
+
 ![Home view](public/images/home-page.png)
 
 #### Mobile
+
 ![Mobile view](public/images/mobile-all.png)
 
 <details>
