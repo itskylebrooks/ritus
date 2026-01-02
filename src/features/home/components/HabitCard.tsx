@@ -58,7 +58,7 @@ function ButtonsMenu({
           <motion.button
             key="settings"
             onClick={() => setOpen(true)}
-            className="rounded-xl border dark:border-neutral-700 p-2 hover-nonaccent"
+            className="rounded-xl border border-subtle p-2 hover-nonaccent"
             aria-label="More actions"
             title="More"
             initial={{ opacity: 0 }}
@@ -84,7 +84,7 @@ function ButtonsMenu({
                 setOpen(false);
                 setEditing(true);
               }}
-              className="rounded-xl border dark:border-neutral-700 p-2 hover-nonaccent"
+              className="rounded-xl border border-subtle p-2 hover-nonaccent"
               aria-label="Edit habit"
               title="Edit"
               whileHover={{ scale: 1.1 }}
@@ -102,7 +102,7 @@ function ButtonsMenu({
                   archiveHabit(habit.id);
                 }
               }}
-              className="rounded-xl border dark:border-neutral-700 p-2 hover-nonaccent"
+              className="rounded-xl border border-subtle p-2 hover-nonaccent"
               aria-label={habit.archived ? 'Unarchive habit' : 'Archive habit'}
               title={habit.archived ? 'Unarchive' : 'Archive'}
               whileHover={{ scale: 1.1 }}
@@ -116,7 +116,7 @@ function ButtonsMenu({
                 setOpen(false);
                 setConfirmDeleteOpen(true);
               }}
-              className="rounded-xl border dark:border-neutral-700 p-2 hover-nonaccent text-red-500"
+              className="rounded-xl border border-subtle p-2 hover-nonaccent text-red-500"
               aria-label="Delete habit"
               title="Delete"
               whileHover={{ scale: 1.1 }}
@@ -201,7 +201,7 @@ export default function HabitCard({
 
   return (
     <div
-      className={`rounded-2xl border dark:border-neutral-700 p-4 shadow-sm ${isRemoving ? 'habit-remove' : initialDisableEntry ? '' : 'habit-add'}`}
+      className={`rounded-2xl border border-subtle p-4 shadow-sm ${isRemoving ? 'habit-remove' : initialDisableEntry ? '' : 'habit-add'}`}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1 min-h-[48px]">
@@ -220,7 +220,7 @@ export default function HabitCard({
                     value={name}
                     onChange={(e) => setName(e.target.value.slice(0, 60))}
                     maxLength={60}
-                    className="w-full rounded-xl border dark:border-neutral-700 bg-white px-3 py-2 dark:bg-neutral-950 text-sm text-strong dark:text-neutral-100 placeholder:text-muted dark:placeholder:text-neutral-300"
+                    className="w-full rounded-xl border border-subtle bg-white px-3 py-2 dark:bg-neutral-950 text-sm text-strong dark:text-neutral-100 placeholder:text-muted dark:placeholder:text-neutral-300"
                   />
                 </div>
               </motion.div>
@@ -280,7 +280,7 @@ export default function HabitCard({
                     setEditing(false);
                     setName(habit.name);
                   }}
-                  className="rounded-xl border dark:border-neutral-700 px-3 py-2 text-sm hover-nonaccent"
+                  className="rounded-xl border border-subtle px-3 py-2 text-sm hover-nonaccent"
                 >
                   Cancel
                 </button>

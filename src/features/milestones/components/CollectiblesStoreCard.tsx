@@ -30,7 +30,10 @@ export default function CollectiblesStoreCard() {
   ];
 
   return (
-    <div className="rounded-2xl border border-subtle p-5 shadow-sm bg-surface-elevated dark:bg-[#000000]">
+    <div
+      className="rounded-2xl border border-subtle p-5 shadow-sm"
+      style={{ backgroundColor: 'var(--color-surface-elevated)' }}
+    >
       <div className="mb-4 text-center uppercase tracking-wider text-sm md:text-base font-semibold text-muted">
         COLLECTIBLES STORE
       </div>
@@ -59,8 +62,8 @@ export default function CollectiblesStoreCard() {
                   return (
                     <div
                       key={item.id}
-                      className="rounded-xl border border-subtle p-3 transform-gpu motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out hover:-translate-y-1 motion-reduce:transition-none motion-reduce:transform-none flex flex-col bg-[#f9fafb] dark:bg-[#0b0b0b]"
-                      style={{ willChange: 'transform' }}
+                      className="rounded-xl border border-subtle p-3 transform-gpu motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out hover:-translate-y-1 motion-reduce:transition-none motion-reduce:transform-none flex flex-col"
+                      style={{ willChange: 'transform', backgroundColor: 'var(--color-tile)' }}
                     >
                       <div className="flex items-center gap-2">
                         <span className={flash[item.id] ? 'collectible-flash' : undefined}>

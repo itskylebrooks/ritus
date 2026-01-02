@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
 import { useHabitStore } from '@/shared/store/store';
+import { useEffect, useMemo, useState } from 'react';
 
 export default function ClockCard() {
   const [now, setNow] = useState(() => new Date());
@@ -54,7 +54,7 @@ export default function ClockCard() {
   }, [now]);
 
   return (
-    <div className="rounded-2xl border dark:border-neutral-700 shadow-sm overflow-hidden w-full h-[200px] sm:h-[160px] sm:w-[160px] sm:aspect-square sm:justify-self-end">
+    <div className="rounded-2xl border border-subtle shadow-sm overflow-hidden w-full h-[200px] sm:h-[160px] sm:w-[160px] sm:aspect-square sm:justify-self-end">
       <div className="p-2 h-full flex items-center justify-center">
         <div className="w-full h-full max-w-full max-h-full flex items-center sm:block">
           <div className="h-full aspect-square max-h-full sm:aspect-square sm:w-full sm:h-full">

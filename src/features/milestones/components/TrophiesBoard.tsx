@@ -1,20 +1,26 @@
-import { WandSparkles } from 'lucide-react';
 import { TROPHIES } from '@/shared/constants/trophies';
 import { useHabitStore } from '@/shared/store/store';
+import { WandSparkles } from 'lucide-react';
 
 export default function TrophiesBoard() {
   const unlocked = useHabitStore((s) => s.progress.unlocked || {});
   const items = TROPHIES.filter((t) => unlocked[t.id]);
 
   return (
-    <div className="rounded-2xl border border-subtle p-5 shadow-sm bg-surface-elevated dark:bg-[#000000]">
+    <div
+      className="rounded-2xl border border-subtle p-5 shadow-sm"
+      style={{ backgroundColor: 'var(--color-surface-elevated)' }}
+    >
       <div className="mb-4 text-center uppercase tracking-wider text-sm md:text-base font-semibold text-muted">
         TROPHY BOARD
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {items.length === 0 ? (
-          <div className="col-span-2 md:col-span-4 flex flex-col items-center gap-3 rounded-lg border border-subtle p-6 bg-[#f9fafb] dark:bg-[#0b0b0b]">
+          <div
+            className="col-span-2 md:col-span-4 flex flex-col items-center gap-3 rounded-lg border border-subtle p-6"
+            style={{ backgroundColor: 'var(--color-tile)' }}
+          >
             <div className="p-2 rounded-md">
               <WandSparkles className="h-8 w-8 text-accent" />
             </div>
@@ -28,7 +34,8 @@ export default function TrophiesBoard() {
           items.map(({ id, label, Icon, reason }) => (
             <div
               key={id}
-              className="flex flex-col items-center justify-between gap-3 rounded-lg border border-subtle p-4 min-h-[140px] bg-[#f9fafb] dark:bg-[#0b0b0b]"
+              className="flex flex-col items-center justify-between gap-3 rounded-lg border border-subtle p-4 min-h-[140px]"
+              style={{ backgroundColor: 'var(--color-tile)' }}
             >
               <div className="p-2 rounded-md">
                 <Icon className="h-7 w-7 text-accent" />

@@ -14,7 +14,7 @@ export default function MilestonesHeaderCard() {
   // points progress bar removed per design; keep top-right display only
 
   return (
-    <div className="rounded-2xl border dark:border-neutral-700 p-5 shadow-sm">
+    <div className="rounded-2xl border border-subtle p-5 shadow-sm">
       <div className="flex items-center justify-between gap-3">
         <div>
           <div className="mt-1 flex items-baseline gap-2">

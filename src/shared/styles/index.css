@@ -480,6 +480,9 @@ header button[aria-haspopup='menu'] {
   .hover\:bg-subtle:hover {
     background-color: var(--color-surface-alt);
   }
+  .hover\:bg-surface-alt:hover {
+    background-color: var(--color-surface-alt);
+  }
   .hover\:bg-accent-soft:hover {
     background-color: var(--color-accent-soft);
   }
@@ -609,15 +612,10 @@ header button[aria-haspopup='menu'] {
   .dark .text-black {
     color: var(--color-text-primary) !important;
   }
-  /* Ensure weekstrip-day marked done shows correct contrast in both modes */
+  /* Ensure weekstrip-day marked done uses accent color in both modes */
   .weekstrip-done {
-    /* light-mode: white text on dark bg */
-    color: var(--color-text-inverse) !important;
-  }
-  .dark button.weekstrip-done,
-  .dark .weekstrip-done {
-    /* dark-mode: when done button uses white bg, force dark text for contrast */
-    color: var(--color-text-primary) !important;
+    background-color: var(--color-accent) !important;
+    color: var(--color-accent-contrast) !important;
   }
   .text-black\/80,
   .dark .text-black\/80 {

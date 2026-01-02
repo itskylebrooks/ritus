@@ -115,7 +115,7 @@ export default function AddHabit() {
     <motion.form
       layout
       onSubmit={submit}
-      className="flex flex-col gap-3 rounded-2xl border dark:border-neutral-700 p-3 shadow-sm sm:flex-row sm:items-end"
+      className="flex flex-col gap-3 rounded-2xl border border-subtle p-3 shadow-sm sm:flex-row sm:items-end"
     >
       <motion.div
         className="flex-1"

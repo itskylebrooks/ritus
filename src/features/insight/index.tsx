@@ -50,7 +50,7 @@ export default function Insight() {
   const renderHabitCard = (h: Habit) => {
     const completionDays = completionLookup.get(h.id);
     return (
-      <div key={h.id} className="rounded-2xl border dark:border-neutral-700 p-4 shadow-sm w-full">
+      <div key={h.id} className="rounded-2xl border border-subtle p-4 shadow-sm w-full">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2 min-w-0">
             <h3 className="text-lg font-semibold truncate after:content-[''] after:inline-block after:w-2">

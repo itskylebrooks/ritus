@@ -1,9 +1,9 @@
+import { useHabitStore } from '@/shared/store/store';
+import type { Habit } from '@/shared/types';
+import { daysThisWeek } from '@/shared/utils/date';
+import { hasCompletionOnDay } from '@/shared/utils/scoring';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
-import { useHabitStore } from '@/shared/store/store';
-import { hasCompletionOnDay } from '@/shared/utils/scoring';
-import { daysThisWeek } from '@/shared/utils/date';
-import type { Habit } from '@/shared/types';
 
 export default function WeekStrip({
   habit,
@@ -36,7 +36,7 @@ export default function WeekStrip({
             ? 'border-transparent bg-emerald-600 text-white'
             : isPast
               ? 'border-transparent bg-red-500 text-white'
-              : 'border-neutral-300 text-neutral-700 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-900';
+              : 'border-subtle text-strong hover:bg-surface-alt';
 
           return (
             <motion.button
@@ -78,8 +78,8 @@ export default function WeekStrip({
               showList ? 'w-8 rounded-full sm:w-auto sm:px-3 sm:rounded-lg' : 'w-8 rounded-full'
             } ${
               done
-                ? 'weekstrip-done border-transparent bg-black dark:bg-white'
-                : 'border-neutral-300 text-neutral-700 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-900'
+                ? 'weekstrip-done border-transparent'
+                : 'border-subtle text-strong hover:bg-surface-alt'
             } ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`}
             aria-label={`${format(d, 'EEEE, d MMM')}: ${done ? 'Completed' : disabled ? 'Not available' : 'Not completed'}`}
             title={`${shortLabel} ${format(d, 'd MMM')}`}

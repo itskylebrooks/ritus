@@ -17,7 +17,7 @@ function EmptyState({ disableAnim = false }: { disableAnim?: boolean }) {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: -6, scale: 0.98 }}
       transition={{ ...transitions.fadeLg, ease: emphasizeEase }}
-      className="rounded-2xl border dark:border-neutral-700 p-10 text-center text-neutral-600 dark:text-neutral-300"
+      className="rounded-2xl border border-subtle p-10 text-center text-muted"
     >
       <p className="text-lg font-medium">No habits yet</p>
       <p className="mt-1 text-sm">Create your first habit to get started.</p>

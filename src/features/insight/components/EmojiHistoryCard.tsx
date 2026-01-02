@@ -211,11 +211,9 @@ export default function EmojiHistoryCard() {
   }
 
   return (
-    <div className="rounded-2xl border dark:border-neutral-700 p-4 shadow-sm">
+    <div className="rounded-2xl border border-subtle p-4 shadow-sm">
       <div className="mb-3 flex items-center justify-between">
-        <div className="text-sm text-neutral-600 dark:text-neutral-300 font-medium">
-          Emoji history
-        </div>
+        <div className="text-sm text-muted font-medium">Emoji history</div>
         <div className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-300">
           <button
             onClick={() => shiftYear(-1)}

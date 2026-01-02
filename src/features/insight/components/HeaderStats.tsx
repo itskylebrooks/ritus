@@ -59,7 +59,7 @@ export default function HeaderStats() {
         </div>
         <div className="mt-1 text-2xl font-semibold">{longestStreak}d</div>
       </div>
-      <div className="col-span-2 rounded-2xl border dark:border-neutral-700 p-4 shadow-sm sm:col-span-1">
+      <div className="col-span-2 rounded-2xl border border-subtle p-4 shadow-sm sm:col-span-1">
         <div className="flex items-center justify-between text-sm text-neutral-600 dark:text-neutral-300">
           <span>Weekly completion</span>
           <Info className="h-4 w-4" />

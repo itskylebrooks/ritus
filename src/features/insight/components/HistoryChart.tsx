@@ -112,7 +112,7 @@ export default function HistoryChart() {
   );
 
   return (
-    <div className="rounded-2xl border dark:border-neutral-700 p-4 shadow-sm">
+    <div className="rounded-2xl border border-subtle p-4 shadow-sm">
       <div className="mb-3 flex items-center justify-between">
         <div className="text-sm text-neutral-600 dark:text-neutral-300 font-medium">
           Practice Arc
