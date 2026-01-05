@@ -39,12 +39,14 @@ export function useEmojiOfTheDay(): EmojiOfTheDayState {
       normalizedRecents.length !== recentsIds.length ||
       normalizedRecents.some((id, idx) => id !== recentsIds[idx]);
     if (!hasDiff) return;
-    try {
-      useHabitStore.setState?.((state) => ({
-        ...state,
-        emojiRecents: normalizedRecents,
-      }));
-    } catch {}
+    queueMicrotask(() => {
+      try {
+        useHabitStore.setState?.((state) => ({
+          ...state,
+          emojiRecents: normalizedRecents,
+        }));
+      } catch {}
+    });
   }, [recentsIds]);
 
   const setEmojiId = useCallback(

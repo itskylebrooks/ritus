@@ -4,6 +4,8 @@ import { useEmojiOfTheDay } from '@/shared/hooks/useEmojiOfTheDay';
 import { CirclePlus } from 'lucide-react';
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 
+/* eslint-disable no-empty */
+
 function normalizeQuery(value: string) {
   return value
     .toLowerCase()
@@ -52,11 +54,36 @@ export default function EmojiPicker() {
     beginClose();
   };
 
-  // Modal open/close helpers (match Settings modal behavior)
   const CLOSE_DURATION = 280;
+  const bodyLockRef = useRef<{
+    overflow: string;
+    position: string;
+    top: string;
+    left: string;
+    right: string;
+    width: string;
+  } | null>(null);
+
   const beginClose = useCallback(() => {
     if (!open || closing) return;
     setClosing(true);
+
+    if (bodyLockRef.current) {
+      const body = document.body;
+      const prev = bodyLockRef.current;
+      body.style.overflow = prev.overflow;
+      body.style.position = prev.position;
+      body.style.top = prev.top;
+      body.style.left = prev.left;
+      body.style.right = prev.right;
+      body.style.width = prev.width;
+      if (prev.top) {
+        const y = -parseInt(prev.top || '0', 10) || 0;
+        window.scrollTo(0, y);
+      }
+      bodyLockRef.current = null;
+    }
+
     closeTimerRef.current = window.setTimeout(() => {
       setClosing(false);
       setOpen(false);
@@ -87,9 +114,7 @@ export default function EmojiPicker() {
           inputRef.current?.select();
         });
       }
-    } catch {
-      // no-op: conservative fallback is to not auto-focus
-    }
+    } catch {}
 
     // Robust body scroll lock (works on mobile Safari)
     const body = document.body as HTMLBodyElement;
@@ -101,6 +126,7 @@ export default function EmojiPicker() {
       right: body.style.right,
       width: body.style.width,
     };
+    bodyLockRef.current = prev;
     const scrollY = window.scrollY || window.pageYOffset;
     body.style.overflow = 'hidden';
     body.style.position = 'fixed';
@@ -112,22 +138,23 @@ export default function EmojiPicker() {
     return () => {
       if (raf !== null) cancelAnimationFrame(raf);
       window.removeEventListener('keydown', handleKey);
-      // restore body styles and scroll position
-      body.style.overflow = prev.overflow;
-      body.style.position = prev.position;
-      body.style.top = prev.top;
-      body.style.left = prev.left;
-      body.style.right = prev.right;
-      body.style.width = prev.width;
-      if (prev.top) {
-        const y = -parseInt(prev.top || '0', 10) || 0;
-        window.scrollTo(0, y);
+      if (bodyLockRef.current) {
+        body.style.overflow = prev.overflow;
+        body.style.position = prev.position;
+        body.style.top = prev.top;
+        body.style.left = prev.left;
+        body.style.right = prev.right;
+        body.style.width = prev.width;
+        if (prev.top) {
+          const y = -parseInt(prev.top || '0', 10) || 0;
+          window.scrollTo(0, y);
+        }
+        bodyLockRef.current = null;
       }
       if (closeTimerRef.current) window.clearTimeout(closeTimerRef.current);
     };
   }, [open, beginClose]);
 
-  // keep emoji selection valid even if assets change
   useEffect(() => {
     if (!emojiId) return;
     if (!emojiIndex.has(emojiId)) {
@@ -162,7 +189,7 @@ export default function EmojiPicker() {
 
       {open && (
         <div
-          className={`fixed inset-0 z-[80] flex items-center justify-center p-5 settings-overlay ${closing ? 'closing bg-transparent' : 'bg-overlay backdrop-blur-sm'}`}
+          className={`fixed inset-0 z-[80] flex items-center justify-center p-5 settings-overlay ${closing ? 'closing bg-transparent pointer-events-none' : 'bg-overlay backdrop-blur-sm'}`}
           onClick={beginClose}
         >
           <div
@@ -182,7 +209,6 @@ export default function EmojiPicker() {
                     if (e.key === 'Enter') {
                       e.preventDefault();
                       e.stopPropagation();
-                      // Select the first result and close; if none, blur
                       const firstCategory = filteredCategories[0];
                       const firstItem = firstCategory?.items?.[0];
                       if (firstItem) {
@@ -198,7 +224,6 @@ export default function EmojiPicker() {
                 />
               </label>
             </div>
-            {/* Category tabs */}
             <div className="sticky top-0 z-10 bg-surface-elevated/95 backdrop-blur supports-[backdrop-filter]:bg-surface-elevated/80">
               <div className="flex gap-1 overflow-x-auto px-3 py-1">
                 {(query ? filteredCategories : baseCats).map((cat) => (

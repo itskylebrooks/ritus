@@ -111,7 +111,6 @@ export const useHabitStore = create<HabitState>()(
       setShowHomeCards: (v) => set({ showHomeCards: v }),
       setShowArchived: (v) => set({ showArchived: v }),
       setShowList: (v) => set({ showList: v }),
-      // emoji of the day defaults
       emojiByDate: {},
       emojiRecents: [],
       setEmojiForDate: (dateISO: string, emojiId: string | null) =>
@@ -124,43 +123,55 @@ export const useHabitStore = create<HabitState>()(
             recents = [emojiId, ...recents.filter((x) => x !== emojiId)].slice(0, 10);
           }
 
-          // Compute longest emoji streak (UTC-safe) and idempotently unlock emoji trophies
-          const keys = Object.keys(by);
-          const norm = new Set(keys.map((k) => (k.length > 10 ? k.slice(0, 10) : k)));
-          const prevDay = (ds: string) => {
-            const d = new Date(`${ds}T00:00:00Z`);
-            d.setUTCDate(d.getUTCDate() - 1);
-            return d.toISOString().slice(0, 10);
-          };
-          const nextDay = (ds: string) => {
-            const d = new Date(`${ds}T00:00:00Z`);
-            d.setUTCDate(d.getUTCDate() + 1);
-            return d.toISOString().slice(0, 10);
-          };
-          let longest = 0;
-          for (const ds of norm) {
-            const prevKey = prevDay(ds);
-            if (norm.has(prevKey)) continue;
-            let cnt = 0;
-            let cur = ds;
-            while (norm.has(cur)) {
-              cnt++;
-              cur = nextDay(cur);
-            }
-            if (cnt > longest) longest = cnt;
-          }
-          const unlocked = { ...(s.progress.unlocked || {}) };
-          for (const t of TROPHIES)
-            if (t.group === 'emoji' && !unlocked[t.id] && longest >= t.threshold)
-              unlocked[t.id] = true;
+          setTimeout(() => {
+            const currentState = get();
+            const currentBy = currentState.emojiByDate || {};
+            const keys = Object.keys(currentBy);
+            if (keys.length === 0) return;
 
-          return { emojiByDate: by, emojiRecents: recents, progress: { ...s.progress, unlocked } };
+            const norm = new Set(keys.map((k) => (k.length > 10 ? k.slice(0, 10) : k)));
+            const prevDay = (ds: string) => {
+              const d = new Date(`${ds}T00:00:00Z`);
+              d.setUTCDate(d.getUTCDate() - 1);
+              return d.toISOString().slice(0, 10);
+            };
+            const nextDay = (ds: string) => {
+              const d = new Date(`${ds}T00:00:00Z`);
+              d.setUTCDate(d.getUTCDate() + 1);
+              return d.toISOString().slice(0, 10);
+            };
+            let longest = 0;
+            for (const ds of norm) {
+              const prevKey = prevDay(ds);
+              if (norm.has(prevKey)) continue;
+              let cnt = 0;
+              let cur = ds;
+              while (norm.has(cur)) {
+                cnt++;
+                cur = nextDay(cur);
+              }
+              if (cnt > longest) longest = cnt;
+            }
+
+            const unlocked = { ...(currentState.progress.unlocked || {}) };
+            let hasChanges = false;
+            for (const t of TROPHIES) {
+              if (t.group === 'emoji' && !unlocked[t.id] && longest >= t.threshold) {
+                unlocked[t.id] = true;
+                hasChanges = true;
+              }
+            }
+
+            if (hasChanges) {
+              set((state) => ({ progress: { ...state.progress, unlocked } }));
+            }
+          }, 0);
+
+          return { emojiByDate: by, emojiRecents: recents };
         }),
       clearEmojiData: () => set({ emojiByDate: {}, emojiRecents: [] }),
-      // user / preferences (no username — removed)
       reminders: { dailyEnabled: false, dailyTime: '21:00' },
       setReminders: (r: { dailyEnabled: boolean; dailyTime: string }) => set({ reminders: r }),
-      // cumulative stats that persist even if habits are deleted
       totalPoints: 0,
       longestStreak: 0,
       // progression helpers
