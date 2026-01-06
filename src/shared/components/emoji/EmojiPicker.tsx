@@ -55,35 +55,10 @@ export default function EmojiPicker() {
   };
 
   const CLOSE_DURATION = 280;
-  const bodyLockRef = useRef<{
-    overflow: string;
-    position: string;
-    top: string;
-    left: string;
-    right: string;
-    width: string;
-  } | null>(null);
 
   const beginClose = useCallback(() => {
     if (!open || closing) return;
     setClosing(true);
-
-    if (bodyLockRef.current) {
-      const body = document.body;
-      const prev = bodyLockRef.current;
-      body.style.overflow = prev.overflow;
-      body.style.position = prev.position;
-      body.style.top = prev.top;
-      body.style.left = prev.left;
-      body.style.right = prev.right;
-      body.style.width = prev.width;
-      if (prev.top) {
-        const y = -parseInt(prev.top || '0', 10) || 0;
-        window.scrollTo(0, y);
-      }
-      bodyLockRef.current = null;
-    }
-
     closeTimerRef.current = window.setTimeout(() => {
       setClosing(false);
       setOpen(false);
@@ -91,7 +66,14 @@ export default function EmojiPicker() {
   }, [open, closing]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      if (closeTimerRef.current) {
+        window.clearTimeout(closeTimerRef.current);
+        closeTimerRef.current = null;
+      }
+      return;
+    }
+
     const handleKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') beginClose();
     };
@@ -116,42 +98,14 @@ export default function EmojiPicker() {
       }
     } catch {}
 
-    // Robust body scroll lock (works on mobile Safari)
-    const body = document.body as HTMLBodyElement;
-    const prev = {
-      overflow: body.style.overflow,
-      position: body.style.position,
-      top: body.style.top,
-      left: body.style.left,
-      right: body.style.right,
-      width: body.style.width,
-    };
-    bodyLockRef.current = prev;
-    const scrollY = window.scrollY || window.pageYOffset;
+    const body = document.body;
+    const prevOverflow = body.style.overflow;
     body.style.overflow = 'hidden';
-    body.style.position = 'fixed';
-    body.style.top = `-${scrollY}px`;
-    body.style.left = '0';
-    body.style.right = '0';
-    body.style.width = '100%';
 
     return () => {
       if (raf !== null) cancelAnimationFrame(raf);
       window.removeEventListener('keydown', handleKey);
-      if (bodyLockRef.current) {
-        body.style.overflow = prev.overflow;
-        body.style.position = prev.position;
-        body.style.top = prev.top;
-        body.style.left = prev.left;
-        body.style.right = prev.right;
-        body.style.width = prev.width;
-        if (prev.top) {
-          const y = -parseInt(prev.top || '0', 10) || 0;
-          window.scrollTo(0, y);
-        }
-        bodyLockRef.current = null;
-      }
-      if (closeTimerRef.current) window.clearTimeout(closeTimerRef.current);
+      body.style.overflow = prevOverflow;
     };
   }, [open, beginClose]);
 
@@ -160,7 +114,7 @@ export default function EmojiPicker() {
     if (!emojiIndex.has(emojiId)) {
       clearEmoji();
     }
-  }, [emojiId, clearEmoji, beginClose]);
+  }, [emojiId, clearEmoji]);
 
   return (
     <div className="relative" ref={containerRef}>
