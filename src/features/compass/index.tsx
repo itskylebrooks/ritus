@@ -13,7 +13,16 @@ interface HabitDef {
   description?: string;
 }
 
-const COMPASS_SETS = [
+interface CompassSet {
+  dir: string;
+  arrow: string;
+  title: string;
+  note: string;
+  disclaimer?: string;
+  habits: HabitDef[];
+}
+
+const COMPASS_SETS: CompassSet[] = [
   {
     dir: 'North',
     arrow: '↑',
