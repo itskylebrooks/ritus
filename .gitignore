@@ -15,6 +15,7 @@ dev-dist/
 coverage/
 *.local
 .DS_Store
+*.tsbuildinfo
 
 # Env
 .env
