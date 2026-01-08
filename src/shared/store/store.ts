@@ -1,11 +1,57 @@
 import { COLLECTIBLES } from '@/shared/constants/collectibles';
 import { computeLevel } from '@/shared/constants/progression';
-import { TROPHIES } from '@/shared/constants/trophies';
+import { TROPHIES, type TrophyGroup } from '@/shared/constants/trophies';
 import type { Frequency, Habit } from '@/shared/types';
 import { daysThisWeek, fromISO, iso, isSameDay, lastNDays, startOfWeek } from '@/shared/utils/date';
 import { recalc } from '@/shared/utils/scoring';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+
+const TROPHIES_BY_GROUP: Record<TrophyGroup, (typeof TROPHIES)[number][]> = {
+  daily_build: [],
+  daily_break: [],
+  weekly: [],
+  monthly: [],
+  totals: [],
+  milestone: [],
+  meta: [],
+  emoji: [],
+};
+
+for (const trophy of TROPHIES) {
+  TROPHIES_BY_GROUP[trophy.group].push(trophy);
+}
+
+const AUTO_META_TROPHY_IDS = new Set(['meta_balance', 'meta_focus', 'meta_persistence']);
+
+const computeLongestEmojiStreak = (by: Record<string, string | undefined>): number => {
+  const keys = Object.keys(by || {});
+  if (!keys.length) return 0;
+  const norm = new Set(keys.map((k) => (k.length > 10 ? k.slice(0, 10) : k)));
+  const prevDay = (ds: string) => {
+    const d = new Date(`${ds}T00:00:00Z`);
+    d.setUTCDate(d.getUTCDate() - 1);
+    return d.toISOString().slice(0, 10);
+  };
+  const nextDay = (ds: string) => {
+    const d = new Date(`${ds}T00:00:00Z`);
+    d.setUTCDate(d.getUTCDate() + 1);
+    return d.toISOString().slice(0, 10);
+  };
+  let longest = 0;
+  for (const ds of norm) {
+    const prevKey = prevDay(ds);
+    if (norm.has(prevKey)) continue;
+    let count = 0;
+    let cur = ds;
+    while (norm.has(cur)) {
+      count++;
+      cur = nextDay(cur);
+    }
+    if (count > longest) longest = count;
+  }
+  return longest;
+};
 
 export interface HabitState {
   habits: Habit[];
@@ -57,6 +103,7 @@ export interface HabitState {
   emojiRecents?: string[];
   setEmojiForDate?: (dateISO: string, emojiId: string | null) => void;
   clearEmojiData?: () => void;
+  syncEmojiTrophies: () => string[];
   archiveHabit: (id: string) => void;
   unarchiveHabit: (id: string) => void;
   reminders: { dailyEnabled: boolean; dailyTime: string };
@@ -123,54 +170,30 @@ export const useHabitStore = create<HabitState>()(
           if (emojiId) {
             recents = [emojiId, ...recents.filter((x) => x !== emojiId)].slice(0, 10);
           }
-
-          setTimeout(() => {
-            const currentState = get();
-            const currentBy = currentState.emojiByDate || {};
-            const keys = Object.keys(currentBy);
-            if (keys.length === 0) return;
-
-            const norm = new Set(keys.map((k) => (k.length > 10 ? k.slice(0, 10) : k)));
-            const prevDay = (ds: string) => {
-              const d = new Date(`${ds}T00:00:00Z`);
-              d.setUTCDate(d.getUTCDate() - 1);
-              return d.toISOString().slice(0, 10);
-            };
-            const nextDay = (ds: string) => {
-              const d = new Date(`${ds}T00:00:00Z`);
-              d.setUTCDate(d.getUTCDate() + 1);
-              return d.toISOString().slice(0, 10);
-            };
-            let longest = 0;
-            for (const ds of norm) {
-              const prevKey = prevDay(ds);
-              if (norm.has(prevKey)) continue;
-              let cnt = 0;
-              let cur = ds;
-              while (norm.has(cur)) {
-                cnt++;
-                cur = nextDay(cur);
-              }
-              if (cnt > longest) longest = cnt;
-            }
-
-            const unlocked = { ...(currentState.progress.unlocked || {}) };
-            let hasChanges = false;
-            for (const t of TROPHIES) {
-              if (t.group === 'emoji' && !unlocked[t.id] && longest >= t.threshold) {
-                unlocked[t.id] = true;
-                hasChanges = true;
-              }
-            }
-
-            if (hasChanges) {
-              set((state) => ({ progress: { ...state.progress, unlocked } }));
-            }
-          }, 0);
-
           return { emojiByDate: by, emojiRecents: recents };
         }),
       clearEmojiData: () => set({ emojiByDate: {}, emojiRecents: [] }),
+      syncEmojiTrophies: () => {
+        const state = get();
+        const unlocked = { ...(state.progress.unlocked || {}) };
+        const emojiTrophies = TROPHIES_BY_GROUP.emoji;
+        const needsEmoji = emojiTrophies.some((t) => !unlocked[t.id]);
+        if (!needsEmoji) return [];
+        const by = (state.emojiByDate || {}) as Record<string, string | undefined>;
+        if (!Object.keys(by).length) return [];
+        const longest = computeLongestEmojiStreak(by);
+        const newly: string[] = [];
+        for (const t of emojiTrophies) {
+          if (!unlocked[t.id] && longest >= t.threshold) {
+            unlocked[t.id] = true;
+            newly.push(t.id);
+          }
+        }
+        if (newly.length > 0) {
+          set((s) => ({ progress: { ...s.progress, unlocked } }));
+        }
+        return newly;
+      },
       reminders: { dailyEnabled: false, dailyTime: '21:00' },
       setReminders: (r: { dailyEnabled: boolean; dailyTime: string }) => set({ reminders: r }),
       totalPoints: 0,
@@ -278,37 +301,10 @@ export const useHabitStore = create<HabitState>()(
             ...allHabits.filter((h) => h.frequency === 'monthly').map((h) => h.streak || 0),
           );
 
-        // Emoji-of-the-day: compute the LONGEST consecutive streak across all time
-        const computeLongestEmojiStreak = (): number => {
-          const by = (get().emojiByDate || {}) as Record<string, string | undefined>;
-          const keys = Object.keys(by || {});
-          if (!keys.length) return 0;
-          const norm = new Set(keys.map((k) => (k.length > 10 ? k.slice(0, 10) : k)));
-          const prevDay = (ds: string) => {
-            const d = new Date(`${ds}T00:00:00Z`);
-            d.setUTCDate(d.getUTCDate() - 1);
-            return d.toISOString().slice(0, 10);
-          };
-          const nextDay = (ds: string) => {
-            const d = new Date(`${ds}T00:00:00Z`);
-            d.setUTCDate(d.getUTCDate() + 1);
-            return d.toISOString().slice(0, 10);
-          };
-          let longest = 0;
-          for (const ds of norm) {
-            const prevKey = prevDay(ds);
-            if (norm.has(prevKey)) continue; // not a streak start
-            let count = 0;
-            let cur = ds;
-            while (norm.has(cur)) {
-              count++;
-              cur = nextDay(cur);
-            }
-            if (count > longest) longest = count;
-          }
-          return longest;
-        };
-        const emojiStreak = summary?.emojiStreak ?? computeLongestEmojiStreak();
+        const needsEmoji = TROPHIES_BY_GROUP.emoji.some((t) => !unlocked[t.id]);
+        const emojiStreak =
+          summary?.emojiStreak ??
+          (needsEmoji ? computeLongestEmojiStreak(get().emojiByDate || {}) : 0);
 
         // compute unique days with at least one completion across all habits
         const uniqueDays = new Set<string>();
@@ -605,105 +601,122 @@ export const useHabitStore = create<HabitState>()(
               // evaluate trophies idempotently based on updated habits
               unlocked: (() => {
                 const existing = { ...(s.progress.unlocked || {}) };
-
                 const allHabits = updated;
                 const totalCompletions = newTotalCompletions;
-                const dailyBuildStreak = Math.max(
-                  0,
-                  ...allHabits
-                    .filter((hh) => hh.frequency === 'daily' && hh.mode === 'build')
-                    .map((hh) => hh.streak || 0),
+                const needs = (group: TrophyGroup) =>
+                  TROPHIES_BY_GROUP[group].some((t) => !existing[t.id]);
+
+                const needsDailyBuild = needs('daily_build');
+                const needsDailyBreak = needs('daily_break');
+                const needsWeekly = needs('weekly');
+                const needsMonthly = needs('monthly');
+                const needsMilestone = needs('milestone');
+
+                const dailyBuildStreak = needsDailyBuild
+                  ? Math.max(
+                      0,
+                      ...allHabits
+                        .filter((hh) => hh.frequency === 'daily' && hh.mode === 'build')
+                        .map((hh) => hh.streak || 0),
+                    )
+                  : 0;
+                const dailyBreakStreak = needsDailyBreak
+                  ? Math.max(
+                      0,
+                      ...allHabits
+                        .filter((hh) => hh.frequency === 'daily' && hh.mode === 'break')
+                        .map((hh) => hh.streak || 0),
+                    )
+                  : 0;
+                const weeklyStreak = needsWeekly
+                  ? Math.max(
+                      0,
+                      ...allHabits
+                        .filter((hh) => hh.frequency === 'weekly')
+                        .map((hh) => hh.streak || 0),
+                    )
+                  : 0;
+                const monthlyStreak = needsMonthly
+                  ? Math.max(
+                      0,
+                      ...allHabits
+                        .filter((hh) => hh.frequency === 'monthly')
+                        .map((hh) => hh.streak || 0),
+                    )
+                  : 0;
+
+                const metaTrophies = TROPHIES_BY_GROUP.meta.filter(
+                  (t) => AUTO_META_TROPHY_IDS.has(t.id) && !existing[t.id],
                 );
-                const dailyBreakStreak = Math.max(
-                  0,
-                  ...allHabits
-                    .filter((hh) => hh.frequency === 'daily' && hh.mode === 'break')
-                    .map((hh) => hh.streak || 0),
-                );
-                const weeklyStreak = Math.max(
-                  0,
-                  ...allHabits
-                    .filter((hh) => hh.frequency === 'weekly')
-                    .map((hh) => hh.streak || 0),
-                );
-                const monthlyStreak = Math.max(
-                  0,
-                  ...allHabits
-                    .filter((hh) => hh.frequency === 'monthly')
-                    .map((hh) => hh.streak || 0),
-                );
-                const emojiStreak = (() => {
-                  const by = (get().emojiByDate || {}) as Record<string, string | undefined>;
-                  const keys = Object.keys(by || {});
-                  if (!keys.length) return 0;
-                  const norm = new Set(keys.map((k) => (k.length > 10 ? k.slice(0, 10) : k)));
-                  const prevDay = (ds: string) => {
-                    const d = new Date(`${ds}T00:00:00Z`);
-                    d.setUTCDate(d.getUTCDate() - 1);
-                    return d.toISOString().slice(0, 10);
-                  };
-                  const nextDay = (ds: string) => {
-                    const d = new Date(`${ds}T00:00:00Z`);
-                    d.setUTCDate(d.getUTCDate() + 1);
-                    return d.toISOString().slice(0, 10);
-                  };
-                  let longest = 0;
-                  for (const ds of norm) {
-                    const prevKey = prevDay(ds);
-                    if (norm.has(prevKey)) continue;
-                    let count = 0;
-                    let cur = ds;
-                    while (norm.has(cur)) {
-                      count++;
-                      cur = nextDay(cur);
-                    }
-                    if (count > longest) longest = count;
+                const needsMetaBalance = metaTrophies.some((t) => t.id === 'meta_balance');
+                const needsMetaFocus = metaTrophies.some((t) => t.id === 'meta_focus');
+                const needsMetaPersistence = metaTrophies.some((t) => t.id === 'meta_persistence');
+
+                let uniqueDays: Set<string> | null = null;
+                const getUniqueDays = () => {
+                  if (uniqueDays) return uniqueDays;
+                  uniqueDays = new Set<string>();
+                  for (const h of allHabits) {
+                    for (const c of h.completions || []) uniqueDays.add(iso(fromISO(c)));
                   }
-                  return longest;
-                })();
+                  return uniqueDays;
+                };
 
-                const uniqueDays = new Set<string>();
-                for (const h of allHabits) for (const c of h.completions || []) uniqueDays.add(c);
-                const daysUsedCount = uniqueDays.size;
-
-                const maxBuildStreak = Math.max(
-                  0,
-                  ...allHabits.filter((h) => h.mode === 'build').map((h) => h.streak || 0),
-                );
-                const maxBreakStreak = Math.max(
-                  0,
-                  ...allHabits.filter((h) => h.mode === 'break').map((h) => h.streak || 0),
-                );
+                const daysUsedCount =
+                  needsMilestone || needsMetaPersistence ? getUniqueDays().size : 0;
+                const maxBuildStreak = needsMetaBalance
+                  ? Math.max(
+                      0,
+                      ...allHabits.filter((h) => h.mode === 'build').map((h) => h.streak || 0),
+                    )
+                  : 0;
+                const maxBreakStreak = needsMetaBalance
+                  ? Math.max(
+                      0,
+                      ...allHabits.filter((h) => h.mode === 'break').map((h) => h.streak || 0),
+                    )
+                  : 0;
 
                 const hasContinuousDays = (n: number) => {
+                  if (!needsMetaPersistence) return false;
                   const days = lastNDays(n);
-                  for (const d of days)
-                    if (![...uniqueDays].some((u) => isSameDay(fromISO(u), d))) return false;
+                  const daySet = getUniqueDays();
+                  for (const d of days) if (!daySet.has(iso(d))) return false;
                   return true;
                 };
 
                 const allActiveDailyCompletedN = (n: number) => {
+                  if (!needsMetaFocus) return false;
                   const activeDaily = allHabits.filter(
                     (h) => !h.archived && h.frequency === 'daily',
                   );
                   if (activeDaily.length === 0) return false;
+                  const completionSets = new Map<string, Set<string>>();
+                  for (const h of activeDaily) {
+                    completionSets.set(
+                      h.id,
+                      new Set((h.completions || []).map((c) => iso(fromISO(c)))),
+                    );
+                  }
                   const days = lastNDays(n);
                   for (const d of days) {
+                    const key = iso(d);
                     for (const h of activeDaily) {
-                      if (!h.completions.some((c) => isSameDay(fromISO(c), d))) return false;
+                      if (!completionSets.get(h.id)?.has(key)) return false;
                     }
                   }
                   return true;
                 };
 
                 for (const t of TROPHIES) {
+                  if (existing[t.id]) continue;
+                  if (t.group === 'emoji') continue;
                   let meets = false;
                   if (t.group === 'daily_build') meets = dailyBuildStreak >= t.threshold;
                   else if (t.group === 'daily_break') meets = dailyBreakStreak >= t.threshold;
                   else if (t.group === 'weekly') meets = weeklyStreak >= t.threshold;
                   else if (t.group === 'monthly') meets = monthlyStreak >= t.threshold;
                   else if (t.group === 'milestone') meets = daysUsedCount >= t.threshold;
-                  else if (t.group === 'emoji') meets = emojiStreak >= t.threshold;
                   else if (t.group === 'meta') {
                     switch (t.id) {
                       case 'meta_balance':
@@ -722,10 +735,12 @@ export const useHabitStore = create<HabitState>()(
                       default:
                         meets = false;
                     }
-                  } else {
+                  } else if (t.group === 'totals') {
                     meets = totalCompletions >= t.threshold;
+                  } else {
+                    meets = false;
                   }
-                  if (!existing[t.id] && meets) existing[t.id] = true;
+                  if (meets) existing[t.id] = true;
                 }
                 return existing;
               })(),

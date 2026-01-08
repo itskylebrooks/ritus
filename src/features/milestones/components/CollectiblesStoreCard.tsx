@@ -1,12 +1,19 @@
 import type { CollectibleType } from '@/shared/constants/collectibles';
 import { COLLECTIBLES } from '@/shared/constants/collectibles';
 import { useHabitStore } from '@/shared/store/store';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+
+const COLLECTIBLE_GROUPS: { label: string; type: CollectibleType }[] = [
+  { label: 'Clock styles', type: 'clock' },
+  { label: 'Quote packs', type: 'quotes' },
+  { label: 'Accent themes', type: 'accent' },
+  { label: 'Mysterious relics', type: 'relic' },
+];
 
 export default function CollectiblesStoreCard() {
   const points = useHabitStore((s) => s.progress.points || 0);
   const ownedArr = useHabitStore((s) => s.progress.ownedCollectibles || []);
-  const owned = new Set(ownedArr);
+  const owned = useMemo(() => new Set(ownedArr), [ownedArr]);
   const applied = useHabitStore((s) => s.progress.appliedCollectibles || {});
   const buy = useHabitStore((s) => s.purchaseCollectible);
   const apply = useHabitStore((s) => s.applyCollectible);
@@ -22,12 +29,19 @@ export default function CollectiblesStoreCard() {
     }, 700);
   };
 
-  const groups: { label: string; type: CollectibleType }[] = [
-    { label: 'Clock styles', type: 'clock' },
-    { label: 'Quote packs', type: 'quotes' },
-    { label: 'Accent themes', type: 'accent' },
-    { label: 'Mysterious relics', type: 'relic' },
-  ];
+  const groups = useMemo(
+    () =>
+      COLLECTIBLE_GROUPS.map((g) => ({
+        ...g,
+        items: COLLECTIBLES.filter((i) => i.type === g.type)
+          .slice()
+          .sort((a, b) => {
+            if (a.cost !== b.cost) return a.cost - b.cost;
+            return a.title.localeCompare(b.title);
+          }),
+      })),
+    [],
+  );
 
   return (
     <div
@@ -44,12 +58,7 @@ export default function CollectiblesStoreCard() {
 
       <div className="space-y-5">
         {groups.map((g) => {
-          const items = COLLECTIBLES.filter((i) => i.type === g.type)
-            .slice()
-            .sort((a, b) => {
-              if (a.cost !== b.cost) return a.cost - b.cost;
-              return a.title.localeCompare(b.title);
-            });
+          const items = g.items;
           return (
             <div key={g.type}>
               <div className="mb-2 text-sm font-medium text-strong">{g.label}</div>

@@ -1,10 +1,11 @@
 import { TROPHIES } from '@/shared/constants/trophies';
 import { useHabitStore } from '@/shared/store/store';
 import { WandSparkles } from 'lucide-react';
+import { useMemo } from 'react';
 
 export default function TrophiesBoard() {
   const unlocked = useHabitStore((s) => s.progress.unlocked || {});
-  const items = TROPHIES.filter((t) => unlocked[t.id]);
+  const items = useMemo(() => TROPHIES.filter((t) => unlocked[t.id]), [unlocked]);
 
   return (
     <div
