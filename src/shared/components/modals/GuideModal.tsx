@@ -35,8 +35,8 @@ const STEPS: GuideStep[] = [
     body: 'Tap the emoji button in the header to record your mood or daily highlight. Over time, your emoji history will appear in Insights — a quick reflection of your days.',
   },
   {
-    title: 'Progress, tokens & milestones',
-    body: 'Each completion earns tokens and strengthens streaks. Your total tokens and current level are visible in Milestones, while Insights show your consistency and trends.',
+    title: 'Points & milestones',
+    body: 'Each completion earns points and strengthens streaks. Your points are visible in Milestones, while Insights show your consistency and trends.',
   },
   {
     title: 'Import example data',
@@ -82,7 +82,7 @@ export default function GuideModal({ open, onClose, onLoadExample }: GuideModalP
         0,
       );
       const longest = (defaultHabits || []).reduce((m, h) => Math.max(m, h.streak || 0), 0);
-      // also set example progress when loading sample data (progress/tokens/level)
+      // also set example progress when loading sample data (points + award keys)
       const base = {
         habits: defaultHabits,
         totalPoints: total,

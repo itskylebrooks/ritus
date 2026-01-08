@@ -174,7 +174,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
             );
         }
         if (res.totalPointsNew !== res.totalPointsPrev)
-          changes.push(`Total tokens: ${res.totalPointsPrev} → ${res.totalPointsNew}`);
+          changes.push(`Total points: ${res.totalPointsPrev} → ${res.totalPointsNew}`);
         if (res.totalCompletionsNew !== res.totalCompletionsPrev)
           changes.push(
             `Total completions: ${res.totalCompletionsPrev} → ${res.totalCompletionsNew}`,
@@ -551,15 +551,17 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
                 const st = useHabitStore.getState();
                 st.clearAll();
                 st.resetStats();
-                // reset progression (progress/tokens/level and award keys)
+                // reset progression (points and award keys)
                 try {
                   useHabitStore.setState({
                     progress: {
-                      essence: 0,
                       points: 0,
-                      level: 1,
                       weekBonusKeys: {},
                       completionAwardKeys: {},
+                      unlocked: {},
+                      ownedCollectibles: [],
+                      appliedCollectibles: {},
+                      seenTrophies: {},
                     },
                   });
                 } catch {}

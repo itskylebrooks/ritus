@@ -1,5 +1,4 @@
 import { COLLECTIBLES } from '@/shared/constants/collectibles';
-import { computeLevel } from '@/shared/constants/progression';
 import { TROPHIES, type TrophyGroup } from '@/shared/constants/trophies';
 import type { Frequency, Habit } from '@/shared/types';
 import { daysThisWeek, fromISO, iso, isSameDay, lastNDays, startOfWeek } from '@/shared/utils/date';
@@ -55,11 +54,9 @@ const computeLongestEmojiStreak = (by: Record<string, string | undefined>): numb
 
 export interface HabitState {
   habits: Habit[];
-  // progression / XP
+  // progression / points
   progress: {
-    essence: number;
     points: number;
-    level: number;
     weekBonusKeys?: Record<string, true | undefined>;
     completionAwardKeys?: Record<string, true | undefined>;
     unlocked?: Record<string, true | undefined>;
@@ -67,8 +64,6 @@ export interface HabitState {
     appliedCollectibles?: Record<string, string>;
     seenTrophies?: Record<string, true | undefined>;
   };
-  setEssence: (n: number) => void;
-  addEssence: (delta: number) => void;
   setPoints: (n: number) => void;
   addPoints: (delta: number) => void;
   tryAwardWeeklyBonus: (habitId: string, weekDate: Date, reached: boolean) => void;
@@ -132,11 +127,9 @@ export const useHabitStore = create<HabitState>()(
   persist(
     (set, get) => ({
       habits: [],
-      // Progression defaults (progress XP determines level)
+      // Progression defaults
       progress: {
-        essence: 0,
         points: 0,
-        level: 1,
         weekBonusKeys: {},
         completionAwardKeys: {},
         unlocked: {},
@@ -199,19 +192,6 @@ export const useHabitStore = create<HabitState>()(
       totalPoints: 0,
       totalCompletions: 0,
       longestStreak: 0,
-      // progression helpers
-      setEssence: (n: number) =>
-        set((s) => {
-          const essence = Math.max(0, Math.floor(n));
-          const level = computeLevel(essence);
-          return { progress: { ...s.progress, essence, level } };
-        }),
-      addEssence: (delta: number) =>
-        set((s) => {
-          const essence = Math.max(0, Math.floor(s.progress.essence + delta));
-          const level = computeLevel(essence);
-          return { progress: { ...s.progress, essence, level } };
-        }),
       setPoints: (n: number) =>
         set((s) => ({ progress: { ...s.progress, points: Math.max(0, Math.floor(n)) } })),
       addPoints: (delta: number) =>
@@ -226,14 +206,10 @@ export const useHabitStore = create<HabitState>()(
           const has = !!keys[key];
           // Award
           if (reached && !has) {
-            const newEssence = Math.max(0, Math.floor(s.progress.essence + 10));
-            const newLevel = computeLevel(newEssence);
             const newPoints = Math.max(0, Math.floor(s.progress.points + 10));
             return {
               progress: {
                 ...s.progress,
-                essence: newEssence,
-                level: newLevel,
                 points: newPoints,
                 weekBonusKeys: { ...keys, [key]: true },
               },
@@ -241,16 +217,12 @@ export const useHabitStore = create<HabitState>()(
           }
           // Revoke
           if (!reached && has) {
-            const newEssence = Math.max(0, Math.floor(s.progress.essence - 10));
-            const newLevel = computeLevel(newEssence);
             const newPoints = Math.max(0, Math.floor(s.progress.points - 10));
             const nextKeys = { ...keys };
             delete nextKeys[key];
             return {
               progress: {
                 ...s.progress,
-                essence: newEssence,
-                level: newLevel,
                 points: newPoints,
                 weekBonusKeys: nextKeys,
               },
@@ -505,7 +477,6 @@ export const useHabitStore = create<HabitState>()(
           // work on copies of award keys so we can atomically update progress at the end
           const compKeys = { ...(s.progress.completionAwardKeys || {}) };
           const weekKeys = { ...(s.progress.weekBonusKeys || {}) };
-          let essenceDelta = 0;
           let pointsAwardDelta = 0;
 
           const updated = s.habits.map((h) => {
@@ -521,7 +492,6 @@ export const useHabitStore = create<HabitState>()(
               completionDelta -= 1;
               // if we had awarded for this completion previously, revoke it
               if (compKeys[dayKey]) {
-                essenceDelta -= 5;
                 pointsAwardDelta -= 5;
                 delete compKeys[dayKey];
               }
@@ -531,7 +501,6 @@ export const useHabitStore = create<HabitState>()(
               completionDelta += 1;
               // only award if we haven't rewarded this specific day before
               if (!compKeys[dayKey]) {
-                essenceDelta += 5;
                 pointsAwardDelta += 5;
                 compKeys[dayKey] = true;
               }
@@ -555,13 +524,11 @@ export const useHabitStore = create<HabitState>()(
               const reached = count >= target;
               if (reached && !hadWeek) {
                 // award weekly bonus
-                essenceDelta += 10;
                 pointsAwardDelta += 10;
                 weekKeys[weekKey] = true;
               }
               if (!reached && hadWeek) {
                 // revoke weekly bonus
-                essenceDelta -= 10;
                 pointsAwardDelta -= 10;
                 delete weekKeys[weekKey];
               }
@@ -582,8 +549,6 @@ export const useHabitStore = create<HabitState>()(
           );
 
           // apply award/revoke deltas to persisted progress
-          const newEssence = Math.max(0, Math.floor(s.progress.essence + essenceDelta));
-          const newLevel = computeLevel(newEssence);
           const newPoints = Math.max(0, Math.floor(s.progress.points + pointsAwardDelta));
 
           return {
@@ -593,8 +558,6 @@ export const useHabitStore = create<HabitState>()(
             longestStreak: newLongest,
             progress: {
               ...s.progress,
-              essence: newEssence,
-              level: newLevel,
               points: newPoints,
               weekBonusKeys: weekKeys,
               completionAwardKeys: compKeys,
@@ -775,6 +738,12 @@ export const useHabitStore = create<HabitState>()(
       merge: (persistedState, currentState) => {
         const incoming = persistedState as Partial<HabitState> | undefined;
         const merged = { ...currentState, ...(incoming || {}) };
+        if (merged.progress) {
+          const cleaned = { ...(merged.progress as Record<string, unknown>) };
+          delete cleaned.essence;
+          delete cleaned.level;
+          merged.progress = cleaned as HabitState['progress'];
+        }
         const hasPersistedTotal =
           incoming && Object.prototype.hasOwnProperty.call(incoming, 'totalCompletions');
         if (!hasPersistedTotal) {

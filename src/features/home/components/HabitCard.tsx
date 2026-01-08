@@ -187,7 +187,7 @@ export default function HabitCard({
     [completionKeys, habit.frequency, weekKeys],
   );
 
-  // If tokens are large, render the number smaller so it fits the card
+  // If points are large, render the number smaller so it fits the card
   const pointsClass =
     habit.points && habit.points > 999
       ? 'text-sm font-semibold tabular-nums'
@@ -380,7 +380,7 @@ export default function HabitCard({
       </div>
 
       <div className="mt-4">
-        {/* Mobile: streak, compact progress bar, and tokens all on one row */}
+        {/* Mobile: streak, compact progress bar, and points all on one row */}
         <div className="flex items-center justify-between gap-2 sm:hidden">
           <div className="flex items-center gap-2">
             <Flame className="h-4 w-4 text-accent" aria-hidden />
@@ -400,7 +400,7 @@ export default function HabitCard({
           <div className="flex items-center gap-2">
             <Diamond className="h-4 w-4 text-accent" aria-hidden />
             <div className={pointsClass}>{habit.points}</div>
-            <span className="sr-only">Tokens</span>
+            <span className="sr-only">Points</span>
           </div>
         </div>
 
@@ -426,13 +426,13 @@ export default function HabitCard({
 
           <div className="flex items-center justify-end gap-2">
             <Diamond className="h-4 w-4 text-accent" aria-hidden />
-            <div className="sr-only">Tokens</div>
+            <div className="sr-only">Points</div>
             <div className={pointsClass}>{habit.points}</div>
           </div>
         </div>
       </div>
 
-      {/* Tokens text moved to the quick guide modal per UX request */}
+      {/* Points text moved to the quick guide modal per UX request */}
       <ConfirmModal
         open={confirmDeleteOpen}
         onClose={() => setConfirmDeleteOpen(false)}

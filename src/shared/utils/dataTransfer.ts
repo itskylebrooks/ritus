@@ -1,5 +1,5 @@
 import { resolveEmojiId } from '@/shared/constants/emojis';
-import { useHabitStore } from '@/shared/store/store';
+import { useHabitStore, type HabitState } from '@/shared/store/store';
 import type { Habit } from '@/shared/types';
 import pkg from '../../../package.json';
 import { fromISO, iso } from './date';
@@ -20,6 +20,16 @@ export interface ImportResult {
 }
 
 export type ImportResultFail = { ok: false; reason: 'invalid' | 'not_ritus' };
+
+const normalizeProgress = (progress: unknown): HabitState['progress'] | undefined => {
+  if (!progress || typeof progress !== 'object') return undefined;
+  const cleaned = { ...(progress as HabitState['progress'] & Record<string, unknown>) };
+  delete cleaned.essence;
+  delete cleaned.level;
+  const candidate = cleaned as HabitState['progress'];
+  const points = typeof candidate.points === 'number' ? candidate.points : 0;
+  return { ...candidate, points };
+};
 
 export function exportAllData() {
   const s = useHabitStore.getState();
@@ -42,14 +52,13 @@ export function exportAllData() {
     totalPoints: s.totalPoints,
     totalCompletions: s.totalCompletions,
     longestStreak: s.longestStreak,
-    // progression state (progress/tokens/level and bookkeeping keys)
-    progress: s.progress || {
-      essence: 0,
-      points: 0,
-      level: 1,
-      weekBonusKeys: {},
-      completionAwardKeys: {},
-    },
+    // progression state (points + bookkeeping keys)
+    progress:
+      normalizeProgress(s.progress) || ({
+        points: 0,
+        weekBonusKeys: {},
+        completionAwardKeys: {},
+      } as const),
     // emoji data
     emojiByDate: s.emojiByDate || {},
     emojiRecents: Array.isArray(s.emojiRecents) ? s.emojiRecents : [],
@@ -77,7 +86,7 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
       typeof parsed.totalCompletions === 'number' ? parsed.totalCompletions : 0;
     const incomingLongest = typeof parsed.longestStreak === 'number' ? parsed.longestStreak : 0;
     const incomingProgress =
-      parsed && typeof parsed.progress === 'object' ? parsed.progress : undefined;
+      parsed && typeof parsed.progress === 'object' ? normalizeProgress(parsed.progress) : undefined;
     const incomingEmojiByDateRaw =
       parsed && typeof parsed.emojiByDate === 'object'
         ? (parsed.emojiByDate as Record<string, string>)
@@ -184,7 +193,7 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
       showArchived: incomingShowArchived ?? cur.showArchived,
       showAdd: cur.showAdd,
       // include progress when persisting import
-      progress: incomingProgress ?? cur.progress,
+      progress: incomingProgress ?? normalizeProgress(cur.progress) ?? cur.progress,
       emojiByDate:
         incomingEmojiByDate ??
         (cur as typeof cur & { emojiByDate?: Record<string, string> }).emojiByDate ??

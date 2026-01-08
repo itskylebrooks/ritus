@@ -1,4 +1,3 @@
-import { computeLevel } from '@/shared/constants/progression';
 import type { Habit } from '@/shared/types';
 import { lastNDays } from '@/shared/utils/date';
 
@@ -620,12 +619,8 @@ export default defaultHabits;
 
 // Example default progress that pairs with the example habits above.
 export const defaultProgress = {
-  // lifetime progress XP (example)
-  essence: 4320,
-  // spendable tokens
+  // spendable points
   points: 200,
-  // derived level
-  level: computeLevel(4320),
   // bookkeeping maps (empty by default for example data)
   weekBonusKeys: {},
   completionAwardKeys: {},
