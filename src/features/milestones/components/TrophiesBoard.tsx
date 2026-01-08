@@ -8,11 +8,8 @@ export default function TrophiesBoard() {
   const items = useMemo(() => TROPHIES.filter((t) => unlocked[t.id]), [unlocked]);
 
   return (
-    <div
-      className="rounded-2xl border border-subtle p-5 shadow-sm"
-      style={{ backgroundColor: 'var(--color-surface-elevated)' }}
-    >
-      <div className="mb-4 text-center uppercase tracking-wider text-sm md:text-base font-semibold text-muted">
+    <div>
+      <div className="mb-4 uppercase tracking-wider text-sm md:text-base font-semibold text-muted text-center">
         TROPHY BOARD
       </div>
 

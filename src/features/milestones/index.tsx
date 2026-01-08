@@ -1,10 +1,9 @@
-import CollectiblesStoreCard from './components/CollectiblesStoreCard';
-import MilestonesHeaderCard from './components/MilestonesHeaderCard';
-import TrophiesBoard from './components/TrophiesBoard';
 import { useEffect } from 'react';
 import { useHabitStore } from '@/shared/store/store';
 import fireConfetti from '@/shared/utils/confetti';
 import { useIdleReady } from '@/shared/hooks/useIdleReady';
+import CollectiblesStoreCard from './components/CollectiblesStoreCard';
+import TrophiesBoard from './components/TrophiesBoard';
 
 export default function Milestones() {
   const ready = useIdleReady();
@@ -30,25 +29,23 @@ export default function Milestones() {
 
   return (
     <div>
-      <div className="mt-4">
-        <MilestonesHeaderCard />
-      </div>
       <div className="mt-6">
         {ready ? (
           <div className="fade-in-soft">
             <TrophiesBoard />
           </div>
         ) : (
-          <div className="h-[260px] rounded-2xl border border-subtle bg-neutral-100/70 dark:bg-neutral-900/40" />
+          <div className="h-[260px] rounded-2xl bg-neutral-100/70 dark:bg-neutral-900/40" />
         )}
       </div>
+      <div className="my-8 border-t border-subtle" />
       <div className="mt-6">
         {ready ? (
           <div className="fade-in-soft">
             <CollectiblesStoreCard />
           </div>
         ) : (
-          <div className="h-[340px] rounded-2xl border border-subtle bg-neutral-100/70 dark:bg-neutral-900/40" />
+          <div className="h-[340px] rounded-2xl bg-neutral-100/70 dark:bg-neutral-900/40" />
         )}
       </div>
     </div>
