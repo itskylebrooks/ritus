@@ -54,7 +54,8 @@ export function exportAllData() {
     longestStreak: s.longestStreak,
     // progression state (points + bookkeeping keys)
     progress:
-      normalizeProgress(s.progress) || ({
+      normalizeProgress(s.progress) ||
+      ({
         points: 0,
         weekBonusKeys: {},
         completionAwardKeys: {},
@@ -86,7 +87,9 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
       typeof parsed.totalCompletions === 'number' ? parsed.totalCompletions : 0;
     const incomingLongest = typeof parsed.longestStreak === 'number' ? parsed.longestStreak : 0;
     const incomingProgress =
-      parsed && typeof parsed.progress === 'object' ? normalizeProgress(parsed.progress) : undefined;
+      parsed && typeof parsed.progress === 'object'
+        ? normalizeProgress(parsed.progress)
+        : undefined;
     const incomingEmojiByDateRaw =
       parsed && typeof parsed.emojiByDate === 'object'
         ? (parsed.emojiByDate as Record<string, string>)

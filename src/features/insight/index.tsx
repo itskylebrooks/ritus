@@ -100,7 +100,7 @@ export default function Insight() {
 
   const renderHabitCard = (h: Habit) => {
     const completionKeys = calcReady
-      ? summary.completionKeysById.get(h.id) ?? EMPTY_SET
+      ? (summary.completionKeysById.get(h.id) ?? EMPTY_SET)
       : undefined;
     return (
       <div key={h.id} className="rounded-2xl border border-subtle p-4 shadow-sm w-full">
