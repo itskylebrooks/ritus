@@ -7,7 +7,6 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import EmojiHistoryCard from './components/EmojiHistoryCard';
 import HeaderStats from './components/HeaderStats';
-import HistoryChart from './components/HistoryChart';
 import MonthGrid from './components/MonthGrid';
 
 export default function Insight() {
@@ -114,10 +113,6 @@ export default function Insight() {
     <div>
       <div className="mt-4">
         <HeaderStats />
-      </div>
-
-      <div className="mt-4">
-        <HistoryChart />
       </div>
 
       <div className="mt-4">
