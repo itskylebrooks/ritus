@@ -5,7 +5,7 @@ import WeekStrip from '@/shared/components/layout/WeekStrip';
 import ConfirmModal from '@/shared/components/modals/ConfirmModal';
 import { useHabitStore } from '@/shared/store/store';
 import type { Habit } from '@/shared/types';
-import { countCompletionsInMonth, countCompletionsInWeek } from '@/shared/utils/scoring';
+import { iso } from '@/shared/utils/date';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Archive, Check, Diamond, Flame, Inbox, Pencil, Settings2, Trash2 } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -133,9 +133,13 @@ function ButtonsMenu({
 
 export default function HabitCard({
   habit,
+  completionKeys,
+  weekKeys,
   disableEntryAnim = false,
 }: {
   habit: Habit;
+  completionKeys: Set<string>;
+  weekKeys: string[];
   disableEntryAnim?: boolean;
 }) {
   const toggleCompletion = useHabitStore((s) => s.toggleCompletion);
@@ -168,16 +172,19 @@ export default function HabitCard({
       : habit.frequency === 'weekly'
         ? (habit.weeklyTarget ?? 1)
         : (habit.monthlyTarget ?? 1);
-  // Subscribe to persisted weekStart from the habit store so progress recalculates
-  // immediately when the user toggles week-start in settings.
-  const weekStartPref = useHabitStore((s) => s.weekStart);
-  const weekStartsOn = weekStartPref === 'sunday' ? 0 : 1;
   const progressVal = useMemo(
     () =>
       habit.frequency === 'monthly'
-        ? countCompletionsInMonth(habit.completions)
-        : countCompletionsInWeek(habit.completions, new Date(), weekStartsOn),
-    [habit.completions, habit.frequency, weekStartsOn],
+        ? (() => {
+            const monthKey = iso(new Date()).slice(0, 7);
+            let count = 0;
+            completionKeys.forEach((key) => {
+              if (key.startsWith(monthKey)) count += 1;
+            });
+            return count;
+          })()
+        : weekKeys.reduce((acc, key) => acc + (completionKeys.has(key) ? 1 : 0), 0),
+    [completionKeys, habit.frequency, weekKeys],
   );
 
   // If tokens are large, render the number smaller so it fits the card
@@ -309,7 +316,11 @@ export default function HabitCard({
 
       <div className="mt-0 grid gap-3 md:grid-cols-[1fr_auto] md:items-center">
         <div className="flex justify-center md:justify-start">
-          <WeekStrip habit={habit} onToggle={(d) => toggleCompletion(habit.id, d)} />
+          <WeekStrip
+            habit={habit}
+            completionKeys={completionKeys}
+            onToggle={(d) => toggleCompletion(habit.id, d)}
+          />
         </div>
         {habit.mode === 'break' ? (
           showList ? (

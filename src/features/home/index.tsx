@@ -1,12 +1,16 @@
 import { emphasizeEase, transitions } from '@/shared/animations';
 import { useHabitStore } from '@/shared/store/store';
-import { fromISO, startOfDay } from '@/shared/utils/date';
+import { daysThisWeek, iso } from '@/shared/utils/date';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import AddHabit from './components/AddHabit';
 import ClockCard from './components/ClockCard';
 import HabitCard from './components/HabitCard';
 import QuoteCard from './components/QuoteCard';
+
+const nameCollator = new Intl.Collator(undefined, { sensitivity: 'base' });
+const EMPTY_SET = new Set<string>();
+const EMPTY_ARRAY: string[] = [];
 
 function EmptyState({ disableAnim = false }: { disableAnim?: boolean }) {
   return (
@@ -33,6 +37,7 @@ export default function Home() {
 
   const habits = useHabitStore((s) => s.habits);
   const showArchived = useHabitStore((s) => s.showArchived);
+  const weekStart = useHabitStore((s) => s.weekStart);
   const [initialListRender, setInitialListRender] = useState(true);
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -41,13 +46,38 @@ export default function Home() {
   const [emptyReady, setEmptyReady] = useState(habits.length === 0);
   const emptyTimer = useRef<number | null>(null);
   const prevCount = useRef(habits.length);
-  const completionLookup = useMemo(() => {
-    const map = new Map<string, Set<number>>();
+  const completionCache = useRef(
+    new Map<string, { completions: string[]; set: Set<string> }>(),
+  );
+  const weekKeys = useMemo(() => {
+    const weekStartsOn = weekStart === 'sunday' ? 0 : 1;
+    return daysThisWeek(new Date(), weekStartsOn).map((d) => iso(d).slice(0, 10));
+  }, [weekStart]);
+  const completionKeysById = useMemo(() => {
+    const map = new Map<string, Set<string>>();
+    const cache = completionCache.current;
+    const activeIds = new Set<string>();
+
     for (const h of habits) {
-      map.set(h.id, new Set((h.completions || []).map((c) => fromISO(c).getTime())));
+      if (h.archived && !showArchived) continue;
+      activeIds.add(h.id);
+      const completions = h.completions ?? EMPTY_ARRAY;
+      const cached = cache.get(h.id);
+      if (cached && cached.completions === completions) {
+        map.set(h.id, cached.set);
+        continue;
+      }
+      const keys = new Set(completions.map((c) => (c.length > 10 ? c.slice(0, 10) : c)));
+      cache.set(h.id, { completions, set: keys });
+      map.set(h.id, keys);
     }
+
+    for (const id of cache.keys()) {
+      if (!activeIds.has(id)) cache.delete(id);
+    }
+
     return map;
-  }, [habits]);
+  }, [habits, showArchived]);
 
   useEffect(() => {
     const cur = habits.length;
@@ -81,29 +111,30 @@ export default function Home() {
   }, [habits.length]);
 
   const groupedHabits = useMemo(() => {
-    const today = new Date();
-    const todayKey = startOfDay(today).getTime();
-    const normalize = (name: string) => name.toLocaleLowerCase();
+    const todayShort = iso(new Date()).slice(0, 10);
     const byName = (a: (typeof habits)[number], b: (typeof habits)[number]) =>
-      normalize(a.name).localeCompare(normalize(b.name));
+      nameCollator.compare(a.name, b.name);
 
-    const active = habits.filter((h) => !h.archived);
-    const archived = habits.filter((h) => h.archived);
+    const incompleteToday: (typeof habits)[number][] = [];
+    const completedToday: (typeof habits)[number][] = [];
+    const archived: (typeof habits)[number][] = [];
 
-    const hasCompletionToday = (h: (typeof habits)[number]) => {
-      const set = completionLookup.get(h.id);
-      return set ? set.has(todayKey) : false;
-    };
-
-    const incompleteToday = active.filter((h) => !hasCompletionToday(h));
-    const completedToday = active.filter((h) => hasCompletionToday(h));
+    for (const h of habits) {
+      if (h.archived) {
+        archived.push(h);
+        continue;
+      }
+      const doneToday = completionKeysById.get(h.id)?.has(todayShort) ?? false;
+      if (doneToday) completedToday.push(h);
+      else incompleteToday.push(h);
+    }
 
     return {
-      incompleteToday: [...incompleteToday].sort(byName),
-      completedToday: [...completedToday].sort(byName),
-      archived: [...archived].sort(byName),
+      incompleteToday: incompleteToday.sort(byName),
+      completedToday: completedToday.sort(byName),
+      archived: archived.sort(byName),
     };
-  }, [habits, completionLookup]);
+  }, [completionKeysById, habits]);
 
   return (
     <div>
@@ -142,8 +173,13 @@ export default function Home() {
                       exit={{ opacity: 0, scale: 0.95 }}
                       transition={transitions.fadeXl}
                     >
-                      <HabitCard habit={h} disableEntryAnim={initialListRender} />
-                    </motion.div>
+                    <HabitCard
+                      habit={h}
+                      completionKeys={completionKeysById.get(h.id) ?? EMPTY_SET}
+                      weekKeys={weekKeys}
+                      disableEntryAnim={initialListRender}
+                    />
+                  </motion.div>
                   ))}
 
                   {groupedHabits.completedToday.length > 0 &&
@@ -164,8 +200,13 @@ export default function Home() {
                       exit={{ opacity: 0, scale: 0.95 }}
                       transition={transitions.fadeXl}
                     >
-                      <HabitCard habit={h} disableEntryAnim={initialListRender} />
-                    </motion.div>
+                    <HabitCard
+                      habit={h}
+                      completionKeys={completionKeysById.get(h.id) ?? EMPTY_SET}
+                      weekKeys={weekKeys}
+                      disableEntryAnim={initialListRender}
+                    />
+                  </motion.div>
                   ))}
 
                   {showArchived && groupedHabits.archived.length > 0 && (
@@ -188,7 +229,12 @@ export default function Home() {
                           exit={{ opacity: 0, scale: 0.95 }}
                           transition={transitions.fadeXl}
                         >
-                          <HabitCard habit={h} disableEntryAnim={initialListRender} />
+                          <HabitCard
+                            habit={h}
+                            completionKeys={completionKeysById.get(h.id) ?? EMPTY_SET}
+                            weekKeys={weekKeys}
+                            disableEntryAnim={initialListRender}
+                          />
                         </motion.div>
                       ))}
                     </>

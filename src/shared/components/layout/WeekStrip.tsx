@@ -1,15 +1,16 @@
 import { useHabitStore } from '@/shared/store/store';
 import type { Habit } from '@/shared/types';
-import { daysThisWeek } from '@/shared/utils/date';
-import { hasCompletionOnDay } from '@/shared/utils/scoring';
+import { daysThisWeek, iso } from '@/shared/utils/date';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
 
 export default function WeekStrip({
   habit,
+  completionKeys,
   onToggle,
 }: {
   habit: Habit;
+  completionKeys: Set<string>;
   onToggle: (d: Date) => void;
 }) {
   // subscribe to weekStart so the component re-renders when user changes first day of week
@@ -24,13 +25,14 @@ export default function WeekStrip({
       {week.map((d) => {
         const shortLabel = format(d, 'EE');
         const fullLabel = format(d, 'EEEE');
-        const done = hasCompletionOnDay(habit.completions, d);
+        const key = iso(d).slice(0, 10);
+        const done = completionKeys.has(key);
         const isPast = d < todayStart;
         const isFuture = d > todayStart;
         const disabled = isFuture || habit.archived;
 
         if (habit.mode === 'break') {
-          const isMarked = hasCompletionOnDay(habit.completions, d);
+          const isMarked = done;
           const contentShort = shortLabel[0];
           const cls = isMarked
             ? 'border-transparent bg-emerald-600 text-white'
