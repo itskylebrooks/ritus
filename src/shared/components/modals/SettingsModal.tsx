@@ -173,9 +173,12 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
               `Ignored ${res.invalidHabits} invalid item${res.invalidHabits === 1 ? '' : 's'}`,
             );
         }
-        // username no longer used
         if (res.totalPointsNew !== res.totalPointsPrev)
           changes.push(`Total tokens: ${res.totalPointsPrev} → ${res.totalPointsNew}`);
+        if (res.totalCompletionsNew !== res.totalCompletionsPrev)
+          changes.push(
+            `Total completions: ${res.totalCompletionsPrev} → ${res.totalCompletionsNew}`,
+          );
         if (res.longestStreakNew !== res.longestStreakPrev)
           changes.push(`Longest streak: ${res.longestStreakPrev} → ${res.longestStreakNew}`);
         changes.push(`Now tracking ${res.totalHabits} habit${res.totalHabits === 1 ? '' : 's'}`);
@@ -183,6 +186,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
         const changed =
           res.addedHabits > 0 ||
           res.totalPointsNew !== res.totalPointsPrev ||
+          res.totalCompletionsNew !== res.totalCompletionsPrev ||
           res.longestStreakNew !== res.longestStreakPrev;
 
         if (!changed) {

@@ -77,9 +77,18 @@ export default function GuideModal({ open, onClose, onLoadExample }: GuideModalP
     const attemptLoad = async () => {
       // compute cumulative totals from example data
       const total = (defaultHabits || []).reduce((s, h) => s + (h.points || 0), 0);
+      const totalCompletions = (defaultHabits || []).reduce(
+        (s, h) => s + (h.completions ? h.completions.length : 0),
+        0,
+      );
       const longest = (defaultHabits || []).reduce((m, h) => Math.max(m, h.streak || 0), 0);
       // also set example progress when loading sample data (progress/tokens/level)
-      const base = { habits: defaultHabits, totalPoints: total, longestStreak: longest };
+      const base = {
+        habits: defaultHabits,
+        totalPoints: total,
+        totalCompletions,
+        longestStreak: longest,
+      };
       const emoji = { emojiByDate: defaultEmojiByDate, emojiRecents: defaultEmojiRecents };
       if (defaultProgress) {
         useHabitStore.setState({ ...base, ...emoji, progress: defaultProgress });
@@ -106,10 +115,7 @@ export default function GuideModal({ open, onClose, onLoadExample }: GuideModalP
             0,
             ...defaultHabits.filter((h) => h.frequency === 'weekly').map((h) => h.streak || 0),
           ),
-          totalCompletions: defaultHabits.reduce(
-            (acc, h) => acc + (h.completions ? h.completions.length : 0),
-            0,
-          ),
+          totalCompletions,
           // longest emoji streak across the dataset (UTC-safe), not just trailing today
           emojiStreak: (() => {
             const by = defaultEmojiByDate || {};

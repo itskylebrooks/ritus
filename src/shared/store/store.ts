@@ -62,6 +62,7 @@ export interface HabitState {
   reminders: { dailyEnabled: boolean; dailyTime: string };
   setReminders: (r: { dailyEnabled: boolean; dailyTime: string }) => void;
   totalPoints: number;
+  totalCompletions: number;
   longestStreak: number;
   resetStats: () => void;
   addHabit: (
@@ -173,6 +174,7 @@ export const useHabitStore = create<HabitState>()(
       reminders: { dailyEnabled: false, dailyTime: '21:00' },
       setReminders: (r: { dailyEnabled: boolean; dailyTime: string }) => set({ reminders: r }),
       totalPoints: 0,
+      totalCompletions: 0,
       longestStreak: 0,
       // progression helpers
       setEssence: (n: number) =>
@@ -241,9 +243,12 @@ export const useHabitStore = create<HabitState>()(
 
         // Build a richer summary from either the provided summary or the current habits
         const allHabits = habits || [];
+        const storedTotalCompletions = get().totalCompletions;
         const totalCompletions =
           summary?.totalCompletions ??
-          allHabits.reduce((acc, h) => acc + (h.completions ? h.completions.length : 0), 0);
+          (typeof storedTotalCompletions === 'number'
+            ? storedTotalCompletions
+            : allHabits.reduce((acc, h) => acc + (h.completions ? h.completions.length : 0), 0));
         const dailyBuildStreak =
           summary?.dailyBuildStreak ??
           Math.max(
@@ -431,7 +436,7 @@ export const useHabitStore = create<HabitState>()(
         }));
         return true;
       },
-      resetStats: () => set({ totalPoints: 0, longestStreak: 0 }),
+      resetStats: () => set({ totalPoints: 0, totalCompletions: 0, longestStreak: 0 }),
       // safe id generation: crypto.randomUUID may not exist on some older mobile browsers
       addHabit: (
         name,
@@ -500,6 +505,7 @@ export const useHabitStore = create<HabitState>()(
         set((s) => {
           const day = new Date(date);
           let pointsDelta = 0; // for totalPoints (habit-level points changes)
+          let completionDelta = 0;
           // work on copies of award keys so we can atomically update progress at the end
           const compKeys = { ...(s.progress.completionAwardKeys || {}) };
           const weekKeys = { ...(s.progress.weekBonusKeys || {}) };
@@ -516,6 +522,7 @@ export const useHabitStore = create<HabitState>()(
             if (isAlready) {
               // user removed a completion
               completions = completions.filter((c) => !isSameDay(fromISO(c), day));
+              completionDelta -= 1;
               // if we had awarded for this completion previously, revoke it
               if (compKeys[dayKey]) {
                 essenceDelta -= 5;
@@ -525,6 +532,7 @@ export const useHabitStore = create<HabitState>()(
             } else {
               // adding a completion
               completions.push(iso(day));
+              completionDelta += 1;
               // only award if we haven't rewarded this specific day before
               if (!compKeys[dayKey]) {
                 essenceDelta += 5;
@@ -572,6 +580,10 @@ export const useHabitStore = create<HabitState>()(
           // update cumulative totalPoints by the net delta from toggles (allow reductions when user unmarks)
           // clamp to zero so we never go negative.
           const newTotal = Math.max(0, s.totalPoints + pointsDelta);
+          const newTotalCompletions = Math.max(
+            0,
+            (typeof s.totalCompletions === 'number' ? s.totalCompletions : 0) + completionDelta,
+          );
 
           // apply award/revoke deltas to persisted progress
           const newEssence = Math.max(0, Math.floor(s.progress.essence + essenceDelta));
@@ -581,6 +593,7 @@ export const useHabitStore = create<HabitState>()(
           return {
             habits: updated,
             totalPoints: newTotal,
+            totalCompletions: newTotalCompletions,
             longestStreak: newLongest,
             progress: {
               ...s.progress,
@@ -594,10 +607,7 @@ export const useHabitStore = create<HabitState>()(
                 const existing = { ...(s.progress.unlocked || {}) };
 
                 const allHabits = updated;
-                const totalCompletions = allHabits.reduce(
-                  (acc, hh) => acc + (hh.completions ? hh.completions.length : 0),
-                  0,
-                );
+                const totalCompletions = newTotalCompletions;
                 const dailyBuildStreak = Math.max(
                   0,
                   ...allHabits
@@ -736,6 +746,7 @@ export const useHabitStore = create<HabitState>()(
         progress: state.progress,
         reminders: state.reminders,
         totalPoints: state.totalPoints,
+        totalCompletions: state.totalCompletions,
         longestStreak: state.longestStreak,
         showArchived: state.showArchived,
         showList: state.showList,
@@ -746,6 +757,19 @@ export const useHabitStore = create<HabitState>()(
         emojiByDate: state.emojiByDate || {},
         emojiRecents: state.emojiRecents || [],
       }),
+      merge: (persistedState, currentState) => {
+        const incoming = persistedState as Partial<HabitState> | undefined;
+        const merged = { ...currentState, ...(incoming || {}) };
+        const hasPersistedTotal =
+          incoming && Object.prototype.hasOwnProperty.call(incoming, 'totalCompletions');
+        if (!hasPersistedTotal) {
+          merged.totalCompletions = (merged.habits || []).reduce(
+            (acc, h) => acc + (h.completions ? h.completions.length : 0),
+            0,
+          );
+        }
+        return merged;
+      },
     },
   ),
 );

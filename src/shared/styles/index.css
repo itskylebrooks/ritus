@@ -296,6 +296,19 @@ html {
   animation: fadeSlide 0.35s ease both;
 }
 
+/* Subtle fade-in for deferred content */
+@keyframes fadeInSoft {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.fade-in-soft {
+  animation: fadeInSoft 0.2s ease-out both;
+}
+
 /* Habit animations */
 @keyframes habitAdd {
   from {

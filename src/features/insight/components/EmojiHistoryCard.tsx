@@ -12,37 +12,39 @@ import {
   startOfYear,
 } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-export default function EmojiHistoryCard() {
+export default function EmojiHistoryCard({ ready = true }: { ready?: boolean }) {
   const emojiByDate = useHabitStore((s) => s.emojiByDate || {});
   const ws = useHabitStore((s) => (s.weekStart === 'sunday' ? 0 : 1));
   const [yearDate, setYearDate] = useState<Date>(startOfYear(new Date()));
 
   const today = new Date();
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  function buildCols(rangeStart: Date, rangeEnd: Date) {
-    const startAligned = startOfWeek(rangeStart, { weekStartsOn: ws as 0 | 1 });
-    const minDate = rangeStart;
-    const end = rangeEnd;
-    const cols: (Date | null)[][] = [];
-    let cur = new Date(startAligned);
-    while (cur <= end) {
-      const col: (Date | null)[] = Array.from({ length: 7 }).map(() => null);
-      for (let r = 0; r < 7; r++) {
-        const d = addDays(cur, r);
-        if (d >= minDate && d <= end) col[r] = d;
+  const buildCols = useCallback(
+    (rangeStart: Date, rangeEnd: Date) => {
+      const startAligned = startOfWeek(rangeStart, { weekStartsOn: ws as 0 | 1 });
+      const minDate = rangeStart;
+      const end = rangeEnd;
+      const cols: (Date | null)[][] = [];
+      let cur = new Date(startAligned);
+      while (cur <= end) {
+        const col: (Date | null)[] = Array.from({ length: 7 }).map(() => null);
+        for (let r = 0; r < 7; r++) {
+          const d = addDays(cur, r);
+          if (d >= minDate && d <= end) col[r] = d;
+        }
+        cols.push(col);
+        cur = addDays(cur, 7);
       }
-      cols.push(col);
-      cur = addDays(cur, 7);
-    }
-    return cols;
-  }
+      return cols;
+    },
+    [ws],
+  );
 
   const yearCols = useMemo(
-    () => buildCols(startOfYear(yearDate), endOfYear(yearDate)),
-    [yearDate, buildCols],
+    () => (ready ? buildCols(startOfYear(yearDate), endOfYear(yearDate)) : []),
+    [ready, yearDate, buildCols],
   );
 
   const weekdayLabels = useMemo(() => {
@@ -209,6 +211,7 @@ export default function EmojiHistoryCard() {
       return isAfter(candidate, nowYearStart) ? nowYearStart : candidate;
     });
   }
+  const showGrid = ready && yearCols.length > 0;
 
   return (
     <div className="rounded-2xl border border-subtle p-4 shadow-sm">
@@ -235,7 +238,17 @@ export default function EmojiHistoryCard() {
           </button>
         </div>
       </div>
-      <Container cols={yearCols} showMonthLabels baseYear={startOfYear(yearDate).getFullYear()} />
+      {showGrid ? (
+        <div className="fade-in-soft">
+          <Container
+            cols={yearCols}
+            showMonthLabels
+            baseYear={startOfYear(yearDate).getFullYear()}
+          />
+        </div>
+      ) : (
+        <div className="mt-2 h-[180px] rounded-xl bg-neutral-100/70 dark:bg-neutral-900/40" />
+      )}
     </div>
   );
 }

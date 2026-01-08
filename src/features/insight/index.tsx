@@ -1,4 +1,5 @@
 import Badge from '@/shared/components/cards/Badge';
+import { useIdleReady } from '@/shared/hooks/useIdleReady';
 import { useHabitStore } from '@/shared/store/store';
 import type { Habit } from '@/shared/types';
 import { fromISO } from '@/shared/utils/date';
@@ -15,13 +16,16 @@ export default function Insight() {
 
   // local month state per habit keyed by habit id
   const [months, setMonths] = useState<Record<string, Date>>({});
+  const calcReady = useIdleReady();
+
   const completionLookup = useMemo(() => {
+    if (!calcReady) return new Map<string, Set<number>>();
     const map = new Map<string, Set<number>>();
     for (const h of habits) {
       map.set(h.id, new Set((h.completions || []).map((c) => fromISO(c).getTime())));
     }
     return map;
-  }, [habits]);
+  }, [calcReady, habits]);
 
   function monthFor(h: Habit) {
     return months[h.id] ?? new Date();
@@ -47,7 +51,7 @@ export default function Insight() {
   const archivedHabits = habits.filter((h) => h.archived).sort(byName);
 
   const renderHabitCard = (h: Habit) => {
-    const completionDays = completionLookup.get(h.id);
+    const completionDays = calcReady ? completionLookup.get(h.id) : undefined;
     return (
       <div key={h.id} className="rounded-2xl border border-subtle p-4 shadow-sm w-full">
         <div className="flex items-start justify-between">
@@ -95,14 +99,18 @@ export default function Insight() {
         {(() => {
           const isDefault = !months[h.id];
           // allow horizontal scrolling for all years so user can pan previous years
-          return (
-            <MonthGrid
-              habit={h}
-              month={monthFor(h)}
-              allowScroll={true}
-              alignToNow={isDefault}
-              completionDays={completionDays}
-            />
+          return calcReady ? (
+            <div className="fade-in-soft">
+              <MonthGrid
+                habit={h}
+                month={monthFor(h)}
+                allowScroll={true}
+                alignToNow={isDefault}
+                completionDays={completionDays}
+              />
+            </div>
+          ) : (
+            <div className="mt-3 h-[140px] rounded-xl bg-neutral-100/70 dark:bg-neutral-900/40" />
           );
         })()}
       </div>
@@ -112,11 +120,11 @@ export default function Insight() {
   return (
     <div>
       <div className="mt-4">
-        <HeaderStats />
+        <HeaderStats ready={calcReady} />
       </div>
 
       <div className="mt-4">
-        <EmojiHistoryCard />
+        <EmojiHistoryCard ready={calcReady} />
       </div>
 
       <div className="mt-4 space-y-4">

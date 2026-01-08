@@ -13,6 +13,8 @@ export interface ImportResult {
   totalHabits: number;
   totalPointsPrev: number;
   totalPointsNew: number;
+  totalCompletionsPrev: number;
+  totalCompletionsNew: number;
   longestStreakPrev: number;
   longestStreakNew: number;
 }
@@ -38,6 +40,7 @@ export function exportAllData() {
     showArchived: s.showArchived,
     // no reminders in export
     totalPoints: s.totalPoints,
+    totalCompletions: s.totalCompletions,
     longestStreak: s.longestStreak,
     // progression state (progress/tokens/level and bookkeeping keys)
     progress: s.progress || {
@@ -70,6 +73,8 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
     const incomingShowArchived: boolean | undefined =
       typeof parsed.showArchived === 'boolean' ? parsed.showArchived : undefined;
     const incomingTotal = typeof parsed.totalPoints === 'number' ? parsed.totalPoints : 0;
+    const incomingTotalCompletions =
+      typeof parsed.totalCompletions === 'number' ? parsed.totalCompletions : 0;
     const incomingLongest = typeof parsed.longestStreak === 'number' ? parsed.longestStreak : 0;
     const incomingProgress =
       parsed && typeof parsed.progress === 'object' ? parsed.progress : undefined;
@@ -149,7 +154,16 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
     // recomputed from current habits. Prefer the highest seen value among
     // existing, incoming export, and a safety recompute from merged habits.
     const recomputedTotal = mergedHabits.reduce((acc, h) => acc + (h.points || 0), 0);
+    const recomputedCompletions = mergedHabits.reduce(
+      (acc, h) => acc + (h.completions ? h.completions.length : 0),
+      0,
+    );
     const newTotal = Math.max(incomingTotal || 0, cur.totalPoints || 0, recomputedTotal);
+    const newTotalCompletions = Math.max(
+      incomingTotalCompletions || 0,
+      cur.totalCompletions || 0,
+      recomputedCompletions,
+    );
     const newLongest = Math.max(
       incomingLongest || 0,
       cur.longestStreak || 0,
@@ -162,6 +176,7 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
       habits: mergedHabits,
       reminders: cur.reminders,
       totalPoints: newTotal,
+      totalCompletions: newTotalCompletions,
       longestStreak: newLongest,
       // restore formatting settings from import when available
       dateFormat: incomingDateFormat ?? cur.dateFormat,
@@ -193,6 +208,7 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
     useHabitStore.setState(() => ({
       habits: updated.habits,
       totalPoints: updated.totalPoints,
+      totalCompletions: updated.totalCompletions,
       longestStreak: updated.longestStreak,
       dateFormat: updated.dateFormat,
       weekStart: updated.weekStart,
@@ -213,6 +229,8 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
       totalHabits: mergedHabits.length,
       totalPointsPrev: cur.totalPoints || 0,
       totalPointsNew: newTotal,
+      totalCompletionsPrev: cur.totalCompletions || 0,
+      totalCompletionsNew: newTotalCompletions,
       longestStreakPrev: cur.longestStreak || 0,
       longestStreakNew: newLongest,
     };
