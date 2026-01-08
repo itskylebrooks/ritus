@@ -2,7 +2,7 @@ import Badge from '@/shared/components/cards/Badge';
 import { useIdleReady } from '@/shared/hooks/useIdleReady';
 import { useHabitStore } from '@/shared/store/store';
 import type { Habit } from '@/shared/types';
-import { fromISO } from '@/shared/utils/date';
+import { daysThisWeek, iso } from '@/shared/utils/date';
 import { addYears, isAfter } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useMemo, useState } from 'react';
@@ -10,22 +10,64 @@ import EmojiHistoryCard from './components/EmojiHistoryCard';
 import HeaderStats from './components/HeaderStats';
 import MonthGrid from './components/MonthGrid';
 
+const habitNameCollator = new Intl.Collator(undefined, { sensitivity: 'base' });
+const EMPTY_SET = new Set<string>();
+
 export default function Insight() {
   const habits = useHabitStore((s) => s.habits);
   const showArchived = useHabitStore((s) => s.showArchived);
+  const weekStart = useHabitStore((s) => s.weekStart);
 
   // local month state per habit keyed by habit id
   const [months, setMonths] = useState<Record<string, Date>>({});
-  const calcReady = useIdleReady();
+  const calcReady = useIdleReady({ resetOnMount: true });
 
-  const completionLookup = useMemo(() => {
-    if (!calcReady) return new Map<string, Set<number>>();
-    const map = new Map<string, Set<number>>();
-    for (const h of habits) {
-      map.set(h.id, new Set((h.completions || []).map((c) => fromISO(c).getTime())));
+  const weekKeys = useMemo(() => {
+    const weekStartsOn = weekStart === 'sunday' ? 0 : 1;
+    return daysThisWeek(new Date(), weekStartsOn).map((d) => iso(d).slice(0, 10));
+  }, [weekStart]);
+
+  const summary = useMemo(() => {
+    if (!calcReady) {
+      return { completionKeysById: new Map<string, Set<string>>(), weeklyPct: 0 };
     }
-    return map;
-  }, [calcReady, habits]);
+    const todayKey = iso(new Date()).slice(0, 10);
+    const monthKey = todayKey.slice(0, 7);
+    const weekKeySet = new Set(weekKeys);
+    const completionKeysById = new Map<string, Set<string>>();
+    let done = 0;
+    let total = 0;
+
+    for (const h of habits) {
+      const keys = new Set<string>();
+      let weekCount = 0;
+      let monthCount = 0;
+      for (const c of h.completions || []) {
+        const key = c.length > 10 ? c.slice(0, 10) : c;
+        if (keys.has(key)) continue;
+        keys.add(key);
+        if (weekKeySet.has(key)) weekCount += 1;
+        if (key.startsWith(monthKey)) monthCount += 1;
+      }
+      completionKeysById.set(h.id, keys);
+
+      if (h.frequency === 'daily') {
+        done += weekCount;
+        total += weekKeys.length;
+      } else if (h.frequency === 'weekly') {
+        const target = h.weeklyTarget ?? 1;
+        done += weekCount >= target ? 1 : 0;
+        total += 1;
+      } else {
+        const target = h.monthlyTarget ?? 1;
+        done += monthCount >= target ? 1 : 0;
+        total += 1;
+      }
+    }
+
+    const weeklyPct = total === 0 ? 0 : Math.round((done / total) * 100);
+    return { completionKeysById, weeklyPct };
+  }, [calcReady, habits, weekKeys]);
 
   function monthFor(h: Habit) {
     return months[h.id] ?? new Date();
@@ -44,14 +86,22 @@ export default function Insight() {
     });
   }
 
-  const normalize = (name: string) => name.toLocaleLowerCase();
-  const byName = (a: Habit, b: Habit) => normalize(a.name).localeCompare(normalize(b.name));
-
-  const activeHabits = habits.filter((h) => !h.archived).sort(byName);
-  const archivedHabits = habits.filter((h) => h.archived).sort(byName);
+  const { activeHabits, archivedHabits } = useMemo(() => {
+    if (!calcReady) return { activeHabits: [], archivedHabits: [] };
+    const active: Habit[] = [];
+    const archived: Habit[] = [];
+    for (const h of habits) {
+      if (h.archived) archived.push(h);
+      else active.push(h);
+    }
+    const byName = (a: Habit, b: Habit) => habitNameCollator.compare(a.name, b.name);
+    return { activeHabits: active.sort(byName), archivedHabits: archived.sort(byName) };
+  }, [calcReady, habits]);
 
   const renderHabitCard = (h: Habit) => {
-    const completionDays = calcReady ? completionLookup.get(h.id) : undefined;
+    const completionKeys = calcReady
+      ? summary.completionKeysById.get(h.id) ?? EMPTY_SET
+      : undefined;
     return (
       <div key={h.id} className="rounded-2xl border border-subtle p-4 shadow-sm w-full">
         <div className="flex items-start justify-between">
@@ -106,7 +156,7 @@ export default function Insight() {
                 month={monthFor(h)}
                 allowScroll={true}
                 alignToNow={isDefault}
-                completionDays={completionDays}
+                completionKeys={completionKeys}
               />
             </div>
           ) : (
@@ -120,7 +170,7 @@ export default function Insight() {
   return (
     <div>
       <div className="mt-4">
-        <HeaderStats ready={calcReady} />
+        <HeaderStats weeklyPct={summary.weeklyPct} />
       </div>
 
       <div className="mt-4">
@@ -128,22 +178,32 @@ export default function Insight() {
       </div>
 
       <div className="mt-4 space-y-4">
-        {activeHabits.length === 0 && (!showArchived || archivedHabits.length === 0) && (
-          <p className="text-neutral-600 dark:text-neutral-300">
-            No habits to show. Add some habits on the Home page.
-          </p>
-        )}
-
-        {activeHabits.map(renderHabitCard)}
-
-        {showArchived && archivedHabits.length > 0 && (
+        {calcReady ? (
           <>
-            {activeHabits.length > 0 && (
-              <div className="text-xs font-semibold tracking-[0.6em] text-neutral-400 dark:text-neutral-500 text-center uppercase">
-                ARCHIVED
-              </div>
+            {activeHabits.length === 0 && (!showArchived || archivedHabits.length === 0) && (
+              <p className="text-neutral-600 dark:text-neutral-300">
+                No habits to show. Add some habits on the Home page.
+              </p>
             )}
-            {archivedHabits.map(renderHabitCard)}
+
+            {activeHabits.map(renderHabitCard)}
+
+            {showArchived && archivedHabits.length > 0 && (
+              <>
+                {activeHabits.length > 0 && (
+                  <div className="text-xs font-semibold tracking-[0.6em] text-neutral-400 dark:text-neutral-500 text-center uppercase">
+                    ARCHIVED
+                  </div>
+                )}
+                {archivedHabits.map(renderHabitCard)}
+              </>
+            )}
+          </>
+        ) : (
+          <>
+            <div className="h-[140px] rounded-2xl border border-subtle bg-neutral-100/70 dark:bg-neutral-900/40" />
+            <div className="h-[140px] rounded-2xl border border-subtle bg-neutral-100/70 dark:bg-neutral-900/40" />
+            <div className="h-[140px] rounded-2xl border border-subtle bg-neutral-100/70 dark:bg-neutral-900/40" />
           </>
         )}
       </div>

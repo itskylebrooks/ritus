@@ -1,8 +1,69 @@
 import { useHabitStore } from '@/shared/store/store';
 import type { Habit } from '@/shared/types';
-import { fromISO } from '@/shared/utils/date';
+import { iso } from '@/shared/utils/date';
 import { addDays, endOfYear, format, isSameDay, startOfYear } from 'date-fns';
 import { useEffect, useMemo, useRef } from 'react';
+
+const YEAR_CACHE = new Map<string, { cols: (Date | null)[][]; monthLabels: (string | null)[] }>();
+
+const buildYearData = (year: number, ws: 0 | 1) => {
+  const yearStartDate = startOfYear(new Date(year, 0, 1));
+  const yearEndDate = endOfYear(new Date(year, 0, 1));
+  const cols: (Date | null)[][] = [];
+  let cur = new Date(yearStartDate);
+  const jan1 = new Date(yearStartDate);
+  const jan1Weekday = jan1.getDay();
+  const jan1Row = (jan1Weekday - ws + 7) % 7;
+
+  const firstCol: (Date | null)[] = Array.from({ length: 7 }).map(() => null);
+  firstCol[jan1Row] = new Date(cur);
+  cur = addDays(cur, 1);
+  for (let r = jan1Row + 1; r < 7; r++) {
+    if (cur <= yearEndDate) {
+      firstCol[r] = new Date(cur);
+      cur = addDays(cur, 1);
+    } else firstCol[r] = null;
+  }
+  cols.push(firstCol);
+
+  while (cur <= yearEndDate) {
+    const col: (Date | null)[] = Array.from({ length: 7 }).map(() => null);
+    for (let r = 0; r < 7; r++) {
+      if (cur <= yearEndDate) {
+        col[r] = new Date(cur);
+        cur = addDays(cur, 1);
+      } else col[r] = null;
+    }
+    cols.push(col);
+  }
+
+  const rawLabels: (string | null)[] = cols.map((col) => {
+    const first = col.find((d) => d && d.getFullYear() === year) ?? null;
+    return first ? format(first, 'MMM') : null;
+  });
+  const monthLabels: (string | null)[] = [];
+  let lastLabel: string | null = null;
+  for (let i = 0; i < rawLabels.length; i++) {
+    const l = rawLabels[i];
+    if (!l) monthLabels.push(null);
+    else if (l === lastLabel) monthLabels.push(null);
+    else {
+      monthLabels.push(l);
+      lastLabel = l;
+    }
+  }
+
+  return { cols, monthLabels };
+};
+
+const getYearData = (year: number, ws: 0 | 1) => {
+  const key = `${year}-${ws}`;
+  const cached = YEAR_CACHE.get(key);
+  if (cached) return cached;
+  const data = buildYearData(year, ws);
+  YEAR_CACHE.set(key, data);
+  return data;
+};
 
 // Render a GitHub-style contributions heatmap: columns = weeks, rows = weekdays.
 // Non-interactive (read-only) view. Shows ~52 weeks ending at the provided month reference.
@@ -11,65 +72,28 @@ export default function MonthGrid({
   month,
   allowScroll = true,
   alignToNow = false,
-  completionDays,
+  completionKeys,
 }: {
   habit: Habit;
   month: Date;
   allowScroll?: boolean;
   alignToNow?: boolean;
-  completionDays?: Set<number>;
+  completionKeys?: Set<string>;
 }) {
   const weekStart = useHabitStore((s) => s.weekStart);
   const ws = weekStart === 'sunday' ? 0 : 1;
   const completionSet = useMemo(() => {
-    if (completionDays) return completionDays;
-    return new Set((habit.completions || []).map((c) => fromISO(c).getTime()));
-  }, [completionDays, habit.completions]);
+    if (completionKeys) return completionKeys;
+    return new Set((habit.completions || []).map((c) => (c.length > 10 ? c.slice(0, 10) : c)));
+  }, [completionKeys, habit.completions]);
 
   // Build columns for the calendar year where each column has 7 rows (weekdays).
   // The top row corresponds to the user's selected weekStart (0 = Sunday, 1 = Monday).
   // Jan 1 should appear in the column 0 at the correct row for its weekday; cells
   // before Jan 1 are null placeholders. Continue filling columns left-to-right until
   // Dec 31 is placed; the remaining cells in the final column are null placeholders.
-  const yearStartDate = startOfYear(month);
-  const yearEndDate = endOfYear(month);
-
-  const cols = useMemo(() => {
-    const cols: (Date | null)[][] = [];
-    let cur = new Date(yearStartDate);
-    // Determine row index in column for Jan 1 relative to weekStart
-    const jan1 = new Date(yearStartDate);
-    const jan1Weekday = jan1.getDay(); // 0..6
-    const jan1Row = (jan1Weekday - ws + 7) % 7;
-
-    // First column: fill placeholders until jan1Row, then fill with dates
-    const col: (Date | null)[] = Array.from({ length: 7 }).map(() => null);
-    // place jan1 at jan1Row
-    // fill preceding rows with null (already null)
-    col[jan1Row] = new Date(cur);
-    cur = addDays(cur, 1);
-    // fill remaining rows in first col
-    for (let r = jan1Row + 1; r < 7; r++) {
-      if (cur <= yearEndDate) {
-        col[r] = new Date(cur);
-        cur = addDays(cur, 1);
-      } else col[r] = null;
-    }
-    cols.push(col);
-
-    // subsequent columns
-    while (cur <= yearEndDate) {
-      const c: (Date | null)[] = Array.from({ length: 7 }).map(() => null);
-      for (let r = 0; r < 7; r++) {
-        if (cur <= yearEndDate) {
-          c[r] = new Date(cur);
-          cur = addDays(cur, 1);
-        } else c[r] = null;
-      }
-      cols.push(c);
-    }
-    return cols;
-  }, [yearStartDate, yearEndDate, ws]);
+  const targetYear = startOfYear(month).getFullYear();
+  const { cols, monthLabels } = useMemo(() => getYearData(targetYear, ws), [targetYear, ws]);
 
   const today = useMemo(() => new Date(), []);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -95,23 +119,6 @@ export default function MonthGrid({
       }
     });
   }, [alignToNow, cols, today]);
-
-  const targetYear = startOfYear(month).getFullYear();
-  const rawLabels: (string | null)[] = cols.map((col) => {
-    const first = col.find((d) => d && d.getFullYear() === targetYear) ?? null;
-    return first ? format(first, 'MMM') : null;
-  });
-  const monthLabels: (string | null)[] = [];
-  let lastLabel: string | null = null;
-  for (let i = 0; i < rawLabels.length; i++) {
-    const l = rawLabels[i];
-    if (!l) monthLabels.push(null);
-    else if (l === lastLabel) monthLabels.push(null);
-    else {
-      monthLabels.push(l);
-      lastLabel = l;
-    }
-  }
 
   // weekday labels: top row should be user's configured weekStart
   const shortDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -160,7 +167,7 @@ export default function MonthGrid({
             <div key={colIdx} data-col className="flex flex-col gap-1">
               {Array.from({ length: 7 }).map((_, row) => {
                 const d = col[row];
-                const done = d ? completionSet.has(d.getTime()) : false;
+                const done = d ? completionSet.has(iso(d).slice(0, 10)) : false;
                 const inFuture = d ? d > today : false;
 
                 const base = 'h-3 w-3 rounded-sm transition';

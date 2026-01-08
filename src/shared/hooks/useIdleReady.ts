@@ -1,49 +1,63 @@
-import { useSyncExternalStore } from 'react';
+import { useMemo, useSyncExternalStore } from 'react';
 
 type Listener = () => void;
 
-let isReady = false;
-let scheduled = false;
-const listeners = new Set<Listener>();
-
-const notify = () => {
-  listeners.forEach((listener) => listener());
+type IdleStore = {
+  subscribe: (listener: Listener) => () => void;
+  getSnapshot: () => boolean;
+  getServerSnapshot: () => boolean;
 };
 
-const scheduleReady = () => {
-  if (scheduled || isReady) return;
-  scheduled = true;
-  if (typeof window === 'undefined') {
-    isReady = true;
-    return;
-  }
-  const win = window as Window & {
-    requestIdleCallback?: (cb: () => void, opts?: { timeout?: number }) => number;
+const createIdleStore = (): IdleStore => {
+  let isReady = false;
+  let scheduled = false;
+  const listeners = new Set<Listener>();
+
+  const notify = () => {
+    listeners.forEach((listener) => listener());
   };
-  const markReady = () => {
-    if (isReady) return;
-    isReady = true;
-    notify();
+
+  const scheduleReady = () => {
+    if (scheduled || isReady) return;
+    scheduled = true;
+    if (typeof window === 'undefined') {
+      isReady = true;
+      return;
+    }
+    const win = window as Window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout?: number }) => number;
+    };
+    const markReady = () => {
+      if (isReady) return;
+      isReady = true;
+      notify();
+    };
+    if (win.requestIdleCallback) {
+      win.requestIdleCallback(markReady, { timeout: 800 });
+    } else {
+      window.setTimeout(markReady, 0);
+    }
   };
-  if (win.requestIdleCallback) {
-    win.requestIdleCallback(markReady, { timeout: 800 });
-  } else {
-    window.setTimeout(markReady, 0);
-  }
+
+  return {
+    subscribe: (listener: Listener) => {
+      listeners.add(listener);
+      scheduleReady();
+      return () => {
+        listeners.delete(listener);
+      };
+    },
+    getSnapshot: () => isReady,
+    getServerSnapshot: () => true,
+  };
 };
 
-const subscribe = (listener: Listener) => {
-  listeners.add(listener);
-  scheduleReady();
-  return () => {
-    listeners.delete(listener);
-  };
-};
+const globalIdleStore = createIdleStore();
 
-const getSnapshot = () => isReady;
-
-const getServerSnapshot = () => true;
-
-export function useIdleReady() {
-  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+export function useIdleReady(options?: { resetOnMount?: boolean }) {
+  const store = useMemo(
+    () => (options?.resetOnMount ? createIdleStore() : globalIdleStore),
+    [options?.resetOnMount],
+  );
+  return useSyncExternalStore(store.subscribe, store.getSnapshot, store.getServerSnapshot);
 }
