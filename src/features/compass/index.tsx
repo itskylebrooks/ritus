@@ -17,184 +17,89 @@ const COMPASS_SETS = [
   {
     dir: 'North',
     arrow: '↑',
-    title: 'Truth & Freedom',
-    note: 'I’ve always felt lies and manipulation like static in the air. My North is about honesty, independence, and mental clarity — the kind that lets you breathe. These habits remind me to live by choice, not by autopilot.',
-    disclaimer:
-      'I share these from personal experience — not all forms of “freedom” feel the same to everyone. Take what fits your rhythm.',
+    title: 'Truth and Freedom',
+    note: 'I feel lies, pressure, and manipulation almost physically. There’s something in me that cannot tolerate being controlled or forced into a mold. My North pulls me toward truth: to see clearly, to speak plainly, to stop performing for approval, and to refuse rules that violate dignity. Freedom, for me, is not chaos—it’s the right to live from what I actually believe and choose, without self-deception.',
     habits: [
-      { name: 'Morning Silence', mode: 'build' as const, frequency: 'daily' as const },
+      { name: 'Truth Journal', mode: 'build' as const, frequency: 'daily' as const },
+      { name: 'No People-Pleasing "Yes"', mode: 'break' as const, frequency: 'daily' as const },
+      { name: 'Speak One Hard Truth', mode: 'build' as const, frequency: 'weekly' as const },
+      { name: 'Boundary Check-In', mode: 'build' as const, frequency: 'weekly' as const },
       { name: 'No Social Media in Morning', mode: 'break' as const, frequency: 'daily' as const },
       { name: 'Inbox Once a Day', mode: 'break' as const, frequency: 'daily' as const },
-      {
-        name: 'Deep Work Session',
-        mode: 'build' as const,
-        frequency: 'weekly' as const,
-        weeklyTarget: 3,
-      },
       {
         name: 'Digital Sabbath',
         mode: 'break' as const,
         frequency: 'weekly' as const,
         weeklyTarget: 1,
       },
-      { name: 'Plan Tomorrow Before Sleep', mode: 'build' as const, frequency: 'daily' as const },
       {
-        name: 'Declutter Workspace',
+        name: 'Declutter Commitments',
         mode: 'build' as const,
         frequency: 'weekly' as const,
         weeklyTarget: 1,
       },
       {
-        name: 'Monthly Reflection',
+        name: 'Monthly Values Review',
         mode: 'build' as const,
         frequency: 'monthly' as const,
         monthlyTarget: 1,
       },
       { name: 'No Multitasking', mode: 'break' as const, frequency: 'daily' as const },
-      {
-        name: 'Walk Without Headphones',
-        mode: 'build' as const,
-        frequency: 'weekly' as const,
-        weeklyTarget: 2,
-      },
-      {
-        name: 'Minimal Day',
-        mode: 'break' as const,
-        frequency: 'weekly' as const,
-        weeklyTarget: 1,
-      },
+      { name: 'Walk Without Headphones', mode: 'build' as const, frequency: 'weekly' as const },
     ],
   },
   {
     dir: 'East',
     arrow: '→',
-    title: 'Faith & Hope',
-    note: 'The East is light. For me, faith isn’t dogma — it’s the quiet certainty that meaning still exists, even when logic fails. These habits help me stay open, anchored in something higher than achievement.',
-    disclaimer:
-      'My reflections here come from a Christian frame, but the point is not religion — it’s faith in something that lifts you beyond yourself.',
+    title: 'Silence and Meaning',
+    note: 'I don’t rely on a personal rescuer to make life coherent. The world can be indifferent, and some things will never be fully explained. Still, I choose meaning. My East is the quiet place inside me that stays when the noise collapses—the practice of returning to breath, to stillness, to reality as it is. From that silence I regain perspective, and I remember what matters: integrity, dignity, and the next right action. Hope, in my worldview, is not wishing for intervention; it’s trusting that I can meet reality cleanly and keep building anyway.',
     habits: [
-      { name: 'Read Before Bed', mode: 'build' as const, frequency: 'daily' as const },
-      { name: 'Pray or Meditate', mode: 'build' as const, frequency: 'daily' as const },
-      { name: 'No Alcohol', mode: 'break' as const, frequency: 'daily' as const },
-      {
-        name: 'Write a Blessing',
-        mode: 'build' as const,
-        frequency: 'weekly' as const,
-        weeklyTarget: 1,
-      },
-      {
-        name: 'Attend Aikido',
-        mode: 'build' as const,
-        frequency: 'weekly' as const,
-        weeklyTarget: 2,
-      },
-      { name: 'Morning Walk', mode: 'build' as const, frequency: 'daily' as const },
-      { name: 'Gratitude Prayer', mode: 'build' as const, frequency: 'daily' as const },
+      { name: '10-Minute Stillness', mode: 'build' as const, frequency: 'daily' as const },
+      { name: 'Breath Reset', mode: 'build' as const, frequency: 'daily' as const },
+      { name: 'Morning Quiet', mode: 'build' as const, frequency: 'daily' as const },
       { name: 'Limit News Intake', mode: 'break' as const, frequency: 'daily' as const },
-      {
-        name: 'Reflect on Scripture / Wisdom Text',
-        mode: 'build' as const,
-        frequency: 'weekly' as const,
-        weeklyTarget: 3,
-      },
-      {
-        name: 'Act of Service',
-        mode: 'build' as const,
-        frequency: 'weekly' as const,
-        weeklyTarget: 1,
-      },
+      { name: 'Evening Reflection', mode: 'build' as const, frequency: 'daily' as const },
+      { name: 'Nature Walk', mode: 'build' as const, frequency: 'weekly' as const },
+      { name: 'Device-Free Hour', mode: 'break' as const, frequency: 'daily' as const },
+      { name: 'Weekly Solitude Block', mode: 'build' as const, frequency: 'weekly' as const },
+      { name: 'Read a Wisdom Text', mode: 'build' as const, frequency: 'weekly' as const },
+      { name: 'Meaning Check-In', mode: 'build' as const, frequency: 'monthly' as const },
     ],
   },
   {
     dir: 'West',
     arrow: '←',
-    title: 'Growth & Mastery',
-    note: 'I see discipline as art — something built brick by brick. My West keeps me grounded in work, study, and effort that actually changes who I am. It’s not about perfection, just the next small proof that I’m learning.',
-    disclaimer:
-      'Discipline means different things to different people. Don’t use it to punish yourself — it’s meant to build trust with your future self.',
+    title: 'Growth and Mastery',
+    note: 'Study, coding, projects, and sport are my training ground. For me it’s not about having—it’s about becoming capable. My West is discipline: patient repetition, craft, the steady step forward. It keeps me honest because it doesn’t accept excuses. It turns ideals into skills and dreams into evidence.',
     habits: [
       { name: 'Code for 1 Hour', mode: 'build' as const, frequency: 'daily' as const },
-      {
-        name: 'Study English',
-        mode: 'build' as const,
-        frequency: 'weekly' as const,
-        weeklyTarget: 2,
-      },
-      { name: 'Journal Reflection', mode: 'build' as const, frequency: 'daily' as const },
-      { name: 'Cold Shower', mode: 'build' as const, frequency: 'daily' as const },
-      {
-        name: 'Sunday Review',
-        mode: 'build' as const,
-        frequency: 'weekly' as const,
-        weeklyTarget: 1,
-      },
-      { name: 'Read 30 Minutes', mode: 'build' as const, frequency: 'daily' as const },
-      { name: 'Practice a Skill', mode: 'build' as const, frequency: 'daily' as const },
+      { name: 'Deliberate Practice', mode: 'build' as const, frequency: 'daily' as const },
+      { name: 'Workout', mode: 'build' as const, frequency: 'daily' as const },
       { name: 'Limit Distractions', mode: 'break' as const, frequency: 'daily' as const },
-      {
-        name: 'Weekly Sprint',
-        mode: 'build' as const,
-        frequency: 'weekly' as const,
-        weeklyTarget: 1,
-      },
-      {
-        name: 'Teach What You Learn',
-        mode: 'build' as const,
-        frequency: 'weekly' as const,
-        weeklyTarget: 1,
-      },
-      {
-        name: 'Monthly Review',
-        mode: 'build' as const,
-        frequency: 'monthly' as const,
-        monthlyTarget: 1,
-      },
+      { name: 'Study Session', mode: 'build' as const, frequency: 'weekly' as const },
+      { name: 'Ship One Small Thing', mode: 'build' as const, frequency: 'weekly' as const },
+      { name: 'Skill Drill', mode: 'build' as const, frequency: 'daily' as const },
+      { name: 'Review Mistakes', mode: 'build' as const, frequency: 'weekly' as const },
+      { name: 'Weekly Sprint', mode: 'build' as const, frequency: 'weekly' as const },
+      { name: 'Monthly Review', mode: 'build' as const, frequency: 'monthly' as const },
     ],
   },
   {
     dir: 'South',
     arrow: '↓',
-    title: 'Love & Care',
-    note: 'Even in frustration, I always return to the wish that people around me feel safe. The South reminds me that strength without tenderness becomes armor — and armor isolates.',
-    disclaimer:
-      'I’m not good at this every day. These habits are simply my practice in learning gentleness — yours might look very different.',
+    title: 'Love and Care',
+    note: 'Even when I’m angry at my family, there’s a core in me that says: “My children will have it better than I did.” I don’t just want to break away—I want to build a circle where it feels warm and safe. My South is protective care: loyalty, gentleness, responsibility, the willingness to repair instead of discard. It’s the part of me that measures success not only by achievement, but by whether people around me feel respected and held.',
     habits: [
-      { name: 'Gratitude Note', mode: 'build' as const, frequency: 'daily' as const },
-      { name: 'Evening Stretch', mode: 'build' as const, frequency: 'daily' as const },
-      { name: 'No Complaining', mode: 'break' as const, frequency: 'daily' as const },
-      {
-        name: 'Call a Friend',
-        mode: 'build' as const,
-        frequency: 'weekly' as const,
-        weeklyTarget: 1,
-      },
-      {
-        name: 'Cook Mindfully',
-        mode: 'build' as const,
-        frequency: 'weekly' as const,
-        weeklyTarget: 1,
-      },
+      { name: 'Family Check-In', mode: 'build' as const, frequency: 'daily' as const },
       { name: 'Listen Without Fixing', mode: 'build' as const, frequency: 'daily' as const },
-      { name: 'Compliment Someone', mode: 'build' as const, frequency: 'daily' as const },
-      {
-        name: 'Family Dinner',
-        mode: 'build' as const,
-        frequency: 'weekly' as const,
-        weeklyTarget: 1,
-      },
-      {
-        name: 'Random Kindness',
-        mode: 'build' as const,
-        frequency: 'weekly' as const,
-        weeklyTarget: 2,
-      },
-      {
-        name: 'Family Budget Review',
-        mode: 'build' as const,
-        frequency: 'monthly' as const,
-        monthlyTarget: 1,
-      },
+      { name: 'Repair One Thing', mode: 'build' as const, frequency: 'weekly' as const },
+      { name: 'Acts of Care', mode: 'build' as const, frequency: 'daily' as const },
       { name: 'No Gossip', mode: 'break' as const, frequency: 'daily' as const },
+      { name: 'Family Dinner', mode: 'build' as const, frequency: 'weekly' as const },
+      { name: 'Gratitude Note', mode: 'build' as const, frequency: 'daily' as const },
+      { name: 'Quality Time', mode: 'build' as const, frequency: 'weekly' as const },
+      { name: 'Home Responsibility', mode: 'build' as const, frequency: 'daily' as const },
+      { name: 'Budget Review', mode: 'build' as const, frequency: 'monthly' as const },
     ],
   },
 ];
@@ -240,7 +145,7 @@ export default function Compass() {
                 <span className="text-strong">{set.title}</span>
               </h3>
               <p className="mt-2 text-sm text-muted">{set.note}</p>
-              <p className="mt-2 italic text-xs text-soft">{set.disclaimer}</p>
+              {set.disclaimer && <p className="mt-2 italic text-xs text-soft">{set.disclaimer}</p>}
             </div>
 
             <div className="mt-4">
@@ -297,10 +202,22 @@ export default function Compass() {
 
       {/* Center Balance */}
       <section>
-        <div className="text-center">
+        <div className="text-center space-y-3">
+          <p className="text-neutral-600 dark:text-neutral-300">
+            When I put all of this together, I get a compass that keeps me from getting lost:
+          </p>
           <p className="italic text-neutral-500">
-            Freedom without love turns into loneliness. Love without freedom turns into dependency.
-            Growth without faith turns into burnout. Faith without growth turns into stagnation.
+            Freedom without love turns into loneliness.
+            <br />
+            Love without freedom turns into dependency.
+            <br />
+            Growth without silence turns into burnout.
+            <br />
+            Silence without growth turns into escape.
+          </p>
+          <p className="text-neutral-600 dark:text-neutral-300">
+            My task is to hold all four directions—not as a perfect system, but as a daily practice.
+            When I drift, I return: to truth, to care, to training, and to quiet.
           </p>
         </div>
       </section>
