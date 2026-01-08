@@ -76,7 +76,7 @@ export default function CollectiblesStoreCard() {
                     <div
                       key={item.id}
                       className="rounded-xl border border-subtle p-3 transform-gpu motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out hover:-translate-y-1 motion-reduce:transition-none motion-reduce:transform-none flex flex-col"
-                      style={{ willChange: 'transform', backgroundColor: 'var(--color-tile)' }}
+                      style={{ willChange: 'transform' }}
                     >
                       <div className="flex items-center gap-2">
                         <span className={flash[item.id] ? 'collectible-flash' : undefined}>

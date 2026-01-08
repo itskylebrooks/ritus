@@ -17,7 +17,6 @@ export default function TrophiesBoard() {
         {items.length === 0 ? (
           <div
             className="col-span-2 md:col-span-4 flex flex-col items-center gap-3 rounded-lg border border-subtle p-6"
-            style={{ backgroundColor: 'var(--color-tile)' }}
           >
             <div className="p-2 rounded-md">
               <WandSparkles className="h-8 w-8 text-accent" />
@@ -33,7 +32,6 @@ export default function TrophiesBoard() {
             <div
               key={id}
               className="flex flex-col items-center justify-between gap-3 rounded-lg border border-subtle p-4 min-h-[140px]"
-              style={{ backgroundColor: 'var(--color-tile)' }}
             >
               <div className="p-2 rounded-md">
                 <Icon className="h-7 w-7 text-accent" />
