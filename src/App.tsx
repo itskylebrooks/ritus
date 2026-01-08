@@ -7,7 +7,7 @@ import { createPageMotion } from '@/shared/animations';
 import AppHeader from '@/shared/components/headers/AppHeader';
 import type { TargetAndTransition, Transition } from 'framer-motion';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 
 // Define Page component outside of App to avoid recreating during render
@@ -30,30 +30,7 @@ const Page = ({
 export default function App() {
   const location = useLocation();
   const shouldReduceMotion = useReducedMotion();
-  const [isMobile, setIsMobile] = useState(() => {
-    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
-    return window.matchMedia('(max-width: 639px)').matches;
-  });
-
-  useEffect(() => {
-    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
-    const mq = window.matchMedia('(max-width: 639px)');
-    const handleChange = (e: MediaQueryListEvent | MediaQueryList) => {
-      setIsMobile(e.matches);
-    };
-
-    handleChange(mq);
-
-    if (typeof mq.addEventListener === 'function') {
-      mq.addEventListener('change', handleChange);
-      return () => mq.removeEventListener('change', handleChange);
-    } else {
-      mq.addListener(handleChange);
-      return () => mq.removeListener(handleChange);
-    }
-  }, []);
-
-  const { initial, animate, transition } = createPageMotion(shouldReduceMotion || isMobile);
+  const { initial, animate, transition } = createPageMotion(shouldReduceMotion);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
