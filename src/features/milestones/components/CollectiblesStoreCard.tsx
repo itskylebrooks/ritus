@@ -56,10 +56,6 @@ export default function CollectiblesStoreCard() {
         </div>
       </div>
 
-      <div className="text-xs text-muted mt-3 text-center mb-6">
-        Some items are placeholders for now — the store is in development.
-      </div>
-
       <div className="space-y-5">
         {groups.map((g) => {
           const items = g.items;
