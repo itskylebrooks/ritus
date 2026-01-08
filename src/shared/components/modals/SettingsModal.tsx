@@ -3,7 +3,7 @@ import { usePWA } from '@/shared/hooks/usePWA';
 import { useHabitStore } from '@/shared/store/store';
 import useThemeStore from '@/shared/store/theme';
 import { exportAllData, importAllData } from '@/shared/utils/dataTransfer';
-import { ChevronDown, Linkedin, User } from 'lucide-react';
+import { ChevronDown, Linkedin, User, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import pkg from '../../../../package.json';
 import ConfirmModal from './ConfirmModal';
@@ -235,15 +235,24 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
         aria-modal="true"
         aria-labelledby="settings-title"
       >
-        <div className="mb-2">
+        <div className="-mx-6 px-6 pb-3 mb-2 border-b border-subtle">
           <div className="relative h-12 flex items-center justify-center">
             <span id="settings-title" className="text-lg font-semibold tracking-wide text-strong">
               Settings
             </span>
+            <button
+              type="button"
+              onClick={beginClose}
+              className="absolute right-0 rounded-lg border border-subtle p-2 text-muted hover-nonaccent transition"
+              aria-label="Close settings"
+              title="Close"
+            >
+              <X className="h-4 w-4" />
+            </button>
           </div>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-4 pt-2">
           {/* Theme */}
           <div className="text-sm">
             <div className="flex items-center justify-between gap-3">
@@ -324,48 +333,44 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
               </div>
             </div>
           </div>
-          <div className="border-t border-subtle" />
+          <div className="border-t border-subtle mt-2" />
 
           {/* PWA Install */}
-          {(canInstall || isInstalled) && (
-            <>
-              <div className="text-sm">
-                <div className="grid grid-cols-3 items-center gap-2">
-                  <div className="col-span-2">
-                    <div className="text-sm font-semibold mb-0.5">Install App</div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={isInstalled ? undefined : install}
-                    disabled={isInstalled}
-                    className={`w-full flex items-center justify-center gap-1.5 rounded-lg h-10 px-3 text-xs font-medium transition-colors whitespace-nowrap ${
-                      isInstalled
-                        ? 'cursor-default border border-subtle text-muted'
-                        : 'bg-accent text-inverse hover:opacity-90'
-                    }`}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                      <polyline points="7 10 12 15 17 10" />
-                      <line x1="12" y1="15" x2="12" y2="3" />
-                    </svg>
-                    {isInstalled ? 'Installed' : 'Install'}
-                  </button>
-                </div>
+          <div className="text-sm">
+            <div className="grid grid-cols-3 items-center gap-2">
+              <div className="col-span-2">
+                <div className="text-sm font-semibold mb-0.5">Install App</div>
               </div>
-              <div className="border-t border-subtle" />
-            </>
-          )}
+              <button
+                type="button"
+                onClick={!isInstalled && canInstall ? install : undefined}
+                disabled={isInstalled || !canInstall}
+                className={`w-full flex items-center justify-center gap-1.5 rounded-lg h-10 px-3 text-xs font-medium transition-colors whitespace-nowrap ${
+                  isInstalled || !canInstall
+                    ? 'cursor-not-allowed border border-subtle text-muted opacity-60'
+                    : 'bg-accent text-inverse hover:opacity-90'
+                }`}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                {isInstalled ? 'Installed' : 'Install'}
+              </button>
+            </div>
+          </div>
+          <div className="border-t border-subtle" />
 
           {/* Format */}
           <div className="text-sm">
@@ -531,15 +536,6 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
           */}
         </div>
 
-        <div className="mt-5">
-          <button
-            onClick={beginClose}
-            className="w-full rounded-2xl px-4 py-3 text-sm font-semibold bg-accent text-inverse hover-accent-fade transition"
-          >
-            Done
-          </button>
-        </div>
-
         <ConfirmModal
           open={confirmClearOpen}
           onClose={() => setConfirmClearOpen(false)}
@@ -609,55 +605,57 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
           cancelLabel={importReportReload ? 'Cancel' : 'Close'}
         />
 
-        <div className="mt-6 text-center text-[12px] text-muted relative">
-          <a
-            href="https://www.linkedin.com/in/itskylebrooks/"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Kyle Brooks on LinkedIn"
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-strong opacity-90 hover:opacity-75 transition-opacity"
-          >
-            <Linkedin className="w-5 h-5" />
-          </a>
+        <div className="-mx-6 mt-6 border-t border-subtle pt-4 px-6">
+          <div className="text-center text-[12px] text-muted relative">
+            <a
+              href="https://www.linkedin.com/in/itskylebrooks/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Kyle Brooks on LinkedIn"
+              className="absolute left-0 top-1/2 -translate-y-1/2 text-strong opacity-90 hover:opacity-75 transition-opacity"
+            >
+              <Linkedin className="w-5 h-5" />
+            </a>
 
-          <a
-            href="https://itskylebrooks.tech/"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Kyle Brooks personal website"
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-strong opacity-90 hover:opacity-75 transition-opacity"
-          >
-            <User className="w-5 h-5" />
-          </a>
+            <a
+              href="https://itskylebrooks.tech/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Kyle Brooks personal website"
+              className="absolute right-0 top-1/2 -translate-y-1/2 text-strong opacity-90 hover:opacity-75 transition-opacity"
+            >
+              <User className="w-5 h-5" />
+            </a>
 
-          <div className="font-medium text-strong">
-            Kyle Brooks <span className="mx-2">•</span> Ritus {pkg.version}
-          </div>
-          <div className="mt-0.5 flex items-center justify-center gap-3">
-            <a
-              href="https://itskylebrooks.vercel.app/imprint"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline"
-            >
-              Imprint
-            </a>
-            <a
-              href="https://itskylebrooks.vercel.app/privacy"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline"
-            >
-              Privacy Policy
-            </a>
-            <a
-              href="https://itskylebrooks.vercel.app/license"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline"
-            >
-              License
-            </a>
+            <div className="font-medium text-strong">
+              Kyle Brooks <span className="mx-2">•</span> Ritus {pkg.version}
+            </div>
+            <div className="mt-0.5 flex items-center justify-center gap-3">
+              <a
+                href="https://itskylebrooks.vercel.app/imprint"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+              >
+                Imprint
+              </a>
+              <a
+                href="https://itskylebrooks.vercel.app/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+              >
+                Privacy Policy
+              </a>
+              <a
+                href="https://itskylebrooks.vercel.app/license"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+              >
+                License
+              </a>
+            </div>
           </div>
         </div>
       </div>
