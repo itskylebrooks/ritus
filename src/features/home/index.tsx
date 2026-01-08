@@ -39,7 +39,7 @@ export default function Home() {
   const habits = useHabitStore((s) => s.habits);
   const showArchived = useHabitStore((s) => s.showArchived);
   const weekStart = useHabitStore((s) => s.weekStart);
-  const initialListRender = !useIdleReady();
+  const initialListRender = !useIdleReady({ resetOnMount: true });
   const weekKeys = useMemo(() => {
     const weekStartsOn = weekStart === 'sunday' ? 0 : 1;
     return daysThisWeek(new Date(), weekStartsOn).map((d) => iso(d).slice(0, 10));
