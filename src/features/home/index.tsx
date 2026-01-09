@@ -191,7 +191,7 @@ export default function Home() {
         </div>
 
         {showHomeCards && (
-          <div className="h-full sm:row-start-1 sm:col-start-2 sm:col-span-1">
+          <div className="hidden h-full sm:block sm:row-start-1 sm:col-start-2 sm:col-span-1">
             <ClockCard />
           </div>
         )}

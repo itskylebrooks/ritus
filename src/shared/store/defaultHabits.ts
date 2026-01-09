@@ -626,9 +626,9 @@ export const defaultProgress = {
   completionAwardKeys: {},
   // Kyle’s initial pick list for shop UI. These are also granted as owned when
   // loading the example data so the store UI shows them as "Owned".
-  preferredCollectibles: ['clock_nocturne', 'accent_ocean'],
+  preferredCollectibles: ['accent_ocean'],
   // Mark these as owned by default when example data is loaded
-  ownedCollectibles: ['clock_nocturne', 'accent_ocean'],
+  ownedCollectibles: ['accent_ocean'],
   // example unlocked trophies (empty by default)
   unlocked: {},
 };

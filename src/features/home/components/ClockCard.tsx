@@ -1,4 +1,3 @@
-import { useHabitStore } from '@/shared/store/store';
 import { useEffect, useMemo, useState } from 'react';
 
 export default function ClockCard() {
@@ -16,13 +15,6 @@ export default function ClockCard() {
   const hourDeg = (hours / 12) * 360;
   const minuteDeg = (minutes / 60) * 360;
   const secondDeg = (seconds / 60) * 360;
-
-  // subscribe to applied collectibles so the clock updates reactively
-  const applied = useHabitStore((s) => s.progress.appliedCollectibles || {});
-  const clockStyle = applied['clock'];
-  const nocturne = clockStyle === 'clock_nocturne';
-  const hasClockStyle = !!clockStyle;
-  const accentApplied = !!applied['accent'];
 
   const dayLabelColorClass = 'text-accent';
 
@@ -78,13 +70,10 @@ export default function ClockCard() {
                   const x2 = 50 + Math.sin(angle) * outer;
                   const y2 = 50 - Math.cos(angle) * outer;
                   const width = isHour ? 1.6 : 0.8;
-                  // Use CSS tokens for subtle greys in normal mode (they adapt to .dark)
-                  // When nocturne collectible is applied, keep high-contrast monochrome ticks.
-                  const strokeColor = nocturne
-                    ? 'currentColor'
-                    : isHour
-                      ? 'var(--color-text-secondary)'
-                      : 'var(--color-border-subtle)';
+                  // Use CSS tokens for subtle greys in normal mode (they adapt to .dark).
+                  const strokeColor = isHour
+                    ? 'var(--color-text-secondary)'
+                    : 'var(--color-border-subtle)';
 
                   return (
                     <line
@@ -99,90 +88,44 @@ export default function ClockCard() {
                   );
                 })}
 
-                {/* hour, minute, second hands: adjust when nocturne collectible is applied */}
-                {(() => {
-                  // When nocturne is active, use the current accent color for the clock
-                  // by setting the element color to `var(--color-accent)` via the
-                  // `text-accent` utility. This allows the clock to adapt when the
-                  // user switches accent collectibles. Otherwise, fall back to the
-                  // existing neutral/monochrome styling.
-                  const armColorClass = nocturne ? 'text-accent' : '';
+                {/* hour, minute, second hands */}
+                <g transform={`rotate(${hourDeg} 50 50)`}>
+                  <line
+                    x1="50"
+                    y1="50"
+                    x2="50"
+                    y2="28"
+                    stroke="var(--color-text-primary)"
+                    strokeWidth={3.8}
+                    strokeLinecap="round"
+                  />
+                </g>
 
-                  // Second hand color:
-                  // - If a custom clock style is applied, keep existing behavior.
-                  // - If no custom clock style but an accent is applied, use accent.
-                  // - If no accent is applied, fall back to red (danger).
-                  const secondStroke = nocturne
-                    ? 'currentColor'
-                    : !hasClockStyle && accentApplied
-                      ? 'var(--color-accent)'
-                      : 'var(--color-danger)';
+                <g transform={`rotate(${minuteDeg} 50 50)`}>
+                  <line
+                    x1="50"
+                    y1="50"
+                    x2="50"
+                    y2="18"
+                    stroke="var(--color-text-secondary)"
+                    strokeWidth={2.4}
+                    strokeLinecap="round"
+                  />
+                </g>
 
-                  const secondClassName = nocturne
-                    ? armColorClass
-                    : !hasClockStyle && accentApplied
-                      ? 'text-accent'
-                      : '';
-                  return (
-                    <>
-                      <g
-                        transform={`rotate(${hourDeg} 50 50)`}
-                        className={nocturne ? 'text-accent' : ''}
-                      >
-                        <line
-                          x1="50"
-                          y1="50"
-                          x2="50"
-                          y2="28"
-                          stroke={nocturne ? 'currentColor' : 'var(--color-text-primary)'}
-                          strokeWidth={3.8}
-                          strokeLinecap="round"
-                        />
-                      </g>
+                <g transform={`rotate(${secondDeg} 50 50)`}>
+                  <line
+                    x1="50"
+                    y1="54"
+                    x2="50"
+                    y2="14"
+                    stroke="var(--color-danger)"
+                    strokeWidth={1.4}
+                    strokeLinecap="round"
+                  />
+                </g>
 
-                      {/* minute hand: kept under nocturne but styled monochrome */}
-                      <g
-                        transform={`rotate(${minuteDeg} 50 50)`}
-                        className={nocturne ? 'text-accent' : ''}
-                      >
-                        <line
-                          x1="50"
-                          y1="50"
-                          x2="50"
-                          y2="18"
-                          stroke={nocturne ? 'currentColor' : 'var(--color-text-secondary)'}
-                          strokeWidth={2.4}
-                          strokeLinecap="round"
-                        />
-                      </g>
-
-                      {/* second hand */}
-                      <g
-                        transform={`rotate(${secondDeg} 50 50)`}
-                        className={nocturne ? 'text-accent' : ''}
-                      >
-                        <line
-                          x1="50"
-                          y1="54"
-                          x2="50"
-                          y2="14"
-                          stroke={secondStroke}
-                          strokeWidth={1.4}
-                          strokeLinecap="round"
-                          className={secondClassName}
-                        />
-                      </g>
-
-                      {/* center */}
-                      <circle
-                        cx="50"
-                        cy="50"
-                        r="2"
-                        fill={nocturne ? 'currentColor' : 'var(--color-text-primary)'}
-                      />
-                    </>
-                  );
-                })()}
+                <circle cx="50" cy="50" r="2" fill="var(--color-text-primary)" />
               </g>
             </svg>
           </div>

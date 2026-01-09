@@ -4,7 +4,6 @@ import { useHabitStore } from '@/shared/store/store';
 import { useMemo, useState } from 'react';
 
 const COLLECTIBLE_GROUPS: { label: string; type: CollectibleType }[] = [
-  { label: 'Clock styles', type: 'clock' },
   { label: 'Quote packs', type: 'quotes' },
   { label: 'Accent themes', type: 'accent' },
   { label: 'Mysterious relics', type: 'relic' },
