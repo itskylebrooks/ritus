@@ -149,6 +149,16 @@ export const COLLECTIBLES: CollectibleDef[] = [
     cost: 1000,
     implemented: false,
   },
+  {
+    id: 'quotes_mindset',
+    type: 'quotes',
+    title: 'Mindset',
+    desc: 'Short affirmations and reframes from licensed or original sources.',
+    icon: Star,
+    rarity: 'common',
+    cost: 1500,
+    implemented: false,
+  },
 
   // ────────────────────────────────────────────────────────────────────────────
   // ACCENT THEMES (placeholders; monochrome-friendly accents)
