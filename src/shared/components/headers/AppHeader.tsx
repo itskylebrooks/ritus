@@ -288,7 +288,7 @@ export default function AppHeader() {
                         </li>
                       )}
                       {isHome && (
-                        <li>
+                        <li className="hidden sm:block">
                           <button
                             type="button"
                             onClick={() => {
