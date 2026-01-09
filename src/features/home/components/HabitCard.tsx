@@ -7,7 +7,7 @@ import { useHabitStore } from '@/shared/store/store';
 import type { Habit } from '@/shared/types';
 import { iso } from '@/shared/utils/date';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Archive, Check, Diamond, Flame, Inbox, Pencil, Settings2, Trash2 } from 'lucide-react';
+import { Archive, Diamond, Flame, Inbox, Pencil, Settings2, Trash2, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 type ButtonsMenuProps = {
@@ -333,7 +333,7 @@ export default function HabitCard({
               aria-label="Clean today"
               className={`inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl ${breakPrimaryBgClass} p-2 text-sm text-inverse transition transform duration-150 ease-in-out sm:flex-none sm:px-3 sm:py-2 sm:w-full md:w-[124px] ${habit.archived ? 'opacity-60 cursor-not-allowed' : 'hover-accent-fade active:scale-[.98]'} md:justify-self-end`}
             >
-              <Check className="h-4 w-4" />
+              <X className="h-4 w-4" />
               <span className="hidden sm:inline">Clean today</span>
             </button>
           ) : (
@@ -346,7 +346,7 @@ export default function HabitCard({
               aria-label="Clean today"
               className={`inline-flex items-center justify-center rounded-xl ${breakPrimaryBgClass} p-2 text-inverse transition transform duration-150 ease-in-out md:w-12 ${habit.archived ? 'opacity-60 cursor-not-allowed' : 'hover-accent-fade active:scale-[.98]'} md:justify-self-end`}
             >
-              <Check className="h-4 w-4" />
+              <X className="h-4 w-4" />
               {/* Visible label on mobile, hidden on small+ so grid view buttons stay icon-only */}
               <span className="ml-2 inline sm:hidden">Clean today</span>
             </button>
@@ -361,7 +361,7 @@ export default function HabitCard({
             aria-label="Done today"
             className={`inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-accent p-2 text-sm text-inverse transition transform duration-150 ease-in-out sm:flex-none sm:px-3 sm:py-2 sm:w-full md:w-[124px] ${habit.archived ? 'opacity-60 cursor-not-allowed' : 'hover-accent-fade active:scale-[.98]'} md:justify-self-end`}
           >
-            <Check className="h-4 w-4" />
+            <X className="h-4 w-4" />
             <span className="hidden sm:inline">Done today</span>
           </button>
         ) : (
@@ -374,7 +374,7 @@ export default function HabitCard({
             aria-label="Done today"
             className={`inline-flex items-center justify-center rounded-xl bg-accent p-2 text-inverse transition transform duration-150 ease-in-out md:w-12 ${habit.archived ? 'opacity-60 cursor-not-allowed' : 'hover-accent-fade active:scale-[.98]'} md:justify-self-end`}
           >
-            <Check className="h-4 w-4" />
+            <X className="h-4 w-4" />
             {/* Visible label on mobile, hidden on small+ so grid view buttons stay icon-only */}
             <span className="ml-2 inline sm:hidden">Done today</span>
           </button>
