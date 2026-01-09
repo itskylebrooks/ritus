@@ -16,10 +16,8 @@ import {
   LayoutList,
   Lightbulb,
   MinusCircle,
-  Moon,
   PlusCircle,
   Settings as SettingsIcon,
-  Sun,
   Trophy,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -43,8 +41,6 @@ export default function AppHeader() {
   const [moreDesktopOpen, setMoreDesktopOpen] = useState(false);
   const showAdd = useHabitStore((s) => s.showAdd);
   const setShowAdd = useHabitStore((s) => s.setShowAdd);
-  const showHomeCards = useHabitStore((s) => s.showHomeCards ?? true);
-  const setShowHomeCards = useHabitStore((s) => s.setShowHomeCards);
   const showArchived = useHabitStore((s) => s.showArchived);
   const setShowArchived = useHabitStore((s) => s.setShowArchived);
   const showList = useHabitStore((s) => s.showList);
@@ -244,27 +240,6 @@ export default function AppHeader() {
                                 <PlusCircle className="w-4 h-4" />
                               )}
                               <span>{showAdd ? 'Hide add' : 'Show add'}</span>
-                            </span>
-                          </button>
-                        </li>
-                      )}
-                      {isHome && (
-                        <li>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setMoreDesktopOpen(false);
-                              setShowHomeCards(!showHomeCards);
-                            }}
-                            className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent"
-                          >
-                            <span className="flex items-center gap-2">
-                              {showHomeCards ? (
-                                <Moon className="w-4 h-4" />
-                              ) : (
-                                <Sun className="w-4 h-4" />
-                              )}
-                              <span>{showHomeCards ? 'Hide rituals' : 'Show rituals'}</span>
                             </span>
                           </button>
                         </li>

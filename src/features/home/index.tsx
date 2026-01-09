@@ -35,7 +35,6 @@ export default function Home() {
   const showAdd = useHabitStore((s) => s.showAdd);
 
   const showList = useHabitStore((s) => s.showList);
-  const showHomeCards = useHabitStore((s) => s.showHomeCards ?? true);
 
   const habits = useHabitStore((s) => s.habits);
   const showArchived = useHabitStore((s) => s.showArchived);
@@ -105,21 +104,19 @@ export default function Home() {
   return (
     <div>
       <div className="mt-4 space-y-4">
-        {showHomeCards && (
-          <div className="w-full">
-            <LazyMount
-              enabled={isMobile}
-              className="w-full"
-              minHeight={180}
-              unmountOnExit={false}
-              placeholder={
-                <div className="h-full rounded-2xl border border-subtle bg-neutral-100/70 dark:bg-neutral-900/40" />
-              }
-            >
-              <QuoteCard />
-            </LazyMount>
-          </div>
-        )}
+        <div className="w-full">
+          <LazyMount
+            enabled={isMobile}
+            className="w-full"
+            minHeight={180}
+            unmountOnExit={false}
+            placeholder={
+              <div className="h-full rounded-2xl border border-subtle bg-neutral-100/70 dark:bg-neutral-900/40" />
+            }
+          >
+            <QuoteCard />
+          </LazyMount>
+        </div>
 
         <div className="space-y-4">
           {showAdd && (
