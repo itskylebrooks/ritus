@@ -7,7 +7,6 @@ import { daysThisWeek, iso } from '@/shared/utils/date';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useMemo, useState } from 'react';
 import AddHabit from './components/AddHabit';
-import ClockCard from './components/ClockCard';
 import HabitCard from './components/HabitCard';
 import QuoteCard from './components/QuoteCard';
 
@@ -105,9 +104,9 @@ export default function Home() {
 
   return (
     <div>
-      <div className="mt-4 grid gap-4 sm:[grid-template-columns:minmax(0,1fr)_auto] items-stretch">
+      <div className="mt-4 space-y-4">
         {showHomeCards && (
-          <div className="h-full min-w-0 sm:row-start-1 sm:col-start-1 sm:col-span-1">
+          <div className="w-full">
             <LazyMount
               enabled={isMobile}
               className="w-full"
@@ -122,11 +121,7 @@ export default function Home() {
           </div>
         )}
 
-        <div
-          className={`space-y-4 ${
-            showHomeCards ? 'sm:col-span-2 sm:row-start-2' : 'sm:col-span-2 sm:row-start-1'
-          }`}
-        >
+        <div className="space-y-4">
           {showAdd && (
             <div>
               <LazyMount
@@ -259,22 +254,6 @@ export default function Home() {
             </AnimatePresence>
           </motion.main>
         </div>
-
-        {showHomeCards && (
-          <div className="hidden h-full sm:block sm:row-start-1 sm:col-start-2 sm:col-span-1">
-            <LazyMount
-              enabled={isMobile}
-              className="w-full"
-              minHeight={200}
-              unmountOnExit={false}
-              placeholder={
-                <div className="h-full rounded-2xl border border-subtle bg-neutral-100/70 dark:bg-neutral-900/40" />
-              }
-            >
-              <ClockCard />
-            </LazyMount>
-          </div>
-        )}
       </div>
     </div>
   );
