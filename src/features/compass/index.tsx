@@ -127,7 +127,7 @@ export default function Compass() {
   };
 
   return (
-    <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8">
+    <div className="allow-select prose prose-neutral dark:prose-invert max-w-none space-y-8">
       {/* Hero */}
       <section>
         <h2 className="text-xl font-semibold flex items-center gap-2">

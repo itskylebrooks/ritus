@@ -136,6 +136,16 @@ body,
 body {
   background-color: var(--color-app-bg);
   color: var(--color-text-primary);
+  user-select: none;
+}
+
+input,
+textarea,
+select,
+[contenteditable='true'],
+.allow-select,
+.allow-select * {
+  user-select: text;
 }
 
 html {
