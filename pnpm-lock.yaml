@@ -3715,7 +3715,6 @@ packages:
       }
     engines: { node: '>=8.10.0' }
 
-
   reflect.getprototypeof@1.0.10:
     resolution:
       {
@@ -6862,7 +6861,6 @@ snapshots:
   readdirp@3.6.0:
     dependencies:
       picomatch: 2.3.1
-
 
   reflect.getprototypeof@1.0.10:
     dependencies:

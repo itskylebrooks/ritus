@@ -105,7 +105,7 @@ export default function Home() {
 
   return (
     <div>
-      <div className="mt-4 grid gap-4 sm:[grid-template-columns:minmax(0,1fr)_minmax(0,160px)] items-stretch">
+      <div className="mt-4 grid gap-4 sm:[grid-template-columns:minmax(0,1fr)_auto] items-stretch">
         {showHomeCards && (
           <div className="h-full min-w-0 sm:row-start-1 sm:col-start-1 sm:col-span-1">
             <LazyMount
