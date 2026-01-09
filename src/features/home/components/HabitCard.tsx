@@ -344,7 +344,7 @@ export default function HabitCard({
               disabled={habit.archived}
               aria-disabled={habit.archived}
               aria-label="Clean today"
-              className={`inline-flex items-center justify-center rounded-xl ${breakPrimaryBgClass} p-2 text-inverse transition transform duration-150 ease-in-out ${habit.archived ? 'opacity-60 cursor-not-allowed' : 'hover-accent-fade active:scale-[.98]'} md:justify-self-end`}
+              className={`inline-flex items-center justify-center rounded-xl ${breakPrimaryBgClass} p-2 text-inverse transition transform duration-150 ease-in-out md:w-12 ${habit.archived ? 'opacity-60 cursor-not-allowed' : 'hover-accent-fade active:scale-[.98]'} md:justify-self-end`}
             >
               <Check className="h-4 w-4" />
               {/* Visible label on mobile, hidden on small+ so grid view buttons stay icon-only */}
@@ -372,7 +372,7 @@ export default function HabitCard({
             disabled={habit.archived}
             aria-disabled={habit.archived}
             aria-label="Done today"
-            className={`inline-flex items-center justify-center rounded-xl bg-accent p-2 text-inverse transition transform duration-150 ease-in-out ${habit.archived ? 'opacity-60 cursor-not-allowed' : 'hover-accent-fade active:scale-[.98]'} md:justify-self-end`}
+            className={`inline-flex items-center justify-center rounded-xl bg-accent p-2 text-inverse transition transform duration-150 ease-in-out md:w-12 ${habit.archived ? 'opacity-60 cursor-not-allowed' : 'hover-accent-fade active:scale-[.98]'} md:justify-self-end`}
           >
             <Check className="h-4 w-4" />
             {/* Visible label on mobile, hidden on small+ so grid view buttons stay icon-only */}
