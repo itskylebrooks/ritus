@@ -15,6 +15,15 @@ import MonthGrid from './components/MonthGrid';
 const habitNameCollator = new Intl.Collator(undefined, { sensitivity: 'base' });
 const EMPTY_SET = new Set<string>();
 
+function EmptyState() {
+  return (
+    <div className="rounded-2xl border border-subtle p-10 text-center text-muted">
+      <p className="text-lg font-medium">No habits to show</p>
+      <p className="mt-1 text-sm">Add some habits on the Home page.</p>
+    </div>
+  );
+}
+
 export default function Insight() {
   const habits = useHabitStore((s) => s.habits);
   const showArchived = useHabitStore((s) => s.showArchived);
@@ -195,9 +204,7 @@ export default function Insight() {
         {calcReady ? (
           <>
             {activeHabits.length === 0 && (!showArchived || archivedHabits.length === 0) && (
-              <p className="text-neutral-600 dark:text-neutral-300">
-                No habits to show. Add some habits on the Home page.
-              </p>
+              <EmptyState />
             )}
 
             {activeHabits.map(renderHabitCard)}
