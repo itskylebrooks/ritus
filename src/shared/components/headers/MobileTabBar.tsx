@@ -80,7 +80,7 @@ export default function MobileTabBar() {
                   {isActive && (
                     <motion.span
                       layoutId="mobile-tab-pill"
-                      className="absolute inset-0 rounded-full bg-[var(--color-text-primary)]"
+                      className="absolute inset-0 rounded-full bg-[var(--color-accent)]"
                       transition={pillTransition}
                     />
                   )}
@@ -88,7 +88,7 @@ export default function MobileTabBar() {
                     layout="position"
                     className={`relative z-10 flex h-full flex-col items-center justify-center transition-colors ${
                       isCompact ? 'gap-0' : 'gap-1'
-                    } ${isActive ? 'text-inverse' : 'text-strong'}`}
+                    } ${isActive ? 'text-[var(--color-accent-contrast)]' : 'text-strong'}`}
                     transition={layoutTransition}
                   >
                     <motion.span
