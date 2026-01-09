@@ -6,6 +6,7 @@ import defaultHabits, {
   defaultProgress,
 } from '@/shared/store/defaultHabits';
 import { useHabitStore } from '@/shared/store/store';
+import { fromISO, iso } from '@/shared/utils/date';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import ConfirmModal from './ConfirmModal';
@@ -82,12 +83,17 @@ export default function GuideModal({ open, onClose, onLoadExample }: GuideModalP
         0,
       );
       const longest = (defaultHabits || []).reduce((m, h) => Math.max(m, h.streak || 0), 0);
+      const uniqueDays = new Set<string>();
+      for (const h of defaultHabits || []) {
+        for (const c of h.completions || []) uniqueDays.add(iso(fromISO(c)));
+      }
       // also set example progress when loading sample data (points + award keys)
       const base = {
         habits: defaultHabits,
         totalPoints: total,
         totalCompletions,
         longestStreak: longest,
+        daysWithRitus: uniqueDays.size,
       };
       const emoji = { emojiByDate: defaultEmojiByDate, emojiRecents: defaultEmojiRecents };
       if (defaultProgress) {

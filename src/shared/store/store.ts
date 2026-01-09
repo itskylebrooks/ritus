@@ -52,6 +52,14 @@ const computeLongestEmojiStreak = (by: Record<string, string | undefined>): numb
   return longest;
 };
 
+const computeDaysWithRitus = (habits: Habit[]): number => {
+  const uniqueDays = new Set<string>();
+  for (const h of habits) {
+    for (const c of h.completions || []) uniqueDays.add(iso(fromISO(c)));
+  }
+  return uniqueDays.size;
+};
+
 export interface HabitState {
   habits: Habit[];
   // progression / points
@@ -63,6 +71,8 @@ export interface HabitState {
     ownedCollectibles?: string[];
     appliedCollectibles?: Record<string, string>;
     seenTrophies?: Record<string, true | undefined>;
+    lastUnlockedTrophyId?: string;
+    lastUnlockedTrophyAt?: string;
   };
   setPoints: (n: number) => void;
   addPoints: (delta: number) => void;
@@ -106,6 +116,7 @@ export interface HabitState {
   totalPoints: number;
   totalCompletions: number;
   longestStreak: number;
+  daysWithRitus: number;
   resetStats: () => void;
   addHabit: (
     name: string,
@@ -183,7 +194,15 @@ export const useHabitStore = create<HabitState>()(
           }
         }
         if (newly.length > 0) {
-          set((s) => ({ progress: { ...s.progress, unlocked } }));
+          const lastUnlockedId = newly[newly.length - 1];
+          set((s) => ({
+            progress: {
+              ...s.progress,
+              unlocked,
+              lastUnlockedTrophyId: lastUnlockedId,
+              lastUnlockedTrophyAt: iso(new Date()),
+            },
+          }));
         }
         return newly;
       },
@@ -192,6 +211,7 @@ export const useHabitStore = create<HabitState>()(
       totalPoints: 0,
       totalCompletions: 0,
       longestStreak: 0,
+      daysWithRitus: 0,
       setPoints: (n: number) =>
         set((s) => ({ progress: { ...s.progress, points: Math.max(0, Math.floor(n)) } })),
       addPoints: (delta: number) =>
@@ -350,7 +370,15 @@ export const useHabitStore = create<HabitState>()(
           }
         }
         if (newly.length === 0) return newly;
-        set((s) => ({ progress: { ...s.progress, unlocked } }));
+        const lastUnlockedId = newly[newly.length - 1];
+        set((s) => ({
+          progress: {
+            ...s.progress,
+            unlocked,
+            lastUnlockedTrophyId: lastUnlockedId,
+            lastUnlockedTrophyAt: iso(new Date()),
+          },
+        }));
         return newly;
       },
       purchaseCollectible: (id, cost) => {
@@ -404,7 +432,8 @@ export const useHabitStore = create<HabitState>()(
         }));
         return true;
       },
-      resetStats: () => set({ totalPoints: 0, totalCompletions: 0, longestStreak: 0 }),
+      resetStats: () =>
+        set({ totalPoints: 0, totalCompletions: 0, longestStreak: 0, daysWithRitus: 0 }),
       // safe id generation: crypto.randomUUID may not exist on some older mobile browsers
       addHabit: (
         name,
@@ -452,7 +481,11 @@ export const useHabitStore = create<HabitState>()(
           // recompute longest streak from the edited list so stats stay in sync with the UI
           const maxStreak = Math.max(0, ...updated.map((h) => h.streak || 0));
           // Do not recompute/overwrite cumulative totalPoints when editing habit metadata
-          return { habits: updated, longestStreak: maxStreak };
+          return {
+            habits: updated,
+            longestStreak: maxStreak,
+            daysWithRitus: computeDaysWithRitus(updated),
+          };
         }),
 
       // deleting a habit keeps cumulative points but recomputes longest streak from remaining habits
@@ -460,7 +493,11 @@ export const useHabitStore = create<HabitState>()(
         set((s) => {
           const remaining = s.habits.filter((h) => h.id !== id);
           const nextLongest = Math.max(0, ...remaining.map((h) => h.streak || 0));
-          return { habits: remaining, longestStreak: nextLongest };
+          return {
+            habits: remaining,
+            longestStreak: nextLongest,
+            daysWithRitus: computeDaysWithRitus(remaining),
+          };
         }),
       // archive/unarchive a habit (archived habits are hidden from default lists)
       archiveHabit: (id: string) =>
@@ -539,6 +576,11 @@ export const useHabitStore = create<HabitState>()(
 
           // recompute longest streak from updated habits so insights stay accurate
           const newLongest = Math.max(0, ...updated.map((h) => h.streak || 0));
+          const uniqueDaysSet = new Set<string>();
+          for (const h of updated) {
+            for (const c of h.completions || []) uniqueDaysSet.add(iso(fromISO(c)));
+          }
+          const daysWithRitus = uniqueDaysSet.size;
 
           // update cumulative totalPoints by the net delta from toggles (allow reductions when user unmarks)
           // clamp to zero so we never go negative.
@@ -550,6 +592,7 @@ export const useHabitStore = create<HabitState>()(
 
           // apply award/revoke deltas to persisted progress
           const newPoints = Math.max(0, Math.floor(s.progress.points + pointsAwardDelta));
+          let lastUnlockedId: string | undefined;
 
           return {
             habits: updated,
@@ -615,18 +658,8 @@ export const useHabitStore = create<HabitState>()(
                 const needsMetaFocus = metaTrophies.some((t) => t.id === 'meta_focus');
                 const needsMetaPersistence = metaTrophies.some((t) => t.id === 'meta_persistence');
 
-                let uniqueDays: Set<string> | null = null;
-                const getUniqueDays = () => {
-                  if (uniqueDays) return uniqueDays;
-                  uniqueDays = new Set<string>();
-                  for (const h of allHabits) {
-                    for (const c of h.completions || []) uniqueDays.add(iso(fromISO(c)));
-                  }
-                  return uniqueDays;
-                };
-
                 const daysUsedCount =
-                  needsMilestone || needsMetaPersistence ? getUniqueDays().size : 0;
+                  needsMilestone || needsMetaPersistence ? uniqueDaysSet.size : 0;
                 const maxBuildStreak = needsMetaBalance
                   ? Math.max(
                       0,
@@ -643,7 +676,7 @@ export const useHabitStore = create<HabitState>()(
                 const hasContinuousDays = (n: number) => {
                   if (!needsMetaPersistence) return false;
                   const days = lastNDays(n);
-                  const daySet = getUniqueDays();
+                  const daySet = uniqueDaysSet;
                   for (const d of days) if (!daySet.has(iso(d))) return false;
                   return true;
                 };
@@ -703,15 +736,24 @@ export const useHabitStore = create<HabitState>()(
                   } else {
                     meets = false;
                   }
-                  if (meets) existing[t.id] = true;
+                  if (meets) {
+                    existing[t.id] = true;
+                    lastUnlockedId = t.id;
+                  }
                 }
                 return existing;
               })(),
+              lastUnlockedTrophyId: lastUnlockedId ?? s.progress.lastUnlockedTrophyId,
+              lastUnlockedTrophyAt: lastUnlockedId
+                ? iso(new Date())
+                : s.progress.lastUnlockedTrophyAt,
             },
+            daysWithRitus,
           };
         }),
       // clearing current habits resets longest streak so insights reflect empty state (totalPoints handled via resetStats)
-      clearAll: () => set({ habits: [], longestStreak: 0, emojiByDate: {}, emojiRecents: [] }),
+      clearAll: () =>
+        set({ habits: [], longestStreak: 0, daysWithRitus: 0, emojiByDate: {}, emojiRecents: [] }),
     }),
     {
       name: 'ritus-habits',
@@ -726,6 +768,7 @@ export const useHabitStore = create<HabitState>()(
         totalPoints: state.totalPoints,
         totalCompletions: state.totalCompletions,
         longestStreak: state.longestStreak,
+        daysWithRitus: state.daysWithRitus,
         showArchived: state.showArchived,
         showList: state.showList,
         dateFormat: state.dateFormat,
@@ -751,6 +794,11 @@ export const useHabitStore = create<HabitState>()(
             (acc, h) => acc + (h.completions ? h.completions.length : 0),
             0,
           );
+        }
+        const hasPersistedDays =
+          incoming && Object.prototype.hasOwnProperty.call(incoming, 'daysWithRitus');
+        if (!hasPersistedDays) {
+          merged.daysWithRitus = computeDaysWithRitus(merged.habits || []);
         }
         return merged;
       },

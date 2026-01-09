@@ -1,7 +1,6 @@
 import type { CollectibleType } from '@/shared/constants/collectibles';
 import { COLLECTIBLES } from '@/shared/constants/collectibles';
 import { useHabitStore } from '@/shared/store/store';
-import { Coins } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 const COLLECTIBLE_GROUPS: { label: string; type: CollectibleType }[] = [
@@ -48,12 +47,6 @@ export default function CollectiblesStoreCard() {
     <div>
       <div className="uppercase tracking-wider text-sm md:text-base font-semibold text-muted text-center">
         COLLECTIBLES STORE
-      </div>
-      <div className="mt-2 flex justify-center">
-        <div className="inline-flex items-center gap-2 rounded-full border border-subtle bg-surface-elevated px-3 py-1 text-xs font-semibold text-strong">
-          <Coins className="h-3.5 w-3.5 text-accent" />
-          <span>{points.toLocaleString()} points</span>
-        </div>
       </div>
 
       <div className="space-y-5">

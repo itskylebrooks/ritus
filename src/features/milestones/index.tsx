@@ -3,6 +3,7 @@ import { useHabitStore } from '@/shared/store/store';
 import fireConfetti from '@/shared/utils/confetti';
 import { useIdleReady } from '@/shared/hooks/useIdleReady';
 import CollectiblesStoreCard from './components/CollectiblesStoreCard';
+import HeaderStats from './components/HeaderStats';
 import TrophiesBoard from './components/TrophiesBoard';
 
 export default function Milestones() {
@@ -32,13 +33,21 @@ export default function Milestones() {
       <div className="mt-6">
         {ready ? (
           <div className="fade-in-soft">
+            <HeaderStats />
+          </div>
+        ) : (
+          <div className="h-[120px] rounded-2xl bg-neutral-100/70 dark:bg-neutral-900/40" />
+        )}
+      </div>
+      <div className="mt-6">
+        {ready ? (
+          <div className="fade-in-soft">
             <TrophiesBoard />
           </div>
         ) : (
           <div className="h-[260px] rounded-2xl bg-neutral-100/70 dark:bg-neutral-900/40" />
         )}
       </div>
-      <div className="my-8 border-t border-subtle" />
       <div className="mt-6">
         {ready ? (
           <div className="fade-in-soft">
