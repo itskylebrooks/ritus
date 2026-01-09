@@ -130,7 +130,7 @@ export default function AppHeader() {
 
   return (
     <>
-      <header className="mb-6 relative flex items-center justify-between">
+      <header className="sticky top-0 z-40 relative flex items-center justify-between bg-app py-2.5 sm:py-3">
         <div className="flex items-center gap-3">
           <Link
             to="/"

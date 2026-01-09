@@ -38,7 +38,7 @@ export default function App() {
   }, [location.pathname]);
 
   return (
-    <div className="mx-auto max-w-3xl px-4 pt-6 pb-24 sm:pb-6">
+    <div className="mx-auto max-w-3xl px-4 pb-24 sm:pb-6">
       <AppHeader />
 
       <main>
