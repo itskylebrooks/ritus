@@ -1,9 +1,11 @@
 import { emphasizeEase, transitions } from '@/shared/animations';
+import LazyMount from '@/shared/components/layout/LazyMount';
 import { useIdleReady } from '@/shared/hooks/useIdleReady';
+import { useIsMobile } from '@/shared/hooks/useIsMobile';
 import { useHabitStore } from '@/shared/store/store';
 import { daysThisWeek, iso } from '@/shared/utils/date';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import AddHabit from './components/AddHabit';
 import ClockCard from './components/ClockCard';
 import HabitCard from './components/HabitCard';
@@ -39,7 +41,25 @@ export default function Home() {
   const habits = useHabitStore((s) => s.habits);
   const showArchived = useHabitStore((s) => s.showArchived);
   const weekStart = useHabitStore((s) => s.weekStart);
+  const isMobile = useIsMobile();
   const initialListRender = !useIdleReady({ resetOnMount: true });
+  const [hasInteracted, setHasInteracted] = useState(false);
+  const disableEntryAnim = initialListRender || !hasInteracted;
+
+  useEffect(() => {
+    if (hasInteracted || typeof window === 'undefined') return;
+    const onInteract = () => setHasInteracted(true);
+    window.addEventListener('scroll', onInteract, { passive: true });
+    window.addEventListener('pointerdown', onInteract);
+    window.addEventListener('keydown', onInteract);
+    window.addEventListener('touchstart', onInteract, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onInteract);
+      window.removeEventListener('pointerdown', onInteract);
+      window.removeEventListener('keydown', onInteract);
+      window.removeEventListener('touchstart', onInteract);
+    };
+  }, [hasInteracted]);
   const weekKeys = useMemo(() => {
     const weekStartsOn = weekStart === 'sunday' ? 0 : 1;
     return daysThisWeek(new Date(), weekStartsOn).map((d) => iso(d).slice(0, 10));
@@ -88,7 +108,17 @@ export default function Home() {
       <div className="mt-4 grid gap-4 sm:[grid-template-columns:minmax(0,1fr)_minmax(0,160px)] items-stretch">
         {showHomeCards && (
           <div className="h-full min-w-0 sm:row-start-1 sm:col-start-1 sm:col-span-1">
-            <QuoteCard />
+            <LazyMount
+              enabled={isMobile}
+              className="w-full"
+              minHeight={180}
+              unmountOnExit={false}
+              placeholder={
+                <div className="h-full rounded-2xl border border-subtle bg-neutral-100/70 dark:bg-neutral-900/40" />
+              }
+            >
+              <QuoteCard />
+            </LazyMount>
           </div>
         )}
 
@@ -99,7 +129,17 @@ export default function Home() {
         >
           {showAdd && (
             <div>
-              <AddHabit />
+              <LazyMount
+                enabled={isMobile}
+                className="w-full"
+                minHeight={200}
+                unmountOnExit={false}
+                placeholder={
+                  <div className="h-full rounded-2xl border border-subtle bg-neutral-100/70 dark:bg-neutral-900/40" />
+                }
+              >
+                <AddHabit />
+              </LazyMount>
             </div>
           )}
 
@@ -118,12 +158,22 @@ export default function Home() {
                       exit={{ opacity: 0, scale: 0.95 }}
                       transition={transitions.fadeXl}
                     >
-                      <HabitCard
-                        habit={h}
-                        completionKeys={completionKeysById.get(h.id) ?? EMPTY_SET}
-                        weekKeys={weekKeys}
-                        disableEntryAnim={initialListRender}
-                      />
+                      <LazyMount
+                        enabled={isMobile}
+                        className="w-full"
+                        minHeight={180}
+                        unmountOnExit={false}
+                        placeholder={
+                          <div className="h-full rounded-2xl border border-subtle bg-neutral-100/70 dark:bg-neutral-900/40" />
+                        }
+                      >
+                        <HabitCard
+                          habit={h}
+                          completionKeys={completionKeysById.get(h.id) ?? EMPTY_SET}
+                          weekKeys={weekKeys}
+                          disableEntryAnim={disableEntryAnim}
+                        />
+                      </LazyMount>
                     </motion.div>
                   ))}
 
@@ -145,12 +195,22 @@ export default function Home() {
                       exit={{ opacity: 0, scale: 0.95 }}
                       transition={transitions.fadeXl}
                     >
-                      <HabitCard
-                        habit={h}
-                        completionKeys={completionKeysById.get(h.id) ?? EMPTY_SET}
-                        weekKeys={weekKeys}
-                        disableEntryAnim={initialListRender}
-                      />
+                      <LazyMount
+                        enabled={isMobile}
+                        className="w-full"
+                        minHeight={180}
+                        unmountOnExit={false}
+                        placeholder={
+                          <div className="h-full rounded-2xl border border-subtle bg-neutral-100/70 dark:bg-neutral-900/40" />
+                        }
+                      >
+                        <HabitCard
+                          habit={h}
+                          completionKeys={completionKeysById.get(h.id) ?? EMPTY_SET}
+                          weekKeys={weekKeys}
+                          disableEntryAnim={disableEntryAnim}
+                        />
+                      </LazyMount>
                     </motion.div>
                   ))}
 
@@ -174,12 +234,22 @@ export default function Home() {
                           exit={{ opacity: 0, scale: 0.95 }}
                           transition={transitions.fadeXl}
                         >
-                          <HabitCard
-                            habit={h}
-                            completionKeys={completionKeysById.get(h.id) ?? EMPTY_SET}
-                            weekKeys={weekKeys}
-                            disableEntryAnim={initialListRender}
-                          />
+                          <LazyMount
+                            enabled={isMobile}
+                            className="w-full"
+                            minHeight={180}
+                            unmountOnExit={false}
+                            placeholder={
+                              <div className="h-full rounded-2xl border border-subtle bg-neutral-100/70 dark:bg-neutral-900/40" />
+                            }
+                          >
+                            <HabitCard
+                              habit={h}
+                              completionKeys={completionKeysById.get(h.id) ?? EMPTY_SET}
+                              weekKeys={weekKeys}
+                              disableEntryAnim={disableEntryAnim}
+                            />
+                          </LazyMount>
                         </motion.div>
                       ))}
                     </>
@@ -192,7 +262,17 @@ export default function Home() {
 
         {showHomeCards && (
           <div className="hidden h-full sm:block sm:row-start-1 sm:col-start-2 sm:col-span-1">
-            <ClockCard />
+            <LazyMount
+              enabled={isMobile}
+              className="w-full"
+              minHeight={200}
+              unmountOnExit={false}
+              placeholder={
+                <div className="h-full rounded-2xl border border-subtle bg-neutral-100/70 dark:bg-neutral-900/40" />
+              }
+            >
+              <ClockCard />
+            </LazyMount>
           </div>
         )}
       </div>

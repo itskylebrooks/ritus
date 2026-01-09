@@ -37,11 +37,13 @@ export const useSmartSticky = (pathname?: string) => {
 
   // Expand tab bar when route changes
   useEffect(() => {
-    if (pathname && isMobile) {
+    if (!(pathname && isMobile) || typeof window === 'undefined') return;
+    const frame = window.requestAnimationFrame(() => {
       setIsVisible(true);
       accumulatedDelta.current = 0;
       lastDirection.current = null;
-    }
+    });
+    return () => window.cancelAnimationFrame(frame);
   }, [pathname, isMobile]);
 
   useEffect(() => {
