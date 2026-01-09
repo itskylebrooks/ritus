@@ -49,12 +49,12 @@ export default function CollectiblesStoreCard() {
         COLLECTIBLES STORE
       </div>
 
-      <div className="space-y-5">
-        {groups.map((g) => {
+      <div className="space-y-4">
+        {groups.map((g, index) => {
           const items = g.items;
           return (
-            <div key={g.type}>
-              <div className="mb-2 text-sm font-medium text-strong">{g.label}</div>
+            <div key={g.type} className={index === 0 ? 'mt-2' : undefined}>
+              <div className="mb-2 text-sm font-medium text-strong text-center">{g.label}</div>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {items.map((item) => {
                   const ItemIcon = item.icon;
