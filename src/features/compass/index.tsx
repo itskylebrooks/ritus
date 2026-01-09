@@ -27,7 +27,7 @@ const COMPASS_SETS: CompassSet[] = [
     dir: 'North',
     arrow: '↑',
     title: 'Truth and Freedom',
-    note: 'I feel lies, pressure, and manipulation almost physically. There’s something in me that cannot tolerate being controlled or forced into a mold. My North pulls me toward truth: to see clearly, to speak plainly, to stop performing for approval, and to refuse rules that violate dignity. Freedom, for me, is not chaos—it’s the right to live from what I actually believe and choose, without self-deception.',
+    note: "I feel lies, pressure, and manipulation almost physically. There's something in me that can't tolerate being controlled or forced into a mold. My North pulls me toward truth: to see clearly, speak plainly, stop performing for approval, and refuse rules that violate dignity. Freedom, for me, isn't chaos—it's living from what I genuinely believe and choose, without self-deception.",
     habits: [
       { name: 'Truth Journal', mode: 'build' as const, frequency: 'daily' as const },
       { name: 'No People-Pleasing "Yes"', mode: 'break' as const, frequency: 'daily' as const },
@@ -61,7 +61,7 @@ const COMPASS_SETS: CompassSet[] = [
     dir: 'East',
     arrow: '→',
     title: 'Silence and Meaning',
-    note: 'I don’t rely on a personal rescuer to make life coherent. The world can be indifferent, and some things will never be fully explained. Still, I choose meaning. My East is the quiet place inside me that stays when the noise collapses—the practice of returning to breath, to stillness, to reality as it is. From that silence I regain perspective, and I remember what matters: integrity, dignity, and the next right action. Hope, in my worldview, is not wishing for intervention; it’s trusting that I can meet reality cleanly and keep building anyway.',
+    note: "I don't rely on a personal rescuer to make life coherent. The world can be indifferent, and some things won't be fully explained. Still, I choose meaning. My East is the quiet place that remains when the noise collapses—the practice of returning to breath, stillness, and reality as it is. From that silence I regain perspective and remember what matters: integrity, dignity, and the next right action. Hope, for me, isn't wishing for intervention; it's trusting that I can meet reality cleanly and keep building anyway.",
     habits: [
       { name: '10-Minute Stillness', mode: 'build' as const, frequency: 'daily' as const },
       { name: 'Breath Reset', mode: 'build' as const, frequency: 'daily' as const },
@@ -79,7 +79,7 @@ const COMPASS_SETS: CompassSet[] = [
     dir: 'West',
     arrow: '←',
     title: 'Growth and Mastery',
-    note: 'Study, coding, projects, and sport are my training ground. For me it’s not about having—it’s about becoming capable. My West is discipline: patient repetition, craft, the steady step forward. It keeps me honest because it doesn’t accept excuses. It turns ideals into skills and dreams into evidence.',
+    note: "Study, craft, and training are my playground for becoming capable. My West is discipline: patient repetition, steady effort, and skill-building that turns ideals into evidence. It keeps me honest, because real mastery can't be faked.",
     habits: [
       { name: 'Code for 1 Hour', mode: 'build' as const, frequency: 'daily' as const },
       { name: 'Deliberate Practice', mode: 'build' as const, frequency: 'daily' as const },
@@ -97,7 +97,7 @@ const COMPASS_SETS: CompassSet[] = [
     dir: 'South',
     arrow: '↓',
     title: 'Love and Care',
-    note: 'Even when I’m angry at my family, there’s a core in me that says: “My children will have it better than I did.” I don’t just want to break away—I want to build a circle where it feels warm and safe. My South is protective care: loyalty, gentleness, responsibility, the willingness to repair instead of discard. It’s the part of me that measures success not only by achievement, but by whether people around me feel respected and held.',
+    note: "Even when I'm frustrated with people close to me, there's a core in me that wants to build something better: a circle where it feels warm, safe, and human. My South is care in action—loyalty, gentleness, responsibility, and the willingness to repair instead of discard. It's the part of me that measures success not only by achievement, but by whether people around me feel respected and held.",
     habits: [
       { name: 'Family Check-In', mode: 'build' as const, frequency: 'daily' as const },
       { name: 'Listen Without Fixing', mode: 'build' as const, frequency: 'daily' as const },
@@ -131,7 +131,7 @@ export default function Compass() {
       {/* Hero */}
       <section>
         <h2 className="text-xl font-semibold flex items-center gap-2">
-          <CompassIcon className="w-5 h-5" /> The Compass
+          <CompassIcon className="w-5 h-5" /> Moral Compass
         </h2>
         <p className="mt-4 text-neutral-600 dark:text-neutral-300">
           Ritus is more than a tracker. It’s a way to stay oriented when life feels scattered. Over
@@ -142,68 +142,66 @@ export default function Compass() {
         </p>
       </section>
 
-      {COMPASS_SETS.map((set) => (
-        <section key={set.dir}>
-          <div
-            className="rounded-lg border border-subtle p-4 shadow-sm"
-            style={{ backgroundColor: 'var(--color-surface)' }}
-          >
-            <div>
-              <h3 className="text-lg font-semibold flex items-center gap-2">
-                <span className="text-xl text-muted">{set.arrow}</span>
-                <span className="text-strong">{set.title}</span>
-              </h3>
-              <p className="mt-2 text-sm text-muted">{set.note}</p>
-              {set.disclaimer && <p className="mt-2 italic text-xs text-soft">{set.disclaimer}</p>}
-            </div>
+      {COMPASS_SETS.map((set, index) => (
+        <section
+          key={set.dir}
+          className={`${index === 0 ? 'border-t border-subtle pt-8' : ''} border-b border-subtle pb-8`}
+        >
+          <div>
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <span className="text-xl text-muted">{set.arrow}</span>
+              <span className="text-strong">{set.title}</span>
+            </h3>
+            <p className="mt-2 text-sm text-muted">{set.note}</p>
+            {set.disclaimer && <p className="mt-2 italic text-xs text-soft">{set.disclaimer}</p>}
+          </div>
 
-            <div className="mt-4">
-              <div className="flex flex-wrap gap-3 justify-center">
-                {set.habits.map((h) => (
-                  <motion.button
-                    key={h.name}
-                    type="button"
-                    onClick={() => handleAdd(h)}
-                    className={`relative inline-flex items-center gap-2 px-3 py-1 rounded-full border text-sm transition-colors duration-150 transform-gpu align-middle ${h.mode === 'build' ? 'border-success' : 'border-danger'} text-strong hover:bg-surface-alt ${recentlyAdded.includes(h.name) ? 'cursor-not-allowed' : ''}`}
-                    title={`${h.name} — ${h.mode} · ${h.frequency}`}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    transition={transitions.fadeSm}
-                  >
-                    <>
-                      {/* Keep name and frequency in DOM to preserve pill width; fade them when showing the added overlay */}
-                      <span
-                        className={`${recentlyAdded.includes(h.name) ? 'opacity-0' : 'opacity-100'} whitespace-normal leading-tight transition-opacity duration-150`}
-                      >
-                        {h.name}
-                      </span>
-                      <span
-                        className={`${recentlyAdded.includes(h.name) ? 'opacity-0' : 'opacity-60'} text-[10px] ml-1 flex-none transition-opacity duration-150`}
-                      >
-                        {h.frequency === 'daily'
-                          ? 'D'
-                          : h.frequency === 'weekly'
-                            ? `W${h.weeklyTarget ? h.weeklyTarget : ''}`
-                            : `M${h.monthlyTarget ?? 1}`}
-                      </span>
-                      <AnimatePresence>
-                        {recentlyAdded.includes(h.name) && (
-                          <motion.span
-                            initial={{ opacity: 0, scale: 0.98 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.98 }}
-                            transition={transitions.fadeSm}
-                            className="absolute inset-0 flex items-center justify-center pointer-events-none text-strong"
-                          >
-                            <Check className="w-4 h-4 mr-1" />
-                            <span className="text-sm">Added</span>
-                          </motion.span>
-                        )}
-                      </AnimatePresence>
-                    </>
-                  </motion.button>
-                ))}
-              </div>
+          <div className="mt-4">
+            <div className="flex flex-wrap gap-3 justify-start">
+              {set.habits.map((h) => (
+                <motion.button
+                  key={h.name}
+                  type="button"
+                  onClick={() => handleAdd(h)}
+                  className={`relative inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-sm transition-colors duration-150 transform-gpu will-change-transform align-middle ${h.mode === 'build' ? 'border-success' : 'border-danger'} text-strong hover:bg-surface-alt ${recentlyAdded.includes(h.name) ? 'cursor-not-allowed' : ''}`}
+                  title={`${h.name} — ${h.mode} · ${h.frequency}`}
+                  whileHover={{ y: -2 }}
+                  whileTap={{ y: 0, scale: 0.98 }}
+                  transition={{ type: 'spring', stiffness: 520, damping: 32, mass: 0.5 }}
+                >
+                  <>
+                    {/* Keep name and frequency in DOM to preserve pill width; fade them when showing the added overlay */}
+                    <span
+                      className={`${recentlyAdded.includes(h.name) ? 'opacity-0' : 'opacity-100'} whitespace-normal leading-tight transition-opacity duration-150`}
+                    >
+                      {h.name}
+                    </span>
+                    <span
+                      className={`${recentlyAdded.includes(h.name) ? 'opacity-0' : 'opacity-60'} text-[9px] ml-1 flex-none transition-opacity duration-150`}
+                    >
+                      {h.frequency === 'daily'
+                        ? 'D'
+                        : h.frequency === 'weekly'
+                          ? `W${h.weeklyTarget ? h.weeklyTarget : ''}`
+                          : `M${h.monthlyTarget ?? 1}`}
+                    </span>
+                    <AnimatePresence>
+                      {recentlyAdded.includes(h.name) && (
+                        <motion.span
+                          initial={{ opacity: 0, scale: 0.98 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.98 }}
+                          transition={transitions.fadeSm}
+                          className="absolute inset-0 flex items-center justify-center pointer-events-none text-strong"
+                        >
+                          <Check className="w-4 h-4 mr-1" />
+                          <span className="text-sm">Added</span>
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
+                  </>
+                </motion.button>
+              ))}
             </div>
           </div>
         </section>
@@ -216,17 +214,17 @@ export default function Compass() {
             When I put all of this together, I get a compass that keeps me from getting lost:
           </p>
           <p className="italic text-neutral-500">
-            Freedom without love turns into loneliness.
+            Freedom without love becomes loneliness.
             <br />
-            Love without freedom turns into dependency.
+            Love without freedom becomes dependency.
             <br />
-            Growth without silence turns into burnout.
+            Growth without silence becomes burnout.
             <br />
-            Silence without growth turns into escape.
+            Silence without growth becomes escape.
           </p>
           <p className="text-neutral-600 dark:text-neutral-300">
-            My task is to hold all four directions—not as a perfect system, but as a daily practice.
-            When I drift, I return: to truth, to care, to training, and to quiet.
+            My task is to hold all four—not as a perfect system, but as a daily practice. When I
+            drift, I return: to truth, to care, to training, and to quiet.
           </p>
         </div>
       </section>
