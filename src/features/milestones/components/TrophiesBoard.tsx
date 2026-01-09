@@ -15,9 +15,7 @@ export default function TrophiesBoard() {
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {items.length === 0 ? (
-          <div
-            className="col-span-2 md:col-span-4 flex flex-col items-center gap-3 rounded-lg border border-subtle p-6"
-          >
+          <div className="col-span-2 md:col-span-4 flex flex-col items-center gap-3 rounded-lg border border-subtle p-6">
             <div className="p-2 rounded-md">
               <WandSparkles className="h-8 w-8 text-accent" />
             </div>
