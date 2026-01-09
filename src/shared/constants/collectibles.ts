@@ -21,15 +21,12 @@ import {
 import type { ComponentType } from 'react';
 
 export type CollectibleType = 'clock' | 'quotes' | 'accent' | 'animation';
-export type Rarity = 'common' | 'rare' | 'epic';
-
 export interface CollectibleDef {
   id: string;
   type: CollectibleType;
   title: string;
   desc: string;
   icon: ComponentType<React.SVGProps<SVGSVGElement>>;
-  rarity: Rarity;
   cost: number;
   implemented?: boolean;
 }
@@ -45,7 +42,6 @@ export const COLLECTIBLES: CollectibleDef[] = [
     title: 'Pilot Markers',
     desc: 'Bold 12/3/6/9 indices, tapered hands, high-contrast ticks.',
     icon: Gauge,
-    rarity: 'rare',
     cost: 600,
     implemented: false,
   },
@@ -55,7 +51,6 @@ export const COLLECTIBLES: CollectibleDef[] = [
     title: 'Nocturne',
     desc: 'Hour-only bars, faint minute ring, deep contrast.',
     icon: Moon,
-    rarity: 'common',
     cost: 300,
     implemented: false,
   },
@@ -65,7 +60,6 @@ export const COLLECTIBLES: CollectibleDef[] = [
     title: 'Sector Dial',
     desc: 'Quarter-hour sectors with a fine minute track.',
     icon: Target,
-    rarity: 'epic',
     cost: 3000,
     implemented: false,
   },
@@ -75,7 +69,6 @@ export const COLLECTIBLES: CollectibleDef[] = [
     title: 'Orbit Subdial',
     desc: 'Small seconds subdial with continuous sweep.',
     icon: SunMoon,
-    rarity: 'epic',
     cost: 2500,
     implemented: false,
   },
@@ -85,7 +78,6 @@ export const COLLECTIBLES: CollectibleDef[] = [
     title: 'Radar Sweep',
     desc: 'Radial index array; slender hands with smooth motion.',
     icon: Radar,
-    rarity: 'rare',
     cost: 800,
     implemented: false,
   },
@@ -101,7 +93,6 @@ export const COLLECTIBLES: CollectibleDef[] = [
     title: 'Hollywood Voices',
     desc: 'Short, attributed lines. Use licensed or public-domain sources.',
     icon: Star,
-    rarity: 'epic',
     cost: 3500,
     implemented: false,
   },
@@ -111,7 +102,6 @@ export const COLLECTIBLES: CollectibleDef[] = [
     title: 'Author’s Notes',
     desc: 'Original reflections by the developer.',
     icon: Feather,
-    rarity: 'rare',
     cost: 770,
     implemented: false,
   },
@@ -121,7 +111,6 @@ export const COLLECTIBLES: CollectibleDef[] = [
     title: 'Creators & Builders',
     desc: 'From video creators and makers. Use licensed/original sources.',
     icon: PlayCircle,
-    rarity: 'common',
     cost: 300,
     implemented: false,
   },
@@ -131,7 +120,6 @@ export const COLLECTIBLES: CollectibleDef[] = [
     title: 'Athletes',
     desc: 'Training wisdom and discipline. Use licensed or PD sources.',
     icon: Medal,
-    rarity: 'common',
     cost: 250,
     implemented: false,
   },
@@ -141,7 +129,6 @@ export const COLLECTIBLES: CollectibleDef[] = [
     title: 'Christian Wisdom',
     desc: 'Public‑domain scripture and classic commentary only.',
     icon: BookOpen,
-    rarity: 'rare',
     cost: 1000,
     implemented: false,
   },
@@ -151,7 +138,6 @@ export const COLLECTIBLES: CollectibleDef[] = [
     title: 'Mindset',
     desc: 'Short affirmations and reframes from licensed or original sources.',
     icon: Star,
-    rarity: 'common',
     cost: 400,
     implemented: false,
   },
@@ -165,7 +151,6 @@ export const COLLECTIBLES: CollectibleDef[] = [
     title: 'Ocean',
     desc: 'Calm blue‑grey accent.',
     icon: Waves,
-    rarity: 'epic',
     cost: 4000,
     implemented: true,
   },
@@ -175,7 +160,6 @@ export const COLLECTIBLES: CollectibleDef[] = [
     title: 'Ember',
     desc: 'Warm subtle orange accent.',
     icon: Flame,
-    rarity: 'common',
     cost: 500,
     implemented: true,
   },
@@ -185,7 +169,6 @@ export const COLLECTIBLES: CollectibleDef[] = [
     title: 'Sage',
     desc: 'Soft green accent.',
     icon: Leaf,
-    rarity: 'rare',
     cost: 800,
     implemented: true,
   },
@@ -195,7 +178,6 @@ export const COLLECTIBLES: CollectibleDef[] = [
     title: 'Lagoon',
     desc: 'Cool teal accent.',
     icon: Droplet,
-    rarity: 'rare',
     cost: 1200,
     implemented: true,
   },
@@ -205,7 +187,6 @@ export const COLLECTIBLES: CollectibleDef[] = [
     title: 'Citrine',
     desc: 'Warm golden accent.',
     icon: Sun,
-    rarity: 'epic',
     cost: 2200,
     implemented: true,
   },
@@ -215,7 +196,6 @@ export const COLLECTIBLES: CollectibleDef[] = [
     title: 'Amethyst',
     desc: 'Rich violet accent.',
     icon: Gem,
-    rarity: 'epic',
     cost: 2600,
     implemented: true,
   },
@@ -230,7 +210,6 @@ export const COLLECTIBLES: CollectibleDef[] = [
     title: 'Veilstep Passage',
     desc: 'Soft page transitions with a drifting veil.',
     icon: Wand2,
-    rarity: 'epic',
     cost: 2400,
     implemented: false,
   },
@@ -240,7 +219,6 @@ export const COLLECTIBLES: CollectibleDef[] = [
     title: 'Glyph Pulse',
     desc: 'Completion marks bloom with a subtle pulse.',
     icon: Sparkles,
-    rarity: 'rare',
     cost: 1400,
     implemented: false,
   },

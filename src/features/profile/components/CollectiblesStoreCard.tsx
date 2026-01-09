@@ -78,11 +78,6 @@ export default function CollectiblesStoreCard() {
                         style={{ minHeight: 32 }}
                       >
                         <span className="text-muted">{item.cost} pts</span>
-                        <div className="flex-1 flex justify-center">
-                          <span className="rounded-full border border-subtle px-2 py-0.5 text-[10px] uppercase tracking-wide text-muted">
-                            {item.rarity}
-                          </span>
-                        </div>
                         {Owned ? (
                           // Owned items show an Apply button so the user can activate them.
                           applied[item.type] === item.id ? (
