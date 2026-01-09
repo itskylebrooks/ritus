@@ -374,11 +374,13 @@ header button[aria-haspopup='menu'] {
   gap: 0.5rem;
 }
 
-header nav > ul > li > a:not([aria-current='page']):hover,
-header button[aria-haspopup='menu']:hover {
-  /* use the subtle hover token which is adapted per-theme for better contrast */
-  background-color: var(--color-subtle-hover);
-  box-shadow: none;
+@media (hover: hover) and (pointer: fine) {
+  header nav > ul > li > a:not([aria-current='page']):hover,
+  header button[aria-haspopup='menu']:hover {
+    /* use the subtle hover token which is adapted per-theme for better contrast */
+    background-color: var(--color-subtle-hover);
+    box-shadow: none;
+  }
 }
 
 header nav > ul > li > a[aria-current='page'] {
@@ -404,11 +406,6 @@ header button[aria-haspopup='menu'] {
 }
 
 @layer utilities {
-  .hover-nonaccent:hover {
-    /* prefer the subtle hover mix so dark-mode shows a visible surface separation */
-    background-color: var(--color-subtle-hover);
-    color: var(--color-text-primary);
-  }
   .text-strong {
     color: var(--color-text-primary);
   }
@@ -506,55 +503,10 @@ header button[aria-haspopup='menu'] {
   .shadow-elevated {
     box-shadow: var(--shadow-elevated);
   }
-  .hover\:bg-subtle:hover {
-    background-color: var(--color-surface-alt);
-  }
-  .hover\:bg-surface-alt:hover {
-    background-color: var(--color-surface-alt);
-  }
-  .hover\:bg-accent-soft:hover {
-    background-color: var(--color-accent-soft);
-  }
-  .hover\:bg-success-soft:hover {
-    background-color: var(--color-success-soft);
-  }
-  .hover\:bg-danger-soft:hover {
-    background-color: var(--color-danger-soft);
-  }
-  .hover\:bg-success-hover:hover {
-    background-color: var(--color-success-hover);
-  }
-  .hover\:bg-subtle-hover:hover {
-    background-color: var(--color-subtle-hover);
-  }
-  .hover\:shadow-elevated:hover {
-    box-shadow: var(--shadow-hover);
-  }
   .no-focus-ring:focus,
   .no-focus-ring:focus-visible {
     outline: none;
     box-shadow: none;
-  }
-  .hover\:bg-neutral-100:hover,
-  .hover\:bg-neutral-50:hover,
-  .hover\:bg-neutral-200:hover {
-    background-color: var(--color-surface-alt) !important;
-  }
-  .dark .hover\:bg-neutral-800:hover,
-  .dark .hover\:bg-neutral-900:hover {
-    background-color: var(--color-surface-alt) !important;
-  }
-  .hover\:bg-neutral-700:hover,
-  .dark .hover\:bg-neutral-300:hover {
-    background-color: var(--color-accent-soft) !important;
-  }
-  .hover\:bg-gray-200:hover,
-  .hover\:bg-gray-300:hover {
-    background-color: var(--color-surface-alt) !important;
-  }
-  .dark .hover\:bg-gray-200:hover,
-  .dark .hover\:bg-gray-300:hover {
-    background-color: var(--color-surface-alt) !important;
   }
 
   /* Map common Tailwind neutral color utilities to theme tokens */
@@ -690,10 +642,6 @@ header button[aria-haspopup='menu'] {
     color: var(--color-success) !important;
   }
 
-  .hover-accent-fade:hover {
-    opacity: 0.9;
-  }
-
   /* Hide scrollbars where desired (e.g., EmojiPicker list) */
   .no-scrollbar {
     -ms-overflow-style: none; /* IE and Edge */
@@ -701,6 +649,64 @@ header button[aria-haspopup='menu'] {
   }
   .no-scrollbar::-webkit-scrollbar {
     display: none; /* Chrome, Safari */
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  @layer utilities {
+    .hover-nonaccent:hover {
+      /* prefer the subtle hover mix so dark-mode shows a visible surface separation */
+      background-color: var(--color-subtle-hover);
+      color: var(--color-text-primary);
+    }
+    .hover\:bg-subtle:hover {
+      background-color: var(--color-surface-alt);
+    }
+    .hover\:bg-surface-alt:hover {
+      background-color: var(--color-surface-alt);
+    }
+    .hover\:bg-accent-soft:hover {
+      background-color: var(--color-accent-soft);
+    }
+    .hover\:bg-success-soft:hover {
+      background-color: var(--color-success-soft);
+    }
+    .hover\:bg-danger-soft:hover {
+      background-color: var(--color-danger-soft);
+    }
+    .hover\:bg-success-hover:hover {
+      background-color: var(--color-success-hover);
+    }
+    .hover\:bg-subtle-hover:hover {
+      background-color: var(--color-subtle-hover);
+    }
+    .hover\:shadow-elevated:hover {
+      box-shadow: var(--shadow-hover);
+    }
+    .hover\:bg-neutral-100:hover,
+    .hover\:bg-neutral-50:hover,
+    .hover\:bg-neutral-200:hover {
+      background-color: var(--color-surface-alt) !important;
+    }
+    .dark .hover\:bg-neutral-800:hover,
+    .dark .hover\:bg-neutral-900:hover {
+      background-color: var(--color-surface-alt) !important;
+    }
+    .hover\:bg-neutral-700:hover,
+    .dark .hover\:bg-neutral-300:hover {
+      background-color: var(--color-accent-soft) !important;
+    }
+    .hover\:bg-gray-200:hover,
+    .hover\:bg-gray-300:hover {
+      background-color: var(--color-surface-alt) !important;
+    }
+    .dark .hover\:bg-gray-200:hover,
+    .dark .hover\:bg-gray-300:hover {
+      background-color: var(--color-surface-alt) !important;
+    }
+    .hover-accent-fade:hover {
+      opacity: 0.9;
+    }
   }
 }
 
