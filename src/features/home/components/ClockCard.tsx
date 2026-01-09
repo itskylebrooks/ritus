@@ -1,3 +1,4 @@
+import { useHabitStore } from '@/shared/store/store';
 import { useEffect, useMemo, useState } from 'react';
 
 export default function ClockCard() {
@@ -15,6 +16,8 @@ export default function ClockCard() {
   const hourDeg = (hours / 12) * 360;
   const minuteDeg = (minutes / 60) * 360;
   const secondDeg = (seconds / 60) * 360;
+
+  const accentApplied = useHabitStore((s) => !!s.progress.appliedCollectibles?.accent);
 
   const dayLabelColorClass = 'text-accent';
 
@@ -119,7 +122,7 @@ export default function ClockCard() {
                     y1="54"
                     x2="50"
                     y2="14"
-                    stroke="var(--color-danger)"
+                    stroke={accentApplied ? 'var(--color-accent)' : 'var(--color-danger)'}
                     strokeWidth={1.4}
                     strokeLinecap="round"
                   />
