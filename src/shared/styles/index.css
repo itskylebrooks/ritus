@@ -57,7 +57,7 @@ body,
 
   /* Accents */
   /* Defaults; can be overridden at runtime via --accent-* variables */
-  --accent-light: #111827;
+  --accent-light: #52525b;
   --accent-contrast-light: #ffffff;
   --color-accent: var(--accent-light);
   --color-accent-contrast: var(--accent-contrast-light);
