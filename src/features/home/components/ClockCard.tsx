@@ -24,11 +24,7 @@ export default function ClockCard() {
   const hasClockStyle = !!clockStyle;
   const accentApplied = !!applied['accent'];
 
-  const dayLabelColorClass = accentApplied
-    ? 'text-accent'
-    : nocturne
-      ? 'text-[var(--color-text-primary)] opacity-80'
-      : 'text-[var(--color-border-subtle)] opacity-70';
+  const dayLabelColorClass = 'text-accent';
 
   const dayChunks = useMemo(() => {
     const idx = now.getDay();
@@ -191,7 +187,7 @@ export default function ClockCard() {
             </svg>
           </div>
           {dayChunks.length > 0 && (
-            <div className="ml-4 h-full flex-1 flex flex-col items-end justify-center text-right text-4xl font-black tracking-[0.15em] leading-tight uppercase sm:hidden">
+            <div className="ml-4 h-full flex-1 flex flex-col items-end justify-center text-right text-5xl font-black tracking-[0.15em] leading-tight uppercase sm:hidden">
               {dayChunks.map((chunk) => (
                 <div key={chunk} className={dayLabelColorClass}>
                   {chunk}
