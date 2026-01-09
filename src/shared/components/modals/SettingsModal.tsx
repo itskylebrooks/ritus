@@ -225,10 +225,10 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
       onClick={beginClose}
     >
       <div
-        className={`w-full max-w-sm rounded-2xl bg-surface-elevated p-6 pt-3 pb-8 ring-1 ring-black/5 dark:ring-neutral-700/5 border border-subtle overflow-y-auto settings-panel ${closing ? 'closing' : ''}`}
+        className={`w-full max-w-sm rounded-2xl bg-surface-elevated p-6 pt-3 ring-1 ring-black/5 dark:ring-neutral-700/5 border border-subtle overflow-y-auto settings-panel ${closing ? 'closing' : ''}`}
         style={{
           WebkitOverflowScrolling: 'touch',
-          paddingBottom: 'max(env(safe-area-inset-bottom), 32px)',
+          paddingBottom: 'max(env(safe-area-inset-bottom), 16px)',
         }}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
@@ -243,7 +243,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
             <button
               type="button"
               onClick={beginClose}
-              className="absolute right-0 rounded-lg border border-subtle p-2 text-muted hover-nonaccent transition"
+              className="absolute right-0 grid h-10 w-10 place-items-center rounded-lg border border-subtle text-muted hover-nonaccent transition"
               aria-label="Close settings"
               title="Close"
             >
