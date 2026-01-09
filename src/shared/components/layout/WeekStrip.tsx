@@ -21,7 +21,7 @@ export default function WeekStrip({
   todayStart.setHours(0, 0, 0, 0);
 
   return (
-    <div className="flex gap-1.5">
+    <div className={`flex ${showList ? 'gap-1.5 sm:gap-2.5' : 'gap-1.5'}`}>
       {week.map((d) => {
         const shortLabel = format(d, 'EE');
         const fullLabel = format(d, 'EEEE');
