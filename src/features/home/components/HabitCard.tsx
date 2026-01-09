@@ -314,8 +314,8 @@ export default function HabitCard({
         </div>
       </div>
 
-      <div className="mt-0 grid gap-3 md:grid-cols-[1fr_auto] md:items-center">
-        <div className="flex justify-center md:justify-start">
+      <div className="mt-0 flex items-center gap-3 md:grid md:grid-cols-[1fr_auto] md:items-center">
+        <div className="flex shrink-0 justify-start">
           <WeekStrip
             habit={habit}
             completionKeys={completionKeys}
@@ -330,10 +330,11 @@ export default function HabitCard({
               }}
               disabled={habit.archived}
               aria-disabled={habit.archived}
-              className={`inline-flex items-center justify-center gap-1.5 rounded-xl ${breakPrimaryBgClass} px-3 py-2 text-sm text-inverse transition transform duration-150 ease-in-out sm:w-full md:w-[124px] ${habit.archived ? 'opacity-60 cursor-not-allowed' : 'hover-accent-fade active:scale-[.98]'} md:justify-self-end`}
+              aria-label="Clean today"
+              className={`inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl ${breakPrimaryBgClass} p-2 text-sm text-inverse transition transform duration-150 ease-in-out sm:flex-none sm:px-3 sm:py-2 sm:w-full md:w-[124px] ${habit.archived ? 'opacity-60 cursor-not-allowed' : 'hover-accent-fade active:scale-[.98]'} md:justify-self-end`}
             >
               <Check className="h-4 w-4" />
-              <span>Clean today</span>
+              <span className="hidden sm:inline">Clean today</span>
             </button>
           ) : (
             <button
@@ -357,10 +358,11 @@ export default function HabitCard({
             }}
             disabled={habit.archived}
             aria-disabled={habit.archived}
-            className={`inline-flex items-center justify-center gap-1.5 rounded-xl bg-accent px-3 py-2 text-sm text-inverse transition transform duration-150 ease-in-out sm:w-full md:w-[124px] ${habit.archived ? 'opacity-60 cursor-not-allowed' : 'hover-accent-fade active:scale-[.98]'} md:justify-self-end`}
+            aria-label="Done today"
+            className={`inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-accent p-2 text-sm text-inverse transition transform duration-150 ease-in-out sm:flex-none sm:px-3 sm:py-2 sm:w-full md:w-[124px] ${habit.archived ? 'opacity-60 cursor-not-allowed' : 'hover-accent-fade active:scale-[.98]'} md:justify-self-end`}
           >
             <Check className="h-4 w-4" />
-            <span>Done today</span>
+            <span className="hidden sm:inline">Done today</span>
           </button>
         ) : (
           <button
