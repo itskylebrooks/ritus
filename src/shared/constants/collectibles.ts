@@ -222,6 +222,15 @@ export const COLLECTIBLES: CollectibleDef[] = [
     cost: 1400,
     implemented: false,
   },
+  {
+    id: 'anim_silent_wake',
+    type: 'animation',
+    title: 'Silent Wake',
+    desc: 'Cards slip in with a gentle wake on page load.',
+    icon: Moon,
+    cost: 1800,
+    implemented: false,
+  },
 ];
 
 export default COLLECTIBLES;
