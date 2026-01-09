@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 // Detect scroll direction and manage smart sticky visibility on mobile.
-export const useSmartSticky = () => {
+export const useSmartSticky = (pathname?: string) => {
   const [isVisible, setIsVisible] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const lastScrollY = useRef(0);
@@ -35,6 +35,15 @@ export const useSmartSticky = () => {
     };
   }, []);
 
+  // Expand tab bar when route changes
+  useEffect(() => {
+    if (pathname && isMobile) {
+      setIsVisible(true);
+      accumulatedDelta.current = 0;
+      lastDirection.current = null;
+    }
+  }, [pathname, isMobile]);
+
   useEffect(() => {
     if (!isMobile || typeof window === 'undefined') return;
 
@@ -43,6 +52,7 @@ export const useSmartSticky = () => {
     const HIDE_THRESHOLD = 18;
     const SHOW_THRESHOLD = 28;
     const MIN_DELTA = 2;
+    const INSTANT_SCROLL_THRESHOLD = 100; // Detect instant/programmatic scrolls
 
     const handleScroll = () => {
       if (ticking) return;
@@ -50,6 +60,16 @@ export const useSmartSticky = () => {
       window.requestAnimationFrame(() => {
         const currentScrollY = window.scrollY;
         const delta = currentScrollY - lastScrollY.current;
+
+        // Detect instant scroll (like page navigation) and reset tracking
+        if (Math.abs(delta) > INSTANT_SCROLL_THRESHOLD) {
+          lastScrollY.current = currentScrollY;
+          accumulatedDelta.current = 0;
+          lastDirection.current = null;
+          // Keep current visibility state, don't change it
+          ticking = false;
+          return;
+        }
 
         if (Math.abs(delta) < MIN_DELTA) {
           lastScrollY.current = currentScrollY;

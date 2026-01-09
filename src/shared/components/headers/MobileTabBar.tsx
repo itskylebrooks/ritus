@@ -1,13 +1,13 @@
-import { NavLink, useLocation } from 'react-router-dom';
-import { ChartPie, Home, Trophy } from 'lucide-react';
-import { LayoutGroup, motion, type Transition } from 'framer-motion';
 import { useMotionPreferences } from '@/shared/animations';
 import { useSmartSticky } from '@/shared/hooks/useSmartSticky';
+import { LayoutGroup, motion, type Transition } from 'framer-motion';
+import { ChartPie, Home, Trophy } from 'lucide-react';
+import { NavLink, useLocation } from 'react-router-dom';
 
 export default function MobileTabBar() {
   const location = useLocation();
   const { prefersReducedMotion } = useMotionPreferences();
-  const { isVisible, isMobile } = useSmartSticky();
+  const { isVisible, isMobile } = useSmartSticky(location.pathname);
   const isCompact = isMobile && !isVisible;
 
   const springLayout: Transition = { type: 'spring', damping: 14, stiffness: 230, mass: 0.7 };
