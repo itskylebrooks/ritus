@@ -30,7 +30,7 @@ export default function Profile() {
 
   return (
     <div>
-      <div className="mt-6">
+      <div className="mt-4">
         {ready ? (
           <div className="fade-in-soft">
             <HeaderStats />
