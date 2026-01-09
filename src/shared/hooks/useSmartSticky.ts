@@ -8,6 +8,8 @@ export const useSmartSticky = (pathname?: string) => {
   const lastDirection = useRef<'up' | 'down' | null>(null);
   const accumulatedDelta = useRef(0);
   const headerRef = useRef<HTMLElement>(null);
+  // Lock scroll handling briefly after navigation to prevent jumping
+  const isNavigating = useRef(false);
 
   useEffect(() => {
     if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
@@ -35,15 +37,27 @@ export const useSmartSticky = (pathname?: string) => {
     };
   }, []);
 
-  // Expand tab bar when route changes
+  // Expand tab bar when route changes and lock scroll handling briefly
   useEffect(() => {
     if (!(pathname && isMobile) || typeof window === 'undefined') return;
-    const frame = window.requestAnimationFrame(() => {
-      setIsVisible(true);
-      accumulatedDelta.current = 0;
-      lastDirection.current = null;
-    });
-    return () => window.cancelAnimationFrame(frame);
+
+    // Immediately set navigation lock and visibility
+    isNavigating.current = true;
+    setIsVisible(true);
+
+    // Reset scroll tracking state synchronously
+    accumulatedDelta.current = 0;
+    lastDirection.current = null;
+    lastScrollY.current = 0; // Reset to 0 since page scrolls to top
+
+    // Unlock scroll handling after a short delay to let the page settle
+    const timeoutId = window.setTimeout(() => {
+      isNavigating.current = false;
+      // Sync lastScrollY with actual position after navigation settles
+      lastScrollY.current = window.scrollY;
+    }, 150);
+
+    return () => window.clearTimeout(timeoutId);
   }, [pathname, isMobile]);
 
   useEffect(() => {
@@ -54,24 +68,20 @@ export const useSmartSticky = (pathname?: string) => {
     const HIDE_THRESHOLD = 18;
     const SHOW_THRESHOLD = 28;
     const MIN_DELTA = 2;
-    const INSTANT_SCROLL_THRESHOLD = 100; // Detect instant/programmatic scrolls
 
     const handleScroll = () => {
-      if (ticking) return;
+      // Skip scroll handling during navigation
+      if (isNavigating.current || ticking) return;
 
       window.requestAnimationFrame(() => {
-        const currentScrollY = window.scrollY;
-        const delta = currentScrollY - lastScrollY.current;
-
-        // Detect instant scroll (like page navigation) and reset tracking
-        if (Math.abs(delta) > INSTANT_SCROLL_THRESHOLD) {
-          lastScrollY.current = currentScrollY;
-          accumulatedDelta.current = 0;
-          lastDirection.current = null;
-          // Keep current visibility state, don't change it
+        // Double-check navigation lock inside rAF
+        if (isNavigating.current) {
           ticking = false;
           return;
         }
+
+        const currentScrollY = window.scrollY;
+        const delta = currentScrollY - lastScrollY.current;
 
         if (Math.abs(delta) < MIN_DELTA) {
           lastScrollY.current = currentScrollY;
