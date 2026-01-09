@@ -22,14 +22,14 @@ export default function HeaderStats({ weeklyPct }: { weeklyPct: number }) {
 
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-      <div className="rounded-2xl border dark:border-neutral-700 p-4 shadow-sm">
+      <div className="rounded-2xl border border-subtle p-4 shadow-sm">
         <div className="flex items-center justify-between text-sm text-neutral-600 dark:text-neutral-300">
           <span>Total Done</span>
           <ChartNoAxesColumnIncreasing className="h-4 w-4" />
         </div>
         <div className="mt-1 text-2xl font-semibold">{totalCompletions}</div>
       </div>
-      <div className="rounded-2xl border dark:border-neutral-700 p-4 shadow-sm">
+      <div className="rounded-2xl border border-subtle p-4 shadow-sm">
         <div className="flex items-center justify-between text-sm text-neutral-600 dark:text-neutral-300">
           <span>This Month</span>
           <Calendar className="h-4 w-4" />
