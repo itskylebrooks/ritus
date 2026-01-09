@@ -41,14 +41,18 @@ export const useSmartSticky = (pathname?: string) => {
   useEffect(() => {
     if (!(pathname && isMobile) || typeof window === 'undefined') return;
 
-    // Immediately set navigation lock and visibility
+    // Immediately set navigation lock
     isNavigating.current = true;
-    setIsVisible(true);
 
     // Reset scroll tracking state synchronously
     accumulatedDelta.current = 0;
     lastDirection.current = null;
     lastScrollY.current = 0; // Reset to 0 since page scrolls to top
+
+    // Use queueMicrotask to update visibility asynchronously after render
+    queueMicrotask(() => {
+      setIsVisible(true);
+    });
 
     // Unlock scroll handling after a short delay to let the page settle
     const timeoutId = window.setTimeout(() => {
