@@ -53,10 +53,10 @@ export default function AppHeader() {
   const moreButtonRef = useRef<HTMLButtonElement | null>(null);
   const location = useLocation();
   const isHome = location.pathname === '/';
-  const isMilestones = location.pathname === '/milestones';
+  const isProfile = location.pathname === '/profile';
   const isInspiration = location.pathname === '/inspiration';
   const isCompass = location.pathname === '/compass';
-  const isArchiveHidden = isMilestones || isInspiration || isCompass;
+  const isArchiveHidden = isProfile || isInspiration || isCompass;
   const navLinkBase =
     'rounded-lg border border-subtle px-3 text-sm transition-colors duration-150 ease-in-out inline-flex items-center h-10';
 
@@ -180,11 +180,11 @@ export default function AppHeader() {
             </li>
             <li>
               <NavLink
-                to="/milestones"
-                aria-label="Milestones"
-                title="Milestones"
+                to="/profile"
+                aria-label="Profile"
+                title="Profile"
                 onClick={(e) => {
-                  if (location.pathname === '/milestones') e.preventDefault();
+                  if (location.pathname === '/profile') e.preventDefault();
                 }}
                 className={({ isActive }: { isActive: boolean }) =>
                   `${navLinkBase} ${isActive ? 'bg-accent text-inverse border-transparent hover-accent-fade' : 'text-strong hover-nonaccent'}`

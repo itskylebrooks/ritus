@@ -13,11 +13,11 @@ A calm habit tracker focused on simplicity and privacy. Track daily/weekly/month
 ![Mobile view](public/images/mobile-all.png)
 
 <details>
-<summary>Pages (Insight &amp; Milestones)</summary>
+<summary>Pages (Insight &amp; Profile)</summary>
 
 ![Insight page](public/images/insight-page.png)
 
-![Milestones page](public/images/milestones-page.png)
+![Profile page](public/images/profile-page.png)
 
 </details>
 
@@ -132,7 +132,7 @@ High-level layout:
   - `features/` — feature pages and page-level components
     - `home/` — habit list, add/edit flows, quick completion actions
     - `insight/` — stats + charts + history views
-    - `milestones/` — progression, trophies, collectibles store
+    - `profile/` — progression, trophies, collectibles store
     - `inspiration/` — inspiration/quote-related UI (feature page)
     - `compass/` — compass feature page
   - `shared/`

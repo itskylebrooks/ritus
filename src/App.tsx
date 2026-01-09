@@ -2,7 +2,7 @@ import Compass from '@/features/compass';
 import Home from '@/features/home';
 import Insight from '@/features/insight';
 import Inspiration from '@/features/inspiration';
-import Milestones from '@/features/milestones';
+import Profile from '@/features/profile';
 import { createPageMotion } from '@/shared/animations';
 import AppHeader from '@/shared/components/headers/AppHeader';
 import type { TargetAndTransition, Transition } from 'framer-motion';
@@ -61,10 +61,10 @@ export default function App() {
               }
             />
             <Route
-              path="/milestones"
+              path="/profile"
               element={
                 <Page initial={initial} animate={animate} transition={transition}>
-                  <Milestones />
+                  <Profile />
                 </Page>
               }
             />

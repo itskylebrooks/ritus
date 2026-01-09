@@ -49,9 +49,9 @@ export default function MobileTabBar() {
               end: true,
             },
             {
-              id: 'milestones',
-              to: '/milestones',
-              label: 'Milestones',
+              id: 'profile',
+              to: '/profile',
+              label: 'Profile',
               icon: <Trophy className="h-5 w-5" aria-hidden />,
             },
           ].map((tab) => (

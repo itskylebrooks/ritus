@@ -6,7 +6,7 @@ import CollectiblesStoreCard from './components/CollectiblesStoreCard';
 import HeaderStats from './components/HeaderStats';
 import TrophiesBoard from './components/TrophiesBoard';
 
-export default function Milestones() {
+export default function Profile() {
   const ready = useIdleReady();
   const unlocked = useHabitStore((s) => s.progress.unlocked || {});
   const seen = useHabitStore((s) => s.progress.seenTrophies || {});

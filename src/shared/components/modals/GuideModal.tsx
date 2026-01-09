@@ -37,7 +37,7 @@ const STEPS: GuideStep[] = [
   },
   {
     title: 'Points & milestones',
-    body: 'Each completion earns points and strengthens streaks. Your points are visible in Milestones, while Insights show your consistency and trends.',
+    body: 'Each completion earns points and strengthens streaks. Your points are visible in Profile, while Insights show your consistency and trends.',
   },
   {
     title: 'Import example data',
