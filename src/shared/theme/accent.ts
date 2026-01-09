@@ -1,7 +1,14 @@
 /* eslint-disable no-empty */
 import { useHabitStore } from '@/shared/store/store';
 
-type AccentId = 'accent_ocean' | 'accent_ember' | 'accent_sage' | 'default';
+type AccentId =
+  | 'accent_ocean'
+  | 'accent_ember'
+  | 'accent_sage'
+  | 'accent_lagoon'
+  | 'accent_citrine'
+  | 'accent_amethyst'
+  | 'default';
 
 // Define light/dark pairs with appropriate text contrast
 const ACCENTS: Record<
@@ -33,6 +40,27 @@ const ACCENTS: Record<
     light: '#166534',
     lightContrast: '#ffffff',
     dark: '#31ed76',
+    darkContrast: '#050505',
+  },
+  accent_lagoon: {
+    // Cool teal
+    light: '#0f766e',
+    lightContrast: '#ffffff',
+    dark: '#33d6c7',
+    darkContrast: '#050505',
+  },
+  accent_citrine: {
+    // Warm golden
+    light: '#a16207',
+    lightContrast: '#ffffff',
+    dark: '#facc15',
+    darkContrast: '#050505',
+  },
+  accent_amethyst: {
+    // Rich violet
+    light: '#5b21b6',
+    lightContrast: '#ffffff',
+    dark: '#c084fc',
     darkContrast: '#050505',
   },
 };
