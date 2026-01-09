@@ -25,7 +25,7 @@ export default function LazyMount({
   minHeight,
   rootMargin = '0px',
   threshold = 0,
-  unmountOnExit = true,
+  unmountOnExit = false,
 }: LazyMountProps) {
   const [isVisible, setIsVisible] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
