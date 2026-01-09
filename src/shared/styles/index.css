@@ -190,6 +190,12 @@ html {
   animation: fadeSwap var(--motion-page-duration) var(--motion-page-ease) both;
 }
 
+@media (hover: none), (pointer: coarse) {
+  * {
+    transition: none !important;
+  }
+}
+
 @keyframes fadeOut {
   from {
     opacity: 1;
