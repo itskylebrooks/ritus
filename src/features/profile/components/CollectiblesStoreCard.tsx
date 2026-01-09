@@ -6,7 +6,7 @@ import { useMemo, useState } from 'react';
 const COLLECTIBLE_GROUPS: { label: string; type: CollectibleType }[] = [
   { label: 'Accent themes', type: 'accent' },
   { label: 'Quote packs', type: 'quotes' },
-  { label: 'Mysterious relics', type: 'relic' },
+  { label: 'Animations', type: 'animation' },
 ];
 
 export default function CollectiblesStoreCard() {
