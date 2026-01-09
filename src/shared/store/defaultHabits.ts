@@ -127,7 +127,7 @@ const EXAMPLE_END_DATE = (() => {
   return d;
 })();
 
-const EXAMPLE_END_ISO = toISO(EXAMPLE_END_DATE);
+export const EXAMPLE_END_ISO = toISO(EXAMPLE_END_DATE);
 
 function shiftISODateToExampleEnd(dateISO: string): string {
   const original = new Date(`${dateISO}T00:00:00`);
@@ -629,7 +629,7 @@ export const defaultProgress = {
   preferredCollectibles: ['accent_ocean'],
   // Mark these as owned by default when example data is loaded
   ownedCollectibles: ['accent_ocean'],
-  // example unlocked trophies (empty by default)
+  // example unlocked trophies (id -> ISO date; empty by default)
   unlocked: {},
 };
 

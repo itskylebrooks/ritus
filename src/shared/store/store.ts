@@ -23,6 +23,19 @@ for (const trophy of TROPHIES) {
 
 const AUTO_META_TROPHY_IDS = new Set(['meta_balance', 'meta_focus', 'meta_persistence']);
 
+const normalizeUnlockedDates = (
+  unlocked: Record<string, string | boolean | undefined> | undefined,
+  fallback: string,
+): Record<string, string> | undefined => {
+  if (!unlocked) return undefined;
+  const next: Record<string, string> = {};
+  for (const [id, value] of Object.entries(unlocked)) {
+    if (!value) continue;
+    next[id] = typeof value === 'string' ? value : fallback;
+  }
+  return next;
+};
+
 const computeLongestEmojiStreak = (by: Record<string, string | undefined>): number => {
   const keys = Object.keys(by || {});
   if (!keys.length) return 0;
@@ -67,7 +80,8 @@ export interface HabitState {
     points: number;
     weekBonusKeys?: Record<string, true | undefined>;
     completionAwardKeys?: Record<string, true | undefined>;
-    unlocked?: Record<string, true | undefined>;
+    // trophy id -> ISO date string (start of day)
+    unlocked?: Record<string, string>;
     ownedCollectibles?: string[];
     appliedCollectibles?: Record<string, string>;
     seenTrophies?: Record<string, true | undefined>;
@@ -187,9 +201,10 @@ export const useHabitStore = create<HabitState>()(
         if (!Object.keys(by).length) return [];
         const longest = computeLongestEmojiStreak(by);
         const newly: string[] = [];
+        const unlockedAt = iso(new Date());
         for (const t of emojiTrophies) {
           if (!unlocked[t.id] && longest >= t.threshold) {
-            unlocked[t.id] = true;
+            unlocked[t.id] = unlockedAt;
             newly.push(t.id);
           }
         }
@@ -200,7 +215,7 @@ export const useHabitStore = create<HabitState>()(
               ...s.progress,
               unlocked,
               lastUnlockedTrophyId: lastUnlockedId,
-              lastUnlockedTrophyAt: iso(new Date()),
+              lastUnlockedTrophyAt: unlockedAt,
             },
           }));
         }
@@ -255,6 +270,7 @@ export const useHabitStore = create<HabitState>()(
         const { progress, habits } = get();
         const newly: string[] = [];
         const unlocked = { ...(progress.unlocked || {}) };
+        const unlockedAt = iso(new Date());
 
         // Build a richer summary from either the provided summary or the current habits
         const allHabits = habits || [];
@@ -365,7 +381,7 @@ export const useHabitStore = create<HabitState>()(
 
         for (const t of TROPHIES) {
           if (!unlocked[t.id] && meets(t)) {
-            unlocked[t.id] = true;
+            unlocked[t.id] = unlockedAt;
             newly.push(t.id);
           }
         }
@@ -376,7 +392,7 @@ export const useHabitStore = create<HabitState>()(
             ...s.progress,
             unlocked,
             lastUnlockedTrophyId: lastUnlockedId,
-            lastUnlockedTrophyAt: iso(new Date()),
+            lastUnlockedTrophyAt: unlockedAt,
           },
         }));
         return newly;
@@ -593,6 +609,7 @@ export const useHabitStore = create<HabitState>()(
           // apply award/revoke deltas to persisted progress
           const newPoints = Math.max(0, Math.floor(s.progress.points + pointsAwardDelta));
           let lastUnlockedId: string | undefined;
+          const unlockedAt = iso(new Date());
 
           return {
             habits: updated,
@@ -737,16 +754,14 @@ export const useHabitStore = create<HabitState>()(
                     meets = false;
                   }
                   if (meets) {
-                    existing[t.id] = true;
+                    existing[t.id] = unlockedAt;
                     lastUnlockedId = t.id;
                   }
                 }
                 return existing;
               })(),
               lastUnlockedTrophyId: lastUnlockedId ?? s.progress.lastUnlockedTrophyId,
-              lastUnlockedTrophyAt: lastUnlockedId
-                ? iso(new Date())
-                : s.progress.lastUnlockedTrophyAt,
+              lastUnlockedTrophyAt: lastUnlockedId ? unlockedAt : s.progress.lastUnlockedTrophyAt,
             },
             daysWithRitus,
           };
@@ -785,6 +800,17 @@ export const useHabitStore = create<HabitState>()(
           const cleaned = { ...(merged.progress as Record<string, unknown>) };
           delete cleaned.essence;
           delete cleaned.level;
+          const unlockedRaw = cleaned.unlocked as
+            | Record<string, string | boolean | undefined>
+            | undefined;
+          if (unlockedRaw) {
+            const fallback =
+              typeof cleaned.lastUnlockedTrophyAt === 'string'
+                ? cleaned.lastUnlockedTrophyAt
+                : iso(new Date());
+            const normalized = normalizeUnlockedDates(unlockedRaw, fallback);
+            if (normalized) cleaned.unlocked = normalized;
+          }
           merged.progress = cleaned as HabitState['progress'];
         }
         const hasPersistedTotal =

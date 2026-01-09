@@ -1,11 +1,23 @@
 import { TROPHIES } from '@/shared/constants/trophies';
 import { useHabitStore } from '@/shared/store/store';
+import { fromISO } from '@/shared/utils/date';
+import { format } from 'date-fns';
 import { WandSparkles } from 'lucide-react';
 import { useMemo } from 'react';
 
 export default function TrophiesBoard() {
   const unlocked = useHabitStore((s) => s.progress.unlocked || {});
+  const dateFormat = useHabitStore((s) => s.dateFormat);
+  const datePattern = dateFormat === 'MDY' ? 'MMM d, yyyy' : 'd MMM yyyy';
   const items = useMemo(() => TROPHIES.filter((t) => unlocked[t.id]), [unlocked]);
+  const formatDate = (value?: string) => {
+    if (!value) return null;
+    try {
+      return format(fromISO(value), datePattern);
+    } catch {
+      return null;
+    }
+  };
 
   return (
     <div>
@@ -26,18 +38,24 @@ export default function TrophiesBoard() {
             </div>
           </div>
         ) : (
-          items.map(({ id, label, Icon, reason }) => (
-            <div
-              key={id}
-              className="flex flex-col items-center justify-between gap-3 rounded-lg border border-subtle p-4 min-h-[140px]"
-            >
-              <div className="p-2 rounded-md">
-                <Icon className="h-7 w-7 text-accent" />
+          items.map(({ id, label, Icon, reason }) => {
+            const dateLabel = formatDate(unlocked[id]);
+            return (
+              <div
+                key={id}
+                className="flex flex-col items-center justify-between gap-3 rounded-lg border border-subtle p-4 min-h-[140px]"
+              >
+                <div className="p-2 rounded-md">
+                  <Icon className="h-7 w-7 text-accent" />
+                </div>
+                <div className="text-sm font-semibold text-strong text-center">{label}</div>
+                <div className="text-xs text-muted text-center">{reason}</div>
+                {dateLabel ? (
+                  <div className="text-[10px] uppercase tracking-wide text-muted">{dateLabel}</div>
+                ) : null}
               </div>
-              <div className="text-sm font-semibold text-strong text-center">{label}</div>
-              <div className="text-xs text-muted text-center">{reason}</div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>

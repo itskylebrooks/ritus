@@ -4,7 +4,9 @@ import defaultHabits, {
   defaultEmojiByDate,
   defaultEmojiRecents,
   defaultProgress,
+  EXAMPLE_END_ISO,
 } from '@/shared/store/defaultHabits';
+import { TROPHIES } from '@/shared/constants/trophies';
 import { useHabitStore } from '@/shared/store/store';
 import { fromISO, iso } from '@/shared/utils/date';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -155,6 +157,35 @@ export default function GuideModal({ open, onClose, onLoadExample }: GuideModalP
         };
         try {
           useHabitStore.getState().awardTrophies(summary);
+          const state = useHabitStore.getState();
+          const unlocked = state.progress.unlocked || {};
+          const unlockedIds = Object.keys(unlocked).filter((id) => unlocked[id]);
+          if (unlockedIds.length > 0) {
+            const ordered = TROPHIES.filter((t) => unlocked[t.id]).map((t) => t.id);
+            const extras = unlockedIds.filter((id) => !ordered.includes(id));
+            const all = [...ordered, ...extras];
+            const end = fromISO(EXAMPLE_END_ISO);
+            const spanDays = Math.max(60, all.length);
+            const start = new Date(end);
+            start.setDate(start.getDate() - (spanDays - 1));
+            const step = all.length > 1 ? (spanDays - 1) / (all.length - 1) : 0;
+            const dated: Record<string, string> = {};
+            for (let i = 0; i < all.length; i++) {
+              const offset = Math.floor(i * step);
+              const d = new Date(start);
+              d.setDate(start.getDate() + offset);
+              dated[all[i]] = iso(d);
+            }
+            const lastId = all[all.length - 1];
+            useHabitStore.setState({
+              progress: {
+                ...state.progress,
+                unlocked: dated,
+                lastUnlockedTrophyId: lastId,
+                lastUnlockedTrophyAt: dated[lastId],
+              },
+            });
+          }
         } catch {}
       } catch {}
     };

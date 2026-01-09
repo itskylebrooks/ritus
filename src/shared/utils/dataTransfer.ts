@@ -21,6 +21,19 @@ export interface ImportResult {
 
 export type ImportResultFail = { ok: false; reason: 'invalid' | 'not_ritus' };
 
+const normalizeUnlockedDates = (
+  unlocked: Record<string, string | boolean | undefined> | undefined,
+  fallback: string,
+): Record<string, string> | undefined => {
+  if (!unlocked) return undefined;
+  const next: Record<string, string> = {};
+  for (const [id, value] of Object.entries(unlocked)) {
+    if (!value) continue;
+    next[id] = typeof value === 'string' ? value : fallback;
+  }
+  return next;
+};
+
 const normalizeProgress = (progress: unknown): HabitState['progress'] | undefined => {
   if (!progress || typeof progress !== 'object') return undefined;
   const cleaned = { ...(progress as HabitState['progress'] & Record<string, unknown>) };
@@ -28,7 +41,15 @@ const normalizeProgress = (progress: unknown): HabitState['progress'] | undefine
   delete cleaned.level;
   const candidate = cleaned as HabitState['progress'];
   const points = typeof candidate.points === 'number' ? candidate.points : 0;
-  return { ...candidate, points };
+  const fallback =
+    typeof candidate.lastUnlockedTrophyAt === 'string'
+      ? candidate.lastUnlockedTrophyAt
+      : iso(new Date());
+  const normalizedUnlocked = normalizeUnlockedDates(
+    cleaned.unlocked as Record<string, string | boolean | undefined> | undefined,
+    fallback,
+  );
+  return { ...candidate, points, ...(normalizedUnlocked ? { unlocked: normalizedUnlocked } : {}) };
 };
 
 export function exportAllData() {
