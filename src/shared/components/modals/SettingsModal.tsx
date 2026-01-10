@@ -4,8 +4,8 @@ import { usePWA } from '@/shared/hooks/usePWA';
 import { useHabitStore } from '@/shared/store/store';
 import useThemeStore from '@/shared/store/theme';
 import { exportAllData, importAllData } from '@/shared/utils/dataTransfer';
-import { ChevronDown, Linkedin, User, X } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { ChevronDown, Linkedin, Share2, User, X } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import pkg from '../../../../package.json';
 import ConfirmModal from './ConfirmModal';
 function clearAllData() {
@@ -75,20 +75,8 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
     };
   }, [open]);
 
-  // Close on Escape (desktop only)
-  const isMobile = useIsMobile();
-  useEffect(() => {
-    if (!open || isMobile) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' || e.key === 'Esc') {
-        beginClose();
-      }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open, isMobile]);
   const CLOSE_DURATION = 280;
-  function beginClose() {
+  const beginClose = useCallback(() => {
     if (closing) return;
     setClosing(true);
     timeoutRef.current = window.setTimeout(() => {
@@ -113,6 +101,43 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
         pendingRef.current = 'none';
       }
     }, CLOSE_DURATION + 40);
+  }, [closing, onClose, onShowGuide]);
+
+  // Close on Escape (desktop only)
+  const isMobile = useIsMobile();
+  useEffect(() => {
+    if (!open || isMobile) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' || e.key === 'Esc') {
+        beginClose();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open, isMobile, beginClose]);
+
+  // Share via native share API when available, otherwise copy link
+  async function handleShare() {
+    try {
+      const shareData: ShareData = {
+        title: 'Ritus',
+        text: 'Check out Ritus — a simple habit tracker',
+        url: window.location.href,
+      };
+      const navWithShare = navigator as unknown as { share?: (data: ShareData) => Promise<void> };
+      if (typeof navWithShare.share === 'function') {
+        await navWithShare.share(shareData);
+        return;
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(window.location.href);
+        alert('Link copied to clipboard');
+        return;
+      }
+      window.prompt('Copy this link', window.location.href);
+    } catch {
+      // Ignore share errors
+    }
   }
 
   useEffect(() => {
@@ -254,6 +279,15 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
             <span id="settings-title" className="text-lg font-semibold tracking-wide text-strong">
               Settings
             </span>
+            <button
+              type="button"
+              onClick={handleShare}
+              className="absolute left-0 grid h-10 w-10 place-items-center rounded-lg border border-subtle text-muted hover-nonaccent transition"
+              aria-label="Share"
+              title="Share"
+            >
+              <Share2 className="h-4 w-4" />
+            </button>
             <button
               type="button"
               onClick={beginClose}
