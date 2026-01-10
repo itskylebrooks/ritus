@@ -6,6 +6,8 @@
   "packageManager": "pnpm@9.11.0",
   "scripts": {
     "dev": "vite",
+    "dev:host": "vite --host",
+    "gen:certs": "mkdir -p certs && mkcert -key-file certs/localhost-key.pem -cert-file certs/localhost.pem localhost 127.0.0.1 ::1",
     "build": "tsc -b && vite build",
     "typecheck": "tsc -b --pretty false",
     "lint": "eslint .",

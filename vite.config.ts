@@ -1,9 +1,26 @@
 import { fileURLToPath, URL } from 'node:url';
+import fs from 'node:fs';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
+  server: {
+    host: true,
+    https: (() => {
+      const keyPath = './certs/localhost-key.pem';
+      const certPath = './certs/localhost.pem';
+      if (fs.existsSync(keyPath) && fs.existsSync(certPath)) {
+        return {
+          key: fs.readFileSync(keyPath),
+          cert: fs.readFileSync(certPath),
+        };
+      }
+      // Fallback to built-in (untrusted) TLS if cert files are missing
+      console.warn('\x1b[33m[dev] HTTPS certs not found in ./certs — falling back to untrusted self-signed HTTPS. Run `pnpm run gen:certs` to create trusted certs.\x1b[0m');
+      return true;
+    })(),
+  },
   plugins: [
     react(),
     VitePWA({

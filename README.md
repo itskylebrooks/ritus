@@ -116,6 +116,26 @@ pnpm install
 pnpm run dev
 ```
 
+### Local HTTPS dev (optional)
+
+To serve the dev server over HTTPS with trusted local certs, use `mkcert` (recommended):
+
+1. Install mkcert (macOS): `brew install mkcert nss` and run `mkcert -install`
+2. Generate certs in the project:
+
+```bash
+mkdir -p certs
+pnpm run gen:certs
+```
+
+3. Start the dev server using the host flag so the certs match the host:
+
+```bash
+pnpm run dev:host
+```
+
+If cert files are missing, the dev server will fall back to Vite's built-in (untrusted) HTTPS mode and print a warning: `HTTPS certs not found in ./certs — falling back to untrusted self-signed HTTPS. Run \`pnpm run gen:certs\` to create trusted certs.`
+
 Build + preview production:
 
 ```bash
