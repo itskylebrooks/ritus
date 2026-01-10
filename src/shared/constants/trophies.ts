@@ -3,6 +3,7 @@ import {
   CalendarRange,
   Clock,
   Focus,
+  Gem,
   HeartPulse,
   Hourglass,
   Infinity as InfinityIcon,
@@ -76,6 +77,22 @@ export const TROPHIES: TrophyDef[] = [
     Icon: Zap,
     reason: '100-day streak',
   },
+  {
+    id: 'streak_daily_build_200',
+    label: 'Perpetual Light',
+    group: 'daily_build',
+    threshold: 200,
+    Icon: Zap,
+    reason: '200-day streak',
+  },
+  {
+    id: 'streak_daily_build_365',
+    label: 'Year of Fire',
+    group: 'daily_build',
+    threshold: 365,
+    Icon: Zap,
+    reason: '365-day streak',
+  },
   // Daily break trophies (clean streaks)
   {
     id: 'streak_daily_break_7',
@@ -116,6 +133,22 @@ export const TROPHIES: TrophyDef[] = [
     threshold: 100,
     Icon: ShieldCheck,
     reason: '100-day clean streak',
+  },
+  {
+    id: 'streak_daily_break_200',
+    label: 'Iron Will',
+    group: 'daily_break',
+    threshold: 200,
+    Icon: ShieldCheck,
+    reason: '200-day clean streak',
+  },
+  {
+    id: 'streak_daily_break_365',
+    label: 'Year of Clarity',
+    group: 'daily_break',
+    threshold: 365,
+    Icon: ShieldCheck,
+    reason: '365-day clean streak',
   },
   // Weekly habit trophies (consecutive weekly wins)
   {
@@ -183,6 +216,22 @@ export const TROPHIES: TrophyDef[] = [
     Icon: Medal,
     reason: '1000 total completions',
   },
+  {
+    id: 'total_2500',
+    label: 'Legendary Executor',
+    group: 'totals',
+    threshold: 2500,
+    Icon: Medal,
+    reason: '2500 total completions',
+  },
+  {
+    id: 'total_5000',
+    label: 'Unstoppable Force',
+    group: 'totals',
+    threshold: 5000,
+    Icon: Medal,
+    reason: '5000 total completions',
+  },
   // Monthly habit trophies (consecutive monthly wins)
   {
     id: 'streak_monthly_1',
@@ -217,6 +266,22 @@ export const TROPHIES: TrophyDef[] = [
     reason: '12 consecutive monthly wins',
   },
   // Behavioral / meta trophies
+  {
+    id: 'meta_first_collectible',
+    label: 'First Treasure',
+    group: 'meta',
+    threshold: 1,
+    Icon: Gem,
+    reason: 'Bought your first collectible',
+  },
+  {
+    id: 'meta_10_habits',
+    label: 'Habit Collector',
+    group: 'meta',
+    threshold: 10,
+    Icon: Focus,
+    reason: 'Created 10 habits',
+  },
   {
     id: 'meta_balance',
     label: 'Equilibrium',

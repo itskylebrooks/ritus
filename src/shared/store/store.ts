@@ -21,7 +21,13 @@ for (const trophy of TROPHIES) {
   TROPHIES_BY_GROUP[trophy.group].push(trophy);
 }
 
-const AUTO_META_TROPHY_IDS = new Set(['meta_balance', 'meta_focus', 'meta_persistence']);
+const AUTO_META_TROPHY_IDS = new Set([
+  'meta_first_collectible',
+  'meta_10_habits',
+  'meta_balance',
+  'meta_focus',
+  'meta_persistence',
+]);
 
 const normalizeUnlockedDates = (
   unlocked: Record<string, string | boolean | undefined> | undefined,
@@ -357,6 +363,12 @@ export const useHabitStore = create<HabitState>()(
           if (t.group === 'meta') {
             // behavioral/meta trophies with custom logic
             switch (t.id) {
+              case 'meta_first_collectible':
+                // Awarded when user owns at least 1 collectible
+                return (get().progress.ownedCollectibles || []).length >= t.threshold;
+              case 'meta_10_habits':
+                // Awarded when user has created at least 10 habits
+                return allHabits.length >= t.threshold;
               case 'meta_balance':
                 // require both a build and a break habit to have a long streak
                 return maxBuildStreak >= t.threshold && maxBreakStreak >= t.threshold;

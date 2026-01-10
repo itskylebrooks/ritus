@@ -3,17 +3,13 @@ import {
   Droplet,
   Feather,
   Flame,
-  Gauge,
   Gem,
   Leaf,
   Medal,
-  Moon,
   PlayCircle,
-  Radar,
   Sparkles,
   Star,
   Sun,
-  SunMoon,
   Target,
   Waves,
 } from 'lucide-react';
@@ -32,56 +28,6 @@ export interface CollectibleDef {
 
 export const COLLECTIBLES: CollectibleDef[] = [
   // ────────────────────────────────────────────────────────────────────────────
-  // CLOCK STYLES (all analog; placeholders only)
-  // Keep visuals monochrome and minimal. Implementation to be added later.
-  // ────────────────────────────────────────────────────────────────────────────
-  {
-    id: 'clock_pilot_markers',
-    type: 'clock',
-    title: 'Pilot Markers',
-    desc: 'Bold 12/3/6/9 indices, tapered hands, high-contrast ticks.',
-    icon: Gauge,
-    cost: 600,
-    implemented: false,
-  },
-  {
-    id: 'clock_nocturne',
-    type: 'clock',
-    title: 'Nocturne',
-    desc: 'Hour-only bars, faint minute ring, deep contrast.',
-    icon: Moon,
-    cost: 300,
-    implemented: false,
-  },
-  {
-    id: 'clock_sector',
-    type: 'clock',
-    title: 'Sector Dial',
-    desc: 'Quarter-hour sectors with a fine minute track.',
-    icon: Target,
-    cost: 3000,
-    implemented: false,
-  },
-  {
-    id: 'clock_orbit_subdial',
-    type: 'clock',
-    title: 'Orbit Subdial',
-    desc: 'Small seconds subdial with continuous sweep.',
-    icon: SunMoon,
-    cost: 2500,
-    implemented: false,
-  },
-  {
-    id: 'clock_radar_sweep',
-    type: 'clock',
-    title: 'Radar Sweep',
-    desc: 'Radial index array; slender hands with smooth motion.',
-    icon: Radar,
-    cost: 800,
-    implemented: false,
-  },
-
-  // ────────────────────────────────────────────────────────────────────────────
   // QUOTE PACKS (placeholders)
   // NOTE: Populate with ORIGINAL text, PUBLIC-DOMAIN sources, or LICENSED content only.
   // Do not ship copyrighted quotes without permission. Packs may ship empty by default.
@@ -92,7 +38,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     title: 'Hollywood Voices',
     desc: 'Short, attributed lines. Use licensed or public-domain sources.',
     icon: Star,
-    cost: 3500,
+    cost: 4000,
     implemented: false,
   },
   {
@@ -110,7 +56,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     title: 'Creators & Builders',
     desc: 'From video creators and makers. Use licensed/original sources.',
     icon: PlayCircle,
-    cost: 300,
+    cost: 1000,
     implemented: false,
   },
   {
@@ -119,7 +65,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     title: 'Athletes',
     desc: 'Training wisdom and discipline. Use licensed or PD sources.',
     icon: Medal,
-    cost: 250,
+    cost: 1500,
     implemented: false,
   },
   {
@@ -128,7 +74,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     title: 'Christian Wisdom',
     desc: 'Public‑domain scripture and classic commentary only.',
     icon: BookOpen,
-    cost: 1000,
+    cost: 3000,
     implemented: false,
   },
   {
@@ -137,7 +83,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     title: 'Mindset',
     desc: 'Short affirmations and reframes from licensed or original sources.',
     icon: Star,
-    cost: 400,
+    cost: 600,
     implemented: false,
   },
 
@@ -227,7 +173,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     title: 'Whisper Text',
     desc: 'Words reveal themselves character by character, like a quiet whisper.',
     icon: Feather,
-    cost: 1500,
+    cost: 3000,
     implemented: true,
   },
   {
@@ -236,7 +182,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     title: 'Sparkle Progress',
     desc: 'Your progress is celebrated with a magical sparkle effect as the bar fills.',
     icon: Sparkles,
-    cost: 1800,
+    cost: 1000,
     implemented: true,
   },
   {
@@ -245,7 +191,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     title: 'Celebration Pop',
     desc: 'A delightful burst of micro-confetti pops whenever you complete a habit.',
     icon: Target,
-    cost: 2200,
+    cost: 1700,
     implemented: true,
   },
 ];
