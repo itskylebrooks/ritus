@@ -54,7 +54,7 @@ export default function AppHeader() {
   const isCompass = location.pathname === '/compass';
   const isArchiveHidden = isProfile || isInspiration || isCompass;
   const navLinkBase =
-    'rounded-lg border border-subtle px-3 text-sm transition-colors duration-150 ease-in-out inline-flex items-center h-10';
+    'rounded-lg border border-subtle px-3 text-sm transition-colors duration-150 ease-in-out inline-flex items-center gap-2 h-10';
 
   // Close desktop More on outside click / Esc
   useEffect(() => {
@@ -156,6 +156,7 @@ export default function AppHeader() {
                 }
               >
                 <ChartPie className="w-4 h-4" />
+                <span className="text-sm font-semibold">Insight</span>
               </NavLink>
             </li>
             <li>
@@ -172,6 +173,7 @@ export default function AppHeader() {
                 }
               >
                 <Home className="w-4 h-4" />
+                <span className="text-sm font-semibold">Home</span>
               </NavLink>
             </li>
             <li>
@@ -187,6 +189,7 @@ export default function AppHeader() {
                 }
               >
                 <Trophy className="w-4 h-4" />
+                <span className="text-sm font-semibold">Profile</span>
               </NavLink>
             </li>
           </ul>
