@@ -1,6 +1,6 @@
 import { defaultEase, useMotionPreferences } from '@/shared/animations';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface GuideModalProps {
   open: boolean;
@@ -14,7 +14,7 @@ const STEPS: GuideStep[] = [
     body: 'Ritus is a calm habit tracker built for rhythm, not pressure. Every check-in is a small vote for the person you want to become.',
   },
   {
-    title: 'Formulate (Home Page)',
+    title: 'Choose (Home Page)',
     body: 'Create habits you want to build or break. Keep names concrete and small enough to do on a bad day. Then tap Done / Clean to show up.',
   },
   {
@@ -56,6 +56,19 @@ export default function GuideModal({ open, onClose }: GuideModalProps) {
   const enterRaf = useRef<number | null>(null);
   const stepAnimTimer = useRef<number | null>(null);
   const stepKeyRef = useRef(0);
+
+  const [height, setHeight] = useState<number | 'auto'>('auto');
+  const observer = useRef<ResizeObserver | null>(null);
+
+  const measureRef = useCallback((el: HTMLDivElement | null) => {
+    if (observer.current) observer.current.disconnect();
+    if (el) {
+      observer.current = new ResizeObserver((entries) => {
+        if (entries[0]) setHeight(entries[0].contentRect.height);
+      });
+      observer.current.observe(el);
+    }
+  }, []);
 
   useEffect(() => {
     if (open) {
@@ -157,7 +170,12 @@ export default function GuideModal({ open, onClose }: GuideModalProps) {
         <h2 id="guide-title" className="sr-only">
           {STEPS[step].title}
         </h2>
-        <div className="relative min-h-[120px]">
+        <motion.div
+          className="relative overflow-hidden"
+          animate={{ height }}
+          style={{ minHeight: 120 }}
+          transition={{ duration: 0.2 }}
+        >
           {renderedSteps.map((layer) => {
             const data = STEPS[layer.idx];
             const stateClass =
@@ -168,14 +186,20 @@ export default function GuideModal({ open, onClose }: GuideModalProps) {
                 : layer.dir === 'forward'
                   ? 'guide-step-exit-forward'
                   : 'guide-step-exit-back';
+            const isCurrent = layer.idx === step;
             return (
-              <div key={layer.key} className={`guide-step-layer ${stateClass}`}>
+              <div
+                key={layer.key}
+                className={`guide-step-layer ${stateClass}`}
+                style={{ bottom: 'auto' }}
+                ref={isCurrent ? measureRef : undefined}
+              >
                 <h3 className="text-lg font-semibold mb-3 text-strong">{data.title}</h3>
                 <p className="text-sm text-muted leading-relaxed">{data.body}</p>
               </div>
             );
           })}
-        </div>
+        </motion.div>
         <div className="mt-5 flex items-center justify-between text-xs text-muted">
           <div>
             Step {step + 1} / {STEPS.length}
