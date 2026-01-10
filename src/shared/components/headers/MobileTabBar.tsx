@@ -44,7 +44,7 @@ export default function MobileTabBar() {
       >
         <LayoutGroup id="mobile-tab-bar">
           <motion.div
-            className="relative inline-flex items-center rounded-full border border-subtle bg-surface-elevated shadow-elevated"
+            className="relative inline-flex items-center rounded-full border border-subtle bg-surface-elevated shadow-elevated mobile-tab-bar"
             initial={false}
             animate={{
               gap: dims.gap,

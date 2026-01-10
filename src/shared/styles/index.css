@@ -521,6 +521,20 @@ header button[aria-haspopup='menu'] {
     box-shadow: none;
   }
 
+  /* Mobile tab bar: stronger light-mode shadow and slightly lighter dark-mode background */
+  .mobile-tab-bar {
+    /* Slightly stronger, lower-spread shadow for the floating dock in light mode */
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14);
+  }
+  .dark .mobile-tab-bar {
+    /* Make the floating dock a touch lighter than pure-black background for separation on dark mode */
+    background-color: color-mix(
+      in srgb,
+      var(--color-text-primary) 6%,
+      var(--color-surface-elevated)
+    );
+  }
+
   /* Map common Tailwind neutral color utilities to theme tokens */
   .text-neutral-900,
   .text-neutral-800,
