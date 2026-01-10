@@ -77,7 +77,9 @@ export default function CollectiblesStoreCard() {
                         className="mt-3 flex items-center justify-between text-sm"
                         style={{ minHeight: 32 }}
                       >
-                        <span className="text-muted">{item.cost} pts</span>
+                        <span className="inline-flex items-center rounded-full border border-subtle px-2 py-0.5 text-xs font-medium text-muted">
+                          {item.cost} pts
+                        </span>
                         {Owned ? (
                           // Owned items show an Apply button so the user can activate them.
                           applied[item.type] === item.id ? (
@@ -97,7 +99,7 @@ export default function CollectiblesStoreCard() {
                                 const ok = apply(item.id);
                                 if (ok) triggerFlash(item.id);
                               }}
-                              className="inline-flex items-center justify-center rounded-lg bg-accent border border-subtle h-8 px-3 text-xs text-inverse hover-accent-fade"
+                              className="inline-flex items-center justify-center rounded-lg bg-accent border border-subtle h-8 w-20 px-3 text-xs text-inverse hover-accent-fade"
                             >
                               Apply
                             </button>
@@ -118,8 +120,8 @@ export default function CollectiblesStoreCard() {
                             title={isImplemented ? undefined : 'Coming soon'}
                             className={
                               isImplemented
-                                ? 'inline-flex items-center justify-center rounded-lg bg-accent h-8 px-3 text-xs text-inverse hover-accent-fade disabled:opacity-50'
-                                : 'inline-flex items-center justify-center rounded-lg border border-subtle h-8 px-3 text-xs text-muted disabled:opacity-50'
+                                ? 'inline-flex items-center justify-center rounded-lg bg-accent h-8 w-20 px-3 text-xs text-inverse hover-accent-fade disabled:opacity-50'
+                                : 'inline-flex items-center justify-center rounded-lg border border-subtle h-8 w-20 px-3 text-xs text-muted disabled:opacity-50'
                             }
                           >
                             {isImplemented ? 'Unlock' : 'Soon'}
