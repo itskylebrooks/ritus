@@ -72,7 +72,7 @@ export default function QuoteCard() {
 
   return (
     <article
-      className={`rounded-2xl border p-4 shadow-sm w-full max-w-full cursor-pointer transition-colors duration-150 ${
+      className={`rounded-2xl border p-4 shadow-sm w-full max-w-full cursor-pointer transition-colors duration-150 ease-in-out ${
         copied ? 'border-accent bg-accent/10' : 'border-subtle'
       }`}
       role="button"
@@ -99,8 +99,10 @@ export default function QuoteCard() {
           )}
         </div>
         <footer className="flex items-center justify-between text-sm text-neutral-600 dark:text-neutral-400">
-          <span className={`text-xs font-semibold ${copied ? 'text-accent' : 'text-transparent'}`}>
-            Copied
+          <span
+            className={`text-sm font-semibold text-accent transition-opacity duration-150 ease-in-out ${copied ? 'opacity-100' : 'opacity-0'}`}
+          >
+            Copied!
           </span>
           {hasTypingAnimation ? (
             <motion.span
