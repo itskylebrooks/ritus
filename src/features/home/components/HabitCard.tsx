@@ -397,9 +397,6 @@ export default function HabitCard({
             <div className="flex-1">
               <ProgressBar value={progressVal} max={progressMax} />
             </div>
-            <div className="ml-1 text-xs text-neutral-600 dark:text-neutral-300 tabular-nums">
-              {progressVal}/{progressMax}
-            </div>
           </div>
 
           <div className="flex items-center gap-2">
@@ -422,9 +419,6 @@ export default function HabitCard({
           >
             <div className={`${showList ? 'flex-1' : 'w-56 md:w-40'}`}>
               <ProgressBar value={progressVal} max={progressMax} />
-            </div>
-            <div className="text-sm text-neutral-600 dark:text-neutral-300 tabular-nums ml-1">
-              {progressVal}/{progressMax}
             </div>
             <span className="sr-only">Weekly progress</span>
           </div>

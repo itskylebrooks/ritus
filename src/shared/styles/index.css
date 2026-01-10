@@ -191,7 +191,19 @@ html {
 }
 
 @media (hover: none), (pointer: coarse) {
-  * {
+  /* Disable hover transitions on touchscreens, but preserve intentional animations */
+  .hover-nonaccent,
+  .hover\:bg-subtle,
+  .hover\:bg-surface-alt,
+  .hover\:bg-accent-soft,
+  .hover\:bg-success-soft,
+  .hover\:bg-danger-soft,
+  .hover\:bg-success-hover,
+  .hover\:bg-subtle-hover,
+  .hover-accent-fade,
+  .hover-change-color,
+  button:not(.bg-progress),
+  a:not(.bg-progress) {
     transition: none !important;
   }
 }
