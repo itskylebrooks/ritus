@@ -1,7 +1,7 @@
-import { fileURLToPath, URL } from 'node:url';
-import fs from 'node:fs';
-import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import fs from 'node:fs';
+import { fileURLToPath, URL } from 'node:url';
+import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
@@ -17,7 +17,9 @@ export default defineConfig({
         };
       }
       // Fallback to built-in (untrusted) TLS if cert files are missing
-      console.warn('\x1b[33m[dev] HTTPS certs not found in ./certs — falling back to untrusted self-signed HTTPS. Run `pnpm run gen:certs` to create trusted certs.\x1b[0m');
+      console.warn(
+        '\x1b[33m[dev] HTTPS certs not found in ./certs — falling back to untrusted self-signed HTTPS. Run `pnpm run gen:certs` to create trusted certs.\x1b[0m',
+      );
       return true;
     })(),
   },
