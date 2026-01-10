@@ -16,7 +16,7 @@ export const ACCENTS: Record<
   { light: string; lightContrast: string; dark: string; darkContrast: string }
 > = {
   default: {
-    light: '#333333',
+    light: '#0f0f0f',
     lightContrast: '#ffffff',
     dark: '#e5e7eb',
     darkContrast: '#050505',
