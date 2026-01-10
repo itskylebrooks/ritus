@@ -93,40 +93,75 @@ export default function MobileTabBar() {
                           transition={springExpand}
                         />
                       )}
-                      <motion.span
-                        className={`relative z-10 flex flex-col items-center justify-center ${
-                          isActive ? 'text-inverse' : 'text-strong'
-                        }`}
-                      >
-                        <motion.span
-                          className="flex items-center justify-center shrink-0"
-                          initial={false}
-                          animate={{
-                            scale: isCompact ? 1.05 : 1,
-                          }}
-                          transition={springExpand}
-                        >
-                          <Icon className="h-5 w-5" aria-hidden />
-                        </motion.span>
+
+                      {/* Crossfading color layers so icon + label reverse color in sync with pill */}
+                      <div className="relative z-10 w-full h-full flex items-center justify-center">
+                        {/* Active (accent) layer */}
                         <motion.span
                           aria-hidden
-                          className="block overflow-hidden text-center whitespace-nowrap"
+                          className="absolute inset-0 flex flex-col items-center justify-center text-inverse pointer-events-none"
                           initial={false}
-                          animate={{
-                            opacity: isCompact ? 0 : 1,
-                            height: isCompact ? 0 : 14,
-                            marginTop: isCompact ? 0 : 4,
-                            scaleY: isCompact ? 0.5 : 1,
-                          }}
-                          transition={springLabel}
-                          style={{
-                            fontSize: '11px',
-                            transformOrigin: 'top center',
-                          }}
+                          animate={{ opacity: isActive ? 1 : 0 }}
+                          transition={springExpand}
                         >
-                          {tab.label}
+                          <motion.span
+                            className="flex items-center justify-center shrink-0"
+                            initial={false}
+                            animate={{ scale: isCompact ? 1.05 : 1 }}
+                            transition={springExpand}
+                          >
+                            <Icon className="h-5 w-5" aria-hidden />
+                          </motion.span>
+                          <motion.span
+                            aria-hidden
+                            className="block overflow-hidden text-center whitespace-nowrap"
+                            initial={false}
+                            animate={{
+                              opacity: isCompact ? 0 : 1,
+                              height: isCompact ? 0 : 14,
+                              marginTop: isCompact ? 0 : 4,
+                              scaleY: isCompact ? 0.5 : 1,
+                            }}
+                            transition={springLabel}
+                            style={{ fontSize: '11px', transformOrigin: 'top center' }}
+                          >
+                            {tab.label}
+                          </motion.span>
                         </motion.span>
-                      </motion.span>
+
+                        {/* Inactive layer */}
+                        <motion.span
+                          aria-hidden
+                          className="absolute inset-0 flex flex-col items-center justify-center text-strong pointer-events-none"
+                          initial={false}
+                          animate={{ opacity: isActive ? 0 : 1 }}
+                          transition={springExpand}
+                        >
+                          <motion.span
+                            className="flex items-center justify-center shrink-0"
+                            initial={false}
+                            animate={{ scale: isCompact ? 1.05 : 1 }}
+                            transition={springExpand}
+                          >
+                            <Icon className="h-5 w-5" aria-hidden />
+                          </motion.span>
+                          <motion.span
+                            aria-hidden
+                            className="block overflow-hidden text-center whitespace-nowrap"
+                            initial={false}
+                            animate={{
+                              opacity: isCompact ? 0 : 1,
+                              height: isCompact ? 0 : 14,
+                              marginTop: isCompact ? 0 : 4,
+                              scaleY: isCompact ? 0.5 : 1,
+                            }}
+                            transition={springLabel}
+                            style={{ fontSize: '11px', transformOrigin: 'top center' }}
+                          >
+                            {tab.label}
+                          </motion.span>
+                        </motion.span>
+                      </div>
                     </motion.div>
                   )}
                 </NavLink>
