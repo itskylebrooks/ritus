@@ -1,22 +1,10 @@
-/* eslint-disable no-empty */
 import { defaultEase, useMotionPreferences } from '@/shared/animations';
-import defaultHabits, {
-  defaultEmojiByDate,
-  defaultEmojiRecents,
-  defaultProgress,
-  EXAMPLE_END_ISO,
-} from '@/shared/store/defaultHabits';
-import { TROPHIES, type TrophyGroup } from '@/shared/constants/trophies';
-import { useHabitStore } from '@/shared/store/store';
-import { fromISO, iso } from '@/shared/utils/date';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
-import ConfirmModal from './ConfirmModal';
 
 interface GuideModalProps {
   open: boolean;
   onClose: () => void;
-  onLoadExample?: () => void;
 }
 
 type GuideStep = { title: string; body: string };
@@ -41,37 +29,7 @@ const STEPS: GuideStep[] = [
     title: 'Points & milestones',
     body: 'Each completion earns points and strengthens streaks. Your points are visible in Profile, while Insights show your consistency and trends.',
   },
-  {
-    title: 'Import example data',
-    body: "Click 'Load data' below to explore Ritus with sample habits. If you already have data, you’ll be asked to confirm — importing replaces your current habits.",
-  },
 ];
-
-const EXAMPLE_TROPHY_GROUP_ORDER: TrophyGroup[] = [
-  'daily_build',
-  'daily_break',
-  'weekly',
-  'monthly',
-  'totals',
-  'emoji',
-  'meta',
-  'milestone',
-];
-
-const exampleTrophySortMeta = (() => {
-  const groupRank = new Map(EXAMPLE_TROPHY_GROUP_ORDER.map((group, idx) => [group, idx]));
-  const groupTiers = new Map<TrophyGroup, string[]>();
-  TROPHIES.forEach((t) => {
-    const list = groupTiers.get(t.group) ?? [];
-    list.push(t.id);
-    groupTiers.set(t.group, list);
-  });
-  const tierIndexById = new Map<string, number>();
-  groupTiers.forEach((ids) => {
-    ids.forEach((id, idx) => tierIndexById.set(id, idx));
-  });
-  return { groupRank, tierIndexById };
-})();
 
 type LayerPhase = 'enter' | 'exit';
 type LayerDir = 'forward' | 'back';
@@ -82,7 +40,7 @@ interface StepLayer {
   dir: LayerDir;
 }
 
-export default function GuideModal({ open, onClose, onLoadExample }: GuideModalProps) {
+export default function GuideModal({ open, onClose }: GuideModalProps) {
   const [step, setStep] = useState(0);
   const [renderedSteps, setRenderedSteps] = useState<StepLayer[]>([
     { key: 0, idx: 0, phase: 'enter', dir: 'forward' },
@@ -98,156 +56,6 @@ export default function GuideModal({ open, onClose, onLoadExample }: GuideModalP
   const enterRaf = useRef<number | null>(null);
   const stepAnimTimer = useRef<number | null>(null);
   const stepKeyRef = useRef(0);
-
-  // state for in-app confirmation when loading example data
-  const [confirmLoadOpen, setConfirmLoadOpen] = useState(false);
-
-  const doLoad = async () => {
-    const attemptLoad = async () => {
-      // compute cumulative totals from example data
-      const total = (defaultHabits || []).reduce((s, h) => s + (h.points || 0), 0);
-      const totalCompletions = (defaultHabits || []).reduce(
-        (s, h) => s + (h.completions ? h.completions.length : 0),
-        0,
-      );
-      const longest = (defaultHabits || []).reduce((m, h) => Math.max(m, h.streak || 0), 0);
-      const uniqueDays = new Set<string>();
-      for (const h of defaultHabits || []) {
-        for (const c of h.completions || []) uniqueDays.add(iso(fromISO(c)));
-      }
-      // also set example progress when loading sample data (points + award keys)
-      const base = {
-        habits: defaultHabits,
-        totalPoints: total,
-        totalCompletions,
-        longestStreak: longest,
-        daysWithRitus: uniqueDays.size,
-      };
-      const emoji = { emojiByDate: defaultEmojiByDate, emojiRecents: defaultEmojiRecents };
-      if (defaultProgress) {
-        useHabitStore.setState({ ...base, ...emoji, progress: defaultProgress });
-      } else {
-        useHabitStore.setState({ ...base, ...emoji });
-      }
-
-      // Compute trophy summary from the example habits and award any trophies idempotently
-      try {
-        const summary = {
-          dailyBuildStreak: Math.max(
-            0,
-            ...defaultHabits
-              .filter((h) => h.frequency === 'daily' && h.mode === 'build')
-              .map((h) => h.streak || 0),
-          ),
-          dailyBreakStreak: Math.max(
-            0,
-            ...defaultHabits
-              .filter((h) => h.frequency === 'daily' && h.mode === 'break')
-              .map((h) => h.streak || 0),
-          ),
-          weeklyStreak: Math.max(
-            0,
-            ...defaultHabits.filter((h) => h.frequency === 'weekly').map((h) => h.streak || 0),
-          ),
-          totalCompletions,
-          // longest emoji streak across the dataset (UTC-safe), not just trailing today
-          emojiStreak: (() => {
-            const by = defaultEmojiByDate || {};
-            const keys = Object.keys(by);
-            if (!keys.length) return 0;
-            const norm = new Set(keys.map((k) => (k.length > 10 ? k.slice(0, 10) : k)));
-            const prevDay = (ds: string) => {
-              const d = new Date(`${ds}T00:00:00Z`);
-              d.setUTCDate(d.getUTCDate() - 1);
-              return d.toISOString().slice(0, 10);
-            };
-            const nextDay = (ds: string) => {
-              const d = new Date(`${ds}T00:00:00Z`);
-              d.setUTCDate(d.getUTCDate() + 1);
-              return d.toISOString().slice(0, 10);
-            };
-            let longest = 0;
-            for (const ds of norm) {
-              const pk = prevDay(ds);
-              if (norm.has(pk)) continue;
-              let count = 0;
-              let cur = ds;
-              while (norm.has(cur)) {
-                count++;
-                cur = nextDay(cur);
-              }
-              if (count > longest) longest = count;
-            }
-            return longest;
-          })(),
-        };
-        try {
-          useHabitStore.getState().awardTrophies(summary);
-          const state = useHabitStore.getState();
-          const unlocked = state.progress.unlocked || {};
-          const unlockedIds = Object.keys(unlocked).filter((id) => unlocked[id]);
-          if (unlockedIds.length > 0) {
-            const ordered = TROPHIES.filter((t) => unlocked[t.id])
-              .slice()
-              .sort((a, b) => {
-                const tierA = exampleTrophySortMeta.tierIndexById.get(a.id) ?? 0;
-                const tierB = exampleTrophySortMeta.tierIndexById.get(b.id) ?? 0;
-                if (tierA !== tierB) return tierA - tierB;
-                const groupA = exampleTrophySortMeta.groupRank.get(a.group) ?? 0;
-                const groupB = exampleTrophySortMeta.groupRank.get(b.group) ?? 0;
-                if (groupA !== groupB) return groupA - groupB;
-                return a.threshold - b.threshold;
-              })
-              .map((t) => t.id);
-            const extras = unlockedIds.filter((id) => !ordered.includes(id));
-            const all = [...ordered, ...extras];
-            const end = fromISO(EXAMPLE_END_ISO);
-            const spanDays = Math.max(60, all.length);
-            const start = new Date(end);
-            start.setDate(start.getDate() - (spanDays - 1));
-            const step = all.length > 1 ? (spanDays - 1) / (all.length - 1) : 0;
-            const dated: Record<string, string> = {};
-            for (let i = 0; i < all.length; i++) {
-              const offset = Math.floor(i * step);
-              const d = new Date(start);
-              d.setDate(start.getDate() + offset);
-              dated[all[i]] = iso(d);
-            }
-            const lastId = all[all.length - 1];
-            useHabitStore.setState({
-              progress: {
-                ...state.progress,
-                unlocked: dated,
-                lastUnlockedTrophyAt: dated[lastId],
-              },
-            });
-          }
-        } catch {}
-      } catch {}
-    };
-
-    if (onLoadExample) {
-      try {
-        await onLoadExample();
-      } catch {
-        await attemptLoad();
-      }
-    } else {
-      await attemptLoad();
-    }
-
-    if (!closing) onClose();
-  };
-
-  const handleLoadClick = () => {
-    const state = useHabitStore.getState();
-    const existing = state.habits || [];
-    if (existing.length > 0) {
-      setConfirmLoadOpen(true);
-    } else {
-      void doLoad();
-    }
-  };
 
   useEffect(() => {
     if (open) {
@@ -382,78 +190,47 @@ export default function GuideModal({ open, onClose, onLoadExample }: GuideModalP
           </div>
         </div>
         <div className="mt-6">
-          {last ? (
-            // On final step: left -> Load data, right -> Finish (titles and actions swapped; styles unchanged)
-            <div className="flex gap-3">
-              <button
-                onClick={async () => {
-                  handleLoadClick();
-                }}
-                className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-control text-strong transition duration-200 hover-nonaccent"
-              >
-                Load data
-              </button>
-              <button
-                onClick={() => {
-                  if (!closing) onClose();
-                }}
-                className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-accent text-inverse transition duration-200 hover-accent-fade"
-              >
-                Finish
-              </button>
-            </div>
-          ) : (
-            <div className="flex w-full items-center gap-3">
-              <AnimatePresence initial={false} mode="popLayout">
-                {step > 0 && (
-                  <button
-                    key="back"
-                    onClick={() => queueStep(Math.max(0, step - 1))}
-                    className={`flex-1 rounded-md px-3 py-2 text-sm font-medium bg-control text-strong hover-nonaccent transition-opacity ${prefersReducedMotion ? '' : 'duration-180'}`}
-                    style={{
-                      opacity: step > 0 ? 1 : 0,
-                      pointerEvents: step > 0 ? 'auto' : 'none',
-                      willChange: 'opacity',
-                      WebkitTransform: 'translateZ(0)',
-                      WebkitBackfaceVisibility: 'hidden',
-                    }}
-                    aria-hidden={step === 0}
-                    disabled={step === 0}
-                    tabIndex={step > 0 ? 0 : -1}
-                  >
-                    Back
-                  </button>
-                )}
-
-                <motion.button
-                  key="next"
-                  layout
-                  transition={btnTransition}
-                  onClick={() => queueStep(Math.min(STEPS.length - 1, step + 1))}
-                  // Restrict CSS transitions to color only so Framer Motion controls layout/transform
-                  className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-accent text-inverse transition-colors duration-200 hover-accent-fade"
-                  style={{ willChange: 'transform, width', WebkitBackfaceVisibility: 'hidden' }}
+          <div className="flex w-full items-center gap-3">
+            <AnimatePresence initial={false} mode="popLayout">
+              {step > 0 && (
+                <button
+                  key="back"
+                  onClick={() => queueStep(Math.max(0, step - 1))}
+                  className={`flex-1 rounded-md px-3 py-2 text-sm font-medium bg-control text-strong hover-nonaccent transition-opacity ${prefersReducedMotion ? '' : 'duration-180'}`}
+                  style={{
+                    opacity: step > 0 ? 1 : 0,
+                    pointerEvents: step > 0 ? 'auto' : 'none',
+                    willChange: 'opacity',
+                    WebkitTransform: 'translateZ(0)',
+                    WebkitBackfaceVisibility: 'hidden',
+                  }}
+                  aria-hidden={step === 0}
+                  disabled={step === 0}
+                  tabIndex={step > 0 ? 0 : -1}
                 >
-                  Next
-                </motion.button>
-              </AnimatePresence>
-            </div>
-          )}
-        </div>
+                  Back
+                </button>
+              )}
 
-        <ConfirmModal
-          open={confirmLoadOpen}
-          onClose={() => setConfirmLoadOpen(false)}
-          onConfirm={async () => {
-            setConfirmLoadOpen(false);
-            await doLoad();
-          }}
-          title="Load example data?"
-          message="Load example data will replace your current habits. Continue?"
-          confirmLabel="Load"
-          cancelLabel="Cancel"
-          destructive
-        />
+              <motion.button
+                key={last ? 'finish' : 'next'}
+                layout
+                transition={btnTransition}
+                onClick={() => {
+                  if (last) {
+                    if (!closing) onClose();
+                  } else {
+                    queueStep(Math.min(STEPS.length - 1, step + 1));
+                  }
+                }}
+                className="flex-1 rounded-md px-3 py-2 text-sm font-medium bg-accent text-inverse transition-colors duration-200 hover-accent-fade"
+                style={{ willChange: 'transform, width', WebkitBackfaceVisibility: 'hidden' }}
+              >
+                {last ? 'Finish' : 'Next'}
+              </motion.button>
+            </AnimatePresence>
+          </div>
+        </div>
       </div>
     </div>
   );
