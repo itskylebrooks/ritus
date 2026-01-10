@@ -111,7 +111,7 @@ export default function Home() {
             minHeight={180}
             unmountOnExit={false}
             placeholder={
-              <div className="h-full rounded-2xl border border-subtle bg-neutral-100/70 dark:bg-neutral-900/40" />
+              <div className="h-full rounded-2xl border border-subtle bg-neutral-200 dark:bg-neutral-900/40" />
             }
           >
             <QuoteCard />
@@ -127,7 +127,7 @@ export default function Home() {
                 minHeight={200}
                 unmountOnExit={false}
                 placeholder={
-                  <div className="h-full rounded-2xl border border-subtle bg-neutral-100/70 dark:bg-neutral-900/40" />
+                  <div className="h-full rounded-2xl border border-subtle bg-neutral-200 dark:bg-neutral-900/40" />
                 }
               >
                 <AddHabit />
@@ -156,7 +156,7 @@ export default function Home() {
                         minHeight={180}
                         unmountOnExit={false}
                         placeholder={
-                          <div className="h-full rounded-2xl border border-subtle bg-neutral-100/70 dark:bg-neutral-900/40" />
+                          <div className="h-full rounded-2xl border border-subtle bg-neutral-200 dark:bg-neutral-900/40" />
                         }
                       >
                         <HabitCard
@@ -193,7 +193,7 @@ export default function Home() {
                         minHeight={180}
                         unmountOnExit={false}
                         placeholder={
-                          <div className="h-full rounded-2xl border border-subtle bg-neutral-100/70 dark:bg-neutral-900/40" />
+                          <div className="h-full rounded-2xl border border-subtle bg-neutral-200 dark:bg-neutral-900/40" />
                         }
                       >
                         <HabitCard
@@ -232,7 +232,7 @@ export default function Home() {
                             minHeight={180}
                             unmountOnExit={false}
                             placeholder={
-                              <div className="h-full rounded-2xl border border-subtle bg-neutral-100/70 dark:bg-neutral-900/40" />
+                              <div className="h-full rounded-2xl border border-subtle bg-neutral-200 dark:bg-neutral-900/40" />
                             }
                           >
                             <HabitCard
