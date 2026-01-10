@@ -156,7 +156,7 @@ export default function AppHeader() {
                 }
               >
                 <ChartPie className="w-4 h-4" />
-                <span className="text-sm font-semibold">Insight</span>
+                <span className="text-sm">Insight</span>
               </NavLink>
             </li>
             <li>
@@ -173,7 +173,7 @@ export default function AppHeader() {
                 }
               >
                 <Home className="w-4 h-4" />
-                <span className="text-sm font-semibold">Home</span>
+                <span className="text-sm">Home</span>
               </NavLink>
             </li>
             <li>
@@ -189,7 +189,7 @@ export default function AppHeader() {
                 }
               >
                 <Trophy className="w-4 h-4" />
-                <span className="text-sm font-semibold">Profile</span>
+                <span className="text-sm">Profile</span>
               </NavLink>
             </li>
           </ul>
