@@ -46,10 +46,10 @@ export const COLLECTIBLES: CollectibleDef[] = [
     id: 'quotes_author_kyle',
     type: 'quotes',
     title: 'Author’s Notes',
-    desc: 'Original reflections by the developer.',
+    desc: 'Reflections and short lines by Kyle Brooks.',
     icon: Feather,
     cost: 770,
-    implemented: false,
+    implemented: true,
   },
   {
     id: 'quotes_creators',

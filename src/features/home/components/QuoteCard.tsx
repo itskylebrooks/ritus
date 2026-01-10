@@ -7,10 +7,20 @@ export default function QuoteCard() {
   const appliedCollectibles = useHabitStore((s) => s.progress.appliedCollectibles || {});
   const hasTypingAnimation = (appliedCollectibles['animation'] || '').includes('anim_whisper_text');
 
-  // Choose a random quote once and keep it so copying doesn't change it
-  const [selectedQuote] = useState(() =>
+  // Choose a random quote and keep it; reselect when a quote pack is applied or changed
+  const [selectedQuote, setSelectedQuote] = useState(() =>
     QUOTES.length ? QUOTES[Math.floor(Math.random() * QUOTES.length)] : { text: '', author: '' },
   );
+
+  // Update selected quote when the applied quote pack changes so the UI shows the pack's quotes
+  const appliedQuotesPack = appliedCollectibles['quotes'] as string | undefined;
+  useEffect(() => {
+    const pack = appliedQuotesPack;
+    const pool = pack ? QUOTES.filter((q) => q.pack === pack) : QUOTES;
+    const list = pool.length ? pool : QUOTES;
+    const next = list[Math.floor(Math.random() * list.length)];
+    setSelectedQuote(next || { text: '', author: '' });
+  }, [appliedQuotesPack]);
 
   const [copied, setCopied] = useState(false);
   const [displayedText, setDisplayedText] = useState(hasTypingAnimation ? '' : selectedQuote.text);
