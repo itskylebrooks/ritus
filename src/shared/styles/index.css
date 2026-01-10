@@ -521,18 +521,37 @@ header button[aria-haspopup='menu'] {
     box-shadow: none;
   }
 
-  /* Mobile tab bar: stronger light-mode shadow and slightly lighter dark-mode background */
+  /* Mobile tab bar: frosted/foggy glass with stronger translucency and blur */
   .mobile-tab-bar {
-    /* Slightly stronger, lower-spread shadow for the floating dock in light mode */
-    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14);
+    /* Make the surface noticeably more transparent so background content shows through */
+    background-color: color-mix(in srgb, var(--color-surface) 60%, transparent);
+    /* Slightly lighter border so the dock reads as glass */
+    border-color: color-mix(in srgb, var(--color-border-subtle) 56%, transparent);
+    /* Softer shadow so the frosted look feels natural */
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.1);
+    transition:
+      background-color 0.18s var(--motion-page-ease),
+      box-shadow 0.18s var(--motion-page-ease);
+    overflow: hidden;
   }
+
+  @supports ((-webkit-backdrop-filter: blur(0)) or (backdrop-filter: blur(0))) {
+    .mobile-tab-bar {
+      /* Increase blur for a stronger frosted effect */
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+    }
+  }
+
   .dark .mobile-tab-bar {
-    /* Make the floating dock a touch lighter than pure-black background for separation on dark mode */
+    /* Preserve a similar dark-mode hue while making it translucent */
     background-color: color-mix(
       in srgb,
       var(--color-text-primary) 6%,
-      var(--color-surface-elevated)
+      color-mix(in srgb, var(--color-app-bg) 78%, transparent)
     );
+    border-color: color-mix(in srgb, var(--color-border-subtle) 40%, transparent);
+    box-shadow: 0 12px 24px rgba(2, 6, 23, 0.34);
   }
 
   /* Map common Tailwind neutral color utilities to theme tokens */
