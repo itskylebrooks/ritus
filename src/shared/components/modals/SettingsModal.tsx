@@ -1,4 +1,5 @@
 /* eslint-disable no-empty */
+import { useIsMobile } from '@/shared/hooks/useIsMobile';
 import { usePWA } from '@/shared/hooks/usePWA';
 import { useHabitStore } from '@/shared/store/store';
 import useThemeStore from '@/shared/store/theme';
@@ -73,6 +74,19 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
       document.body.style.overflow = prev;
     };
   }, [open]);
+
+  // Close on Escape (desktop only)
+  const isMobile = useIsMobile();
+  useEffect(() => {
+    if (!open || isMobile) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' || e.key === 'Esc') {
+        beginClose();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open, isMobile]);
   const CLOSE_DURATION = 280;
   function beginClose() {
     if (closing) return;
