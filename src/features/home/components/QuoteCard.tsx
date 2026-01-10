@@ -44,7 +44,9 @@ export default function QuoteCard() {
 
   return (
     <article
-      className="rounded-2xl border border-subtle p-4 shadow-sm w-full max-w-full cursor-pointer"
+      className={`rounded-2xl border p-4 shadow-sm w-full max-w-full cursor-pointer transition-colors duration-150 ${
+        copied ? 'border-accent bg-accent/10' : 'border-subtle'
+      }`}
       role="button"
       tabIndex={0}
       onClick={copyQuote}
@@ -55,8 +57,11 @@ export default function QuoteCard() {
         <p className="text-neutral-800 dark:text-neutral-100 italic break-words text-lg leading-tight">
           {selectedQuote.text}
         </p>
-        <footer className="text-sm text-neutral-600 dark:text-neutral-400 text-right">
-          — {selectedQuote.author}
+        <footer className="flex items-center justify-between text-sm text-neutral-600 dark:text-neutral-400">
+          <span className={`text-xs font-semibold ${copied ? 'text-accent' : 'text-transparent'}`}>
+            Copied
+          </span>
+          <span>— {selectedQuote.author}</span>
         </footer>
       </div>
       <span className="sr-only" aria-live="polite">
