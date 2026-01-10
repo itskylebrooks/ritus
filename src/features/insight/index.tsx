@@ -119,7 +119,7 @@ export default function Insight() {
     return (
       <LazyMount
         key={h.id}
-        enabled={isMobile}
+        enabled={true}
         className="w-full"
         minHeight={210}
         unmountOnExit={false}

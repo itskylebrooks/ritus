@@ -106,7 +106,7 @@ export default function Home() {
       <div className="mt-4 space-y-4">
         <div className="w-full">
           <LazyMount
-            enabled={isMobile}
+            enabled={true}
             className="w-full"
             minHeight={180}
             unmountOnExit={false}
@@ -122,7 +122,7 @@ export default function Home() {
           {showAdd && (
             <div>
               <LazyMount
-                enabled={isMobile}
+                enabled={true}
                 className="w-full"
                 minHeight={200}
                 unmountOnExit={false}
@@ -155,7 +155,7 @@ export default function Home() {
                       transition={transitions.fadeXl}
                     >
                       <LazyMount
-                        enabled={isMobile}
+                        enabled={true}
                         className="w-full"
                         minHeight={180}
                         unmountOnExit={false}
@@ -192,7 +192,7 @@ export default function Home() {
                       transition={transitions.fadeXl}
                     >
                       <LazyMount
-                        enabled={isMobile}
+                        enabled={true}
                         className="w-full"
                         minHeight={180}
                         unmountOnExit={false}
@@ -231,7 +231,7 @@ export default function Home() {
                           transition={transitions.fadeXl}
                         >
                           <LazyMount
-                            enabled={isMobile}
+                            enabled={true}
                             className="w-full"
                             minHeight={180}
                             unmountOnExit={false}
