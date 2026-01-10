@@ -47,10 +47,13 @@ export default function Insight() {
     const monthKey = todayKey.slice(0, 7);
     const weekKeySet = new Set(weekKeys);
     const completionKeysById = new Map<string, Set<string>>();
-    let done = 0;
-    let total = 0;
+    let achievedGoalsCount = 0;
+    let totalGoalsCount = 0;
 
     for (const h of habits) {
+      // Skip archived habits - only count active habits
+      if (h.archived && !showArchived) continue;
+
       const keys = new Set<string>();
       let weekCount = 0;
       let monthCount = 0;
@@ -63,23 +66,26 @@ export default function Insight() {
       }
       completionKeysById.set(h.id, keys);
 
+      // Calculate if this habit's weekly goal is achieved
+      // Each habit contributes a single binary goal state for the week
       if (h.frequency === 'daily') {
-        done += weekCount;
-        total += weekKeys.length;
+        // Daily habit: achieved if completed all 7 days this week
+        const target = 7;
+        if (weekCount >= target) achievedGoalsCount += 1;
+        totalGoalsCount += 1;
       } else if (h.frequency === 'weekly') {
+        // Weekly habit: achieved if met the weekly target
         const target = h.weeklyTarget ?? 1;
-        done += weekCount >= target ? 1 : 0;
-        total += 1;
-      } else {
-        const target = h.monthlyTarget ?? 1;
-        done += monthCount >= target ? 1 : 0;
-        total += 1;
+        if (weekCount >= target) achievedGoalsCount += 1;
+        totalGoalsCount += 1;
       }
+      // Monthly habits are excluded from "This Week" calculation
     }
 
-    const weeklyPct = total === 0 ? 0 : Math.round((done / total) * 100);
+    const weeklyPct =
+      totalGoalsCount === 0 ? 0 : Math.round((achievedGoalsCount / totalGoalsCount) * 100);
     return { completionKeysById, weeklyPct };
-  }, [calcReady, habits, weekKeys]);
+  }, [calcReady, habits, weekKeys, showArchived]);
 
   function monthFor(h: Habit) {
     return months[h.id] ?? new Date();
