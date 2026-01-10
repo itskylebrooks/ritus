@@ -11,23 +11,23 @@ type GuideStep = { title: string; body: string };
 const STEPS: GuideStep[] = [
   {
     title: 'Welcome to Ritus',
-    body: 'A minimalist, local-first habit tracker to help you build or break routines. You can even install it as an app for quick access from Settings.',
+    body: 'Ritus is a calm habit tracker built for rhythm, not pressure. Every check-in is a small vote for the person you want to become.',
   },
   {
-    title: 'Create a habit',
-    body: 'Tap Add to create a habit, give it a clear name, then choose Daily, Weekly or Monthly frequency, and Build or Break type.',
+    title: 'Formulate (Home Page)',
+    body: 'Create habits you want to build or break. Keep names concrete and small enough to do on a bad day. Then tap Done / Clean to show up.',
   },
   {
-    title: 'Track completions',
-    body: 'Mark days as Done (or Clean) directly from the card or use the small week strip. Weekly and monthly habits count toward your set targets — stay consistent to grow your streaks.',
+    title: 'Track (Insight Page)',
+    body: 'Visual stats help you notice patterns over time. Weekly and monthly habits count toward their targets: so progress feels steady, not all-or-nothing.',
   },
   {
-    title: 'Emoji of the Day',
-    body: 'Tap the emoji button in the header to record your mood or daily highlight. Over time, your emoji history will appear in Insights — a quick reflection of your days.',
+    title: 'Reflect (Emoji of the Day)',
+    body: 'Add a daily emoji to capture mood or a highlight. Over time, your emoji history becomes a simple timeline of your days.',
   },
   {
-    title: 'Points & milestones',
-    body: 'Each completion earns points and strengthens streaks. Your points are visible in Profile, while Insights show your consistency and trends.',
+    title: 'Reward (Profile Page)',
+    body: 'Completions earn Points: small acknowledgments that accumulate. Use them to unlock cosmetic items, or ignore them and keep the practice quiet.',
   },
 ];
 
