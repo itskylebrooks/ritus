@@ -223,7 +223,7 @@ export const TROPHIES: TrophyDef[] = [
     group: 'meta',
     threshold: 30,
     Icon: Scale,
-    reason: 'Maintained at least one build and one break habit active for 30 days',
+    reason: 'One build and one break habits for 30 days',
   },
   {
     id: 'meta_resilience',

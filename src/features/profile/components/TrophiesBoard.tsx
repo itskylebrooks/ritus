@@ -50,9 +50,9 @@ export default function TrophiesBoard() {
             return (
               <div
                 key={id}
-                className="flex flex-col items-center justify-between gap-3 rounded-lg border border-subtle p-4 min-h-[140px]"
+                className="flex flex-col items-center justify-between gap-2 rounded-lg border border-subtle p-4 min-h-[140px]"
               >
-                <div className="p-2 rounded-md">
+                <div className="p-1 rounded-md">
                   <Icon className="h-7 w-7 text-accent" />
                 </div>
                 <div className="text-sm font-semibold text-strong text-center">{label}</div>
