@@ -247,7 +247,7 @@ export default function EmojiHistoryCard({ ready = true }: { ready?: boolean }) 
           />
         </div>
       ) : (
-        <div className="mt-2 h-[180px] rounded-xl bg-neutral-100/70 dark:bg-neutral-900/40" />
+        <div className="mt-2 h-[180px] rounded-xl bg-neutral-200 dark:bg-neutral-900/40" />
       )}
     </div>
   );

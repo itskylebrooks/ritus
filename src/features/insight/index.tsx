@@ -124,7 +124,7 @@ export default function Insight() {
         minHeight={210}
         unmountOnExit={false}
         placeholder={
-          <div className="h-full rounded-2xl border border-subtle bg-neutral-100/70 dark:bg-neutral-900/40" />
+          <div className="h-full rounded-2xl border border-subtle bg-neutral-200 dark:bg-neutral-900/40" />
         }
       >
         <div className="rounded-2xl border border-subtle p-4 shadow-sm w-full">
@@ -184,7 +184,7 @@ export default function Insight() {
                 />
               </div>
             ) : (
-              <div className="mt-3 h-[140px] rounded-xl bg-neutral-100/70 dark:bg-neutral-900/40" />
+              <div className="mt-3 h-[140px] rounded-xl bg-neutral-200 dark:bg-neutral-900/40" />
             );
           })()}
         </div>
@@ -224,9 +224,9 @@ export default function Insight() {
           </>
         ) : (
           <>
-            <div className="h-[140px] rounded-2xl border border-subtle bg-neutral-100/70 dark:bg-neutral-900/40" />
-            <div className="h-[140px] rounded-2xl border border-subtle bg-neutral-100/70 dark:bg-neutral-900/40" />
-            <div className="h-[140px] rounded-2xl border border-subtle bg-neutral-100/70 dark:bg-neutral-900/40" />
+            <div className="h-[140px] rounded-2xl border border-subtle bg-neutral-200 dark:bg-neutral-900/40" />
+            <div className="h-[140px] rounded-2xl border border-subtle bg-neutral-200 dark:bg-neutral-900/40" />
+            <div className="h-[140px] rounded-2xl border border-subtle bg-neutral-200 dark:bg-neutral-900/40" />
           </>
         )}
       </div>
