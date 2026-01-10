@@ -17,7 +17,7 @@ const EMPTY_ARRAY: string[] = [];
 function EmptyState({ disableAnim = false }: { disableAnim?: boolean }) {
   return (
     <motion.div
-      layout
+      layout={!disableAnim}
       key="empty"
       initial={disableAnim ? false : { opacity: 0, y: 8, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -130,12 +130,16 @@ export default function Home() {
                   <div className="h-full rounded-2xl border border-subtle bg-neutral-200 dark:bg-neutral-900/40" />
                 }
               >
-                <AddHabit />
+                <AddHabit disableInitialLayout={initialListRender} />
               </LazyMount>
             </div>
           )}
 
-          <motion.main layout className={`grid gap-4 ${showList ? '' : 'sm:grid-cols-2'}`}>
+          {/* Disable layout-based motion on initial mount so quote height changes don't animate cards into position */}
+          <motion.main
+            layout={!initialListRender}
+            className={`grid gap-4 ${showList ? '' : 'sm:grid-cols-2'}`}
+          >
             <AnimatePresence initial={false} mode="popLayout">
               {groupedHabits.incompleteToday.length === 0 &&
               groupedHabits.completedToday.length === 0 &&
@@ -146,7 +150,7 @@ export default function Home() {
                   {groupedHabits.incompleteToday.map((h) => (
                     <motion.div
                       key={h.id}
-                      layout
+                      layout={!initialListRender}
                       exit={{ opacity: 0, scale: 0.95 }}
                       transition={transitions.fadeXl}
                     >
@@ -173,7 +177,7 @@ export default function Home() {
                     groupedHabits.incompleteToday.length > 0 && (
                       <motion.div
                         key="divider-completed"
-                        layout
+                        layout={!initialListRender}
                         className="col-span-full text-xs font-semibold tracking-[0.6em] text-neutral-400 dark:text-neutral-500 text-center uppercase"
                       >
                         COMPLETED
@@ -183,7 +187,7 @@ export default function Home() {
                   {groupedHabits.completedToday.map((h) => (
                     <motion.div
                       key={h.id}
-                      layout
+                      layout={!initialListRender}
                       exit={{ opacity: 0, scale: 0.95 }}
                       transition={transitions.fadeXl}
                     >
@@ -212,7 +216,7 @@ export default function Home() {
                         groupedHabits.completedToday.length > 0) && (
                         <motion.div
                           key="divider-archived"
-                          layout
+                          layout={!initialListRender}
                           className="col-span-full text-xs font-semibold tracking-[0.6em] text-neutral-400 dark:text-neutral-500 text-center uppercase"
                         >
                           ARCHIVED
@@ -222,7 +226,7 @@ export default function Home() {
                       {groupedHabits.archived.map((h) => (
                         <motion.div
                           key={h.id}
-                          layout
+                          layout={!initialListRender}
                           exit={{ opacity: 0, scale: 0.95 }}
                           transition={transitions.fadeXl}
                         >

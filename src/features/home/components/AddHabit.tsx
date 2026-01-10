@@ -6,7 +6,13 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, Plus } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
-export default function AddHabit() {
+export default function AddHabit({
+  disableInitialLayout = false,
+}: {
+  disableInitialLayout?: boolean;
+}) {
+  // disableInitialLayout: when true, avoid framer-motion 'layout' animations on mount
+  // (used by Home to avoid initial reflow animations when Quote height differs)
   const addHabit = useHabitStore((s) => s.addHabit);
   const [name, setName] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -113,13 +119,13 @@ export default function AddHabit() {
 
   return (
     <motion.form
-      layout
+      layout={!disableInitialLayout}
       onSubmit={submit}
       className="flex flex-col gap-3 rounded-2xl border border-subtle p-3 shadow-sm sm:flex-row sm:items-end"
     >
       <motion.div
         className="flex-1"
-        layout="position"
+        layout={disableInitialLayout ? false : 'position'}
         transition={transitions.layoutSpring}
         style={{ minWidth: 0 }}
       >
@@ -242,7 +248,11 @@ export default function AddHabit() {
       </motion.div>
       {/* On mobile: show 'I want to' and 'Frequency' side-by-side (two columns). */}
       <div className="grid grid-cols-2 gap-3" style={{ minWidth: 0 }}>
-        <motion.div layout transition={transitions.layoutSpring} style={{ minWidth: 0 }}>
+        <motion.div
+          layout={!disableInitialLayout}
+          transition={transitions.layoutSpring}
+          style={{ minWidth: 0 }}
+        >
           <label className="block text-sm text-muted">I want to</label>
           <div className="mt-1 flex gap-2">
             <label
@@ -273,7 +283,11 @@ export default function AddHabit() {
           </div>
         </motion.div>
 
-        <motion.div layout transition={transitions.layoutSpring} style={{ minWidth: 0 }}>
+        <motion.div
+          layout={!disableInitialLayout}
+          transition={transitions.layoutSpring}
+          style={{ minWidth: 0 }}
+        >
           <label className="block text-sm text-muted">Frequency</label>
           <div className="relative mt-1">
             <select
@@ -297,7 +311,7 @@ export default function AddHabit() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 12 }}
             transition={transitions.spring}
-            layout
+            layout={!disableInitialLayout}
             style={{ minWidth: 0 }}
           >
             <label className="block text-sm text-muted">Days / week</label>
@@ -324,7 +338,7 @@ export default function AddHabit() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 12 }}
             transition={transitions.spring}
-            layout
+            layout={!disableInitialLayout}
             style={{ minWidth: 0 }}
           >
             <label className="block text-sm text-muted">Times / month</label>
@@ -346,7 +360,7 @@ export default function AddHabit() {
         )}
       </AnimatePresence>
       <motion.button
-        layout
+        layout={!disableInitialLayout}
         transition={transitions.layoutSpring}
         style={{ minWidth: 0 }}
         type="submit"
