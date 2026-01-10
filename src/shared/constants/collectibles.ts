@@ -4,6 +4,7 @@ import {
   Feather,
   Flame,
   Gem,
+  Laugh,
   Leaf,
   Medal,
   PlayCircle,
@@ -192,6 +193,15 @@ export const COLLECTIBLES: CollectibleDef[] = [
     desc: 'A delightful burst of micro-confetti pops whenever you complete a habit.',
     icon: Target,
     cost: 1700,
+    implemented: true,
+  },
+  {
+    id: 'anim_emoji_rain',
+    type: 'animation',
+    title: 'Emoji Rain',
+    desc: 'Your chosen emoji falls like rain when you set it for the day.',
+    icon: Laugh,
+    cost: 1200,
     implemented: true,
   },
 ];

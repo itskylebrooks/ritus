@@ -620,7 +620,7 @@ export default defaultHabits;
 // Example default progress that pairs with the example habits above.
 export const defaultProgress = {
   // spendable points
-  points: 200,
+  points: 20000,
   // bookkeeping maps (empty by default for example data)
   weekBonusKeys: {},
   completionAwardKeys: {},

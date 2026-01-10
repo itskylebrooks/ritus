@@ -1,6 +1,8 @@
 import { useMotionPreferences } from '@/shared/animations';
 import { emojiCategories, emojiIndex, EmojiItem } from '@/shared/constants/emojis';
 import { useEmojiOfTheDay } from '@/shared/hooks/useEmojiOfTheDay';
+import { useHabitStore } from '@/shared/store/store';
+import { createEmojiRain } from '@/shared/utils/emojiRain';
 import { CirclePlus } from 'lucide-react';
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -16,6 +18,9 @@ function normalizeQuery(value: string) {
 export default function EmojiPicker() {
   const { emoji, setEmoji, clearEmoji, emojiId, recents } = useEmojiOfTheDay();
   const { prefersReducedMotion } = useMotionPreferences();
+  const appliedCollectibles = useHabitStore((s) => s.progress.appliedCollectibles || {});
+  const animStr = appliedCollectibles['animation'] || '';
+  const hasEmojiRain = animStr.includes('anim_emoji_rain');
   const [open, setOpen] = useState(false);
   const [closing, setClosing] = useState(false);
   const closeTimerRef = useRef<number | null>(null);
@@ -46,10 +51,15 @@ export default function EmojiPicker() {
   }, [query, baseCats]);
 
   const handleSelect = (item: EmojiItem) => {
-    if (emojiId === item.id) {
+    const wasSelected = emojiId === item.id;
+    if (wasSelected) {
       clearEmoji();
     } else {
       setEmoji(item);
+      // Trigger emoji rain effect when new emoji is selected
+      if (hasEmojiRain && !prefersReducedMotion) {
+        createEmojiRain({ emoji: item.emoji });
+      }
     }
     beginClose();
   };
