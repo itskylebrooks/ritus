@@ -43,8 +43,6 @@ export default function Insight() {
     if (!calcReady) {
       return { completionKeysById: new Map<string, Set<string>>(), weeklyPct: 0 };
     }
-    const todayKey = iso(new Date()).slice(0, 10);
-    const monthKey = todayKey.slice(0, 7);
     const weekKeySet = new Set(weekKeys);
     const completionKeysById = new Map<string, Set<string>>();
     let achievedGoalsCount = 0;
@@ -56,13 +54,11 @@ export default function Insight() {
 
       const keys = new Set<string>();
       let weekCount = 0;
-      let monthCount = 0;
       for (const c of h.completions || []) {
         const key = c.length > 10 ? c.slice(0, 10) : c;
         if (keys.has(key)) continue;
         keys.add(key);
         if (weekKeySet.has(key)) weekCount += 1;
-        if (key.startsWith(monthKey)) monthCount += 1;
       }
       completionKeysById.set(h.id, keys);
 
