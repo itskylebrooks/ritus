@@ -6,7 +6,7 @@ import defaultHabits, {
   defaultProgress,
   EXAMPLE_END_ISO,
 } from '@/shared/store/defaultHabits';
-import { TROPHIES } from '@/shared/constants/trophies';
+import { TROPHIES, type TrophyGroup } from '@/shared/constants/trophies';
 import { useHabitStore } from '@/shared/store/store';
 import { fromISO, iso } from '@/shared/utils/date';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -46,6 +46,32 @@ const STEPS: GuideStep[] = [
     body: "Click 'Load data' below to explore Ritus with sample habits. If you already have data, you’ll be asked to confirm — importing replaces your current habits.",
   },
 ];
+
+const EXAMPLE_TROPHY_GROUP_ORDER: TrophyGroup[] = [
+  'daily_build',
+  'daily_break',
+  'weekly',
+  'monthly',
+  'totals',
+  'emoji',
+  'meta',
+  'milestone',
+];
+
+const exampleTrophySortMeta = (() => {
+  const groupRank = new Map(EXAMPLE_TROPHY_GROUP_ORDER.map((group, idx) => [group, idx]));
+  const groupTiers = new Map<TrophyGroup, string[]>();
+  TROPHIES.forEach((t) => {
+    const list = groupTiers.get(t.group) ?? [];
+    list.push(t.id);
+    groupTiers.set(t.group, list);
+  });
+  const tierIndexById = new Map<string, number>();
+  groupTiers.forEach((ids) => {
+    ids.forEach((id, idx) => tierIndexById.set(id, idx));
+  });
+  return { groupRank, tierIndexById };
+})();
 
 type LayerPhase = 'enter' | 'exit';
 type LayerDir = 'forward' | 'back';
@@ -161,7 +187,18 @@ export default function GuideModal({ open, onClose, onLoadExample }: GuideModalP
           const unlocked = state.progress.unlocked || {};
           const unlockedIds = Object.keys(unlocked).filter((id) => unlocked[id]);
           if (unlockedIds.length > 0) {
-            const ordered = TROPHIES.filter((t) => unlocked[t.id]).map((t) => t.id);
+            const ordered = TROPHIES.filter((t) => unlocked[t.id])
+              .slice()
+              .sort((a, b) => {
+                const tierA = exampleTrophySortMeta.tierIndexById.get(a.id) ?? 0;
+                const tierB = exampleTrophySortMeta.tierIndexById.get(b.id) ?? 0;
+                if (tierA !== tierB) return tierA - tierB;
+                const groupA = exampleTrophySortMeta.groupRank.get(a.group) ?? 0;
+                const groupB = exampleTrophySortMeta.groupRank.get(b.group) ?? 0;
+                if (groupA !== groupB) return groupA - groupB;
+                return a.threshold - b.threshold;
+              })
+              .map((t) => t.id);
             const extras = unlockedIds.filter((id) => !ordered.includes(id));
             const all = [...ordered, ...extras];
             const end = fromISO(EXAMPLE_END_ISO);
