@@ -5,6 +5,7 @@ import WeekStrip from '@/shared/components/layout/WeekStrip';
 import ConfirmModal from '@/shared/components/modals/ConfirmModal';
 import { useHabitStore } from '@/shared/store/store';
 import type { Habit } from '@/shared/types';
+import { fireConfetti } from '@/shared/utils/confetti';
 import { iso } from '@/shared/utils/date';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Archive, Check, Diamond, Flame, Inbox, Pencil, Settings2, Trash2, X } from 'lucide-react';
@@ -204,6 +205,24 @@ export default function HabitCard({
     setEditing(false);
   }
 
+  const handleToggle = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (habit.archived) return;
+
+    // Fire confetti if enabling 'done' state and animation is active
+    if (!doneToday && appliedCollectibles['animation']?.includes('anim_confetti_button')) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = (rect.left + rect.width / 2) / window.innerWidth;
+      const y = (rect.top + rect.height / 2) / window.innerHeight;
+      fireConfetti({
+        particleCount: 40,
+        spread: 60,
+        origin: { x, y },
+      });
+    }
+
+    toggleCompletion(habit.id, new Date());
+  };
+
   const deleteHabitWithAnimation = () => {
     setIsRemoving(true);
     setTimeout(() => deleteHabit(habit.id), 300); // Match animation duration
@@ -328,9 +347,7 @@ export default function HabitCard({
         {habit.mode === 'break' ? (
           showList ? (
             <button
-              onClick={() => {
-                if (!habit.archived) toggleCompletion(habit.id, new Date());
-              }}
+              onClick={handleToggle}
               disabled={habit.archived}
               aria-disabled={habit.archived}
               aria-label="Clean today"
@@ -341,9 +358,7 @@ export default function HabitCard({
             </button>
           ) : (
             <button
-              onClick={() => {
-                if (!habit.archived) toggleCompletion(habit.id, new Date());
-              }}
+              onClick={handleToggle}
               disabled={habit.archived}
               aria-disabled={habit.archived}
               aria-label="Clean today"
@@ -356,9 +371,7 @@ export default function HabitCard({
           )
         ) : showList ? (
           <button
-            onClick={() => {
-              if (!habit.archived) toggleCompletion(habit.id, new Date());
-            }}
+            onClick={handleToggle}
             disabled={habit.archived}
             aria-disabled={habit.archived}
             aria-label="Done today"
@@ -369,9 +382,7 @@ export default function HabitCard({
           </button>
         ) : (
           <button
-            onClick={() => {
-              if (!habit.archived) toggleCompletion(habit.id, new Date());
-            }}
+            onClick={handleToggle}
             disabled={habit.archived}
             aria-disabled={habit.archived}
             aria-label="Done today"

@@ -82,7 +82,11 @@ export default function CollectiblesStoreCard() {
                         </span>
                         {Owned ? (
                           // Owned items show an Apply button so the user can activate them.
-                          applied[item.type] === item.id ? (
+                          (
+                            item.type === 'animation'
+                              ? (applied[item.type] || '').split(',').includes(item.id)
+                              : applied[item.type] === item.id
+                          ) ? (
                             // When already applied, show a button that allows the user to unapply
                             <button
                               onClick={() => {

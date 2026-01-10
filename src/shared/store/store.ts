@@ -424,7 +424,38 @@ export const useHabitStore = create<HabitState>()(
         const def = COLLECTIBLES.find((c) => c.id === id);
         if (!def) return false;
         const type = def.type;
-        const current = state.progress.appliedCollectibles?.[type];
+        const current = state.progress.appliedCollectibles?.[type] || '';
+
+        // Handling for multiple selectable items (animations)
+        if (type === 'animation') {
+          const currentList = current ? current.split(',') : [];
+          if (currentList.includes(id)) {
+            // Unapply (remove from list)
+            const nextList = currentList.filter((item) => item !== id);
+            set((s) => {
+              const next = { ...(s.progress.appliedCollectibles || {}) };
+              // if empty, deleting key is cleaner, or keep empty string?
+              if (nextList.length === 0) delete next[type];
+              else next[type] = nextList.join(',');
+              return { progress: { ...s.progress, appliedCollectibles: next } };
+            });
+          } else {
+            // Apply (add to list)
+            const nextList = [...currentList, id];
+            set((s) => ({
+              progress: {
+                ...s.progress,
+                appliedCollectibles: {
+                  ...(s.progress.appliedCollectibles || {}),
+                  [type]: nextList.join(','),
+                },
+              },
+            }));
+          }
+          return true;
+        }
+
+        // Default single-select behavior for other types (accent, quotes, etc.)
         if (current === id) {
           // unapply: remove the applied id for this type
           set((s) => {

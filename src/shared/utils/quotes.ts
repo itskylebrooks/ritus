@@ -244,7 +244,7 @@ export const QUOTES = [
     author: 'Walt Disney',
   },
   {
-    text: 'Innovation is the ability to see change as an opportunity - not a threat',
+    text: 'Innovation is the ability to see change as an opportunity - not a threat.',
     author: 'Steve Jobs',
   },
   {
@@ -284,7 +284,7 @@ export const QUOTES = [
     author: 'Sheryl Sandberg',
   },
   {
-    text: 'To go forward you have to leave something behind',
+    text: 'To go forward you have to leave something behind.',
     author: 'Steve Jobs',
   },
   {
@@ -296,7 +296,7 @@ export const QUOTES = [
     author: 'Steve Jobs',
   },
   {
-    text: 'Do not pray for an easy life, pray for the strength to endure a difficult one',
+    text: 'Do not pray for an easy life, pray for the strength to endure a difficult one.',
     author: 'Bruce Lee',
   },
   {

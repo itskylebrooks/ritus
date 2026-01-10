@@ -5,6 +5,7 @@ import Inspiration from '@/features/inspiration';
 import Profile from '@/features/profile';
 import { createPageMotion } from '@/shared/animations';
 import AppHeader from '@/shared/components/headers/AppHeader';
+import { useHabitStore } from '@/shared/store/store';
 import type { TargetAndTransition, Transition } from 'framer-motion';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { useEffect } from 'react';
@@ -30,7 +31,19 @@ const Page = ({
 export default function App() {
   const location = useLocation();
   const shouldReduceMotion = useReducedMotion();
-  const { initial, animate, transition } = createPageMotion(shouldReduceMotion);
+  const appliedCollectibles = useHabitStore((s) => s.progress.appliedCollectibles || {});
+  const mistFade = (appliedCollectibles['animation'] || '').includes('anim_mist_fade');
+
+  const baseMotion = createPageMotion(shouldReduceMotion);
+  let initial: TargetAndTransition | undefined = baseMotion.initial;
+  let animate: TargetAndTransition | undefined = baseMotion.animate;
+  let transition: Transition | undefined = baseMotion.transition;
+
+  if (mistFade && !shouldReduceMotion) {
+    initial = { opacity: 0, filter: 'blur(4px)' };
+    animate = { opacity: 1, filter: 'blur(0px)' };
+    transition = { duration: 0.5, ease: 'easeInOut' };
+  }
 
   useEffect(() => {
     if (typeof window === 'undefined') return;

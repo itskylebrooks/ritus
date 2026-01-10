@@ -11,7 +11,7 @@ type AccentId =
   | 'default';
 
 // Define light/dark pairs with appropriate text contrast
-const ACCENTS: Record<
+export const ACCENTS: Record<
   AccentId,
   { light: string; lightContrast: string; dark: string; darkContrast: string }
 > = {
