@@ -5,6 +5,7 @@ import Inspiration from '@/features/inspiration';
 import Profile from '@/features/profile';
 import { createPageMotion } from '@/shared/animations';
 import AppHeader from '@/shared/components/headers/AppHeader';
+import BackupSuggestion from '@/shared/components/modals/BackupSuggestion';
 import { useHabitStore } from '@/shared/store/store';
 import type { TargetAndTransition, Transition } from 'framer-motion';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
@@ -53,6 +54,8 @@ export default function App() {
   return (
     <div className="mx-auto max-w-3xl px-4 pb-24 sm:pb-6">
       <AppHeader />
+
+      <BackupSuggestion />
 
       <main>
         <AnimatePresence mode="wait" initial={false}>

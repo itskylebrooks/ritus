@@ -11,6 +11,8 @@ interface ConfirmModalProps {
   confirmLabel?: string;
   cancelLabel?: string;
   destructive?: boolean;
+  // Allow alternate confirm button color variants (e.g. success/green)
+  confirmVariant?: 'accent' | 'success';
 }
 
 export default function ConfirmModal({
@@ -22,6 +24,7 @@ export default function ConfirmModal({
   confirmLabel = 'Confirm',
   cancelLabel = 'Cancel',
   destructive = false,
+  confirmVariant = 'accent',
 }: ConfirmModalProps) {
   const [visible, setVisible] = useState(open);
   const [closing, setClosing] = useState(false);
@@ -107,7 +110,7 @@ export default function ConfirmModal({
             {cancelLabel}
           </button>
           <button
-            className={`rounded-md px-3 py-2 text-sm font-medium ${destructive ? 'bg-danger hover:bg-danger-soft text-inverse' : 'bg-accent text-inverse hover:bg-accent-soft'}`}
+            className={`rounded-md px-3 py-2 text-sm font-medium ${destructive ? 'bg-danger hover:bg-danger-soft text-inverse' : confirmVariant === 'success' ? 'bg-success text-inverse hover:bg-success-soft' : 'bg-accent text-inverse hover:bg-accent-soft'}`}
             onClick={() => {
               if (!closing) {
                 onConfirm();
