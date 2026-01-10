@@ -85,7 +85,6 @@ export interface HabitState {
     ownedCollectibles?: string[];
     appliedCollectibles?: Record<string, string>;
     seenTrophies?: Record<string, true | undefined>;
-    lastUnlockedTrophyId?: string;
     lastUnlockedTrophyAt?: string;
   };
   setPoints: (n: number) => void;
@@ -209,12 +208,10 @@ export const useHabitStore = create<HabitState>()(
           }
         }
         if (newly.length > 0) {
-          const lastUnlockedId = newly[newly.length - 1];
           set((s) => ({
             progress: {
               ...s.progress,
               unlocked,
-              lastUnlockedTrophyId: lastUnlockedId,
               lastUnlockedTrophyAt: unlockedAt,
             },
           }));
@@ -386,12 +383,10 @@ export const useHabitStore = create<HabitState>()(
           }
         }
         if (newly.length === 0) return newly;
-        const lastUnlockedId = newly[newly.length - 1];
         set((s) => ({
           progress: {
             ...s.progress,
             unlocked,
-            lastUnlockedTrophyId: lastUnlockedId,
             lastUnlockedTrophyAt: unlockedAt,
           },
         }));
@@ -760,7 +755,6 @@ export const useHabitStore = create<HabitState>()(
                 }
                 return existing;
               })(),
-              lastUnlockedTrophyId: lastUnlockedId ?? s.progress.lastUnlockedTrophyId,
               lastUnlockedTrophyAt: lastUnlockedId ? unlockedAt : s.progress.lastUnlockedTrophyAt,
             },
             daysWithRitus,

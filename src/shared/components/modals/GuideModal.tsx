@@ -181,7 +181,6 @@ export default function GuideModal({ open, onClose, onLoadExample }: GuideModalP
               progress: {
                 ...state.progress,
                 unlocked: dated,
-                lastUnlockedTrophyId: lastId,
                 lastUnlockedTrophyAt: dated[lastId],
               },
             });

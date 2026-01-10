@@ -9,7 +9,14 @@ export default function TrophiesBoard() {
   const unlocked = useHabitStore((s) => s.progress.unlocked || {});
   const dateFormat = useHabitStore((s) => s.dateFormat);
   const datePattern = dateFormat === 'MDY' ? 'MMM d, yyyy' : 'd MMM yyyy';
-  const items = useMemo(() => TROPHIES.filter((t) => unlocked[t.id]), [unlocked]);
+  const items = useMemo(() => {
+    const filtered = TROPHIES.filter((t) => unlocked[t.id]);
+    return filtered.sort((a, b) => {
+      const aDate = unlocked[a.id] || '';
+      const bDate = unlocked[b.id] || '';
+      return bDate.localeCompare(aDate);
+    });
+  }, [unlocked]);
   const formatDate = (value?: string) => {
     if (!value) return null;
     try {
