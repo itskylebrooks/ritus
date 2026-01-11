@@ -46,7 +46,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     implemented: false,
   },
   {
-    id: 'quotes_author_kyle',
+    id: 'quotes_author',
     type: 'quotes',
     title: 'Author’s Notes',
     desc: 'Reflections and short lines by Kyle Brooks.',

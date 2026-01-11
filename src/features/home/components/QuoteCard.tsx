@@ -1,5 +1,5 @@
 import { useHabitStore } from '@/shared/store/store';
-import { QUOTES } from '@/shared/utils/quotes';
+import { QUOTES, getQuotePool } from '@/shared/utils/quotes';
 import { motion } from 'framer-motion';
 import { type KeyboardEvent, useEffect, useState } from 'react';
 
@@ -8,15 +8,15 @@ export default function QuoteCard() {
   const hasTypingAnimation = (appliedCollectibles['animation'] || '').includes('anim_whisper_text');
 
   // Choose a random quote and keep it; reselect when a quote pack is applied or changed
-  const [selectedQuote, setSelectedQuote] = useState(() =>
-    QUOTES.length ? QUOTES[Math.floor(Math.random() * QUOTES.length)] : { text: '', author: '' },
-  );
+  const appliedQuotesPack = appliedCollectibles['quotes'] as string | undefined;
+  const [selectedQuote, setSelectedQuote] = useState(() => {
+    const pool = getQuotePool(appliedQuotesPack);
+    return pool.length ? pool[Math.floor(Math.random() * pool.length)] : { text: '', author: '' };
+  });
 
   // Update selected quote when the applied quote pack changes so the UI shows the pack's quotes
-  const appliedQuotesPack = appliedCollectibles['quotes'] as string | undefined;
   useEffect(() => {
-    const pack = appliedQuotesPack;
-    const pool = pack ? QUOTES.filter((q) => q.pack === pack) : QUOTES;
+    const pool = getQuotePool(appliedQuotesPack);
     const list = pool.length ? pool : QUOTES;
     const next = list[Math.floor(Math.random() * list.length)];
     setSelectedQuote(next || { text: '', author: '' });
