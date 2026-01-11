@@ -196,6 +196,8 @@ export default function Home({ pageTransitioning = false }: { pageTransitioning?
                       <motion.div
                         key="divider-completed"
                         layout={!initialListRender}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        transition={transitions.fadeXl}
                         className="col-span-full text-xs font-semibold tracking-[0.6em] text-neutral-400 dark:text-neutral-500 text-center uppercase"
                       >
                         COMPLETED
@@ -235,6 +237,8 @@ export default function Home({ pageTransitioning = false }: { pageTransitioning?
                         <motion.div
                           key="divider-archived"
                           layout={!initialListRender}
+                          exit={{ opacity: 0, scale: 0.95 }}
+                          transition={transitions.fadeXl}
                           className="col-span-full text-xs font-semibold tracking-[0.6em] text-neutral-400 dark:text-neutral-500 text-center uppercase"
                         >
                           ARCHIVED
