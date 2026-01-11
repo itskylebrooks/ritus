@@ -420,6 +420,18 @@ export const useHabitStore = create<HabitState>()(
             ownedCollectibles: [...(s.progress.ownedCollectibles || []), id],
           },
         }));
+        // Re-evaluate trophies (e.g. meta_first_collectible) after purchase
+        try {
+          // pass a minimal summary so TypeScript accepts the call
+          get().awardTrophies?.({
+            dailyBuildStreak: 0,
+            dailyBreakStreak: 0,
+            weeklyStreak: 0,
+            totalCompletions: get().totalCompletions || 0,
+          });
+        } catch {
+          // swallow any errors to avoid breaking purchase flow
+        }
         return true;
       },
       markTrophiesSeen: (ids: string[]) => {
@@ -854,6 +866,25 @@ export const useHabitStore = create<HabitState>()(
             if (normalized) cleaned.unlocked = normalized;
           }
           merged.progress = cleaned as HabitState['progress'];
+
+          // If the user already owned collectibles before this trophy existed,
+          // award `meta_first_collectible` once on load so we don't need to
+          // evaluate the owned-collectibles condition repeatedly at runtime.
+          try {
+            const owned = (merged.progress.ownedCollectibles || []) as string[];
+            const unlocked = (merged.progress.unlocked || {}) as Record<string, string>;
+            const metaId = 'meta_first_collectible';
+            if (owned.length > 0 && !unlocked[metaId]) {
+              const at =
+                typeof merged.progress.lastUnlockedTrophyAt === 'string'
+                  ? merged.progress.lastUnlockedTrophyAt
+                  : iso(new Date());
+              merged.progress.unlocked = { ...unlocked, [metaId]: at };
+              merged.progress.lastUnlockedTrophyAt = at;
+            }
+          } catch {
+            // swallow to avoid breaking merge on unexpected persisted shapes
+          }
         }
         const hasPersistedTotal =
           incoming && Object.prototype.hasOwnProperty.call(incoming, 'totalCompletions');
