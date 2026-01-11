@@ -22,8 +22,11 @@ export default function EmojiPicker() {
   const animStr = appliedCollectibles['animation'] || '';
   const hasEmojiRain = animStr.includes('anim_emoji_rain');
   const [open, setOpen] = useState(false);
+  const [visible, setVisible] = useState(false);
   const [closing, setClosing] = useState(false);
+  const [entering, setEntering] = useState(false);
   const closeTimerRef = useRef<number | null>(null);
+  const enterRaf = useRef<number | null>(null);
   const [search, setSearch] = useState('');
   const containerRef = useRef<HTMLDivElement | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
@@ -64,19 +67,51 @@ export default function EmojiPicker() {
     beginClose();
   };
 
-  const CLOSE_DURATION = 280;
+  const CLOSE_DURATION = 220;
 
   const beginClose = useCallback(() => {
-    if (!open || closing) return;
+    if (!visible || closing) return;
     setClosing(true);
     closeTimerRef.current = window.setTimeout(() => {
+      setVisible(false);
       setClosing(false);
       setOpen(false);
-    }, CLOSE_DURATION + 40);
-  }, [open, closing]);
+    }, CLOSE_DURATION);
+  }, [visible, closing]);
 
   useEffect(() => {
-    if (!open) {
+    if (open) {
+      if (closeTimerRef.current) {
+        window.clearTimeout(closeTimerRef.current);
+        closeTimerRef.current = null;
+      }
+      if (enterRaf.current) cancelAnimationFrame(enterRaf.current);
+      setVisible(true);
+      setClosing(false);
+      setEntering(true);
+      enterRaf.current = requestAnimationFrame(() => {
+        enterRaf.current = requestAnimationFrame(() => setEntering(false));
+      });
+    } else if (visible) {
+      setClosing(true);
+      closeTimerRef.current = window.setTimeout(() => {
+        setVisible(false);
+        setClosing(false);
+        setOpen(false);
+      }, CLOSE_DURATION);
+    }
+
+    return () => {
+      if (closeTimerRef.current) {
+        window.clearTimeout(closeTimerRef.current);
+        closeTimerRef.current = null;
+      }
+      if (enterRaf.current) cancelAnimationFrame(enterRaf.current);
+    };
+  }, [open, visible]);
+
+  useEffect(() => {
+    if (!visible) {
       if (closeTimerRef.current) {
         window.clearTimeout(closeTimerRef.current);
         closeTimerRef.current = null;
@@ -117,7 +152,7 @@ export default function EmojiPicker() {
       window.removeEventListener('keydown', handleKey);
       body.style.overflow = prevOverflow;
     };
-  }, [open, beginClose]);
+  }, [visible, beginClose]);
 
   useEffect(() => {
     if (!emojiId) return;
@@ -151,13 +186,15 @@ export default function EmojiPicker() {
         )}
       </button>
 
-      {open && (
+      {visible && (
         <div
-          className={`fixed inset-0 z-[80] flex items-center justify-center p-5 settings-overlay ${closing ? 'closing bg-transparent pointer-events-none' : 'bg-overlay backdrop-blur-sm'}`}
-          onClick={beginClose}
+          className={`fixed inset-0 z-[80] flex items-center justify-center p-5 transition-colors duration-200 settings-overlay ${closing || entering ? 'bg-transparent' : 'bg-overlay backdrop-blur-sm'}`}
+          onClick={() => {
+            if (!closing) beginClose();
+          }}
         >
           <div
-            className={`w-full max-w-md rounded-2xl bg-surface-elevated p-3 ring-1 ring-black/5 dark:ring-neutral-700/5 border border-subtle overflow-hidden settings-panel ${closing ? 'closing' : ''}`}
+            className={`w-full max-w-md rounded-2xl bg-surface-elevated p-3 ring-1 ring-black/5 dark:ring-neutral-700/5 border border-subtle overflow-hidden transition-all duration-200 settings-panel ${closing || entering ? 'opacity-0 scale-[0.95] translate-y-1 pointer-events-none' : 'opacity-100 scale-100 translate-y-0'}`}
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
