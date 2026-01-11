@@ -173,7 +173,7 @@ export default function Home({ pageTransitioning = false }: { pageTransitioning?
                       key={h.id}
                       layout={!initialListRender}
                       exit={{ opacity: 0, scale: 0.95 }}
-                      transition={transitions.fadeXl}
+                      transition={{ ...transitions.fadeXl, layout: transitions.spring }}
                     >
                       <LazyMount
                         enabled={true}
@@ -200,7 +200,7 @@ export default function Home({ pageTransitioning = false }: { pageTransitioning?
                         key="divider-completed"
                         layout={!initialListRender}
                         exit={{ opacity: 0, scale: 0.95 }}
-                        transition={transitions.fadeXl}
+                        transition={{ ...transitions.fadeXl, layout: transitions.spring }}
                         className="col-span-full text-xs font-semibold tracking-[0.6em] text-neutral-400 dark:text-neutral-500 text-center uppercase"
                       >
                         COMPLETED
@@ -212,7 +212,7 @@ export default function Home({ pageTransitioning = false }: { pageTransitioning?
                       key={h.id}
                       layout={!initialListRender}
                       exit={{ opacity: 0, scale: 0.95 }}
-                      transition={transitions.fadeXl}
+                      transition={{ ...transitions.fadeXl, layout: transitions.spring }}
                     >
                       <LazyMount
                         enabled={true}
@@ -241,7 +241,7 @@ export default function Home({ pageTransitioning = false }: { pageTransitioning?
                           key="divider-archived"
                           layout={!initialListRender}
                           exit={{ opacity: 0, scale: 0.95 }}
-                          transition={transitions.fadeXl}
+                          transition={{ ...transitions.fadeXl, layout: transitions.spring }}
                           className="col-span-full text-xs font-semibold tracking-[0.6em] text-neutral-400 dark:text-neutral-500 text-center uppercase"
                         >
                           ARCHIVED
@@ -253,7 +253,7 @@ export default function Home({ pageTransitioning = false }: { pageTransitioning?
                           key={h.id}
                           layout={!initialListRender}
                           exit={{ opacity: 0, scale: 0.95 }}
-                          transition={transitions.fadeXl}
+                          transition={{ ...transitions.fadeXl, layout: transitions.spring }}
                         >
                           <LazyMount
                             enabled={true}
