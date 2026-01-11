@@ -160,7 +160,8 @@ export default function HabitCard({
   // Capture the initial value of disableEntryAnim so it doesn't flip
   // on the first parent-triggered re-render (which caused the entry
   // animation to run for all cards after any button click).
-  const [initialDisableEntry] = useState(disableEntryAnim);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_initialDisableEntry] = useState(disableEntryAnim);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect

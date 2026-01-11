@@ -1,7 +1,6 @@
 import Badge from '@/shared/components/cards/Badge';
 import LazyMount from '@/shared/components/layout/LazyMount';
 import { useIdleReady } from '@/shared/hooks/useIdleReady';
-import { useIsMobile } from '@/shared/hooks/useIsMobile';
 import { useHabitStore } from '@/shared/store/store';
 import type { Habit } from '@/shared/types';
 import { daysThisWeek, iso } from '@/shared/utils/date';
@@ -28,7 +27,6 @@ export default function Insight() {
   const habits = useHabitStore((s) => s.habits);
   const showArchived = useHabitStore((s) => s.showArchived);
   const weekStart = useHabitStore((s) => s.weekStart);
-  const isMobile = useIsMobile();
 
   // local month state per habit keyed by habit id
   const [months, setMonths] = useState<Record<string, Date>>({});

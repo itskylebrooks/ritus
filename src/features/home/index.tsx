@@ -43,7 +43,7 @@ export default function Home({ pageTransitioning = false }: { pageTransitioning?
   const initialListRender = pageTransitioning;
   const [hasInteracted, setHasInteracted] = useState(true);
   const disableEntryAnim = pageTransitioning;
-  const [suppressAddToggleAnim, setSuppressAddToggleAnim] = useState(false);
+  const [, setSuppressAddToggleAnim] = useState(false);
   const prevShowAddRef = useRef<boolean>(showAdd);
 
   useEffect(() => {
@@ -66,13 +66,15 @@ export default function Home({ pageTransitioning = false }: { pageTransitioning?
   useEffect(() => {
     const prev = prevShowAddRef.current;
     if (prev !== showAdd) {
-      setSuppressAddToggleAnim(true);
-      const t = window.setTimeout(() => setSuppressAddToggleAnim(false), 320);
+      const start = window.setTimeout(() => setSuppressAddToggleAnim(true), 0);
+      const end = window.setTimeout(() => setSuppressAddToggleAnim(false), 320);
       prevShowAddRef.current = showAdd;
-      return () => clearTimeout(t);
+      return () => {
+        clearTimeout(start);
+        clearTimeout(end);
+      };
     }
     prevShowAddRef.current = showAdd;
-    return;
   }, [showAdd]);
   const weekKeys = useMemo(() => {
     const weekStartsOn = weekStart === 'sunday' ? 0 : 1;

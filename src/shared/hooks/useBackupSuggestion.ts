@@ -27,15 +27,17 @@ export default function useBackupSuggestion() {
       const seenGuide = localStorage.getItem('ritus_seen_guide');
       if (!seenGuide) return;
       setOpen(true);
-    } catch {
-      // ignore storage errors and don't show
+    } catch (err) {
+      console.debug('useBackupSuggestion storage error', err);
     }
   }, []);
 
   const markShown = useCallback(() => {
     try {
       localStorage.setItem(STORAGE_KEY, getCurrentYearMonth());
-    } catch {}
+    } catch (err) {
+      console.debug('useBackupSuggestion markShown error', err);
+    }
     setOpen(false);
   }, []);
 
@@ -53,8 +55,8 @@ export default function useBackupSuggestion() {
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
-    } catch {
-      // ignore export errors here; caller UI may surface
+    } catch (err) {
+      console.debug('useBackupSuggestion export error', err);
     } finally {
       markShown();
     }

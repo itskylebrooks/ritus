@@ -13,23 +13,21 @@ import React, { useEffect, useState } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 
 // Define Page component outside of App to avoid recreating during render
+type PageChildProps = { pageTransitioning?: boolean };
 const Page = ({
   children,
   initial,
   animate,
   transition,
 }: {
-  children: React.ReactElement<any>;
-  initial: TargetAndTransition | undefined;
-  animate: TargetAndTransition | undefined;
-  transition: Transition | undefined;
+  children: React.ReactElement<PageChildProps>;
+  initial?: TargetAndTransition;
+  animate?: TargetAndTransition;
+  transition?: Transition;
 }) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const child = React.isValidElement(children)
-    ? React.cloneElement(
-        children as React.ReactElement<any>,
-        { pageTransitioning: isAnimating } as any,
-      )
+    ? React.cloneElement(children, { pageTransitioning: isAnimating })
     : children;
 
   return (
