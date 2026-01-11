@@ -275,43 +275,52 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
         aria-labelledby="settings-title"
       >
         <div className="-mx-6 px-6 pb-3 mb-2 border-b border-subtle">
-          <div className="relative h-12 flex items-center justify-center">
-            <span id="settings-title" className="text-lg font-semibold tracking-wide text-strong">
+          <div className="grid grid-cols-3 items-center gap-2 h-12 relative">
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={handleShare}
+                className="grid h-10 w-full place-items-center rounded-lg border border-subtle text-muted hover-nonaccent transition"
+                aria-label="Share"
+                title="Share"
+              >
+                <Share2 className="h-4 w-4" />
+              </button>
+              <div />
+            </div>
+
+            <span id="settings-title" className="text-lg font-semibold tracking-wide text-strong text-center">
               Settings
             </span>
-            <button
-              type="button"
-              onClick={handleShare}
-              className="absolute left-0 grid h-10 w-10 place-items-center rounded-lg border border-subtle text-muted hover-nonaccent transition"
-              aria-label="Share"
-              title="Share"
-            >
-              <Share2 className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={beginClose}
-              className="absolute right-0 grid h-10 w-10 place-items-center rounded-lg border border-subtle text-muted hover-nonaccent transition"
-              aria-label="Close settings"
-              title="Close"
-            >
-              <X className="h-4 w-4" />
-            </button>
+
+            <div className="grid grid-cols-2 gap-2">
+              <div />
+              <button
+                type="button"
+                onClick={beginClose}
+                className="grid h-10 w-full place-items-center rounded-lg border border-subtle text-muted hover-nonaccent transition"
+                aria-label="Close settings"
+                title="Close"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         </div>
 
         <div className="space-y-4 pt-2">
           {/* Theme */}
           <div className="text-sm">
-            <div className="flex items-center justify-between gap-3">
+            <div className="grid grid-cols-3 items-center gap-2">
               <div>
                 <div className="text-sm font-semibold mb-0.5">Theme</div>
               </div>
-              <div className="flex items-center gap-2 whitespace-nowrap">
+              <div className="grid grid-cols-2 gap-2">
+                <div />
                 <button
                   type="button"
                   onClick={() => applyTheme('system')}
-                  className={`grid h-10 w-10 place-items-center rounded-lg border border-subtle transition ${isSystemTheme ? 'bg-accent text-inverse shadow-elevated' : 'text-muted hover-nonaccent'}`}
+                  className={`grid h-10 w-full place-items-center rounded-lg border border-subtle transition ${isSystemTheme ? 'bg-accent text-inverse shadow-elevated' : 'text-muted hover-nonaccent'}`}
                   aria-pressed={isSystemTheme}
                   aria-label="System"
                   title="System"
@@ -331,11 +340,13 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
                     <path d="M12 17v4" />
                   </svg>
                 </button>
+              </div>
 
+              <div className="grid grid-cols-2 gap-2 whitespace-nowrap">
                 <button
                   type="button"
                   onClick={() => applyTheme('light')}
-                  className={`grid h-10 w-10 place-items-center rounded-lg border border-subtle transition ${!isSystemTheme && mode === 'light' ? 'bg-accent text-inverse shadow-elevated' : 'text-muted hover-nonaccent'}`}
+                  className={`grid h-10 w-full place-items-center rounded-lg border border-subtle transition ${!isSystemTheme && mode === 'light' ? 'bg-accent text-inverse shadow-elevated' : 'text-muted hover-nonaccent'}`}
                   aria-pressed={!isSystemTheme && mode === 'light'}
                   aria-label="Light"
                   title="Light"
@@ -360,7 +371,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
                 <button
                   type="button"
                   onClick={() => applyTheme('dark')}
-                  className={`grid h-10 w-10 place-items-center rounded-lg border border-subtle transition ${!isSystemTheme && mode === 'dark' ? 'bg-accent text-inverse shadow-elevated' : 'text-muted hover-nonaccent'}`}
+                  className={`grid h-10 w-full place-items-center rounded-lg border border-subtle transition ${!isSystemTheme && mode === 'dark' ? 'bg-accent text-inverse shadow-elevated' : 'text-muted hover-nonaccent'}`}
                   aria-pressed={!isSystemTheme && mode === 'dark'}
                   aria-label="Dark"
                   title="Dark"
