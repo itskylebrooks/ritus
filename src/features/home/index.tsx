@@ -1,6 +1,5 @@
 import { emphasizeEase, transitions } from '@/shared/animations';
 import LazyMount from '@/shared/components/layout/LazyMount';
-import { useIsMobile } from '@/shared/hooks/useIsMobile';
 import { useHabitStore } from '@/shared/store/store';
 import { daysThisWeek, iso } from '@/shared/utils/date';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -30,7 +29,7 @@ function EmptyState({ disableAnim = false }: { disableAnim?: boolean }) {
   );
 }
 
-export default function Home() {
+export default function Home({ pageTransitioning = false }: { pageTransitioning?: boolean }) {
   const showAdd = useHabitStore((s) => s.showAdd);
 
   const showList = useHabitStore((s) => s.showList);
@@ -38,13 +37,12 @@ export default function Home() {
   const habits = useHabitStore((s) => s.habits);
   const showArchived = useHabitStore((s) => s.showArchived);
   const weekStart = useHabitStore((s) => s.weekStart);
-  const isMobile = useIsMobile();
-  // Enable layout and entry animations by default. Previously these were
-  // gated behind idle/interaction heuristics which prevented motion from
-  // running in many cases — unblock them so cards and the Add form animate.
-  const initialListRender = false;
+
+  // Disable initial layout/entry animations while the page transition is running
+  // so cards and the Add form don't animate into place during page open.
+  const initialListRender = pageTransitioning;
   const [hasInteracted, setHasInteracted] = useState(true);
-  const disableEntryAnim = false;
+  const disableEntryAnim = pageTransitioning;
 
   useEffect(() => {
     if (hasInteracted || typeof window === 'undefined') return;

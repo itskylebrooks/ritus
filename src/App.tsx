@@ -9,7 +9,7 @@ import BackupSuggestion from '@/shared/components/modals/BackupSuggestion';
 import { useHabitStore } from '@/shared/store/store';
 import type { TargetAndTransition, Transition } from 'framer-motion';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 
 // Define Page component outside of App to avoid recreating during render
@@ -19,15 +19,32 @@ const Page = ({
   animate,
   transition,
 }: {
-  children: React.ReactNode;
+  children: React.ReactElement<any>;
   initial: TargetAndTransition | undefined;
   animate: TargetAndTransition | undefined;
   transition: Transition | undefined;
-}) => (
-  <motion.main className="w-full" initial={initial} animate={animate} transition={transition}>
-    {children}
-  </motion.main>
-);
+}) => {
+  const [isAnimating, setIsAnimating] = useState(false);
+  const child = React.isValidElement(children)
+    ? React.cloneElement(
+        children as React.ReactElement<any>,
+        { pageTransitioning: isAnimating } as any,
+      )
+    : children;
+
+  return (
+    <motion.main
+      className="w-full"
+      initial={initial}
+      animate={animate}
+      transition={transition}
+      onAnimationStart={() => setIsAnimating(true)}
+      onAnimationComplete={() => setIsAnimating(false)}
+    >
+      {child}
+    </motion.main>
+  );
+};
 
 export default function App() {
   const location = useLocation();
