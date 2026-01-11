@@ -1,6 +1,7 @@
 import {
   Atom,
   BookOpen,
+  Cake,
   Droplet,
   Feather,
   Flame,
@@ -191,7 +192,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     type: 'accent',
     title: 'Gold',
     desc: 'A classic, luminous gold that conveys richness and celebration.',
-    icon: Medal,
+    icon: Cake,
     cost: 2400,
     implemented: true,
   },
