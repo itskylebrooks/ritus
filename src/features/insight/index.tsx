@@ -47,9 +47,6 @@ export default function Insight() {
     let totalGoalsCount = 0;
 
     for (const h of habits) {
-      // Skip archived habits - only count active habits
-      if (h.archived && !showArchived) continue;
-
       const keys = new Set<string>();
       let weekCount = 0;
       for (const c of h.completions || []) {
@@ -59,6 +56,9 @@ export default function Insight() {
         if (weekKeySet.has(key)) weekCount += 1;
       }
       completionKeysById.set(h.id, keys);
+
+      // Skip archived habits for the goal calculation - always hidden regardless of toggle
+      if (h.archived) continue;
 
       // Calculate if this habit's weekly goal is achieved
       // Each habit contributes a single binary goal state for the week
@@ -79,7 +79,7 @@ export default function Insight() {
     const weeklyPct =
       totalGoalsCount === 0 ? 0 : Math.round((achievedGoalsCount / totalGoalsCount) * 100);
     return { completionKeysById, weeklyPct };
-  }, [calcReady, habits, weekKeys, showArchived]);
+  }, [calcReady, habits, weekKeys]);
 
   function monthFor(h: Habit) {
     return months[h.id] ?? new Date();
