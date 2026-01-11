@@ -1,4 +1,5 @@
 import {
+  Atom,
   BookOpen,
   Droplet,
   Feather,
@@ -163,7 +164,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     type: 'accent',
     title: 'Crimson',
     desc: 'A vivid, rich red tone that energizes the interface.',
-    icon: Flame,
+    icon: Atom,
     cost: 2200,
     implemented: true,
   },
