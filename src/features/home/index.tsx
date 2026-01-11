@@ -12,12 +12,18 @@ const nameCollator = new Intl.Collator(undefined, { sensitivity: 'base' });
 const EMPTY_SET = new Set<string>();
 const EMPTY_ARRAY: string[] = [];
 
-function EmptyState({ disableAnim = false }: { disableAnim?: boolean }) {
+function EmptyState({
+  disableEntry = false,
+  disableLayout = false,
+}: {
+  disableEntry?: boolean;
+  disableLayout?: boolean;
+}) {
   return (
     <motion.div
-      layout={!disableAnim}
+      layout={!disableLayout}
       key="empty"
-      initial={disableAnim ? false : { opacity: 0, y: 8, scale: 0.98 }}
+      initial={disableEntry ? false : { opacity: 0, y: 8, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: -6, scale: 0.98 }}
       transition={{ ...transitions.fadeLg, ease: emphasizeEase }}
@@ -44,7 +50,19 @@ export default function Home({ pageTransitioning = false }: { pageTransitioning?
   const [hasInteracted, setHasInteracted] = useState(true);
   const disableEntryAnim = pageTransitioning;
   const [, setSuppressAddToggleAnim] = useState(false);
+
   const prevShowAddRef = useRef<boolean>(showAdd);
+
+  // Suppress layout animations for a brief moment after mount to allow
+  // variable-height elements (like QuoteCard) to settle without triggering
+  // a visible slide/jump (layout animation) of the content below.
+  const [layoutReady, setLayoutReady] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setLayoutReady(true), 100);
+    return () => clearTimeout(t);
+  }, []);
+
+  const disableLayoutAnim = pageTransitioning || !layoutReady;
 
   useEffect(() => {
     if (hasInteracted || typeof window === 'undefined') return;
@@ -124,7 +142,7 @@ export default function Home({ pageTransitioning = false }: { pageTransitioning?
       <div className="mt-4 space-y-4">
         <div className="w-full">
           <LazyMount
-            enabled={true}
+            enabled={false}
             className="w-full"
             minHeight={180}
             unmountOnExit={false}
@@ -151,32 +169,35 @@ export default function Home({ pageTransitioning = false }: { pageTransitioning?
                 }}
                 className={`w-full ${showAdd ? 'overflow-visible' : 'overflow-hidden'}`}
               >
-                <AddHabit disableInitialLayout={initialListRender} />
+                <AddHabit disableInitialLayout={disableLayoutAnim} />
               </motion.div>
             )}
           </AnimatePresence>
 
           {/* Disable layout-based motion on initial mount so quote height changes don't animate cards into position */}
           <motion.main
-            layout={!initialListRender}
+            layout={!disableLayoutAnim}
             className={`grid gap-4 ${showList ? '' : 'sm:grid-cols-2'}`}
           >
             <AnimatePresence initial={false} mode="popLayout">
               {groupedHabits.incompleteToday.length === 0 &&
               groupedHabits.completedToday.length === 0 &&
               (!showArchived || groupedHabits.archived.length === 0) ? (
-                <EmptyState disableAnim={initialListRender} />
+                <EmptyState
+                  disableEntry={initialListRender}
+                  disableLayout={disableLayoutAnim}
+                />
               ) : (
                 <>
-                  {groupedHabits.incompleteToday.map((h) => (
+                  {groupedHabits.incompleteToday.map((h, i) => (
                     <motion.div
                       key={h.id}
-                      layout={!initialListRender}
+                      layout={!disableLayoutAnim}
                       exit={{ opacity: 0, scale: 0.95 }}
                       transition={{ ...transitions.fadeXl, layout: transitions.spring }}
                     >
                       <LazyMount
-                        enabled={true}
+                        enabled={i > 5}
                         className="w-full"
                         minHeight={180}
                         unmountOnExit={false}
@@ -198,7 +219,7 @@ export default function Home({ pageTransitioning = false }: { pageTransitioning?
                     groupedHabits.incompleteToday.length > 0 && (
                       <motion.div
                         key="divider-completed"
-                        layout={!initialListRender}
+                        layout={!disableLayoutAnim}
                         exit={{ opacity: 0, scale: 0.95 }}
                         transition={{ ...transitions.fadeXl, layout: transitions.spring }}
                         className="col-span-full text-xs font-semibold tracking-[0.6em] text-neutral-400 dark:text-neutral-500 text-center uppercase"
@@ -207,15 +228,15 @@ export default function Home({ pageTransitioning = false }: { pageTransitioning?
                       </motion.div>
                     )}
 
-                  {groupedHabits.completedToday.map((h) => (
+                  {groupedHabits.completedToday.map((h, i) => (
                     <motion.div
                       key={h.id}
-                      layout={!initialListRender}
+                      layout={!disableLayoutAnim}
                       exit={{ opacity: 0, scale: 0.95 }}
                       transition={{ ...transitions.fadeXl, layout: transitions.spring }}
                     >
                       <LazyMount
-                        enabled={true}
+                        enabled={groupedHabits.incompleteToday.length === 0 ? i > 5 : true}
                         className="w-full"
                         minHeight={180}
                         unmountOnExit={false}
@@ -245,7 +266,7 @@ export default function Home({ pageTransitioning = false }: { pageTransitioning?
                 groupedHabits.completedToday.length > 0) && (
                 <motion.div
                   key="divider-archived"
-                  layout={!initialListRender}
+                  layout={!disableLayoutAnim}
                   transition={{ ...transitions.fadeXl, layout: transitions.spring }}
                   className="text-xs font-semibold tracking-[0.6em] text-neutral-400 dark:text-neutral-500 text-center uppercase"
                 >
