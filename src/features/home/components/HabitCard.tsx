@@ -154,7 +154,7 @@ export default function HabitCard({
 
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(habit.name);
-  const [isRemoving, setIsRemoving] = useState(false);
+
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
   // Capture the initial value of disableEntryAnim so it doesn't flip
@@ -223,15 +223,10 @@ export default function HabitCard({
     toggleCompletion(habit.id, new Date());
   };
 
-  const deleteHabitWithAnimation = () => {
-    setIsRemoving(true);
-    setTimeout(() => deleteHabit(habit.id), 300); // Match animation duration
-  };
+  // deletion will rely on parent AnimatePresence exit animation
 
   return (
-    <div
-      className={`rounded-2xl border border-subtle p-4 shadow-sm ${isRemoving ? 'habit-remove' : initialDisableEntry ? '' : 'habit-add'}`}
-    >
+    <div className="rounded-2xl border border-subtle p-4 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1 min-h-[48px]">
           <AnimatePresence mode="wait" initial={false}>
@@ -448,7 +443,7 @@ export default function HabitCard({
         onClose={() => setConfirmDeleteOpen(false)}
         onConfirm={() => {
           setConfirmDeleteOpen(false);
-          deleteHabitWithAnimation();
+          deleteHabit(habit.id);
         }}
         title="Delete habit?"
         message={`Delete "${habit.name}"? This cannot be undone.`}

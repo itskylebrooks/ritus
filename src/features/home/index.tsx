@@ -3,7 +3,7 @@ import LazyMount from '@/shared/components/layout/LazyMount';
 import { useHabitStore } from '@/shared/store/store';
 import { daysThisWeek, iso } from '@/shared/utils/date';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import AddHabit from './components/AddHabit';
 import HabitCard from './components/HabitCard';
 import QuoteCard from './components/QuoteCard';
@@ -43,6 +43,8 @@ export default function Home({ pageTransitioning = false }: { pageTransitioning?
   const initialListRender = pageTransitioning;
   const [hasInteracted, setHasInteracted] = useState(true);
   const disableEntryAnim = pageTransitioning;
+  const [suppressAddToggleAnim, setSuppressAddToggleAnim] = useState(false);
+  const prevShowAddRef = useRef<boolean>(showAdd);
 
   useEffect(() => {
     if (hasInteracted || typeof window === 'undefined') return;
@@ -58,6 +60,20 @@ export default function Home({ pageTransitioning = false }: { pageTransitioning?
       window.removeEventListener('touchstart', onInteract);
     };
   }, [hasInteracted]);
+
+  // Watch for showAdd toggles and briefly suppress layout animations so
+  // the Add form appears/disappears instantly and cards don't animate.
+  useEffect(() => {
+    const prev = prevShowAddRef.current;
+    if (prev !== showAdd) {
+      setSuppressAddToggleAnim(true);
+      const t = window.setTimeout(() => setSuppressAddToggleAnim(false), 320);
+      prevShowAddRef.current = showAdd;
+      return () => clearTimeout(t);
+    }
+    prevShowAddRef.current = showAdd;
+    return;
+  }, [showAdd]);
   const weekKeys = useMemo(() => {
     const weekStartsOn = weekStart === 'sunday' ? 0 : 1;
     return daysThisWeek(new Date(), weekStartsOn).map((d) => iso(d).slice(0, 10));
