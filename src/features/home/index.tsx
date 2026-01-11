@@ -136,22 +136,25 @@ export default function Home({ pageTransitioning = false }: { pageTransitioning?
           </LazyMount>
         </div>
 
-        <div className="space-y-4">
-          {showAdd && (
-            <div>
-              <LazyMount
-                enabled={true}
-                className="w-full"
-                minHeight={200}
-                unmountOnExit={false}
-                placeholder={
-                  <div className="h-full rounded-2xl border border-subtle bg-neutral-200 dark:bg-neutral-900/40" />
-                }
+        <div>
+          <AnimatePresence initial={false}>
+            {showAdd && (
+              <motion.div
+                key="add-habit-wrapper"
+                initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+                animate={{ opacity: 1, height: 'auto', marginBottom: 16 }}
+                exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+                transition={{
+                  opacity: { duration: 0.2 },
+                  height: transitions.spring,
+                  marginBottom: transitions.spring,
+                }}
+                className="overflow-hidden w-full"
               >
                 <AddHabit disableInitialLayout={initialListRender} />
-              </LazyMount>
-            </div>
-          )}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Disable layout-based motion on initial mount so quote height changes don't animate cards into position */}
           <motion.main
