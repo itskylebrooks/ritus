@@ -12,6 +12,9 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 
+import MistOverlay from '@/shared/components/layout/MistOverlay';
+import useIsSafari from '@/shared/hooks/useIsSafari';
+
 // Define Page component outside of App to avoid recreating during render
 type PageChildProps = { pageTransitioning?: boolean };
 const Page = ({
@@ -19,11 +22,13 @@ const Page = ({
   initial,
   animate,
   transition,
+  overlay,
 }: {
   children: React.ReactElement<PageChildProps>;
   initial?: TargetAndTransition;
   animate?: TargetAndTransition;
   transition?: Transition;
+  overlay?: React.ReactNode;
 }) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const child = React.isValidElement(children)
@@ -32,7 +37,7 @@ const Page = ({
 
   return (
     <motion.main
-      className="w-full"
+      className="w-full relative overflow-hidden"
       initial={initial}
       animate={animate}
       transition={transition}
@@ -40,6 +45,7 @@ const Page = ({
       onAnimationComplete={() => setIsAnimating(false)}
     >
       {child}
+      {overlay}
     </motion.main>
   );
 };
@@ -55,10 +61,22 @@ export default function App() {
   let animate: TargetAndTransition | undefined = baseMotion.animate;
   let transition: Transition | undefined = baseMotion.transition;
 
+  const isSafari = useIsSafari();
+  const safariMist = mistFade && !shouldReduceMotion && isSafari;
+
   if (mistFade && !shouldReduceMotion) {
-    initial = { opacity: 0, filter: 'blur(4px)' };
-    animate = { opacity: 1, filter: 'blur(0px)' };
-    transition = { duration: 0.5, ease: 'easeInOut' };
+    if (safariMist) {
+      // Safari: avoid animating `filter` (heavy). Use a simple opacity + y motion
+      // and a lightweight overlay that fades out. This dramatically reduces jank on macOS Safari.
+      initial = { opacity: 0, y: 8 };
+      animate = { opacity: 1, y: 0 };
+      transition = { duration: 0.48, ease: 'easeInOut' };
+    } else {
+      // Non-Safari: preserve the mist blur effect
+      initial = { opacity: 0, filter: 'blur(4px)' };
+      animate = { opacity: 1, filter: 'blur(0px)' };
+      transition = { duration: 0.5, ease: 'easeInOut' };
+    }
   }
 
   useEffect(() => {
@@ -94,7 +112,12 @@ export default function App() {
             <Route
               path="/profile"
               element={
-                <Page initial={initial} animate={animate} transition={transition}>
+                <Page
+                  initial={initial}
+                  animate={animate}
+                  transition={transition}
+                  overlay={safariMist ? <MistOverlay /> : undefined}
+                >
                   <Profile />
                 </Page>
               }

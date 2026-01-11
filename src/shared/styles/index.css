@@ -190,6 +190,35 @@ html {
   animation: fadeSwap var(--motion-page-duration) var(--motion-page-ease) both;
 }
 
+/* Safari-friendly mist overlay used in place of animating `filter: blur()`
+   which can cause heavy main-thread work and jank on Safari. The overlay
+   animates `opacity` only (GPU composited) and uses `translateZ(0)` to
+   encourage compositing. */
+.mist-overlay {
+  position: absolute;
+  inset: -12% -12% -12% -12%;
+  pointer-events: none;
+  z-index: 20;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 255, 255, 0.36) 0%,
+    rgba(255, 255, 255, 0.12) 28%,
+    transparent 60%
+  );
+  will-change: opacity;
+  transform: translateZ(0);
+}
+
+/* Dark theme variant */
+.dark .mist-overlay {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0.48) 0%,
+    rgba(0, 0, 0, 0.18) 28%,
+    transparent 60%
+  );
+}
+
 @media (hover: none), (pointer: coarse) {
   /* Disable hover transitions on touchscreens, but preserve intentional animations */
   .hover-nonaccent,
