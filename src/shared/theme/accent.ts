@@ -8,6 +8,9 @@ type AccentId =
   | 'accent_lagoon'
   | 'accent_citrine'
   | 'accent_amethyst'
+  | 'accent_corall_pink'
+  | 'accent_gold'
+  | 'accent_sand'
   | 'default';
 
 // Define light/dark pairs with appropriate text contrast
@@ -50,10 +53,10 @@ export const ACCENTS: Record<
     darkContrast: '#050505',
   },
   accent_citrine: {
-    // Warm golden
-    light: '#a16207',
+    // Rich red
+    light: '#b91c1c',
     lightContrast: '#ffffff',
-    dark: '#facc15',
+    dark: '#ff4d4f',
     darkContrast: '#050505',
   },
   accent_amethyst: {
@@ -61,6 +64,27 @@ export const ACCENTS: Record<
     light: '#5b21b6',
     lightContrast: '#ffffff',
     dark: '#c084fc',
+    darkContrast: '#050505',
+  },
+  accent_corall_pink: {
+    // Corall Pink
+    light: '#ff6b6b',
+    lightContrast: '#050505',
+    dark: '#ff9aa2',
+    darkContrast: '#050505',
+  },
+  accent_gold: {
+    // Gold
+    light: '#b8860b',
+    lightContrast: '#ffffff',
+    dark: '#ffd43b',
+    darkContrast: '#050505',
+  },
+  accent_sand: {
+    // Warm beige (Sand)
+    light: '#d6c4a4',
+    lightContrast: '#050505',
+    dark: '#efe5d3',
     darkContrast: '#050505',
   },
 };
