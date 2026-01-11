@@ -1,6 +1,5 @@
 import { emphasizeEase, transitions } from '@/shared/animations';
 import LazyMount from '@/shared/components/layout/LazyMount';
-import { useIdleReady } from '@/shared/hooks/useIdleReady';
 import { useIsMobile } from '@/shared/hooks/useIsMobile';
 import { useHabitStore } from '@/shared/store/store';
 import { daysThisWeek, iso } from '@/shared/utils/date';
@@ -40,9 +39,12 @@ export default function Home() {
   const showArchived = useHabitStore((s) => s.showArchived);
   const weekStart = useHabitStore((s) => s.weekStart);
   const isMobile = useIsMobile();
-  const initialListRender = !useIdleReady({ resetOnMount: true });
-  const [hasInteracted, setHasInteracted] = useState(false);
-  const disableEntryAnim = initialListRender || !hasInteracted;
+  // Enable layout and entry animations by default. Previously these were
+  // gated behind idle/interaction heuristics which prevented motion from
+  // running in many cases — unblock them so cards and the Add form animate.
+  const initialListRender = false;
+  const [hasInteracted, setHasInteracted] = useState(true);
+  const disableEntryAnim = false;
 
   useEffect(() => {
     if (hasInteracted || typeof window === 'undefined') return;
