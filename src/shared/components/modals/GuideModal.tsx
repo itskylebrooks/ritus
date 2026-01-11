@@ -140,11 +140,12 @@ export default function GuideModal({ open, onClose }: GuideModalProps) {
   const last = step === STEPS.length - 1;
   return (
     <div
-      className={`fixed inset-0 z-[60] flex items-center justify-center p-5 transition-colors duration-250 ${closing || entering ? 'bg-transparent' : 'bg-overlay backdrop-blur-sm'}`}
+      className={`fixed inset-0 z-[60] flex flex-col items-center p-5 transition-colors duration-250 ${closing || entering ? 'bg-transparent' : 'bg-overlay backdrop-blur-sm'}`}
       onClick={() => {
         if (!closing) onClose();
       }}
     >
+      <div className="flex-[4] min-h-[40px] pointer-events-none" />
       <div
         className={`w-full max-w-sm rounded-2xl ring-1 ring-black/5 dark:ring-neutral-700/5 border border-subtle p-6 relative transition-all duration-250 ${closing || entering ? 'opacity-0 scale-[0.94] -translate-y-2' : 'opacity-100 scale-100 translate-y-0'} bg-surface-elevated`}
         onClick={(e) => {
@@ -171,10 +172,10 @@ export default function GuideModal({ open, onClose }: GuideModalProps) {
           {STEPS[step].title}
         </h2>
         <motion.div
-          className="relative overflow-hidden"
-          animate={{ height }}
-          style={{ minHeight: 120 }}
-          transition={{ duration: 0.2 }}
+           className="relative overflow-hidden"
+           animate={{ height }}
+           style={{ minHeight: 120 }}
+           transition={{ duration: 0.2 }}
         >
           {renderedSteps.map((layer) => {
             const data = STEPS[layer.idx];
@@ -256,6 +257,7 @@ export default function GuideModal({ open, onClose }: GuideModalProps) {
           </div>
         </div>
       </div>
+      <div className="flex-[6] pointer-events-none" />
     </div>
   );
 }

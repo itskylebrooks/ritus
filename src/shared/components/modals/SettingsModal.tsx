@@ -286,9 +286,10 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
   if (!visible) return null;
   return (
     <div
-      className={`fixed inset-0 z-[80] flex items-center justify-center p-5 transition-colors duration-200 ${closing || entering ? 'bg-transparent' : 'bg-overlay backdrop-blur-sm'}`}
+      className={`fixed inset-0 z-[80] flex flex-col items-center p-5 transition-colors duration-200 ${closing || entering ? 'bg-transparent' : 'bg-overlay backdrop-blur-sm'}`}
       onClick={beginClose}
     >
+      <div className="flex-[4] min-h-[40px] pointer-events-none" />
       <div
         className={`w-full max-w-sm rounded-2xl bg-surface-elevated p-6 pt-3 shadow-elevated ring-1 ring-black/5 dark:ring-neutral-700/5 border border-subtle overflow-y-auto relative transition-all duration-200 ${closing || entering ? 'opacity-0 scale-[0.95] translate-y-1' : 'opacity-100 scale-100 translate-y-0'}`}
         style={{
@@ -745,6 +746,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
           </div>
         </div>
       </div>
+      <div className="flex-[6] pointer-events-none" />
     </div>
   );
 }
