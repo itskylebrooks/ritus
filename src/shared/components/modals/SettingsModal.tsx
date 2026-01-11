@@ -317,7 +317,10 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
               <div />
             </div>
 
-            <span id="settings-title" className="text-lg font-semibold tracking-wide text-strong text-center">
+            <span
+              id="settings-title"
+              className="text-lg font-semibold tracking-wide text-strong text-center"
+            >
               Settings
             </span>
 

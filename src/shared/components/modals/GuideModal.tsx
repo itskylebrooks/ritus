@@ -172,10 +172,10 @@ export default function GuideModal({ open, onClose }: GuideModalProps) {
           {STEPS[step].title}
         </h2>
         <motion.div
-           className="relative overflow-hidden"
-           animate={{ height }}
-           style={{ minHeight: 120 }}
-           transition={{ duration: 0.2 }}
+          className="relative overflow-hidden"
+          animate={{ height }}
+          style={{ minHeight: 120 }}
+          transition={{ duration: 0.2 }}
         >
           {renderedSteps.map((layer) => {
             const data = STEPS[layer.idx];

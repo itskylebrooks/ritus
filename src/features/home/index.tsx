@@ -4,7 +4,7 @@ import { useHabitStore } from '@/shared/store/store';
 import type { Habit } from '@/shared/types';
 import { daysThisWeek, iso } from '@/shared/utils/date';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import AddHabit from './components/AddHabit';
 import HabitCard from './components/HabitCard';
 import QuoteCard from './components/QuoteCard';
@@ -52,8 +52,6 @@ export default function Home({ pageTransitioning = false }: { pageTransitioning?
   const disableEntryAnim = pageTransitioning;
   const [isTogglingAdd, setIsTogglingAdd] = useState(false);
 
-  const prevShowAddRef = useRef<boolean>(showAdd);
-
   // Suppress layout animations for a brief moment after mount to allow
   // variable-height elements (like QuoteCard) to settle without triggering
   // a visible slide/jump (layout animation) of the content below.
@@ -62,8 +60,6 @@ export default function Home({ pageTransitioning = false }: { pageTransitioning?
     const t = setTimeout(() => setLayoutReady(true), 300);
     return () => clearTimeout(t);
   }, []);
-
-  const disableLayoutAnim = pageTransitioning || !layoutReady;
 
   useEffect(() => {
     if (hasInteracted || typeof window === 'undefined') return;
@@ -82,18 +78,22 @@ export default function Home({ pageTransitioning = false }: { pageTransitioning?
 
   // Watch for showAdd toggles and briefly suppress layout animations so
   // the Add form appears/disappears instantly and cards don't animate.
+  const [prevShowAdd, setPrevShowAdd] = useState(showAdd);
+  if (showAdd !== prevShowAdd) {
+    setPrevShowAdd(showAdd);
+    setIsTogglingAdd(true);
+  }
+
   useEffect(() => {
-    const prev = prevShowAddRef.current;
-    if (prev !== showAdd) {
-      setIsTogglingAdd(true);
+    if (isTogglingAdd) {
       const timer = setTimeout(() => setIsTogglingAdd(false), 600);
-      prevShowAddRef.current = showAdd;
       return () => clearTimeout(timer);
     }
-    prevShowAddRef.current = showAdd;
-  }, [showAdd]);
+  }, [isTogglingAdd]);
 
-  const canAnimateLayout = !disableLayoutAnim;
+  const disableLayoutAnim = pageTransitioning || !layoutReady;
+
+  const canAnimateLayout = !disableLayoutAnim && !isTogglingAdd;
   const weekKeys = useMemo(() => {
     const weekStartsOn = weekStart === 'sunday' ? 0 : 1;
     return daysThisWeek(new Date(), weekStartsOn).map((d) => iso(d).slice(0, 10));
