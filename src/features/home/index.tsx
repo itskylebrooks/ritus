@@ -149,7 +149,7 @@ export default function Home({ pageTransitioning = false }: { pageTransitioning?
                   height: transitions.spring,
                   marginBottom: transitions.spring,
                 }}
-                className="overflow-hidden w-full"
+                className={`w-full ${showAdd ? 'overflow-visible' : 'overflow-hidden'}`}
               >
                 <AddHabit disableInitialLayout={initialListRender} />
               </motion.div>
