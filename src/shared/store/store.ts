@@ -122,6 +122,9 @@ export interface HabitState {
   // display mode: grid (false) or list (true)
   showList: boolean;
   setShowList: (v: boolean) => void;
+  // home refresh key: increment to force remount of Home
+  homeRefreshKey?: number;
+  triggerHomeRefresh: () => void;
   // emoji of the day mapping by date (YYYY-MM-DD) and recents list
   emojiByDate?: Record<string, string | undefined>;
   emojiRecents?: string[];
@@ -182,6 +185,8 @@ export const useHabitStore = create<HabitState>()(
       setShowHomeCards: (v) => set({ showHomeCards: v }),
       setShowArchived: (v) => set({ showArchived: v }),
       setShowList: (v) => set({ showList: v }),
+      homeRefreshKey: 0,
+      triggerHomeRefresh: () => set((s) => ({ homeRefreshKey: (s.homeRefreshKey || 0) + 1 })),
       emojiByDate: {},
       emojiRecents: [],
       setEmojiForDate: (dateISO: string, emojiId: string | null) =>

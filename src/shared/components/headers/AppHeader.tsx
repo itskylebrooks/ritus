@@ -45,6 +45,7 @@ export default function AppHeader() {
   const setShowArchived = useHabitStore((s) => s.setShowArchived);
   const showList = useHabitStore((s) => s.showList);
   const setShowList = useHabitStore((s) => s.setShowList);
+  const triggerHomeRefresh = useHabitStore((s) => s.triggerHomeRefresh);
   const moreRef = useRef<HTMLDivElement | null>(null);
   const moreButtonRef = useRef<HTMLButtonElement | null>(null);
   const location = useLocation();
@@ -131,6 +132,14 @@ export default function AppHeader() {
           <Link
             to="/"
             aria-label="Go to home"
+            onClick={(e) => {
+              if (location.pathname === '/') {
+                e.preventDefault();
+                try {
+                  triggerHomeRefresh();
+                } catch {}
+              }
+            }}
             className="inline-flex items-center h-10 text-2xl leading-none font-bold uppercase tracking-wider hover-change-color transition-colors"
           >
             Ritus

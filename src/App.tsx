@@ -52,6 +52,7 @@ const Page = ({
 
 export default function App() {
   const location = useLocation();
+  const homeRefreshKey = useHabitStore((s) => s.homeRefreshKey);
   const shouldReduceMotion = useReducedMotion();
   const appliedCollectibles = useHabitStore((s) => s.progress.appliedCollectibles || {});
   const mistFade = (appliedCollectibles['animation'] || '').includes('anim_mist_fade');
@@ -92,7 +93,15 @@ export default function App() {
 
       <main>
         <AnimatePresence mode="wait" initial={false}>
-          <Routes location={location} key={location.pathname}>
+          {/* include homeRefreshKey in the Routes key when on home so Home remounts when triggered */}
+          <Routes
+            location={location}
+            key={
+              location.pathname === '/'
+                ? `${location.pathname}:${homeRefreshKey || 0}`
+                : location.pathname
+            }
+          >
             <Route
               path="/"
               element={
