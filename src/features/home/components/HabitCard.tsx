@@ -59,15 +59,13 @@ function ButtonsMenu({
           <motion.button
             key="settings"
             onClick={() => setOpen(true)}
-            className="rounded-xl border border-subtle p-2 hover-nonaccent"
+            className="rounded-xl border border-subtle p-2 transition-colors duration-150 ease-in-out hover-nonaccent"
             aria-label="More actions"
             title="More"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={transitions.fadeSm}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
           >
             <Settings2 className="h-4 w-4" />
           </motion.button>
@@ -85,11 +83,9 @@ function ButtonsMenu({
                 setOpen(false);
                 setEditing(true);
               }}
-              className="rounded-xl border border-subtle p-2 hover-nonaccent"
+              className="rounded-xl border border-subtle p-2 transition-colors duration-150 ease-in-out hover-nonaccent"
               aria-label="Edit habit"
               title="Edit"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
             >
               <Pencil className="h-4 w-4" />
             </motion.button>
@@ -103,11 +99,9 @@ function ButtonsMenu({
                   archiveHabit(habit.id);
                 }
               }}
-              className="rounded-xl border border-subtle p-2 hover-nonaccent"
+              className="rounded-xl border border-subtle p-2 transition-colors duration-150 ease-in-out hover-nonaccent"
               aria-label={habit.archived ? 'Unarchive habit' : 'Archive habit'}
               title={habit.archived ? 'Unarchive' : 'Archive'}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
             >
               {habit.archived ? <Inbox className="h-4 w-4" /> : <Archive className="h-4 w-4" />}
             </motion.button>
@@ -117,11 +111,9 @@ function ButtonsMenu({
                 setOpen(false);
                 setConfirmDeleteOpen(true);
               }}
-              className="rounded-xl border border-subtle p-2 hover-nonaccent text-red-500"
+              className="rounded-xl border border-subtle p-2 transition-colors duration-150 ease-in-out hover-nonaccent text-red-500"
               aria-label="Delete habit"
               title="Delete"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
             >
               <Trash2 className="h-4 w-4" />
             </motion.button>
@@ -305,7 +297,7 @@ export default function HabitCard({
                     setEditing(false);
                     setName(habit.name);
                   }}
-                  className="rounded-xl border border-subtle px-3 py-2 text-sm hover-nonaccent"
+                  className="rounded-xl border border-subtle px-3 py-2 text-sm transition-colors duration-150 ease-in-out hover-nonaccent"
                 >
                   Cancel
                 </button>
