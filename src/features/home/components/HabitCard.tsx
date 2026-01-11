@@ -227,7 +227,7 @@ export default function HabitCard({
   // deletion will rely on parent AnimatePresence exit animation
 
   return (
-    <div className="rounded-2xl border border-subtle p-4 shadow-sm">
+    <div className="rounded-2xl border border-subtle bg-surface p-4 shadow-sm text-strong">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1 min-h-[48px]">
           <AnimatePresence mode="wait" initial={false}>

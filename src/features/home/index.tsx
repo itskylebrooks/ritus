@@ -1,6 +1,7 @@
 import { emphasizeEase, transitions } from '@/shared/animations';
 import LazyMount from '@/shared/components/layout/LazyMount';
 import { useHabitStore } from '@/shared/store/store';
+import type { Habit } from '@/shared/types';
 import { daysThisWeek, iso } from '@/shared/utils/date';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -49,7 +50,7 @@ export default function Home({ pageTransitioning = false }: { pageTransitioning?
   const initialListRender = pageTransitioning;
   const [hasInteracted, setHasInteracted] = useState(true);
   const disableEntryAnim = pageTransitioning;
-  const [, setSuppressAddToggleAnim] = useState(false);
+  const [isTogglingAdd, setIsTogglingAdd] = useState(false);
 
   const prevShowAddRef = useRef<boolean>(showAdd);
 
@@ -58,7 +59,7 @@ export default function Home({ pageTransitioning = false }: { pageTransitioning?
   // a visible slide/jump (layout animation) of the content below.
   const [layoutReady, setLayoutReady] = useState(false);
   useEffect(() => {
-    const t = setTimeout(() => setLayoutReady(true), 100);
+    const t = setTimeout(() => setLayoutReady(true), 300);
     return () => clearTimeout(t);
   }, []);
 
@@ -84,16 +85,15 @@ export default function Home({ pageTransitioning = false }: { pageTransitioning?
   useEffect(() => {
     const prev = prevShowAddRef.current;
     if (prev !== showAdd) {
-      const start = window.setTimeout(() => setSuppressAddToggleAnim(true), 0);
-      const end = window.setTimeout(() => setSuppressAddToggleAnim(false), 320);
+      setIsTogglingAdd(true);
+      const timer = setTimeout(() => setIsTogglingAdd(false), 600);
       prevShowAddRef.current = showAdd;
-      return () => {
-        clearTimeout(start);
-        clearTimeout(end);
-      };
+      return () => clearTimeout(timer);
     }
     prevShowAddRef.current = showAdd;
   }, [showAdd]);
+
+  const canAnimateLayout = !disableLayoutAnim;
   const weekKeys = useMemo(() => {
     const weekStartsOn = weekStart === 'sunday' ? 0 : 1;
     return daysThisWeek(new Date(), weekStartsOn).map((d) => iso(d).slice(0, 10));
@@ -113,12 +113,11 @@ export default function Home({ pageTransitioning = false }: { pageTransitioning?
 
   const groupedHabits = useMemo(() => {
     const todayShort = iso(new Date()).slice(0, 10);
-    const byName = (a: (typeof habits)[number], b: (typeof habits)[number]) =>
-      nameCollator.compare(a.name, b.name);
+    const byName = (a: Habit, b: Habit) => nameCollator.compare(a.name, b.name);
 
-    const incompleteToday: (typeof habits)[number][] = [];
-    const completedToday: (typeof habits)[number][] = [];
-    const archived: (typeof habits)[number][] = [];
+    const incompleteToday: Habit[] = [];
+    const completedToday: Habit[] = [];
+    const archived: Habit[] = [];
 
     for (const h of habits) {
       if (h.archived) {
@@ -136,6 +135,11 @@ export default function Home({ pageTransitioning = false }: { pageTransitioning?
       archived: archived.sort(byName),
     };
   }, [completionKeysById, habits]);
+
+  const isEmpty =
+    groupedHabits.incompleteToday.length === 0 &&
+    groupedHabits.completedToday.length === 0 &&
+    (!showArchived || groupedHabits.archived.length === 0);
 
   return (
     <div>
@@ -176,7 +180,8 @@ export default function Home({ pageTransitioning = false }: { pageTransitioning?
 
           {/* Disable layout-based motion on initial mount so quote height changes don't animate cards into position */}
           <motion.main
-            layout={!disableLayoutAnim}
+            layout
+            transition={canAnimateLayout ? undefined : { duration: 0 }}
             className={`grid gap-4 ${showList ? '' : 'sm:grid-cols-2'}`}
           >
             <AnimatePresence initial={false} mode="popLayout">
@@ -184,77 +189,90 @@ export default function Home({ pageTransitioning = false }: { pageTransitioning?
               groupedHabits.completedToday.length === 0 &&
               (!showArchived || groupedHabits.archived.length === 0) ? (
                 <EmptyState
+                  key="empty"
                   disableEntry={initialListRender}
-                  disableLayout={disableLayoutAnim}
+                  disableLayout={!canAnimateLayout}
                 />
               ) : (
-                <>
-                  {groupedHabits.incompleteToday.map((h, i) => (
-                    <motion.div
-                      key={h.id}
-                      layout={!disableLayoutAnim}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      transition={{ ...transitions.fadeXl, layout: transitions.spring }}
+                groupedHabits.incompleteToday.map((h: Habit, i: number) => (
+                  <motion.div
+                    key={h.id}
+                    layout
+                    initial={false}
+                    exit={{ opacity: 0 }}
+                    transition={{
+                      opacity: transitions.fadeXs,
+                      layout: canAnimateLayout ? transitions.spring : { duration: 0 },
+                    }}
+                    className="relative z-20 bg-surface rounded-2xl text-strong"
+                  >
+                    <LazyMount
+                      enabled={i > 5}
+                      className="w-full"
+                      minHeight={180}
+                      unmountOnExit={false}
+                      placeholder={
+                        <div className="h-full rounded-2xl border border-subtle bg-neutral-200 dark:bg-neutral-900/40" />
+                      }
                     >
-                      <LazyMount
-                        enabled={i > 5}
-                        className="w-full"
-                        minHeight={180}
-                        unmountOnExit={false}
-                        placeholder={
-                          <div className="h-full rounded-2xl border border-subtle bg-neutral-200 dark:bg-neutral-900/40" />
-                        }
-                      >
-                        <HabitCard
-                          habit={h}
-                          completionKeys={completionKeysById.get(h.id) ?? EMPTY_SET}
-                          weekKeys={weekKeys}
-                          disableEntryAnim={disableEntryAnim}
-                        />
-                      </LazyMount>
-                    </motion.div>
-                  ))}
-
-                  {groupedHabits.completedToday.length > 0 &&
-                    groupedHabits.incompleteToday.length > 0 && (
-                      <motion.div
-                        key="divider-completed"
-                        layout={!disableLayoutAnim}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        transition={{ ...transitions.fadeXl, layout: transitions.spring }}
-                        className="col-span-full text-xs font-semibold tracking-[0.6em] text-neutral-400 dark:text-neutral-500 text-center uppercase"
-                      >
-                        COMPLETED
-                      </motion.div>
-                    )}
-
-                  {groupedHabits.completedToday.map((h, i) => (
-                    <motion.div
-                      key={h.id}
-                      layout={!disableLayoutAnim}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      transition={{ ...transitions.fadeXl, layout: transitions.spring }}
-                    >
-                      <LazyMount
-                        enabled={groupedHabits.incompleteToday.length === 0 ? i > 5 : true}
-                        className="w-full"
-                        minHeight={180}
-                        unmountOnExit={false}
-                        placeholder={
-                          <div className="h-full rounded-2xl border border-subtle bg-neutral-200 dark:bg-neutral-900/40" />
-                        }
-                      >
-                        <HabitCard
-                          habit={h}
-                          completionKeys={completionKeysById.get(h.id) ?? EMPTY_SET}
-                          weekKeys={weekKeys}
-                          disableEntryAnim={disableEntryAnim}
-                        />
-                      </LazyMount>
-                    </motion.div>
-                  ))}
-                </>
+                      <HabitCard
+                        habit={h}
+                        completionKeys={completionKeysById.get(h.id) ?? EMPTY_SET}
+                        weekKeys={weekKeys}
+                        disableEntryAnim={disableEntryAnim}
+                      />
+                    </LazyMount>
+                  </motion.div>
+                ))
               )}
+
+              {!isEmpty && groupedHabits.completedToday.length > 0 && (
+                <motion.div
+                  key="divider-completed"
+                  layout
+                  initial={false}
+                  exit={{ opacity: 0 }}
+                  transition={{
+                    ...transitions.fadeXs,
+                    layout: canAnimateLayout ? transitions.spring : { duration: 0 },
+                  }}
+                  className="col-span-full relative z-0 py-2 text-xs font-semibold tracking-[0.6em] text-neutral-400 dark:text-neutral-500 text-center uppercase"
+                >
+                  COMPLETED
+                </motion.div>
+              )}
+
+              {!isEmpty &&
+                groupedHabits.completedToday.map((h: Habit, i: number) => (
+                  <motion.div
+                    key={h.id}
+                    layout
+                    initial={false}
+                    exit={{ opacity: 0 }}
+                    transition={{
+                      opacity: transitions.fadeXs,
+                      layout: canAnimateLayout ? transitions.spring : { duration: 0 },
+                    }}
+                    className="relative z-20 bg-surface rounded-2xl text-strong"
+                  >
+                    <LazyMount
+                      enabled={groupedHabits.incompleteToday.length === 0 ? i > 5 : true}
+                      className="w-full"
+                      minHeight={180}
+                      unmountOnExit={false}
+                      placeholder={
+                        <div className="h-full rounded-2xl border border-subtle bg-neutral-200 dark:bg-neutral-900/40" />
+                      }
+                    >
+                      <HabitCard
+                        habit={h}
+                        completionKeys={completionKeysById.get(h.id) ?? EMPTY_SET}
+                        weekKeys={weekKeys}
+                        disableEntryAnim={disableEntryAnim}
+                      />
+                    </LazyMount>
+                  </motion.div>
+                ))}
             </AnimatePresence>
           </motion.main>
 
@@ -266,9 +284,14 @@ export default function Home({ pageTransitioning = false }: { pageTransitioning?
                 groupedHabits.completedToday.length > 0) && (
                 <motion.div
                   key="divider-archived"
-                  layout={!disableLayoutAnim}
-                  transition={{ ...transitions.fadeXl, layout: transitions.spring }}
-                  className="text-xs font-semibold tracking-[0.6em] text-neutral-400 dark:text-neutral-500 text-center uppercase"
+                  layout
+                  initial={false}
+                  exit={{ opacity: 0 }}
+                  transition={{
+                    ...transitions.fadeXs,
+                    layout: canAnimateLayout ? transitions.spring : { duration: 0 },
+                  }}
+                  className="relative z-0 py-2 text-xs font-semibold tracking-[0.6em] text-neutral-400 dark:text-neutral-500 text-center uppercase"
                 >
                   ARCHIVED
                 </motion.div>
@@ -276,15 +299,17 @@ export default function Home({ pageTransitioning = false }: { pageTransitioning?
 
               <div className="grid gap-4">
                 <AnimatePresence initial={false}>
-                  {groupedHabits.archived.map((h) => (
+                  {groupedHabits.archived.map((h: Habit) => (
                     <motion.div
                       key={h.id}
-                      // do NOT enable layout animations here so other cards do not shift
-                      layout={false}
-                      initial={{ opacity: 0, y: 6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -6 }}
-                      transition={{ ...transitions.fadeXl }}
+                      layout
+                      initial={false}
+                      exit={{ opacity: 0 }}
+                      transition={{
+                        opacity: transitions.fadeXs,
+                        layout: canAnimateLayout ? transitions.spring : { duration: 0 },
+                      }}
+                      className="relative z-20 bg-surface rounded-2xl text-strong"
                     >
                       <LazyMount
                         enabled={true}
