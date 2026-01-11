@@ -232,53 +232,61 @@ export default function Home({ pageTransitioning = false }: { pageTransitioning?
                       </LazyMount>
                     </motion.div>
                   ))}
-
-                  {showArchived && groupedHabits.archived.length > 0 && (
-                    <>
-                      {(groupedHabits.incompleteToday.length > 0 ||
-                        groupedHabits.completedToday.length > 0) && (
-                        <motion.div
-                          key="divider-archived"
-                          layout={!initialListRender}
-                          exit={{ opacity: 0, scale: 0.95 }}
-                          transition={{ ...transitions.fadeXl, layout: transitions.spring }}
-                          className="col-span-full text-xs font-semibold tracking-[0.6em] text-neutral-400 dark:text-neutral-500 text-center uppercase"
-                        >
-                          ARCHIVED
-                        </motion.div>
-                      )}
-
-                      {groupedHabits.archived.map((h) => (
-                        <motion.div
-                          key={h.id}
-                          layout={!initialListRender}
-                          exit={{ opacity: 0, scale: 0.95 }}
-                          transition={{ ...transitions.fadeXl, layout: transitions.spring }}
-                        >
-                          <LazyMount
-                            enabled={true}
-                            className="w-full"
-                            minHeight={180}
-                            unmountOnExit={false}
-                            placeholder={
-                              <div className="h-full rounded-2xl border border-subtle bg-neutral-200 dark:bg-neutral-900/40" />
-                            }
-                          >
-                            <HabitCard
-                              habit={h}
-                              completionKeys={completionKeysById.get(h.id) ?? EMPTY_SET}
-                              weekKeys={weekKeys}
-                              disableEntryAnim={disableEntryAnim}
-                            />
-                          </LazyMount>
-                        </motion.div>
-                      ))}
-                    </>
-                  )}
                 </>
               )}
             </AnimatePresence>
           </motion.main>
+
+          {/* Archived habits are rendered outside the main grid so toggling them does not
+            trigger layout/position changes for active cards. */}
+          {showArchived && groupedHabits.archived.length > 0 && (
+            <div className="mt-4 space-y-4">
+              {(groupedHabits.incompleteToday.length > 0 ||
+                groupedHabits.completedToday.length > 0) && (
+                <motion.div
+                  key="divider-archived"
+                  layout={!initialListRender}
+                  transition={{ ...transitions.fadeXl, layout: transitions.spring }}
+                  className="text-xs font-semibold tracking-[0.6em] text-neutral-400 dark:text-neutral-500 text-center uppercase"
+                >
+                  ARCHIVED
+                </motion.div>
+              )}
+
+              <div className="grid gap-4">
+                <AnimatePresence initial={false}>
+                  {groupedHabits.archived.map((h) => (
+                    <motion.div
+                      key={h.id}
+                      // do NOT enable layout animations here so other cards do not shift
+                      layout={false}
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      transition={{ ...transitions.fadeXl }}
+                    >
+                      <LazyMount
+                        enabled={true}
+                        className="w-full"
+                        minHeight={180}
+                        unmountOnExit={false}
+                        placeholder={
+                          <div className="h-full rounded-2xl border border-subtle bg-neutral-200 dark:bg-neutral-900/40" />
+                        }
+                      >
+                        <HabitCard
+                          habit={h}
+                          completionKeys={completionKeysById.get(h.id) ?? EMPTY_SET}
+                          weekKeys={weekKeys}
+                          disableEntryAnim={disableEntryAnim}
+                        />
+                      </LazyMount>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

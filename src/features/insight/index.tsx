@@ -172,7 +172,7 @@ export default function Insight() {
             const isDefault = !months[h.id];
             // allow horizontal scrolling for all years so user can pan previous years
             return calcReady ? (
-              <div className="fade-in-soft">
+              h.archived ? (
                 <MonthGrid
                   habit={h}
                   month={monthFor(h)}
@@ -180,7 +180,17 @@ export default function Insight() {
                   alignToNow={isDefault}
                   completionKeys={completionKeys}
                 />
-              </div>
+              ) : (
+                <div className="fade-in-soft">
+                  <MonthGrid
+                    habit={h}
+                    month={monthFor(h)}
+                    allowScroll={true}
+                    alignToNow={isDefault}
+                    completionKeys={completionKeys}
+                  />
+                </div>
+              )
             ) : (
               <div className="mt-3 h-[140px] rounded-xl bg-neutral-200 dark:bg-neutral-900/40" />
             );
