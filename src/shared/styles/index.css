@@ -304,39 +304,6 @@ html {
   animation: guideExitBack 0.22s cubic-bezier(0.4, 0, 0.55, 1) forwards;
 }
 
-/* Settings modal animations (overlay + panel) */
-@keyframes settingsIn {
-  from {
-    opacity: 0;
-    transform: translateY(24px) scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-@keyframes settingsOut {
-  from {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(26px) scale(0.95);
-  }
-}
-.settings-overlay {
-  animation: fadeInMove var(--motion-page-duration) var(--motion-page-ease) both;
-}
-.settings-overlay.closing {
-  animation: fadeOut 0.28s cubic-bezier(0.4, 0, 0.6, 1) forwards;
-}
-.settings-panel {
-  animation: settingsIn 0.42s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.settings-panel.closing {
-  animation: settingsOut 0.28s cubic-bezier(0.4, 0, 0.6, 1) forwards;
-}
 
 /* Small utility for fade/slide used elsewhere */
 @keyframes fadeSlide {

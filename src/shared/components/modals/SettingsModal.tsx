@@ -21,8 +21,11 @@ interface SettingsModalProps {
 type ThemeMode = 'system' | 'light' | 'dark';
 
 export default function SettingsModal({ open, onClose, onShowGuide }: SettingsModalProps) {
+  const [visible, setVisible] = useState(open);
   const [closing, setClosing] = useState(false);
+  const [entering, setEntering] = useState(false);
   const timeoutRef = useRef<number | null>(null);
+  const enterRaf = useRef<number | null>(null);
   const pendingRef = useRef<'none' | 'guide'>('none');
   const storeReminders = useHabitStore((s) => s.reminders);
   const storeSetReminders = useHabitStore((s) => s.setReminders);
@@ -57,31 +60,54 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
   // import/export handled via utils/dataTransfer
 
   useEffect(() => {
-    if (!open) setClosing(false);
-  }, [open]);
+    if (open) {
+      if (timeoutRef.current) {
+        window.clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+      if (enterRaf.current) cancelAnimationFrame(enterRaf.current);
+      setVisible(true);
+      setClosing(false);
+      setEntering(true);
+      enterRaf.current = requestAnimationFrame(() => {
+        enterRaf.current = requestAnimationFrame(() => setEntering(false));
+      });
+    } else if (visible) {
+      setClosing(true);
+      timeoutRef.current = window.setTimeout(() => {
+        setVisible(false);
+        setClosing(false);
+      }, 220);
+    }
+  }, [open, visible]);
+
   useEffect(
     () => () => {
       if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
+      if (enterRaf.current) cancelAnimationFrame(enterRaf.current);
     },
     [],
   );
+
   // Prevent background scrolling while settings modal is open
   useEffect(() => {
-    if (!open) return;
+    if (!visible) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => {
       document.body.style.overflow = prev;
     };
-  }, [open]);
+  }, [visible]);
 
-  const CLOSE_DURATION = 280;
+  const CLOSE_DURATION = 220;
   const beginClose = useCallback(() => {
     if (closing) return;
     setClosing(true);
     timeoutRef.current = window.setTimeout(() => {
       try {
         onClose();
+        setVisible(false);
+        setClosing(false);
       } catch {
         // Ignore close errors
       }
@@ -100,7 +126,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
       } else {
         pendingRef.current = 'none';
       }
-    }, CLOSE_DURATION + 40);
+    }, CLOSE_DURATION);
   }, [closing, onClose, onShowGuide]);
 
   // Close on Escape (desktop only)
@@ -257,17 +283,18 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
     setConfirmClearOpen(true);
   }
 
-  if (!open && !closing) return null;
+  if (!visible) return null;
   return (
     <div
-      className={`fixed inset-0 z-[80] flex items-center justify-center p-5 transition-colors duration-200 ${closing ? 'bg-transparent' : 'bg-overlay backdrop-blur-sm'}`}
+      className={`fixed inset-0 z-[80] flex items-center justify-center p-5 transition-colors duration-200 ${closing || entering ? 'bg-transparent' : 'bg-overlay backdrop-blur-sm'}`}
       onClick={beginClose}
     >
       <div
-        className={`w-full max-w-sm rounded-2xl bg-surface-elevated p-6 pt-3 ring-1 ring-black/5 dark:ring-neutral-700/5 border border-subtle overflow-y-auto settings-panel ${closing ? 'closing' : ''}`}
+        className={`w-full max-w-sm rounded-2xl bg-surface-elevated p-6 pt-3 shadow-elevated ring-1 ring-black/5 dark:ring-neutral-700/5 border border-subtle overflow-y-auto relative transition-all duration-200 ${closing || entering ? 'opacity-0 scale-[0.95] translate-y-1' : 'opacity-100 scale-100 translate-y-0'}`}
         style={{
           WebkitOverflowScrolling: 'touch',
           paddingBottom: 'max(env(safe-area-inset-bottom), 16px)',
+          maxHeight: 'min(720px, 90vh)',
         }}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
