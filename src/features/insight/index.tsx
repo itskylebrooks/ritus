@@ -222,7 +222,7 @@ export default function Insight() {
             {showArchived && archivedHabits.length > 0 && (
               <>
                 {activeHabits.length > 0 && (
-                  <div className="text-xs font-semibold tracking-[0.6em] text-neutral-400 dark:text-neutral-500 text-center uppercase">
+                  <div className="relative z-0 py-2 text-xs font-semibold tracking-[0.6em] text-neutral-400 dark:text-neutral-500 text-center uppercase">
                     ARCHIVED
                   </div>
                 )}
