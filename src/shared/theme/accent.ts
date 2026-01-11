@@ -32,8 +32,8 @@ export const ACCENTS: Record<
     darkContrast: '#050505',
   },
   accent_ember: {
-    // Ember: darker, more saturated in dark mode
-    light: '#c1300b',
+    // Ember: brighter in light mode, darker and saturated in dark mode
+    light: '#e04a12',
     lightContrast: '#ffffff',
     dark: '#ff5c21',
     darkContrast: '#050505',
