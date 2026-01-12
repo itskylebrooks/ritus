@@ -17,6 +17,8 @@ export interface ImportResult {
   totalCompletionsNew: number;
   longestStreakPrev: number;
   longestStreakNew: number;
+  daysWithRitusPrev: number;
+  daysWithRitusNew: number;
 }
 
 export type ImportResultFail = { ok: false; reason: 'invalid' | 'not_ritus' };
@@ -73,6 +75,13 @@ export function exportAllData() {
     totalPoints: s.totalPoints,
     totalCompletions: s.totalCompletions,
     longestStreak: s.longestStreak,
+    // days with ritus (unique days with at least one completion across all habits)
+    daysWithRitus: (() => {
+      const set = new Set<string>();
+      for (const h of habitsForExport)
+        for (const c of h.completions || []) set.add(iso(fromISO(c)));
+      return set.size;
+    })(),
     // progression state (points + bookkeeping keys)
     progress:
       normalizeProgress(s.progress) ||
@@ -107,6 +116,8 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
     const incomingTotalCompletions =
       typeof parsed.totalCompletions === 'number' ? parsed.totalCompletions : 0;
     const incomingLongest = typeof parsed.longestStreak === 'number' ? parsed.longestStreak : 0;
+    const incomingDaysWithRitus =
+      typeof parsed.daysWithRitus === 'number' ? parsed.daysWithRitus : undefined;
     const incomingProgress =
       parsed && typeof parsed.progress === 'object'
         ? normalizeProgress(parsed.progress)
@@ -203,6 +214,19 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
       ...mergedHabits.map((h) => h.streak || 0),
     );
 
+    // recompute unique days used across merged habits
+    const recomputedDaysSet = new Set<string>();
+    for (const h of mergedHabits)
+      for (const c of h.completions || []) recomputedDaysSet.add(iso(fromISO(c)));
+    const recomputedDaysWithRitus = recomputedDaysSet.size;
+
+    // choose conservative maximum across incoming, current, and recomputed
+    const newDaysWithRitus = Math.max(
+      incomingDaysWithRitus || 0,
+      cur.daysWithRitus || 0,
+      recomputedDaysWithRitus,
+    );
+
     // apply to store/persisted state
     const updated = {
       // only persist the partial snapshot used by our persist `partialize`
@@ -211,6 +235,7 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
       totalPoints: newTotal,
       totalCompletions: newTotalCompletions,
       longestStreak: newLongest,
+      daysWithRitus: newDaysWithRitus,
       // restore formatting settings from import when available
       dateFormat: incomingDateFormat ?? cur.dateFormat,
       weekStart: incomingWeekStart ?? cur.weekStart,
@@ -243,6 +268,7 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
       totalPoints: updated.totalPoints,
       totalCompletions: updated.totalCompletions,
       longestStreak: updated.longestStreak,
+      daysWithRitus: updated.daysWithRitus,
       dateFormat: updated.dateFormat,
       weekStart: updated.weekStart,
       progress: updated.progress,
@@ -251,6 +277,24 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
         ? updated.emojiRecents.filter((id): id is string => typeof id === 'string')
         : [],
     }));
+
+    // No separate localStorage key; emoji data is part of the store snapshot above
+
+    return {
+      ok: true,
+      addedHabits: normalized.length,
+      duplicateHabits,
+      invalidHabits,
+      totalHabits: mergedHabits.length,
+      totalPointsPrev: cur.totalPoints || 0,
+      totalPointsNew: newTotal,
+      totalCompletionsPrev: cur.totalCompletions || 0,
+      totalCompletionsNew: newTotalCompletions,
+      longestStreakPrev: cur.longestStreak || 0,
+      longestStreakNew: newLongest,
+      daysWithRitusPrev: cur.daysWithRitus || 0,
+      daysWithRitusNew: newDaysWithRitus,
+    };
 
     // No separate localStorage key; emoji data is part of the store snapshot above
 

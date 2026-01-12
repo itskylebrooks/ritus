@@ -246,13 +246,16 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
           );
         if (res.longestStreakNew !== res.longestStreakPrev)
           changes.push(`Longest streak: ${res.longestStreakPrev} → ${res.longestStreakNew}`);
+        if ('daysWithRitusNew' in res && res.daysWithRitusNew !== res.daysWithRitusPrev)
+          changes.push(`Days with ritus: ${res.daysWithRitusPrev} → ${res.daysWithRitusNew}`);
         changes.push(`Now tracking ${res.totalHabits} habit${res.totalHabits === 1 ? '' : 's'}`);
 
         const changed =
           res.addedHabits > 0 ||
           res.totalPointsNew !== res.totalPointsPrev ||
           res.totalCompletionsNew !== res.totalCompletionsPrev ||
-          res.longestStreakNew !== res.longestStreakPrev;
+          res.longestStreakNew !== res.longestStreakPrev ||
+          ('daysWithRitusNew' in res && res.daysWithRitusNew !== res.daysWithRitusPrev);
 
         if (!changed) {
           setImportReportTitle('No changes imported');
