@@ -295,22 +295,6 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
       daysWithRitusPrev: cur.daysWithRitus || 0,
       daysWithRitusNew: newDaysWithRitus,
     };
-
-    // No separate localStorage key; emoji data is part of the store snapshot above
-
-    return {
-      ok: true,
-      addedHabits: normalized.length,
-      duplicateHabits,
-      invalidHabits,
-      totalHabits: mergedHabits.length,
-      totalPointsPrev: cur.totalPoints || 0,
-      totalPointsNew: newTotal,
-      totalCompletionsPrev: cur.totalCompletions || 0,
-      totalCompletionsNew: newTotalCompletions,
-      longestStreakPrev: cur.longestStreak || 0,
-      longestStreakNew: newLongest,
-    };
   } catch {
     return { ok: false, reason: 'invalid' };
   }
