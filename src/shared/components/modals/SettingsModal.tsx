@@ -47,8 +47,22 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
   // PWA installation
   const { isInstalled, canInstall, install } = usePWA();
 
+  // Detect macOS Safari (desktop) so we can show tailored instructions
+  function isMacSafari() {
+    try {
+      const ua = navigator.userAgent || '';
+      const isMac = /Macintosh|Mac OS X/.test(navigator.platform) || /Macintosh/.test(ua);
+      const isSafari = /Safari/.test(ua) && !/Chrome|Chromium|CriOS|Edg|OPR|Firefox/.test(ua);
+      return isMac && isSafari;
+    } catch {
+      return false;
+    }
+  }
+
   const [exporting, setExporting] = useState(false);
   const [importing, setImporting] = useState(false);
+  const [installHelpOpen, setInstallHelpOpen] = useState(false);
+  const [installHelpSafariOpen, setInstallHelpSafariOpen] = useState(false);
   const [importReportOpen, setImportReportOpen] = useState(false);
   const [importReportTitle, setImportReportTitle] = useState('');
   const [importReportMessage, setImportReportMessage] = useState<string | null>(null);
@@ -436,10 +450,20 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
               </div>
               <button
                 type="button"
-                onClick={!isInstalled && canInstall ? install : undefined}
-                disabled={isInstalled || !canInstall}
+                onClick={() => {
+                  if (isInstalled) return;
+                  if (canInstall) {
+                    install();
+                  } else if (isMacSafari()) {
+                    setInstallHelpSafariOpen(true);
+                  } else {
+                    setInstallHelpOpen(true);
+                  }
+                }}
+                disabled={isInstalled}
+                aria-disabled={isInstalled}
                 className={`w-full flex items-center justify-center gap-1.5 rounded-lg h-10 px-3 text-xs font-medium transition-colors whitespace-nowrap ${
-                  isInstalled || !canInstall
+                  isInstalled
                     ? 'cursor-not-allowed border border-subtle text-muted opacity-60'
                     : 'bg-accent text-inverse hover:opacity-90'
                 }`}
@@ -696,6 +720,40 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
           }
           confirmLabel={importReportReload ? 'Reload' : 'OK'}
           cancelLabel={importReportReload ? 'Cancel' : 'Close'}
+        />
+
+        <ConfirmModal
+          open={installHelpSafariOpen}
+          onClose={() => setInstallHelpSafariOpen(false)}
+          onConfirm={() => setInstallHelpSafariOpen(false)}
+          title="Install Ritus — Safari"
+          message={
+            <div className="text-sm text-strong">
+              <p>
+                To add Ritus to your Dock: click the <strong>Share</strong> button in Safari and
+                choose <strong>Add to Dock</strong>.
+              </p>
+            </div>
+          }
+          confirmLabel="OK"
+          cancelLabel="Close"
+        />
+
+        <ConfirmModal
+          open={installHelpOpen}
+          onClose={() => setInstallHelpOpen(false)}
+          onConfirm={() => setInstallHelpOpen(false)}
+          title="Install Ritus"
+          message={
+            <div className="text-sm text-strong">
+              <p>
+                Install not available here. Try switching to a supported browser (Chrome, Edge,
+                Safari), or exit incognito / private mode.
+              </p>
+            </div>
+          }
+          confirmLabel="OK"
+          cancelLabel="Close"
         />
 
         <div className="-mx-6 mt-6 border-t border-subtle pt-4 px-6">
