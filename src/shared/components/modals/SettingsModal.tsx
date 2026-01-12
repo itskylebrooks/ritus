@@ -757,55 +757,69 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
         />
 
         <div className="-mx-6 mt-6 border-t border-subtle pt-4 px-6">
-          <div className="text-center text-[12px] text-muted relative">
-            <a
-              href="https://www.linkedin.com/in/itskylebrooks/"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Kyle Brooks on LinkedIn"
-              className="absolute left-0 top-1/2 -translate-y-1/2 text-strong opacity-90 hover:opacity-75 transition-opacity"
-            >
-              <Linkedin className="w-5 h-5" />
-            </a>
+          <div className="text-[12px] text-muted">
+            <div className="grid grid-cols-3 items-center gap-2">
+              <div className="grid grid-cols-2 gap-2">
+                <div className="grid h-10 w-full place-items-center">
+                  <a
+                    href="https://www.linkedin.com/in/itskylebrooks/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Kyle Brooks on LinkedIn"
+                    className="text-strong opacity-90 hover:opacity-75 transition-opacity inline-flex items-center justify-center"
+                  >
+                    <Linkedin className="w-5 h-5" />
+                  </a>
+                </div>
+                <div />
+              </div>
 
-            <a
-              href="https://itskylebrooks.tech/"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Kyle Brooks personal website"
-              className="absolute right-0 top-1/2 -translate-y-1/2 text-strong opacity-90 hover:opacity-75 transition-opacity"
-            >
-              <User className="w-5 h-5" />
-            </a>
+              <div className="text-center flex flex-col items-center">
+                <div className="font-medium text-strong whitespace-nowrap">
+                  Kyle Brooks <span className="mx-2">•</span> Ritus {pkg.version}
+                </div>
+                <div className="mt-0.5 flex items-center justify-center gap-3 whitespace-nowrap">
+                  <a
+                    href="https://itskylebrooks.vercel.app/imprint"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline inline-block leading-tight relative z-10"
+                  >
+                    Imprint
+                  </a>
+                  <a
+                    href="https://itskylebrooks.vercel.app/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline inline-block leading-tight relative z-10"
+                  >
+                    Privacy Policy
+                  </a>
+                  <a
+                    href="https://itskylebrooks.vercel.app/license"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline inline-block leading-tight relative z-10"
+                  >
+                    License
+                  </a>
+                </div>
+              </div>
 
-            <div className="font-medium text-strong">
-              Kyle Brooks <span className="mx-2">•</span> Ritus {pkg.version}
-            </div>
-            <div className="mt-0.5 flex items-center justify-center gap-3">
-              <a
-                href="https://itskylebrooks.vercel.app/imprint"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline"
-              >
-                Imprint
-              </a>
-              <a
-                href="https://itskylebrooks.vercel.app/privacy"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline"
-              >
-                Privacy Policy
-              </a>
-              <a
-                href="https://itskylebrooks.vercel.app/license"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline"
-              >
-                License
-              </a>
+              <div className="grid grid-cols-2 gap-2">
+                <div />
+                <div className="grid h-10 w-full place-items-center">
+                  <a
+                    href="https://itskylebrooks.tech/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Kyle Brooks personal website"
+                    className="text-strong opacity-90 hover:opacity-75 transition-opacity inline-flex items-center justify-center"
+                  >
+                    <User className="w-5 h-5" />
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
