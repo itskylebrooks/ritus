@@ -61,19 +61,16 @@ A calm habit tracker focused on simplicity and privacy. Track daily/weekly/month
 ### Insights
 
 - Streaks and completion counts
-- Practice Arc with weekly/monthly overview of earned XP
-- Year grid view for completion history
+- Year grid view of each habit for completion history
 - Year grid view for emoji history
 
 ### Progression (cosmetic)
 
-- Earn **progress XP** (lifetime) and level up
-- Earn **tokens** from completions and consistency bonuses
-- Spend tokens in the **Collectibles Store** (cosmetic only)
-  - Clock styles
+- Earn **points** from completions and consistency bonuses
+- Spend them in the **Collectibles Store** (cosmetic only)
   - Quote packs
   - Accent themes
-  - Relics
+  - Animations
 - Unlock **trophies** for milestones (streaks, consistency, totals, etc.)
 
 ### Emoji of the day
@@ -105,7 +102,6 @@ A calm habit tracker focused on simplicity and privacy. Track daily/weekly/month
 - Tailwind CSS
 - Zustand (with `persist`)
 - Framer Motion
-- Recharts
 - date-fns
 - Lucide-react
 
@@ -151,7 +147,7 @@ High-level layout:
   - `App.tsx`, `main.tsx` — app bootstrap and routing
   - `features/` — feature pages and page-level components
     - `home/` — habit list, add/edit flows, quick completion actions
-    - `insight/` — stats + charts + history views
+    - `insight/` — stats + history views
     - `profile/` — progression, trophies, collectibles store
     - `inspiration/` — inspiration/quote-related UI (feature page)
     - `compass/` — compass feature page
