@@ -21,10 +21,7 @@ export default function EmojiPicker() {
   const appliedCollectibles = useHabitStore((s) => s.progress.appliedCollectibles || {});
   const animStr = appliedCollectibles['animation'] || '';
   const hasEmojiRain = animStr.includes('anim_emoji_rain');
-  const [open, setOpen] = useState(false);
-  const [visible, setVisible] = useState(false);
-  const [closing, setClosing] = useState(false);
-  const [entering, setEntering] = useState(false);
+  const [phase, setPhase] = useState<'closed' | 'opening' | 'open' | 'closing'>('closed');
   const closeTimerRef = useRef<number | null>(null);
   const enterRaf = useRef<number | null>(null);
   const [search, setSearch] = useState('');
@@ -69,38 +66,39 @@ export default function EmojiPicker() {
 
   const CLOSE_DURATION = 220;
 
+  const beginOpen = useCallback(() => {
+    if (phase === 'open' || phase === 'opening') return;
+    if (closeTimerRef.current) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+    if (enterRaf.current) cancelAnimationFrame(enterRaf.current);
+    setPhase('opening');
+    enterRaf.current = requestAnimationFrame(() => {
+      enterRaf.current = requestAnimationFrame(() => {
+        setPhase((prev) => (prev === 'opening' ? 'open' : prev));
+      });
+    });
+  }, [phase]);
+
   const beginClose = useCallback(() => {
-    if (!visible || closing) return;
-    setClosing(true);
+    if (phase === 'closed' || phase === 'closing') return;
+    if (closeTimerRef.current) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+    setPhase('closing');
     closeTimerRef.current = window.setTimeout(() => {
-      setVisible(false);
-      setClosing(false);
-      setOpen(false);
+      setPhase('closed');
     }, CLOSE_DURATION);
-  }, [visible, closing]);
+  }, [phase]);
+
+  const visible = phase !== 'closed';
+  const closing = phase === 'closing';
+  const entering = phase === 'opening';
+  const isOpen = phase !== 'closed';
 
   useEffect(() => {
-    if (open) {
-      if (closeTimerRef.current) {
-        window.clearTimeout(closeTimerRef.current);
-        closeTimerRef.current = null;
-      }
-      if (enterRaf.current) cancelAnimationFrame(enterRaf.current);
-      setVisible(true);
-      setClosing(false);
-      setEntering(true);
-      enterRaf.current = requestAnimationFrame(() => {
-        enterRaf.current = requestAnimationFrame(() => setEntering(false));
-      });
-    } else if (visible) {
-      setClosing(true);
-      closeTimerRef.current = window.setTimeout(() => {
-        setVisible(false);
-        setClosing(false);
-        setOpen(false);
-      }, CLOSE_DURATION);
-    }
-
     return () => {
       if (closeTimerRef.current) {
         window.clearTimeout(closeTimerRef.current);
@@ -108,7 +106,7 @@ export default function EmojiPicker() {
       }
       if (enterRaf.current) cancelAnimationFrame(enterRaf.current);
     };
-  }, [open, visible]);
+  }, []);
 
   useEffect(() => {
     if (!visible) {
@@ -168,11 +166,11 @@ export default function EmojiPicker() {
         onClick={() => {
           setSearch('');
           setActiveCategory(null);
-          setOpen(true);
+          beginOpen();
         }}
         className="inline-flex items-center h-10 text-2xl leading-none text-muted hover:text-strong transition-colors focus:outline-none no-focus-ring"
         aria-haspopup="dialog"
-        aria-expanded={open}
+        aria-expanded={isOpen}
         aria-label={
           emoji ? `Emoji of the day: ${emoji.label}. Click to change.` : 'Select emoji of the day'
         }
