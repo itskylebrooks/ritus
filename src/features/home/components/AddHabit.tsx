@@ -11,8 +11,7 @@ export default function AddHabit({
 }: {
   disableInitialLayout?: boolean;
 }) {
-  // disableInitialLayout: when true, avoid framer-motion 'layout' animations on mount
-  // (used by Home to avoid initial reflow animations when Quote height differs)
+  // Disable initial layout animations to avoid mount-time reflow.
   const addHabit = useHabitStore((s) => s.addHabit);
   const [name, setName] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -36,13 +35,10 @@ export default function AddHabit({
     e.preventDefault();
     if (!name.trim()) return;
     try {
-      // call store.addHabit with weeklyTarget and monthlyTarget (store will ignore the irrelevant one)
+      // Pass both targets; the store ignores the one that doesn't apply.
       addHabit(name.trim(), frequency, weeklyTarget, monthlyTarget, mode);
     } catch (err) {
-      // on some mobile browsers/storage modes this can throw (e.g., blocked storage or missing APIs)
-      // surface to console and avoid crashing the UI
-      // keep reset of inputs only if add succeeded; here we still reset so user can retry
-      // developer can inspect errors via remote debugging
+      // Some storage environments can throw; log and keep the UI responsive.
       console.error('Failed to add habit', err);
     }
     setName('');
@@ -58,12 +54,11 @@ export default function AddHabit({
     setActiveIndex(-1);
   }
 
-  // Mark app ready after first mount to avoid initial load animations in dev StrictMode
+  // Mark app ready after first mount to avoid initial animations in dev StrictMode.
   useEffect(() => {
     setIsReady(true);
   }, []);
 
-  // Close suggestions on outside click
   useEffect(() => {
     function onDocClick(e: MouseEvent) {
       if (!wrapperRef.current) return;
@@ -77,7 +72,7 @@ export default function AddHabit({
   }, []);
 
   useEffect(() => {
-    // Don't animate on first mount
+    // Skip placeholder typing on first mount or while user is typing.
     if (firstMount.current || !isReady) {
       firstMount.current = false;
       return;

@@ -29,6 +29,7 @@ const AUTO_META_TROPHY_IDS = new Set([
   'meta_persistence',
 ]);
 
+// Older saves stored booleans; normalize to ISO dates for trophy unlocks.
 const normalizeUnlockedDates = (
   unlocked: Record<string, string | boolean | undefined> | undefined,
   fallback: string,
@@ -81,7 +82,6 @@ const computeDaysWithRitus = (habits: Habit[]): number => {
 
 export interface HabitState {
   habits: Habit[];
-  // progression / points
   progress: {
     points: number;
     weekBonusKeys?: Record<string, true | undefined>;
@@ -106,26 +106,20 @@ export interface HabitState {
   purchaseCollectible: (id: string, cost: number) => boolean;
   applyCollectible: (id: string) => boolean;
   markTrophiesSeen: (ids: string[]) => void;
-  // display settings
   dateFormat: 'MDY' | 'DMY';
   setDateFormat: (f: 'MDY' | 'DMY') => void;
   weekStart: 'sunday' | 'monday';
   setWeekStart: (w: 'sunday' | 'monday') => void;
-  // UI visibility
   showAdd: boolean;
   setShowAdd: (v: boolean) => void;
   showHomeCards: boolean;
   setShowHomeCards: (v: boolean) => void;
-  // archived visibility toggle (hide archived by default)
   showArchived: boolean;
   setShowArchived: (v: boolean) => void;
-  // display mode: grid (false) or list (true)
   showList: boolean;
   setShowList: (v: boolean) => void;
-  // home refresh key: increment to force remount of Home
   homeRefreshKey?: number;
   triggerHomeRefresh: () => void;
-  // emoji of the day mapping by date (YYYY-MM-DD) and recents list
   emojiByDate?: Record<string, string | undefined>;
   emojiRecents?: string[];
   setEmojiForDate?: (dateISO: string, emojiId: string | null) => void;
@@ -160,7 +154,6 @@ export const useHabitStore = create<HabitState>()(
   persist(
     (set, get) => ({
       habits: [],
-      // Progression defaults
       progress: {
         points: 0,
         weekBonusKeys: {},
@@ -170,16 +163,13 @@ export const useHabitStore = create<HabitState>()(
         appliedCollectibles: {},
         seenTrophies: {},
       },
-      // display preferences
       dateFormat: 'MDY',
       setDateFormat: (f) => set({ dateFormat: f }),
       weekStart: 'monday',
       setWeekStart: (w) => set({ weekStart: w }),
-      // UI visibility
       showAdd: true,
       showHomeCards: true,
       showArchived: false,
-      // default to list view
       showList: true,
       setShowAdd: (v) => set({ showAdd: v }),
       setShowHomeCards: (v) => set({ showHomeCards: v }),
@@ -244,6 +234,7 @@ export const useHabitStore = create<HabitState>()(
       tryAwardWeeklyBonus: (habitId: string, weekDate: Date, reached: boolean) =>
         set((s) => {
           const weekStartsOn = s.weekStart === 'sunday' ? 0 : 1;
+          // Keyed by habit + week start to avoid double-awards.
           const key = `${habitId}@${startOfWeek(weekDate, { weekStartsOn }).toISOString()}`;
           const keys = { ...(s.progress.weekBonusKeys || {}) };
           const has = !!keys[key];
@@ -273,7 +264,7 @@ export const useHabitStore = create<HabitState>()(
           }
           return {};
         }),
-      // award trophies centrally and idempotently based on a summary of stats
+      // Award trophies idempotently from a stats summary.
       awardTrophies: (summary) => {
         const { progress, habits } = get();
         const newly: string[] = [];
@@ -442,9 +433,7 @@ export const useHabitStore = create<HabitState>()(
           return { progress: { ...s.progress, seenTrophies: seen } };
         });
       },
-      // Apply an owned collectible. Records the applied collectible by its type so
-      // UI and other modules can react. This does not implement the visual/functional
-      // behavior of each collectible — that will be added per-item later.
+      // Track the applied collectible by type; visual effects live elsewhere.
       applyCollectible: (id: string) => {
         const state = get();
         const owned = new Set(state.progress.ownedCollectibles || []);

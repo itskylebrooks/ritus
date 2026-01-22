@@ -42,7 +42,6 @@ function ButtonsMenu({
     };
   }, []);
 
-  // Close the menu when clicking/tapping outside the menu while it's open
   useEffect(() => {
     if (!open) return;
     const onPointerDown = (e: PointerEvent) => {
@@ -149,9 +148,7 @@ export default function HabitCard({
 
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
-  // Capture the initial value of disableEntryAnim so it doesn't flip
-  // on the first parent-triggered re-render (which caused the entry
-  // animation to run for all cards after any button click).
+  // Freeze the initial animation flag to avoid re-running entry animations.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_initialDisableEntry] = useState(disableEntryAnim);
 
@@ -166,6 +163,7 @@ export default function HabitCard({
       : habit.frequency === 'weekly'
         ? (habit.weeklyTarget ?? 1)
         : (habit.monthlyTarget ?? 1);
+  // Monthly progress counts only completions in the current month.
   const progressVal = useMemo(
     () =>
       habit.frequency === 'monthly'
@@ -201,7 +199,7 @@ export default function HabitCard({
   const handleToggle = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (habit.archived) return;
 
-    // Fire confetti if enabling 'done' state and animation is active
+    // Fire confetti only when marking complete and the collectible is enabled.
     if (!doneToday && appliedCollectibles['animation']?.includes('anim_confetti_button')) {
       const rect = e.currentTarget.getBoundingClientRect();
       const x = (rect.left + rect.width / 2) / window.innerWidth;
@@ -215,8 +213,6 @@ export default function HabitCard({
 
     toggleCompletion(habit.id, new Date());
   };
-
-  // deletion will rely on parent AnimatePresence exit animation
 
   return (
     <div className="rounded-2xl border border-subtle bg-surface p-4 shadow-sm text-strong">
@@ -250,14 +246,13 @@ export default function HabitCard({
                 transition={transitions.fadeMd}
                 className="relative top-1 flex flex-wrap items-center gap-2"
               >
-                {/* Title with badges inline so badges sit immediately after the end of the title text */}
                 <div className="w-full">
                   <div className="text-lg font-semibold whitespace-normal break-words leading-tight">
                     <span className="inline after:content-[''] after:inline-block after:w-2">
                       {habit.name}
                     </span>
                     <span className="inline-flex items-center gap-2 align-text-bottom">
-                      {/* Compact badge labels: daily -> D, weekly -> W{n}, monthly -> M{n}, archived -> A */}
+                      {/* Compact badge labels: D, W{n}, M{n}, A. */}
                       <Badge>
                         {habit.frequency === 'daily'
                           ? 'D'
@@ -353,7 +348,6 @@ export default function HabitCard({
               className={`inline-flex items-center justify-center rounded-xl ${breakPrimaryBgClass} p-2 text-inverse transition transform duration-150 ease-in-out md:w-12 ${habit.archived ? 'opacity-60 cursor-not-allowed' : 'hover-accent-fade active:scale-[.98]'} md:justify-self-end`}
             >
               <StatusIcon className="h-4 w-4" />
-              {/* Visible label on mobile, hidden on small+ so grid view buttons stay icon-only */}
               <span className="ml-2 inline sm:hidden">Clean today</span>
             </button>
           )
@@ -377,14 +371,12 @@ export default function HabitCard({
             className={`inline-flex items-center justify-center rounded-xl bg-accent p-2 text-inverse transition transform duration-150 ease-in-out md:w-12 ${habit.archived ? 'opacity-60 cursor-not-allowed' : 'hover-accent-fade active:scale-[.98]'} md:justify-self-end`}
           >
             <StatusIcon className="h-4 w-4" />
-            {/* Visible label on mobile, hidden on small+ so grid view buttons stay icon-only */}
             <span className="ml-2 inline sm:hidden">Done today</span>
           </button>
         )}
       </div>
 
       <div className="mt-4">
-        {/* Mobile: streak, compact progress bar, and points all on one row */}
         <div className="flex items-center justify-between gap-2 sm:hidden">
           <div className="flex items-center gap-2">
             <Flame className="h-4 w-4 text-accent" aria-hidden />
@@ -405,7 +397,6 @@ export default function HabitCard({
           </div>
         </div>
 
-        {/* Desktop/tablet: layout adjusted in list view to bring progress bar closer to streak/points */}
         <div className="hidden sm:grid sm:grid-cols-[auto_1fr_auto] sm:items-center sm:gap-3">
           <div className="flex items-center gap-2">
             <Flame className="h-4 w-4 text-accent" aria-hidden />
@@ -430,7 +421,6 @@ export default function HabitCard({
         </div>
       </div>
 
-      {/* Points text moved to the quick guide modal per UX request */}
       <ConfirmModal
         open={confirmDeleteOpen}
         onClose={() => setConfirmDeleteOpen(false)}
