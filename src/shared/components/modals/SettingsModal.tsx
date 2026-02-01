@@ -4,7 +4,7 @@ import { usePWA } from '@/shared/hooks/usePWA';
 import { useHabitStore } from '@/shared/store/store';
 import useThemeStore from '@/shared/store/theme';
 import { exportAllData, importAllData } from '@/shared/utils/dataTransfer';
-import { ChevronDown, Linkedin, Share2, User, X } from 'lucide-react';
+import { ChevronDown, Linkedin, Share2, SquareArrowOutUpRight, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import pkg from '../../../../package.json';
 import ConfirmModal from './ConfirmModal';
@@ -776,11 +776,11 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
 
               <div className="text-center flex flex-col items-center">
                 <div className="font-medium text-strong whitespace-nowrap">
-                  Kyle Brooks <span className="mx-2">•</span> Ritus {pkg.version}
+                  Brooks Studio <span className="mx-2">•</span> Ritus {pkg.version}
                 </div>
                 <div className="mt-0.5 flex items-center justify-center gap-3 whitespace-nowrap">
                   <a
-                    href="https://itskylebrooks.vercel.app/imprint"
+                    href="https://www.brooksstudio.tech/en/imprint"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="underline inline-block leading-tight relative z-10"
@@ -788,7 +788,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
                     Imprint
                   </a>
                   <a
-                    href="https://itskylebrooks.vercel.app/privacy"
+                    href="https://www.brooksstudio.tech/en/privacy"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="underline inline-block leading-tight relative z-10"
@@ -796,7 +796,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
                     Privacy Policy
                   </a>
                   <a
-                    href="https://itskylebrooks.vercel.app/license"
+                    href="https://www.brooksstudio.tech/en/license"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="underline inline-block leading-tight relative z-10"
@@ -810,13 +810,13 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
                 <div />
                 <div className="grid h-10 w-full place-items-center">
                   <a
-                    href="https://itskylebrooks.tech/"
+                    href="https://www.brooksstudio.tech/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label="Kyle Brooks personal website"
+                    aria-label="Brooks Studio website"
                     className="text-strong opacity-90 hover:opacity-75 transition-opacity inline-flex items-center justify-center"
                   >
-                    <User className="w-5 h-5" />
+                    <SquareArrowOutUpRight className="w-5 h-5" />
                   </a>
                 </div>
               </div>
