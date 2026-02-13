@@ -15,6 +15,50 @@ export const DAILY_MILESTONE = 7; // 7-day streak bonus
 export const WEEKLY_MILESTONE = 4; // 4-week streak bonus
 export const MILESTONE_BONUS = 10;
 
+function uniqueSortedCompletionDates(completions: string[]): Date[] {
+  const byDay = new Map<number, Date>();
+  for (const completion of completions) {
+    const day = fromISO(completion);
+    const key = day.getTime();
+    if (!byDay.has(key)) byDay.set(key, day);
+  }
+  return [...byDay.values()].sort((a, b) => a.getTime() - b.getTime());
+}
+
+function buildWeeklyCounts(dates: Date[], weekStartsOn: 0 | 1): Map<number, number> {
+  const counts = new Map<number, number>();
+  for (const day of dates) {
+    const week = startOfWeek(day, { weekStartsOn });
+    const key = week.getTime();
+    counts.set(key, (counts.get(key) || 0) + 1);
+  }
+  return counts;
+}
+
+function buildMonthlyCounts(dates: Date[]): Map<number, number> {
+  const counts = new Map<number, number>();
+  for (const day of dates) {
+    const month = startOfMonth(day);
+    const key = month.getTime();
+    counts.set(key, (counts.get(key) || 0) + 1);
+  }
+  return counts;
+}
+
+function achievedWeeksFromCounts(counts: Map<number, number>, target: number): Date[] {
+  return [...counts.entries()]
+    .filter(([, count]) => count >= target)
+    .map(([key]) => new Date(key))
+    .sort((a, b) => a.getTime() - b.getTime());
+}
+
+function achievedMonthsFromCounts(counts: Map<number, number>, target: number): Date[] {
+  return [...counts.entries()]
+    .filter(([, count]) => count >= target)
+    .map(([key]) => new Date(key))
+    .sort((a, b) => a.getTime() - b.getTime());
+}
+
 export function hasCompletionOnDay(completions: string[], day: Date) {
   return completions.some((c) => isSameDay(fromISO(c), day));
 }
@@ -38,7 +82,7 @@ export function countCompletionsInWeek(
 
 export function countCompletionsInMonth(completions: string[], ref: Date = new Date()): number {
   // count unique days within the calendar month that have a completion
-  return completions.map(fromISO).filter((d) => isSameMonth(d, ref)).length;
+  return uniqueSortedCompletionDates(completions).filter((d) => isSameMonth(d, ref)).length;
 }
 
 export function calcDailyStreak(h: Habit, ref: Date = new Date()) {
@@ -53,101 +97,68 @@ export function calcDailyStreak(h: Habit, ref: Date = new Date()) {
   return s;
 }
 
-export function calcWeeklyStreak(h: Habit) {
-  // Count total weeks with at least `weeklyTarget` completions
+export function calcWeeklyStreak(h: Habit, ref: Date = new Date()) {
+  // Weekly streak is consecutive achieved weeks ending at the current calendar week.
   const target = h.weeklyTarget ?? 1;
-  const dates = [...h.completions].map(fromISO).sort((a, b) => a.getTime() - b.getTime());
-  const weeks = new Set<string>();
-
-  for (const d of dates) {
-    const weekStart = startOfWeek(d, { weekStartsOn: getWeekStartsOn() }).toISOString();
-    weeks.add(weekStart);
-  }
-
+  const weekStartsOn = getWeekStartsOn();
+  const dates = uniqueSortedCompletionDates(h.completions || []);
+  const weekCounts = buildWeeklyCounts(dates, weekStartsOn);
+  let cur = startOfWeek(ref, { weekStartsOn });
   let streak = 0;
-  for (const week of weeks) {
-    const weekDate = fromISO(week);
-    const completionsInWeek = h.completions.filter((c) =>
-      isSameCalendarWeek(fromISO(c), weekDate),
-    ).length;
-    if (completionsInWeek >= target) {
-      streak++;
-    }
+  while ((weekCounts.get(cur.getTime()) || 0) >= target) {
+    streak += 1;
+    cur = addDays(cur, -7);
   }
-
   return streak;
 }
 
-export function calcMonthlyStreak(h: Habit) {
-  // Count total months with at least `monthlyTarget` completions
+export function calcMonthlyStreak(h: Habit, ref: Date = new Date()) {
+  // Monthly streak is consecutive achieved months ending at the current calendar month.
   const target = h.monthlyTarget ?? 1;
-  const dates = [...h.completions].map(fromISO).sort((a, b) => a.getTime() - b.getTime());
-  const months = new Set<string>();
-
-  for (const d of dates) {
-    const monthStart = startOfMonth(d).toISOString();
-    months.add(monthStart);
-  }
-
+  const dates = uniqueSortedCompletionDates(h.completions || []);
+  const monthCounts = buildMonthlyCounts(dates);
+  let cur = startOfMonth(ref);
   let streak = 0;
-  for (const month of months) {
-    const monthDate = fromISO(month);
-    const completionsInMonth = h.completions.filter((c) =>
-      isSameMonth(fromISO(c), monthDate),
-    ).length;
-    if (completionsInMonth >= target) {
-      streak++;
-    }
+  while ((monthCounts.get(cur.getTime()) || 0) >= target) {
+    streak += 1;
+    cur = addMonths(cur, -1);
   }
-
   return streak;
 }
 
 export function calcPoints(h: Habit): number {
   let pts = 0;
+  const dates = uniqueSortedCompletionDates(h.completions || []);
+  const uniqueCompletionCount = dates.length;
+  const weekStartsOn = getWeekStartsOn();
 
   if (h.mode === 'break') {
     // For break habits, points are based on user-marked clean days stored in completions
-    const dates = [...h.completions].map(fromISO).sort((a, b) => a.getTime() - b.getTime());
     let streak = 0;
     let prev: Date | null = null;
     for (const d of dates) {
       if (!prev || isSameDay(d, addDays(prev, 1))) streak += 1;
-      else if (isSameDay(d, prev)) continue;
       else streak = 1;
       pts += POINTS_PER_COMPLETION;
       if (streak % DAILY_MILESTONE === 0) pts += MILESTONE_BONUS;
       prev = d;
     }
   } else {
-    // build behavior (existing)
-    pts = h.completions.length * POINTS_PER_COMPLETION;
-    const dates = [...h.completions].map(fromISO).sort((a, b) => a.getTime() - b.getTime());
+    pts = uniqueCompletionCount * POINTS_PER_COMPLETION;
 
     if (h.frequency === 'daily') {
       let streak = 0;
       let prev: Date | null = null;
       for (const d of dates) {
         if (!prev || isSameDay(d, addDays(prev, 1))) streak += 1;
-        else if (isSameDay(d, prev)) continue;
         else streak = 1;
         if (streak % DAILY_MILESTONE === 0) pts += MILESTONE_BONUS;
         prev = d;
       }
     } else if (h.frequency === 'weekly') {
-      // Weekly scoring: consider a week a 'hit' if completions in that calendar week >= weeklyTarget
       const target = h.weeklyTarget ?? 1;
-      // build list of week-start dates representing weeks with at least target completions
-      const weeks: Date[] = [];
-      let lastWeek: Date | null = null;
-      for (const d of dates) {
-        // find week of this date
-        const wk = startOfWeek(d, { weekStartsOn: getWeekStartsOn() });
-        if (lastWeek && isSameCalendarWeek(wk, lastWeek)) continue;
-        const count = h.completions.filter((c) => isSameCalendarWeek(fromISO(c), wk)).length;
-        if (count >= target) weeks.push(wk);
-        lastWeek = wk;
-      }
+      const weekCounts = buildWeeklyCounts(dates, weekStartsOn);
+      const weeks = achievedWeeksFromCounts(weekCounts, target);
 
       // Award a per-week completion bonus for each week that met the weekly target.
       // This gives weekly habits a +MILESTONE_BONUS for completing the "week challenge".
@@ -162,18 +173,9 @@ export function calcPoints(h: Habit): number {
         prev = wk;
       }
     } else if (h.frequency === 'monthly') {
-      // Monthly scoring: consider a month a 'hit' if completions in that calendar month >= monthlyTarget
       const target = h.monthlyTarget ?? 1;
-      // build list of month-start dates representing months with at least target completions
-      const months: Date[] = [];
-      let lastMonth: Date | null = null;
-      for (const d of dates) {
-        const mo = startOfMonth(d);
-        if (lastMonth && isSameMonth(mo, lastMonth)) continue;
-        const count = h.completions.filter((c) => isSameMonth(fromISO(c), mo)).length;
-        if (count >= target) months.push(mo);
-        lastMonth = mo;
-      }
+      const monthCounts = buildMonthlyCounts(dates);
+      const months = achievedMonthsFromCounts(monthCounts, target);
 
       if (months.length > 0) pts += months.length * MILESTONE_BONUS;
 

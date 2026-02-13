@@ -1,5 +1,6 @@
 import ProgressBar from '@/shared/components/charts/ProgressBar';
 import { useHabitStore } from '@/shared/store/store';
+import { iso } from '@/shared/utils/date';
 import { Calendar, ChartNoAxesColumnIncreasing, Info } from 'lucide-react';
 import { useMemo } from 'react';
 
@@ -8,13 +9,16 @@ export default function HeaderStats({ weeklyPct }: { weeklyPct: number }) {
   const totalCompletions = useHabitStore((s) => s.totalCompletions ?? 0);
   const habits = useHabitStore((s) => s.habits);
   const monthCompletions = useMemo(() => {
-    const now = new Date();
-    const monthKey = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, '0')}`;
+    const monthKey = iso(new Date()).slice(0, 7);
     let count = 0;
     for (const habit of habits) {
       if (habit.archived || !habit.completions) continue;
+      const seen = new Set<string>();
       for (const completion of habit.completions) {
-        if (completion.startsWith(monthKey)) count += 1;
+        const dayKey = completion.length > 10 ? completion.slice(0, 10) : completion;
+        if (!dayKey.startsWith(monthKey) || seen.has(dayKey)) continue;
+        seen.add(dayKey);
+        count += 1;
       }
     }
     return count;

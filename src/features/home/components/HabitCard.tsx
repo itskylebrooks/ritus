@@ -142,6 +142,9 @@ export default function HabitCard({
   const showList = useHabitStore((s) => s.showList);
   const appliedCollectibles = useHabitStore((s) => s.progress.appliedCollectibles || {});
   const accentApplied = !!appliedCollectibles['accent'];
+  const hasSparkleProgress = (appliedCollectibles['animation'] || '').includes(
+    'anim_sparkle_progress',
+  );
 
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(habit.name);
@@ -386,7 +389,11 @@ export default function HabitCard({
 
           <div className="flex items-center justify-center flex-1">
             <div className="flex-1">
-              <ProgressBar value={progressVal} max={progressMax} />
+              <ProgressBar
+                value={progressVal}
+                max={progressMax}
+                hasSparkle={hasSparkleProgress}
+              />
             </div>
           </div>
 
@@ -408,7 +415,11 @@ export default function HabitCard({
             className={`flex items-center gap-2 ${showList ? 'justify-between' : 'justify-center justify-self-center'}`}
           >
             <div className={`${showList ? 'flex-1' : 'w-56 md:w-40'}`}>
-              <ProgressBar value={progressVal} max={progressMax} />
+              <ProgressBar
+                value={progressVal}
+                max={progressMax}
+                hasSparkle={hasSparkleProgress}
+              />
             </div>
             <span className="sr-only">Weekly progress</span>
           </div>

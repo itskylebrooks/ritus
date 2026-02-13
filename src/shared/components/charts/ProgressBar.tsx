@@ -1,14 +1,17 @@
-import { useHabitStore } from '@/shared/store/store';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 
-export default function ProgressBar({ value, max = 1 }: { value: number; max?: number }) {
+export default function ProgressBar({
+  value,
+  max = 1,
+  hasSparkle = false,
+}: {
+  value: number;
+  max?: number;
+  hasSparkle?: boolean;
+}) {
   const safeMax = max <= 0 ? 1 : max;
   const pct = Math.max(0, Math.min(100, Math.round((value / safeMax) * 100)));
-
-  const appliedCollectibles = useHabitStore((s) => s.progress.appliedCollectibles || {});
-  const animStr = appliedCollectibles['animation'] || '';
-  const hasSparkle = animStr.includes('anim_sparkle_progress');
 
   const [sparkleKey, setSparkleKey] = useState(0);
   const [isSparkling, setIsSparkling] = useState(false);

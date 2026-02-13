@@ -4,7 +4,7 @@ import { type Habit } from '@/shared/types';
 import { daysThisWeek, iso } from '@/shared/utils/date';
 import { format } from 'date-fns';
 import { motion, useAnimation } from 'framer-motion';
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 function WeekStripDay({
   date,
@@ -12,17 +12,17 @@ function WeekStripDay({
   done,
   onToggle,
   showList,
+  hasGlow,
+  appliedAccentId,
 }: {
   date: Date;
   habit: Habit;
   done: boolean;
   onToggle: (d: Date) => void;
   showList: boolean;
+  hasGlow: boolean;
+  appliedAccentId: keyof typeof ACCENTS;
 }) {
-  const appliedCollectibles = useHabitStore((s) => s.progress.appliedCollectibles || {});
-  const hasGlow = (appliedCollectibles['animation'] || '').includes('anim_lumina_touch');
-  const appliedAccentId = (appliedCollectibles['accent'] as keyof typeof ACCENTS) || 'default';
-
   const controls = useAnimation();
   const mounted = useRef(false);
   const prevDone = useRef(done);
@@ -153,7 +153,13 @@ export default function WeekStrip({
 }) {
   const weekStart = useHabitStore((s) => s.weekStart);
   const showList = useHabitStore((s) => s.showList ?? false);
-  const week = daysThisWeek(new Date(), weekStart === 'sunday' ? 0 : 1);
+  const appliedCollectibles = useHabitStore((s) => s.progress.appliedCollectibles || {});
+  const hasGlow = (appliedCollectibles['animation'] || '').includes('anim_lumina_touch');
+  const appliedAccentId = (appliedCollectibles['accent'] as keyof typeof ACCENTS) || 'default';
+  const week = useMemo(
+    () => daysThisWeek(new Date(), weekStart === 'sunday' ? 0 : 1),
+    [weekStart],
+  );
 
   return (
     <div className={`flex ${showList ? 'gap-1.5 sm:gap-2.5' : 'gap-1.5'}`}>
@@ -168,6 +174,8 @@ export default function WeekStrip({
             done={done}
             onToggle={onToggle}
             showList={showList}
+            hasGlow={hasGlow}
+            appliedAccentId={appliedAccentId}
           />
         );
       })}
