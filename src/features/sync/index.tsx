@@ -45,6 +45,16 @@ export default function Sync() {
       </section>
 
       <section>
+        <h2 className="text-lg font-medium">Why it's a paid feature</h2>
+        <p className="mt-2 text-neutral-600 dark:text-neutral-300">
+          Sync has ongoing costs: secure servers, storage, and maintenance. A small subscription
+          would cover those costs and help support long-term development of Ritus. If you choose
+          to pay for sync, you are paying for convenience and reliability across devices, not for
+          access to basic habit tracking.
+        </p>
+      </section>
+
+      <section>
         <h2 className="text-lg font-medium">Status</h2>
         <p className="mt-2 text-neutral-600 dark:text-neutral-300">
           Sync is not implemented yet. This page exists to document the direction clearly
