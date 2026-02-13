@@ -139,6 +139,12 @@ pnpm run build
 pnpm run preview
 ```
 
+Run the full local CI gate:
+
+```bash
+pnpm run ci
+```
+
 ## Project structure
 
 High-level layout:
