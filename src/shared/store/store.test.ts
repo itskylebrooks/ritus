@@ -1,4 +1,5 @@
 import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest';
+import { setWeekStartsOnPreference } from '@/shared/utils/date';
 import { useHabitStore } from './store';
 
 const baseProgress = {
@@ -12,6 +13,7 @@ const baseProgress = {
 };
 
 function resetHabitStore() {
+  setWeekStartsOnPreference('monday');
   useHabitStore.setState({
     habits: [],
     progress: baseProgress,

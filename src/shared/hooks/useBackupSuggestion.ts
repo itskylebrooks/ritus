@@ -1,7 +1,7 @@
+import { STORAGE_KEYS } from '@/shared/constants/storageKeys';
 import { exportAllData } from '@/shared/utils/dataTransfer';
+import { safeGetItem, safeSetItem } from '@/shared/utils/storage';
 import { useCallback, useEffect, useState } from 'react';
-
-const STORAGE_KEY = 'ritus-backup-suggestion-lastShown';
 
 function getCurrentYearMonth(): string {
   const d = new Date();
@@ -19,12 +19,12 @@ export default function useBackupSuggestion() {
 
   useEffect(() => {
     try {
-      const last = localStorage.getItem(STORAGE_KEY);
+      const last = safeGetItem(STORAGE_KEYS.BACKUP_SUGGESTION_LAST_SHOWN);
       const current = getCurrentYearMonth();
       if (last === current) return; // already shown this month
       if (!isBeginningOfMonthWindow()) return; // only show at start of month
       // Don't show for brand-new users before they've seen the quick guide
-      const seenGuide = localStorage.getItem('ritus_seen_guide');
+      const seenGuide = safeGetItem(STORAGE_KEYS.SEEN_GUIDE);
       if (!seenGuide) return;
       setOpen(true);
     } catch (err) {
@@ -34,7 +34,7 @@ export default function useBackupSuggestion() {
 
   const markShown = useCallback(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, getCurrentYearMonth());
+      safeSetItem(STORAGE_KEYS.BACKUP_SUGGESTION_LAST_SHOWN, getCurrentYearMonth());
     } catch (err) {
       console.debug('useBackupSuggestion markShown error', err);
     }

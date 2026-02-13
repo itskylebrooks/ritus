@@ -1,8 +1,18 @@
 import { COLLECTIBLES } from '@/shared/constants/collectibles';
+import { STORAGE_KEYS } from '@/shared/constants/storageKeys';
 import { TROPHIES, type TrophyGroup } from '@/shared/constants/trophies';
 import type { Frequency, Habit } from '@/shared/types';
-import { daysThisWeek, fromISO, iso, isSameDay, lastNDays, startOfWeek } from '@/shared/utils/date';
+import {
+  daysThisWeek,
+  fromISO,
+  iso,
+  isSameDay,
+  lastNDays,
+  setWeekStartsOnPreference,
+  startOfWeek,
+} from '@/shared/utils/date';
 import { recalc } from '@/shared/utils/scoring';
+import { readPersistedWeekStart } from '@/shared/utils/storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
@@ -79,6 +89,9 @@ const computeDaysWithRitus = (habits: Habit[]): number => {
   }
   return uniqueDays.size;
 };
+
+const initialWeekStart = readPersistedWeekStart('monday');
+setWeekStartsOnPreference(initialWeekStart);
 
 export interface HabitState {
   habits: Habit[];
@@ -165,8 +178,11 @@ export const useHabitStore = create<HabitState>()(
       },
       dateFormat: 'MDY',
       setDateFormat: (f) => set({ dateFormat: f }),
-      weekStart: 'monday',
-      setWeekStart: (w) => set({ weekStart: w }),
+      weekStart: initialWeekStart,
+      setWeekStart: (w) => {
+        setWeekStartsOnPreference(w);
+        set({ weekStart: w });
+      },
       showAdd: true,
       showHomeCards: true,
       showArchived: false,
@@ -814,7 +830,7 @@ export const useHabitStore = create<HabitState>()(
         set({ habits: [], longestStreak: 0, daysWithRitus: 0, emojiByDate: {}, emojiRecents: [] }),
     }),
     {
-      name: 'ritus-habits',
+      name: STORAGE_KEYS.HABITS,
       storage: createJSONStorage(() => localStorage),
       // Single DB version: no migrations required. Persisted shape will be the
       // `partialize` snapshot below. If you need to change persisted shape in
@@ -888,6 +904,7 @@ export const useHabitStore = create<HabitState>()(
         if (!hasPersistedDays) {
           merged.daysWithRitus = computeDaysWithRitus(merged.habits || []);
         }
+        setWeekStartsOnPreference(merged.weekStart === 'sunday' ? 'sunday' : 'monday');
         return merged;
       },
     },

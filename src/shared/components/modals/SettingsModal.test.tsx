@@ -1,9 +1,10 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest';
+import { STORAGE_KEYS } from '@/shared/constants/storageKeys';
+import { useHabitStore } from '@/shared/store/store';
 import SettingsModal from './SettingsModal';
 import useThemeStore from '@/shared/store/theme';
-import { useHabitStore } from '@/shared/store/store';
 
 vi.mock('@/shared/hooks/useIsMobile', () => ({
   useIsMobile: () => false,
@@ -66,5 +67,27 @@ describe('SettingsModal', () => {
     });
 
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('resets only ritus storage keys', async () => {
+    const user = userEvent.setup();
+    localStorage.setItem(STORAGE_KEYS.HABITS, '{"state":{}}');
+    localStorage.setItem(STORAGE_KEYS.THEME_MODE, 'dark');
+    localStorage.setItem('unrelated-key', 'keep-me');
+
+    render(<SettingsModal open onClose={vi.fn()} />);
+
+    await user.click(screen.getByLabelText('Reset local data'));
+    await user.click(screen.getByRole('button', { name: 'Delete' }));
+
+    const habitsRaw = localStorage.getItem(STORAGE_KEYS.HABITS);
+    expect(habitsRaw).not.toBeNull();
+    const habitsState = JSON.parse(habitsRaw as string) as {
+      state?: { habits?: unknown[] };
+    };
+    expect(habitsState.state?.habits ?? []).toHaveLength(0);
+    expect(localStorage.getItem(STORAGE_KEYS.THEME_MODE)).toBeNull();
+    expect(localStorage.getItem('unrelated-key')).toBe('keep-me');
+    expect(useHabitStore.getState().habits).toHaveLength(0);
   });
 });

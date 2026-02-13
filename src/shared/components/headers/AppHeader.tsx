@@ -3,7 +3,9 @@ import { desktopDropdownVariants } from '@/shared/animations';
 import EmojiPicker from '@/shared/components/emoji/EmojiPicker';
 import GuideModal from '@/shared/components/modals/GuideModal';
 import SettingsModal from '@/shared/components/modals/SettingsModal';
+import { STORAGE_KEYS } from '@/shared/constants/storageKeys';
 import { useHabitStore } from '@/shared/store/store';
+import { safeGetItem, safeSetItem } from '@/shared/utils/storage';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   Archive,
@@ -89,7 +91,7 @@ export default function AppHeader() {
   // Show guide automatically for first-time visitors (persisted in localStorage)
   useEffect(() => {
     try {
-      const seen = localStorage.getItem('ritus_seen_guide');
+      const seen = safeGetItem(STORAGE_KEYS.SEEN_GUIDE);
       if (!seen) {
         // show guide on first visit
         // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -386,7 +388,7 @@ export default function AppHeader() {
         onClose={() => {
           setGuideOpen(false);
           try {
-            localStorage.setItem('ritus_seen_guide', '1');
+            safeSetItem(STORAGE_KEYS.SEEN_GUIDE, '1');
           } catch {}
         }}
       />

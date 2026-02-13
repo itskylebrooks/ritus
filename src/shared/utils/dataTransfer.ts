@@ -2,7 +2,7 @@ import { resolveEmojiId } from '@/shared/constants/emojis';
 import { useHabitStore, type HabitState } from '@/shared/store/store';
 import type { Habit } from '@/shared/types';
 import pkg from '../../../package.json';
-import { fromISO, iso } from './date';
+import { fromISO, iso, setWeekStartsOnPreference } from './date';
 import { recalc } from './scoring';
 
 export interface ImportResult {
@@ -253,13 +253,7 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
         [],
     };
 
-    try {
-      const key = 'ritus-habits';
-      // Persist the same shape the app expects (no {state,version} wrapper).
-      localStorage.setItem(key, JSON.stringify(updated));
-    } catch {
-      // ignore write errors; we'll still update in-memory store below
-    }
+    setWeekStartsOnPreference(updated.weekStart);
 
     // Update in-memory store so the UI reflects the import immediately.
     // Use setState to update only the persisted fields; keep other funcs intact.

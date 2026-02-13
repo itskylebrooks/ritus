@@ -9,19 +9,16 @@ import {
   startOfWeek,
   subDays,
 } from 'date-fns';
+import { readPersistedWeekStart } from './storage';
 
-// week start option is now configurable by user and persisted in the main habit store.
-// To avoid import cycles we read the persisted setting directly from localStorage.
+let weekStartsOnPreference: 0 | 1 = readPersistedWeekStart() === 'sunday' ? 0 : 1;
+
+export function setWeekStartsOnPreference(value: 'sunday' | 'monday' | 0 | 1) {
+  weekStartsOnPreference = value === 'sunday' || value === 0 ? 0 : 1;
+}
+
 export function getWeekStartsOn(): 0 | 1 {
-  try {
-    const raw = localStorage.getItem('ritus-habits');
-    if (!raw) return 1;
-    const parsed = JSON.parse(raw);
-    const ws = parsed && parsed.weekStart ? parsed.weekStart : 'monday';
-    return ws === 'sunday' ? 0 : 1;
-  } catch {
-    return 1;
-  }
+  return weekStartsOnPreference;
 }
 
 export const iso = (d: Date) => startOfDay(d).toISOString();

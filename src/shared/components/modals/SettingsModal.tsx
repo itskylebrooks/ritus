@@ -4,13 +4,11 @@ import { usePWA } from '@/shared/hooks/usePWA';
 import { useHabitStore } from '@/shared/store/store';
 import useThemeStore from '@/shared/store/theme';
 import { exportAllData, importAllData } from '@/shared/utils/dataTransfer';
+import { clearRitusStorage } from '@/shared/utils/storage';
 import { ChevronDown, Linkedin, Share2, SquareArrowOutUpRight, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import pkg from '../../../../package.json';
 import ConfirmModal from './ConfirmModal';
-function clearAllData() {
-  localStorage.clear();
-}
 
 interface SettingsModalProps {
   open: boolean;
@@ -659,7 +657,7 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
           onConfirm={() => {
             try {
               // Clear persisted storage and reset in-memory store to defaults
-              clearAllData();
+              clearRitusStorage();
               try {
                 const st = useHabitStore.getState();
                 st.clearAll();

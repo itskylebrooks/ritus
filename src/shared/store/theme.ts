@@ -1,4 +1,6 @@
 /* eslint-disable no-empty */
+import { STORAGE_KEYS } from '@/shared/constants/storageKeys';
+import { safeGetItem, safeSetItem } from '@/shared/utils/storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
@@ -17,7 +19,7 @@ interface ThemeState {
 let mq: MediaQueryList | null = null;
 let mqListener: ((e: MediaQueryListEvent) => void) | null = null;
 
-const STORAGE_KEY = 'ritus-theme'; // keeps compatibility with existing inline script
+const STORAGE_KEY = STORAGE_KEYS.THEME_MODE; // keeps compatibility with existing inline script
 
 function applyThemeClass(resolved: Theme) {
   if (typeof document === 'undefined' || !document.documentElement) return;
@@ -45,7 +47,7 @@ export const useThemeStore = create<ThemeState>()(
         set({ mode: m, theme: resolved });
         try {
           // persist selected mode under STORAGE_KEY for early-index script compatibility
-          localStorage.setItem(STORAGE_KEY, m);
+          safeSetItem(STORAGE_KEY, m);
         } catch {}
 
         // update DOM class
@@ -74,7 +76,7 @@ export const useThemeStore = create<ThemeState>()(
               set({ theme: newResolved });
               applyThemeClass(newResolved);
               try {
-                localStorage.setItem('ritus-last-theme', newResolved);
+                safeSetItem(STORAGE_KEYS.THEME_LAST_RESOLVED, newResolved);
               } catch {}
             };
             if (mq && mq.addEventListener) mq.addEventListener('change', mqListener);
@@ -88,19 +90,19 @@ export const useThemeStore = create<ThemeState>()(
         } else {
           // write last-resolved theme
           try {
-            localStorage.setItem('ritus-last-theme', resolved);
+            safeSetItem(STORAGE_KEYS.THEME_LAST_RESOLVED, resolved);
           } catch {}
         }
       },
     }),
     {
-      name: 'ritus-theme-store',
+      name: STORAGE_KEYS.THEME_STORE,
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({ mode: state.mode, theme: state.theme }),
       // When the store is rehydrated, ensure DOM and listeners align with stored mode
       onRehydrateStorage: () => (state) => {
         try {
-          const m = state?.mode ?? (localStorage.getItem(STORAGE_KEY) as ThemeMode) ?? 'system';
+          const m = state?.mode ?? (safeGetItem(STORAGE_KEY) as ThemeMode) ?? 'system';
           // small delay to allow hydration to finish
           setTimeout(() => {
             // use getState to call setMode so side-effects run
@@ -124,7 +126,7 @@ if (typeof window !== 'undefined') {
         const s = useThemeStore.getState();
         if (s.mode !== next) s.setMode(next);
       }
-      if (e.key === 'ritus-last-theme') {
+      if (e.key === STORAGE_KEYS.THEME_LAST_RESOLVED) {
         // if only last theme changed (unlikely directly), reflect resolved theme
         const last = (e.newValue as Theme) || null;
         if (last) {
@@ -141,8 +143,7 @@ if (typeof window !== 'undefined') {
 
 // Initialize once on module load to set a theme asap (for SPA navigation after initial HTML script)
 try {
-  const initialMode = (typeof localStorage !== 'undefined' &&
-    localStorage.getItem(STORAGE_KEY)) as ThemeMode | null;
+  const initialMode = safeGetItem(STORAGE_KEY) as ThemeMode | null;
   if (initialMode) {
     // Defer to the store's setMode to ensure listeners and DOM class are consistent
     setTimeout(() => {
