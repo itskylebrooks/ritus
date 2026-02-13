@@ -5,7 +5,6 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { registerSW } from 'virtual:pwa-register';
 import App from './App';
-import AppErrorBoundary from '@/shared/components/errors/AppErrorBoundary';
 // Ensure theme store is initialized early so it can apply the resolved theme and listeners
 import '@/shared/store/theme';
 import initAccentSync from '@/shared/theme/accent';
@@ -34,9 +33,7 @@ const updateSW = registerSW({
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
-      <AppErrorBoundary>
-        <App />
-      </AppErrorBoundary>
+      <App />
     </BrowserRouter>
   </StrictMode>,
 );
