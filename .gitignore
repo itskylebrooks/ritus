@@ -35,3 +35,6 @@ coverage/
 
 # Local dev HTTPS certs
 certs/
+
+# Codex local state
+.codex/
