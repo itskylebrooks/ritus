@@ -4,7 +4,7 @@ import { useHabitStore } from '@/shared/store/store';
 import type { Habit } from '@/shared/types';
 import { daysThisWeek, iso } from '@/shared/utils/date';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import AddHabit from './components/AddHabit';
 import HabitCard from './components/HabitCard';
 import QuoteCard from './components/QuoteCard';
@@ -78,11 +78,13 @@ export default function Home({ pageTransitioning = false }: { pageTransitioning?
 
   // Watch for showAdd toggles and briefly suppress layout animations so
   // the Add form appears/disappears instantly and cards don't animate.
-  const [prevShowAdd, setPrevShowAdd] = useState(showAdd);
-  if (showAdd !== prevShowAdd) {
-    setPrevShowAdd(showAdd);
-    setIsTogglingAdd(true);
-  }
+  const prevShowAddRef = useRef(showAdd);
+  useEffect(() => {
+    if (prevShowAddRef.current === showAdd) return;
+    prevShowAddRef.current = showAdd;
+    const timer = window.setTimeout(() => setIsTogglingAdd(true), 0);
+    return () => window.clearTimeout(timer);
+  }, [showAdd]);
 
   useEffect(() => {
     if (isTogglingAdd) {
