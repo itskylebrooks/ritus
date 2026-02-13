@@ -304,19 +304,18 @@ export default function AppHeader() {
                         <li className="my-1 border-t border-subtle"></li>
                       )}
 
-                      {/* Guide placed above Compass and Inspiration */}
                       <li>
                         <button
                           type="button"
                           onClick={() => {
                             setMoreDesktopOpen(false);
-                            setGuideOpen(true);
+                            setSettingsOpen(true);
                           }}
                           className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent"
                         >
                           <span className="flex items-center gap-2">
-                            <CircleHelp className="w-4 h-4" />
-                            Guide
+                            <SettingsIcon className="w-4 h-4" />
+                            Settings
                           </span>
                         </button>
                       </li>
@@ -355,13 +354,13 @@ export default function AppHeader() {
                           type="button"
                           onClick={() => {
                             setMoreDesktopOpen(false);
-                            setSettingsOpen(true);
+                            setGuideOpen(true);
                           }}
                           className="w-full text-left px-3 py-2 rounded-md text-strong transition-colors duration-150 hover-nonaccent"
                         >
                           <span className="flex items-center gap-2">
-                            <SettingsIcon className="w-4 h-4" />
-                            Settings
+                            <CircleHelp className="w-4 h-4" />
+                            Guide
                           </span>
                         </button>
                       </li>
