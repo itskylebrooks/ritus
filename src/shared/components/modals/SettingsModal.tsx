@@ -5,7 +5,7 @@ import { useHabitStore } from '@/shared/store/store';
 import useThemeStore from '@/shared/store/theme';
 import { exportAllData, importAllData } from '@/shared/utils/dataTransfer';
 import { clearRitusStorage } from '@/shared/utils/storage';
-import { ChevronDown, Linkedin, Share2, SquareArrowOutUpRight, X } from 'lucide-react';
+import { ChevronDown, Dot, Linkedin, Share2, SquareArrowOutUpRight, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import pkg from '../../../../package.json';
 import ConfirmModal from './ConfirmModal';
@@ -14,11 +14,17 @@ interface SettingsModalProps {
   open: boolean;
   onClose: () => void;
   onShowGuide?: () => void;
+  onManageSync?: () => void;
 }
 
 type ThemeMode = 'system' | 'light' | 'dark';
 
-export default function SettingsModal({ open, onClose, onShowGuide }: SettingsModalProps) {
+export default function SettingsModal({
+  open,
+  onClose,
+  onShowGuide,
+  onManageSync,
+}: SettingsModalProps) {
   const [visible, setVisible] = useState(open);
   const [closing, setClosing] = useState(false);
   const [entering, setEntering] = useState(false);
@@ -298,6 +304,16 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
     setConfirmClearOpen(true);
   }
 
+  function handleManageSync() {
+    if (!onManageSync) return;
+    beginClose();
+    window.setTimeout(() => {
+      try {
+        onManageSync();
+      } catch {}
+    }, CLOSE_DURATION + 80);
+  }
+
   if (!visible) return null;
   return (
     <div
@@ -354,12 +370,12 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
           </div>
         </div>
 
-        <div className="space-y-4 pt-2">
+        <div className="space-y-3 pt-1">
           {/* Theme */}
           <div className="text-sm">
             <div className="grid grid-cols-3 items-center gap-2">
               <div>
-                <div className="text-sm font-semibold mb-0.5">Theme</div>
+                <div className="text-sm font-semibold mb-0.5">THEME</div>
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div />
@@ -438,13 +454,47 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
               </div>
             </div>
           </div>
-          <div className="border-t border-subtle mt-2" />
+          <div className="border-t border-subtle" />
+
+          {/* Format */}
+          <div className="text-sm">
+            <div className="grid grid-cols-3 items-center gap-2">
+              <div>
+                <div className="text-sm font-semibold mb-0.5">FORMAT</div>
+              </div>
+              <div className="relative w-full">
+                <select
+                  aria-label="Date format"
+                  className="appearance-none w-full rounded-lg border border-subtle bg-transparent px-3 h-10 pr-7 text-sm text-strong"
+                  value={dateFormat}
+                  onChange={(e) => setDateFormat(e.target.value as 'MDY' | 'DMY')}
+                >
+                  <option value="MDY">MM/DD</option>
+                  <option value="DMY">DD/MM</option>
+                </select>
+                <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted" />
+              </div>
+              <div className="relative w-full">
+                <select
+                  aria-label="Week starts on"
+                  className="appearance-none w-full rounded-lg border border-subtle bg-transparent px-3 h-10 pr-7 text-sm text-strong"
+                  value={weekStart}
+                  onChange={(e) => setWeekStart(e.target.value as 'sunday' | 'monday')}
+                >
+                  <option value="sunday">Sunday</option>
+                  <option value="monday">Monday</option>
+                </select>
+                <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted" />
+              </div>
+            </div>
+          </div>
+          <div className="border-t border-subtle" />
 
           {/* PWA Install */}
           <div className="text-sm">
             <div className="grid grid-cols-3 items-center gap-2">
               <div className="col-span-2">
-                <div className="text-sm font-semibold mb-0.5">Install App</div>
+                <div className="text-sm font-semibold mb-0.5">INSTALL APP</div>
               </div>
               <button
                 type="button"
@@ -487,130 +537,125 @@ export default function SettingsModal({ open, onClose, onShowGuide }: SettingsMo
           </div>
           <div className="border-t border-subtle" />
 
-          {/* Format */}
+          {/* DATA */}
           <div className="text-sm">
             <div className="grid grid-cols-3 items-center gap-2">
               <div>
-                <div className="text-sm font-semibold mb-0.5">Format</div>
+                <div className="text-sm font-semibold mb-0.5">DATA</div>
               </div>
-              <div className="relative w-full">
-                <select
-                  aria-label="Date format"
-                  className="appearance-none w-full rounded-lg border border-subtle bg-transparent px-3 h-10 pr-7 text-sm text-strong"
-                  value={dateFormat}
-                  onChange={(e) => setDateFormat(e.target.value as 'MDY' | 'DMY')}
+              <button
+                type="button"
+                onClick={triggerFilePick}
+                disabled={importing || exporting}
+                aria-label="Import from file"
+                title="Import from file"
+                className="w-full flex items-center justify-center gap-1.5 rounded-lg h-10 px-3 text-xs font-medium border border-subtle text-strong hover:bg-subtle transition disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="lucide lucide-folder-input-icon lucide-folder-input"
                 >
-                  <option value="MDY">MM/DD</option>
-                  <option value="DMY">DD/MM</option>
-                </select>
-                <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted" />
-              </div>
-              <div className="relative w-full">
-                <select
-                  aria-label="Week starts on"
-                  className="appearance-none w-full rounded-lg border border-subtle bg-transparent px-3 h-10 pr-7 text-sm text-strong"
-                  value={weekStart}
-                  onChange={(e) => setWeekStart(e.target.value as 'sunday' | 'monday')}
+                  <path d="M2 9V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-1" />
+                  <path d="M2 13h10" />
+                  <path d="m9 16 3-3-3-3" />
+                </svg>
+                <span>Import</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleExport}
+                disabled={exporting}
+                aria-label="Export data"
+                title="Export data"
+                className="w-full flex items-center justify-center gap-1.5 rounded-lg h-10 px-3 text-xs font-medium border border-subtle text-strong hover:bg-subtle transition disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="lucide lucide-folder-output-icon lucide-folder-output"
                 >
-                  <option value="sunday">Sunday</option>
-                  <option value="monday">Monday</option>
-                </select>
-                <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted" />
+                  <path d="M2 7.5V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-1.5" />
+                  <path d="M2 13h10" />
+                  <path d="m5 10-3 3 3 3" />
+                </svg>
+                <span>Export</span>
+              </button>
+            </div>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="application/json"
+              onChange={handleFileChosen}
+              className="hidden"
+            />
+          </div>
+          <div className="border-t border-subtle" />
+
+          {/* SYNC */}
+          <div className="text-sm">
+            <div className="grid grid-cols-3 items-center gap-2">
+              <div className="col-span-2">
+                <div className="text-sm font-semibold mb-0.5">SYNC</div>
               </div>
+              <button
+                type="button"
+                onClick={handleManageSync}
+                className="w-full h-10 flex items-center justify-center gap-1.5 rounded-lg px-3 text-xs font-medium border border-subtle text-strong hover:bg-subtle transition whitespace-nowrap"
+              >
+                <Dot className="h-6 w-6 shrink-0 text-muted" strokeWidth={6} aria-hidden />
+                <span>Manage</span>
+              </button>
             </div>
           </div>
           <div className="border-t border-subtle" />
 
-          <div className="grid grid-cols-3 gap-2">
-            {/* Import - left */}
-            <button
-              type="button"
-              onClick={triggerFilePick}
-              disabled={importing || exporting}
-              aria-label="Import from file"
-              title="Import from file"
-              className="w-full flex items-center justify-center gap-1.5 rounded-lg h-10 px-3 text-xs font-medium border border-subtle text-strong hover:bg-subtle transition disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="lucide lucide-folder-input-icon lucide-folder-input"
+          {/* ERASE DATA */}
+          <div className="text-sm">
+            <div className="grid grid-cols-3 items-center gap-2">
+              <div className="col-span-2">
+                <div className="text-sm font-semibold mb-0.5">ERASE DATA</div>
+              </div>
+              <button
+                type="button"
+                onClick={handleDeleteAllLocal}
+                aria-label="Reset local data"
+                title="Reset local data"
+                className="w-full flex items-center justify-center gap-1.5 rounded-lg h-10 px-3 text-xs font-medium border border-danger text-danger hover:bg-danger-soft transition whitespace-nowrap"
               >
-                <path d="M2 9V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-1" />
-                <path d="M2 13h10" />
-                <path d="m9 16 3-3-3-3" />
-              </svg>
-              <span>Import</span>
-            </button>
-
-            {/* Reset - middle */}
-            <button
-              type="button"
-              onClick={handleDeleteAllLocal}
-              aria-label="Reset local data"
-              title="Reset local data"
-              className="w-full flex items-center justify-center gap-1.5 rounded-lg h-10 px-3 text-xs font-medium border border-danger text-danger hover:bg-danger-soft transition whitespace-nowrap"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="lucide lucide-eraser-icon lucide-eraser"
-              >
-                <path d="M21 21H8a2 2 0 0 1-1.42-.587l-3.994-3.999a2 2 0 0 1 0-2.828l10-10a2 2 0 0 1 2.829 0l5.999 6a2 2 0 0 1 0 2.828L12.834 21" />
-                <path d="m5.082 11.09 8.828 8.828" />
-              </svg>
-              <span>Reset</span>
-            </button>
-
-            {/* Export - right */}
-            <button
-              type="button"
-              onClick={handleExport}
-              disabled={exporting}
-              aria-label="Export data"
-              title="Export data"
-              className="w-full flex items-center justify-center gap-1.5 rounded-lg h-10 px-3 text-xs font-medium border border-subtle text-strong hover:bg-subtle transition disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="lucide lucide-folder-output-icon lucide-folder-output"
-              >
-                <path d="M2 7.5V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-1.5" />
-                <path d="M2 13h10" />
-                <path d="m5 10-3 3 3 3" />
-              </svg>
-              <span>Export</span>
-            </button>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="lucide lucide-eraser-icon lucide-eraser"
+                >
+                  <path d="M21 21H8a2 2 0 0 1-1.42-.587l-3.994-3.999a2 2 0 0 1 0-2.828l10-10a2 2 0 0 1 2.829 0l5.999 6a2 2 0 0 1 0 2.828L12.834 21" />
+                  <path d="m5.082 11.09 8.828 8.828" />
+                </svg>
+                <span>Erase</span>
+              </button>
+            </div>
           </div>
-          <input
-            ref={fileRef}
-            type="file"
-            accept="application/json"
-            onChange={handleFileChosen}
-            className="hidden"
-          />
 
           {/* Future feature: Daily reminder - temporarily disabled
           <div className="text-sm">

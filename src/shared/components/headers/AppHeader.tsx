@@ -23,7 +23,7 @@ import {
   Trophy,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import MobileTabBar from './MobileTabBar';
 
 function DateDisplay() {
@@ -51,6 +51,7 @@ export default function AppHeader() {
   const moreRef = useRef<HTMLDivElement | null>(null);
   const moreButtonRef = useRef<HTMLButtonElement | null>(null);
   const location = useLocation();
+  const navigate = useNavigate();
   const isHome = location.pathname === '/';
   const isProfile = location.pathname === '/profile';
   const isInspiration = location.pathname === '/inspiration';
@@ -378,6 +379,9 @@ export default function AppHeader() {
       <SettingsModal
         open={settingsOpen}
         onClose={() => setSettingsOpen(false)}
+        onManageSync={() => {
+          if (location.pathname !== '/sync') navigate('/sync');
+        }}
         onShowGuide={() => {
           setGuideOpen(true);
           setSettingsOpen(false);

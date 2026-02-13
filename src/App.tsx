@@ -3,6 +3,7 @@ import Home from '@/features/home';
 import Insight from '@/features/insight';
 import Inspiration from '@/features/inspiration';
 import Profile from '@/features/profile';
+import Sync from '@/features/sync';
 import { createPageMotion } from '@/shared/animations';
 import AppHeader from '@/shared/components/headers/AppHeader';
 import BackupSuggestion from '@/shared/components/modals/BackupSuggestion';
@@ -136,6 +137,14 @@ export default function App() {
               element={
                 <Page initial={initial} animate={animate} transition={transition}>
                   <Inspiration />
+                </Page>
+              }
+            />
+            <Route
+              path="/sync"
+              element={
+                <Page initial={initial} animate={animate} transition={transition}>
+                  <Sync />
                 </Page>
               }
             />
