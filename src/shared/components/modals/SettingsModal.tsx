@@ -823,7 +823,7 @@ export default function SettingsModal({
                 </div>
                 <div className="mt-0.5 flex items-center justify-center gap-3 whitespace-nowrap">
                   <a
-                    href="https://www.brooksstudio.tech/en/imprint"
+                    href="https://brooks.tools/imprint"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="underline inline-block leading-tight relative z-10"
@@ -831,7 +831,7 @@ export default function SettingsModal({
                     Imprint
                   </a>
                   <a
-                    href="https://www.brooksstudio.tech/en/privacy"
+                    href="https://brooks.tools/privacy"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="underline inline-block leading-tight relative z-10"
@@ -839,7 +839,7 @@ export default function SettingsModal({
                     Privacy Policy
                   </a>
                   <a
-                    href="https://www.brooksstudio.tech/en/license"
+                    href="https://brooks.tools/license"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="underline inline-block leading-tight relative z-10"
@@ -853,7 +853,7 @@ export default function SettingsModal({
                 <div />
                 <div className="grid h-10 w-full place-items-center">
                   <a
-                    href="https://www.brooksstudio.tech/"
+                    href="https://brooks.tools/"
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="Brooks Studio website"
