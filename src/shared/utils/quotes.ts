@@ -366,6 +366,11 @@ export type Quote = {
 };
 
 import { AUTHOR_QUOTES } from './quotes_author';
+import { CHRISTIAN_QUOTES } from './quotes_christian';
+import { MEDITERRANEAN_QUOTES } from './quotes_mediterranean';
+import { NORDIC_QUOTES } from './quotes_nordic';
+import { STOIC_QUOTES } from './quotes_stoic';
+import { ZEN_QUOTES } from './quotes_zen';
 
 // Backwards-compatible export for the default pack (defined above in this file)
 export const QUOTES = DEFAULT_QUOTES;
@@ -377,6 +382,11 @@ export const QUOTES = DEFAULT_QUOTES;
 export const QUOTE_PACKS: Record<string, Quote[]> = {
   // collectible id -> array of quotes
   quotes_author: AUTHOR_QUOTES,
+  quotes_christianity: CHRISTIAN_QUOTES,
+  quotes_mediterranean: MEDITERRANEAN_QUOTES,
+  quotes_nordic_friluftsliv: NORDIC_QUOTES,
+  quotes_stoic_classics: STOIC_QUOTES,
+  quotes_zen_fragments: ZEN_QUOTES,
 };
 
 // Return the appropriate pool for a selected pack id. If no pack is selected, return the

@@ -10,8 +10,6 @@ import {
   Laugh,
   Leaf,
   Lightbulb,
-  Medal,
-  PlayCircle,
   Rainbow,
   Ship,
   Sparkles,
@@ -41,15 +39,6 @@ export const COLLECTIBLES: CollectibleDef[] = [
   // Do not ship copyrighted quotes without permission. Packs may ship empty by default.
   // ────────────────────────────────────────────────────────────────────────────
   {
-    id: 'quotes_hollywood',
-    type: 'quotes',
-    title: 'Hollywood Voices',
-    desc: 'Short, attributed lines. Use licensed or public-domain sources.',
-    icon: Star,
-    cost: 4000,
-    implemented: false,
-  },
-  {
     id: 'quotes_author',
     type: 'quotes',
     title: 'Author’s Notes',
@@ -59,31 +48,13 @@ export const COLLECTIBLES: CollectibleDef[] = [
     implemented: true,
   },
   {
-    id: 'quotes_creators',
-    type: 'quotes',
-    title: 'Creators & Builders',
-    desc: 'From video creators and makers. Use licensed/original sources.',
-    icon: PlayCircle,
-    cost: 1000,
-    implemented: false,
-  },
-  {
-    id: 'quotes_athletes',
-    type: 'quotes',
-    title: 'Athletes',
-    desc: 'Training wisdom and discipline. Use licensed or PD sources.',
-    icon: Medal,
-    cost: 1500,
-    implemented: false,
-  },
-  {
     id: 'quotes_christianity',
     type: 'quotes',
     title: 'Christian Wisdom',
     desc: 'Public‑domain scripture and classic commentary only.',
     icon: BookOpen,
     cost: 3000,
-    implemented: false,
+    implemented: true,
   },
   {
     id: 'quotes_zen_fragments',
@@ -92,7 +63,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     desc: 'Concise, present-moment koans and reflections inspired by Zen practice.',
     icon: Sprout,
     cost: 1700,
-    implemented: false,
+    implemented: true,
   },
   {
     id: 'quotes_mediterranean',
@@ -101,7 +72,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     desc: 'Gentle reminders inspired by Mediterranean living—slow, savory pauses (dolce far niente / mañana) framed for healthy balance.',
     icon: Sun,
     cost: 500,
-    implemented: false,
+    implemented: true,
   },
   {
     id: 'quotes_nordic_friluftsliv',
@@ -110,7 +81,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     desc: 'Short reflections on simple living and a love of the outdoors (friluftsliv) — calm, nature-centered prompts.',
     icon: Ship,
     cost: 900,
-    implemented: false,
+    implemented: true,
   },
   {
     id: 'quotes_stoic_classics',
@@ -119,7 +90,7 @@ export const COLLECTIBLES: CollectibleDef[] = [
     desc: 'Stoic-inspired lines from Greek and Roman thought—practical, composed guidance for steady habits.',
     icon: GalleryVerticalEnd,
     cost: 1200,
-    implemented: false,
+    implemented: true,
   },
 
   // ────────────────────────────────────────────────────────────────────────────
