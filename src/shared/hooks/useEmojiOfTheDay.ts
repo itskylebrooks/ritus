@@ -1,7 +1,7 @@
 /* eslint-disable no-empty */
 import { emojiIndex, EmojiItem, resolveEmojiId } from '@/shared/constants/emojis';
 import { useHabitStore } from '@/shared/store/store';
-import { iso } from '@/shared/utils/date';
+import { today } from '@/shared/utils/date';
 import { useCallback, useEffect, useMemo } from 'react';
 
 export interface EmojiOfTheDayState {
@@ -14,11 +14,8 @@ export interface EmojiOfTheDayState {
 }
 
 export function useEmojiOfTheDay(): EmojiOfTheDayState {
-  const today = iso(new Date());
-  const todayShort = today.slice(0, 10);
-  const rawEmojiId = useHabitStore(
-    (s) => (s.emojiByDate || {})[today] || (s.emojiByDate || {})[todayShort] || null,
-  );
+  const todayKey = today();
+  const rawEmojiId = useHabitStore((s) => (s.emojiByDate || {})[todayKey] || null);
   const setEmojiForDate = useHabitStore((s) => s.setEmojiForDate);
   const recentsIds = useHabitStore((s) => (Array.isArray(s.emojiRecents) ? s.emojiRecents : []));
   const emojiId = rawEmojiId ? resolveEmojiId(rawEmojiId) : null;
@@ -26,9 +23,9 @@ export function useEmojiOfTheDay(): EmojiOfTheDayState {
   useEffect(() => {
     if (!rawEmojiId || !emojiId || rawEmojiId === emojiId) return;
     try {
-      setEmojiForDate?.(today, emojiId);
+      setEmojiForDate?.(todayKey, emojiId);
     } catch {}
-  }, [rawEmojiId, emojiId, setEmojiForDate, today]);
+  }, [rawEmojiId, emojiId, setEmojiForDate, todayKey]);
 
   useEffect(() => {
     if (!recentsIds.length) return;
@@ -52,10 +49,10 @@ export function useEmojiOfTheDay(): EmojiOfTheDayState {
   const setEmojiId = useCallback(
     (id: string | null) => {
       try {
-        setEmojiForDate?.(today, id);
+        setEmojiForDate?.(todayKey, id);
       } catch {}
     },
-    [setEmojiForDate, today],
+    [setEmojiForDate, todayKey],
   );
 
   const clearEmoji = useCallback(() => {

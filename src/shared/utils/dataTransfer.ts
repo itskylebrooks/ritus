@@ -8,7 +8,8 @@ import {
 } from '@/shared/persistence/schema';
 import { useHabitStore } from '@/shared/store/store';
 import pkg from '../../../package.json';
-import { fromISO, iso, setWeekStartsOnPreference } from './date';
+import { systemClock } from './clock';
+import { fromISO, iso, setWeekStartsOnPreference, today } from './date';
 import { recalc } from './scoring';
 
 export interface ImportResult {
@@ -39,7 +40,7 @@ export function exportAllData() {
     app: 'ritus',
     version: pkg.version,
     schemaVersion: BACKUP_SCHEMA_VERSION,
-    exportedAt: new Date().toISOString(),
+    exportedAt: systemClock.now().toISOString(),
     // Ensure exported completions are date-only ISO strings (no time part)
     habits: habitsForExport.map((h) => ({
       ...h,
@@ -63,7 +64,7 @@ export function exportAllData() {
     })(),
     // progression state (points + bookkeeping keys)
     progress:
-      normalizeProgress(s.progress, new Date().toISOString()) ||
+      normalizeProgress(s.progress, systemClock.now().toISOString()) ||
       ({
         points: 0,
         weekBonusKeys: {},
@@ -116,9 +117,9 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
             : undefined;
       const normalized = normalizeId(candidate);
       if (normalized) {
-        const today = new Date().toISOString().slice(0, 10);
+        const localToday = today();
         incomingEmojiRecents = [normalized];
-        incomingEmojiByDate = { [today]: normalized };
+        incomingEmojiByDate = { [localToday]: normalized };
       }
     }
     if (incomingEmojiRecents) {

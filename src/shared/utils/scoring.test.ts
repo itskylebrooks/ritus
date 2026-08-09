@@ -1,5 +1,5 @@
 import type { Habit } from '@/shared/types';
-import { setWeekStartsOnPreference } from '@/shared/utils/date';
+import { normalizeLocalDate, setWeekStartsOnPreference } from '@/shared/utils/date';
 import {
   calcMonthlyStreak,
   calcPoints,
@@ -22,6 +22,12 @@ function makeHabit(partial: Partial<Habit>): Habit {
   };
 }
 
+function day(value: string) {
+  const normalized = normalizeLocalDate(value);
+  if (!normalized) throw new Error(`Invalid test date: ${value}`);
+  return normalized;
+}
+
 describe('scoring', () => {
   beforeEach(() => {
     setWeekStartsOnPreference('monday');
@@ -31,7 +37,7 @@ describe('scoring', () => {
     const habit = makeHabit({
       frequency: 'weekly',
       weeklyTarget: 1,
-      completions: ['2024-01-02T00:00:00.000Z', '2024-01-10T00:00:00.000Z', '2024-01-16T00:00:00.000Z'],
+      completions: [day('2024-01-02'), day('2024-01-10'), day('2024-01-16')],
     });
 
     const streak = calcWeeklyStreak(habit, new Date('2024-01-18T12:00:00.000Z'));
@@ -42,7 +48,7 @@ describe('scoring', () => {
     const habit = makeHabit({
       frequency: 'weekly',
       weeklyTarget: 1,
-      completions: ['2024-01-02T00:00:00.000Z', '2024-01-10T00:00:00.000Z'],
+      completions: [day('2024-01-02'), day('2024-01-10')],
     });
 
     const streak = calcWeeklyStreak(habit, new Date('2024-01-18T12:00:00.000Z'));
@@ -53,7 +59,7 @@ describe('scoring', () => {
     const habit = makeHabit({
       frequency: 'monthly',
       monthlyTarget: 1,
-      completions: ['2024-01-09T00:00:00.000Z', '2024-02-08T00:00:00.000Z', '2024-03-07T00:00:00.000Z'],
+      completions: [day('2024-01-09'), day('2024-02-08'), day('2024-03-07')],
     });
 
     const streak = calcMonthlyStreak(habit, new Date('2024-03-15T12:00:00.000Z'));
@@ -74,11 +80,11 @@ describe('scoring', () => {
       frequency: 'weekly',
       weeklyTarget: 1,
       completions: [
-        '2024-01-01T00:00:00.000Z',
-        '2024-01-08T00:00:00.000Z',
-        '2024-01-15T00:00:00.000Z',
-        '2024-01-22T00:00:00.000Z',
-        '2024-01-22T00:00:00.000Z',
+        day('2024-01-01'),
+        day('2024-01-08'),
+        day('2024-01-15'),
+        day('2024-01-22'),
+        day('2024-01-22'),
       ],
     });
 
@@ -89,11 +95,7 @@ describe('scoring', () => {
     const habit = makeHabit({
       mode: 'break',
       frequency: 'daily',
-      completions: [
-        '2024-01-10T00:00:00.000Z',
-        '2024-01-10T00:00:00.000Z',
-        '2024-01-11T00:00:00.000Z',
-      ],
+      completions: [day('2024-01-10'), day('2024-01-10'), day('2024-01-11')],
     });
 
     expect(calcPoints(habit)).toBe(10);

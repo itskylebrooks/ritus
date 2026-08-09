@@ -9,6 +9,7 @@ import {
   startOfWeek,
 } from './date';
 import type { Habit } from '@/shared/types';
+import { systemClock } from './clock';
 
 export const POINTS_PER_COMPLETION = 5;
 export const DAILY_MILESTONE = 7; // 7-day streak bonus
@@ -73,19 +74,22 @@ export function hasCompletionInMonth(completions: string[], dayInMonth: Date) {
 
 export function countCompletionsInWeek(
   completions: string[],
-  ref: Date = new Date(),
+  ref: Date = systemClock.now(),
   weekStartsOn?: 0 | 1,
 ): number {
   const week = daysThisWeek(ref, weekStartsOn ?? getWeekStartsOn());
   return week.filter((d) => hasCompletionOnDay(completions, d)).length;
 }
 
-export function countCompletionsInMonth(completions: string[], ref: Date = new Date()): number {
+export function countCompletionsInMonth(
+  completions: string[],
+  ref: Date = systemClock.now(),
+): number {
   // count unique days within the calendar month that have a completion
   return uniqueSortedCompletionDates(completions).filter((d) => isSameMonth(d, ref)).length;
 }
 
-export function calcDailyStreak(h: Habit, ref: Date = new Date()) {
+export function calcDailyStreak(h: Habit, ref: Date = systemClock.now()) {
   let s = 0;
   let cur = new Date(ref);
   // For both 'build' and 'break' modes, daily streak counts consecutive
@@ -97,7 +101,7 @@ export function calcDailyStreak(h: Habit, ref: Date = new Date()) {
   return s;
 }
 
-export function calcWeeklyStreak(h: Habit, ref: Date = new Date()) {
+export function calcWeeklyStreak(h: Habit, ref: Date = systemClock.now()) {
   // Weekly streak is consecutive achieved weeks ending at the current calendar week.
   const target = h.weeklyTarget ?? 1;
   const weekStartsOn = getWeekStartsOn();
@@ -112,7 +116,7 @@ export function calcWeeklyStreak(h: Habit, ref: Date = new Date()) {
   return streak;
 }
 
-export function calcMonthlyStreak(h: Habit, ref: Date = new Date()) {
+export function calcMonthlyStreak(h: Habit, ref: Date = systemClock.now()) {
   // Monthly streak is consecutive achieved months ending at the current calendar month.
   const target = h.monthlyTarget ?? 1;
   const dates = uniqueSortedCompletionDates(h.completions || []);
@@ -194,14 +198,14 @@ export function calcPoints(h: Habit): number {
   return pts;
 }
 
-export function recalc(h: Habit): Habit {
+export function recalc(h: Habit, ref: Date = systemClock.now()): Habit {
   const base = { ...h };
   base.streak =
     h.frequency === 'daily'
-      ? calcDailyStreak(h)
+      ? calcDailyStreak(h, ref)
       : h.frequency === 'weekly'
-        ? calcWeeklyStreak(h)
-        : calcMonthlyStreak(h);
+        ? calcWeeklyStreak(h, ref)
+        : calcMonthlyStreak(h, ref);
   base.points = calcPoints(h);
   return base;
 }

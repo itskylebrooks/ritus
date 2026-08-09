@@ -1,8 +1,10 @@
 import type { HabitState } from '@/shared/store/store';
 import type { Frequency, Habit } from '@/shared/types';
+import { normalizeLocalDate } from '@/shared/utils/date';
+import { systemClock } from '@/shared/utils/clock';
 
-export const BACKUP_SCHEMA_VERSION = 1;
-export const HABIT_STORE_VERSION = 1;
+export const BACKUP_SCHEMA_VERSION = 2;
+export const HABIT_STORE_VERSION = 2;
 
 type Progress = HabitState['progress'];
 
@@ -107,10 +109,14 @@ function normalizeHabit(value: unknown): Habit | null {
   if (!frequency) return null;
 
   const completions = Array.isArray(value.completions)
-    ? value.completions.filter(
-        (completion): completion is string =>
-          typeof completion === 'string' && Number.isFinite(Date.parse(completion)),
-      )
+    ? [
+        ...new Set(
+          value.completions
+            .filter((completion): completion is string => typeof completion === 'string')
+            .map(normalizeLocalDate)
+            .filter((completion) => completion !== null),
+        ),
+      ]
     : [];
   const createdAt =
     typeof value.createdAt === 'string' && Number.isFinite(Date.parse(value.createdAt))
@@ -133,7 +139,7 @@ function normalizeHabit(value: unknown): Habit | null {
   };
 }
 
-export function decodeBackup(value: unknown, now = new Date()): DecodeBackupResult {
+export function decodeBackup(value: unknown, now = systemClock.now()): DecodeBackupResult {
   if (!isRecord(value)) return { ok: false, reason: 'invalid' };
   if (value.app !== 'ritus') return { ok: false, reason: 'not_ritus' };
 
@@ -165,7 +171,7 @@ export function decodeBackup(value: unknown, now = new Date()): DecodeBackupResu
           ? finiteNonNegative(value.daysWithRitus)
           : undefined,
       progress: normalizeProgress(value.progress, fallbackDate),
-      emojiByDate: isRecord(value.emojiByDate) ? stringMap(value.emojiByDate) : undefined,
+      emojiByDate: isRecord(value.emojiByDate) ? normalizeEmojiDates(value.emojiByDate) : undefined,
       emojiRecents: Array.isArray(value.emojiRecents)
         ? stringArray(value.emojiRecents, 10)
         : undefined,
@@ -207,8 +213,10 @@ export function mergeEmojiData(
   incomingByDate?: Record<string, string>,
   incomingRecents?: string[],
 ) {
+  const normalizedCurrent = normalizeEmojiDates(currentByDate);
+  const normalizedIncoming = normalizeEmojiDates(incomingByDate);
   return {
-    emojiByDate: { ...(incomingByDate || {}), ...currentByDate },
+    emojiByDate: { ...normalizedIncoming, ...normalizedCurrent },
     emojiRecents: [...new Set([...(currentRecents || []), ...(incomingRecents || [])])].slice(
       0,
       10,
@@ -216,13 +224,32 @@ export function mergeEmojiData(
   };
 }
 
-export function migrateHabitStoreState(persistedState: unknown): Record<string, unknown> {
+function normalizeEmojiDates(value: unknown): Record<string, string> {
+  if (!isRecord(value)) return {};
+  const normalized: Record<string, string> = {};
+  for (const [date, emoji] of Object.entries(value)) {
+    if (typeof emoji !== 'string') continue;
+    const localDate = normalizeLocalDate(date);
+    if (localDate) normalized[localDate] = emoji;
+  }
+  return normalized;
+}
+
+export function migrateHabitStoreState(
+  persistedState: unknown,
+  fromVersion = 0,
+): Record<string, unknown> {
   if (!isRecord(persistedState)) return {};
   const migrated = { ...persistedState };
   migrated.progress =
-    normalizeProgress(persistedState.progress, new Date().toISOString()) ?? persistedState.progress;
+    normalizeProgress(persistedState.progress, systemClock.now().toISOString()) ??
+    persistedState.progress;
   migrated.habits = Array.isArray(persistedState.habits)
     ? persistedState.habits.map(normalizeHabit).filter((habit): habit is Habit => habit !== null)
     : [];
+  migrated.emojiByDate =
+    fromVersion < 2
+      ? normalizeEmojiDates(persistedState.emojiByDate)
+      : stringMap(persistedState.emojiByDate);
   return migrated;
 }

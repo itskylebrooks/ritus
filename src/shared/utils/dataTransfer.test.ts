@@ -72,7 +72,7 @@ describe('data transfer', () => {
     expect(imported.dateFormat).toBe('DMY');
     expect(imported.weekStart).toBe('sunday');
     expect(imported.totalCompletions).toBe(1);
-    expect(imported.emojiByDate?.['2024-01-10T00:00:00.000Z']).toBe('1F60A');
+    expect(imported.emojiByDate?.['2024-01-10']).toBe('1F60A');
     expect(getWeekStartsOn()).toBe(0);
   });
 
@@ -112,8 +112,8 @@ describe('data transfer', () => {
       imported_trophy: '2024-01-01T00:00:00.000Z',
     });
     expect(state.emojiByDate).toMatchObject({
-      '2024-01-10T00:00:00.000Z': '1F60A',
-      '2024-01-08T00:00:00.000Z': '1F604',
+      '2024-01-10': '1F60A',
+      '2024-01-08': '1F604',
     });
     expect(state.emojiRecents).toEqual(['1F60A', '1F604']);
   });

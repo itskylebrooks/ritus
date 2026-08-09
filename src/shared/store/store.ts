@@ -14,6 +14,7 @@ import {
 } from '@/shared/utils/date';
 import { recalc } from '@/shared/utils/scoring';
 import { readPersistedWeekStart } from '@/shared/utils/storage';
+import { systemClock } from '@/shared/utils/clock';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
@@ -218,7 +219,7 @@ export const useHabitStore = create<HabitState>()(
         if (!Object.keys(by).length) return [];
         const longest = computeLongestEmojiStreak(by);
         const newly: string[] = [];
-        const unlockedAt = iso(new Date());
+        const unlockedAt = iso(systemClock.now());
         for (const t of emojiTrophies) {
           if (!unlocked[t.id] && longest >= t.threshold) {
             unlocked[t.id] = unlockedAt;
@@ -286,7 +287,7 @@ export const useHabitStore = create<HabitState>()(
         const { progress, habits } = get();
         const newly: string[] = [];
         const unlocked = { ...(progress.unlocked || {}) };
-        const unlockedAt = iso(new Date());
+        const unlockedAt = iso(systemClock.now());
 
         // Build a richer summary from either the provided summary or the current habits
         const allHabits = habits || [];
@@ -538,7 +539,7 @@ export const useHabitStore = create<HabitState>()(
             frequency,
             archived: false,
             mode,
-            createdAt: iso(new Date()),
+            createdAt: systemClock.now().toISOString(),
             completions: [],
             weeklyTarget: frequency === 'weekly' ? weeklyTarget : undefined,
             monthlyTarget: frequency === 'monthly' ? monthlyTarget : undefined,
@@ -670,7 +671,7 @@ export const useHabitStore = create<HabitState>()(
           // apply award/revoke deltas to persisted progress
           const newPoints = Math.max(0, Math.floor(s.progress.points + pointsAwardDelta));
           let lastUnlockedId: string | undefined;
-          const unlockedAt = iso(new Date());
+          const unlockedAt = iso(systemClock.now());
 
           return {
             habits: updated,
@@ -833,7 +834,7 @@ export const useHabitStore = create<HabitState>()(
     {
       name: STORAGE_KEYS.HABITS,
       version: HABIT_STORE_VERSION,
-      migrate: (persistedState) => migrateHabitStoreState(persistedState),
+      migrate: (persistedState, version) => migrateHabitStoreState(persistedState, version),
       storage: createJSONStorage(() => localStorage),
       // Persist only the snapshot below. Schema changes must bump
       // HABIT_STORE_VERSION and be handled by migrateHabitStoreState.
@@ -868,7 +869,7 @@ export const useHabitStore = create<HabitState>()(
             const fallback =
               typeof cleaned.lastUnlockedTrophyAt === 'string'
                 ? cleaned.lastUnlockedTrophyAt
-                : iso(new Date());
+                : iso(systemClock.now());
             const normalized = normalizeUnlockedDates(unlockedRaw, fallback);
             if (normalized) cleaned.unlocked = normalized;
           }
@@ -885,7 +886,7 @@ export const useHabitStore = create<HabitState>()(
               const at =
                 typeof merged.progress.lastUnlockedTrophyAt === 'string'
                   ? merged.progress.lastUnlockedTrophyAt
-                  : iso(new Date());
+                  : iso(systemClock.now());
               merged.progress.unlocked = { ...unlocked, [metaId]: at };
               merged.progress.lastUnlockedTrophyAt = at;
             }
