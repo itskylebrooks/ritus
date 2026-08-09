@@ -1,6 +1,7 @@
 import { COLLECTIBLES } from '@/shared/constants/collectibles';
 import { STORAGE_KEYS } from '@/shared/constants/storageKeys';
 import { TROPHIES, type TrophyGroup } from '@/shared/constants/trophies';
+import { HABIT_STORE_VERSION, migrateHabitStoreState } from '@/shared/persistence/schema';
 import type { Frequency, Habit } from '@/shared/types';
 import {
   daysThisWeek,
@@ -831,10 +832,11 @@ export const useHabitStore = create<HabitState>()(
     }),
     {
       name: STORAGE_KEYS.HABITS,
+      version: HABIT_STORE_VERSION,
+      migrate: (persistedState) => migrateHabitStoreState(persistedState),
       storage: createJSONStorage(() => localStorage),
-      // Single DB version: no migrations required. Persisted shape will be the
-      // `partialize` snapshot below. If you need to change persisted shape in
-      // the future, handle it explicitly (for now keep storage simple).
+      // Persist only the snapshot below. Schema changes must bump
+      // HABIT_STORE_VERSION and be handled by migrateHabitStoreState.
       partialize: (state) => ({
         habits: state.habits,
         progress: state.progress,

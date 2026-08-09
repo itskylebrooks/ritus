@@ -75,4 +75,71 @@ describe('data transfer', () => {
     expect(imported.emojiByDate?.['2024-01-10T00:00:00.000Z']).toBe('1F60A');
     expect(getWeekStartsOn()).toBe(0);
   });
+
+  it('merges progression and emoji history without losing newer local data', () => {
+    useHabitStore.setState({
+      progress: {
+        ...baseProgress,
+        points: 120,
+        ownedCollectibles: ['accent_ocean'],
+        unlocked: { local_trophy: '2024-01-09T00:00:00.000Z' },
+      },
+      emojiByDate: { '2024-01-10T00:00:00.000Z': '1F60A' },
+      emojiRecents: ['1F60A'],
+    });
+
+    const result = importAllData(
+      JSON.stringify({
+        app: 'ritus',
+        schemaVersion: 1,
+        habits: [],
+        progress: {
+          points: 20,
+          ownedCollectibles: ['accent_ember'],
+          unlocked: { imported_trophy: '2024-01-01T00:00:00.000Z' },
+        },
+        emojiByDate: { '2024-01-08T00:00:00.000Z': '1F604' },
+        emojiRecents: ['1F604'],
+      }),
+    );
+
+    expect(result.ok).toBe(true);
+    const state = useHabitStore.getState();
+    expect(state.progress.points).toBe(120);
+    expect(state.progress.ownedCollectibles).toEqual(['accent_ocean', 'accent_ember']);
+    expect(state.progress.unlocked).toMatchObject({
+      local_trophy: '2024-01-09T00:00:00.000Z',
+      imported_trophy: '2024-01-01T00:00:00.000Z',
+    });
+    expect(state.emojiByDate).toMatchObject({
+      '2024-01-10T00:00:00.000Z': '1F60A',
+      '2024-01-08T00:00:00.000Z': '1F604',
+    });
+    expect(state.emojiRecents).toEqual(['1F60A', '1F604']);
+  });
+
+  it('rejects future schemas and reports malformed habits', () => {
+    expect(importAllData(JSON.stringify({ app: 'ritus', schemaVersion: 99, habits: [] }))).toEqual({
+      ok: false,
+      reason: 'unsupported_version',
+    });
+
+    const result = importAllData(
+      JSON.stringify({
+        app: 'ritus',
+        habits: [
+          { id: 'invalid', name: 'Invalid', frequency: 'yearly' },
+          {
+            id: 'valid',
+            name: 'Valid',
+            frequency: 'daily',
+            createdAt: '2024-01-01T00:00:00.000Z',
+            completions: [],
+          },
+        ],
+      }),
+    );
+
+    expect(result).toMatchObject({ ok: true, addedHabits: 1, invalidHabits: 1 });
+  });
 });

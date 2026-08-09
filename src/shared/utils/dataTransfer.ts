@@ -1,6 +1,12 @@
 import { resolveEmojiId } from '@/shared/constants/emojis';
-import { useHabitStore, type HabitState } from '@/shared/store/store';
-import type { Habit } from '@/shared/types';
+import {
+  BACKUP_SCHEMA_VERSION,
+  decodeBackup,
+  mergeEmojiData,
+  mergeProgress,
+  normalizeProgress,
+} from '@/shared/persistence/schema';
+import { useHabitStore } from '@/shared/store/store';
 import pkg from '../../../package.json';
 import { fromISO, iso, setWeekStartsOnPreference } from './date';
 import { recalc } from './scoring';
@@ -21,37 +27,9 @@ export interface ImportResult {
   daysWithRitusNew: number;
 }
 
-export type ImportResultFail = { ok: false; reason: 'invalid' | 'not_ritus' };
-
-const normalizeUnlockedDates = (
-  unlocked: Record<string, string | boolean | undefined> | undefined,
-  fallback: string,
-): Record<string, string> | undefined => {
-  if (!unlocked) return undefined;
-  const next: Record<string, string> = {};
-  for (const [id, value] of Object.entries(unlocked)) {
-    if (!value) continue;
-    next[id] = typeof value === 'string' ? value : fallback;
-  }
-  return next;
-};
-
-const normalizeProgress = (progress: unknown): HabitState['progress'] | undefined => {
-  if (!progress || typeof progress !== 'object') return undefined;
-  const cleaned = { ...(progress as HabitState['progress'] & Record<string, unknown>) };
-  delete cleaned.essence;
-  delete cleaned.level;
-  const candidate = cleaned as HabitState['progress'];
-  const points = typeof candidate.points === 'number' ? candidate.points : 0;
-  const fallback =
-    typeof candidate.lastUnlockedTrophyAt === 'string'
-      ? candidate.lastUnlockedTrophyAt
-      : iso(new Date());
-  const normalizedUnlocked = normalizeUnlockedDates(
-    cleaned.unlocked as Record<string, string | boolean | undefined> | undefined,
-    fallback,
-  );
-  return { ...candidate, points, ...(normalizedUnlocked ? { unlocked: normalizedUnlocked } : {}) };
+export type ImportResultFail = {
+  ok: false;
+  reason: 'invalid' | 'not_ritus' | 'unsupported_version';
 };
 
 export function exportAllData() {
@@ -60,6 +38,7 @@ export function exportAllData() {
   return {
     app: 'ritus',
     version: pkg.version,
+    schemaVersion: BACKUP_SCHEMA_VERSION,
     exportedAt: new Date().toISOString(),
     // Ensure exported completions are date-only ISO strings (no time part)
     habits: habitsForExport.map((h) => ({
@@ -84,7 +63,7 @@ export function exportAllData() {
     })(),
     // progression state (points + bookkeeping keys)
     progress:
-      normalizeProgress(s.progress) ||
+      normalizeProgress(s.progress, new Date().toISOString()) ||
       ({
         points: 0,
         weekBonusKeys: {},
@@ -98,36 +77,22 @@ export function exportAllData() {
 
 export function importAllData(txt: string): ImportResult | ImportResultFail {
   try {
-    const parsed = JSON.parse(txt);
-    if (!parsed || typeof parsed !== 'object') return { ok: false, reason: 'invalid' };
-    if (parsed.app !== 'ritus') return { ok: false, reason: 'not_ritus' };
-    const incomingHabits: Partial<Habit>[] = Array.isArray(parsed.habits) ? parsed.habits : [];
-    const incomingDateFormat: 'DMY' | 'MDY' | undefined =
-      parsed.dateFormat === 'DMY' ? 'DMY' : parsed.dateFormat === 'MDY' ? 'MDY' : undefined;
-    const incomingWeekStart: 'sunday' | 'monday' | undefined =
-      parsed.weekStart === 'sunday'
-        ? 'sunday'
-        : parsed.weekStart === 'monday'
-          ? 'monday'
-          : undefined;
-    const incomingShowArchived: boolean | undefined =
-      typeof parsed.showArchived === 'boolean' ? parsed.showArchived : undefined;
-    const incomingTotal = typeof parsed.totalPoints === 'number' ? parsed.totalPoints : 0;
-    const incomingTotalCompletions =
-      typeof parsed.totalCompletions === 'number' ? parsed.totalCompletions : 0;
-    const incomingLongest = typeof parsed.longestStreak === 'number' ? parsed.longestStreak : 0;
-    const incomingDaysWithRitus =
-      typeof parsed.daysWithRitus === 'number' ? parsed.daysWithRitus : undefined;
-    const incomingProgress =
-      parsed && typeof parsed.progress === 'object'
-        ? normalizeProgress(parsed.progress)
-        : undefined;
-    const incomingEmojiByDateRaw =
-      parsed && typeof parsed.emojiByDate === 'object'
-        ? (parsed.emojiByDate as Record<string, string>)
-        : undefined;
+    const parsed: unknown = JSON.parse(txt);
+    const decoded = decodeBackup(parsed);
+    if (!decoded.ok) return decoded;
+    const backup = decoded.value;
+    const incomingHabits = backup.habits;
+    const incomingDateFormat = backup.dateFormat;
+    const incomingWeekStart = backup.weekStart;
+    const incomingShowArchived = backup.showArchived;
+    const incomingTotal = backup.totalPoints;
+    const incomingTotalCompletions = backup.totalCompletions;
+    const incomingLongest = backup.longestStreak;
+    const incomingDaysWithRitus = backup.daysWithRitus;
+    const incomingProgress = backup.progress;
+    const incomingEmojiByDateRaw = backup.emojiByDate;
     const normalizeId = (id: unknown) => (typeof id === 'string' ? resolveEmojiId(id) : null);
-    const incomingEmojiByDate = incomingEmojiByDateRaw
+    let incomingEmojiByDate = incomingEmojiByDateRaw
       ? Object.entries(incomingEmojiByDateRaw).reduce<Record<string, string>>(
           (acc, [key, value]) => {
             const normalized = normalizeId(value);
@@ -137,9 +102,7 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
           {},
         )
       : undefined;
-    let incomingEmojiRecents = Array.isArray(parsed.emojiRecents)
-      ? (parsed.emojiRecents as unknown[])
-      : undefined;
+    let incomingEmojiRecents: unknown[] | undefined = backup.emojiRecents;
     // Back-compat: if old exports had only emojiOfTheDay, map to today's date
     const parsedUnknown = parsed as Record<string, unknown>;
     if (!incomingEmojiByDate && parsedUnknown.emojiOfTheDay) {
@@ -155,7 +118,7 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
       if (normalized) {
         const today = new Date().toISOString().slice(0, 10);
         incomingEmojiRecents = [normalized];
-        parsedUnknown.emojiByDate = { [today]: normalized };
+        incomingEmojiByDate = { [today]: normalized };
       }
     }
     if (incomingEmojiRecents) {
@@ -168,27 +131,24 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
 
     const cur = useHabitStore.getState();
     const existingIds = new Set(cur.habits.map((h) => h.id));
-    const validIncoming = incomingHabits.filter((h) => h && (h as Habit).id);
-    const toAdd = validIncoming.filter((h) => !existingIds.has((h as Habit).id as string));
-    const duplicateHabits = validIncoming.length - toAdd.length;
-    const invalidHabits = incomingHabits.length - validIncoming.length;
+    const toAdd = incomingHabits.filter((h) => !existingIds.has(h.id));
+    const duplicateHabits = incomingHabits.length - toAdd.length;
+    const invalidHabits = backup.invalidHabits;
 
     const normalized = toAdd.map((h) =>
       recalc({
-        id: String((h as Habit).id),
+        id: h.id,
         name: String(h.name ?? ''),
-        frequency: (h as Habit).frequency ?? 'daily',
-        createdAt: String((h as Habit).createdAt ?? new Date().toISOString()),
+        frequency: h.frequency,
+        createdAt: h.createdAt,
         // Normalize incoming completions to date-only ISO strings (no time component)
-        completions: Array.isArray(h.completions)
-          ? (h.completions as string[]).map((c) => iso(fromISO(String(c))))
-          : [],
-        mode: (h as Habit).mode ?? 'build',
-        weeklyTarget: (h as Habit).weeklyTarget,
-        monthlyTarget: (h as Habit).monthlyTarget,
-        archived: Boolean((h as Habit & { archived?: boolean }).archived ?? false),
-        streak: Number((h as Habit).streak ?? 0),
-        points: Number((h as Habit).points ?? 0),
+        completions: Array.isArray(h.completions) ? h.completions.map((c) => iso(fromISO(c))) : [],
+        mode: h.mode ?? 'build',
+        weeklyTarget: h.weeklyTarget,
+        monthlyTarget: h.monthlyTarget,
+        archived: Boolean(h.archived ?? false),
+        streak: h.streak,
+        points: h.points,
       }),
     );
     const mergedHabits = [...cur.habits, ...normalized].map((h) => recalc(h));
@@ -228,6 +188,12 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
     );
 
     // apply to store/persisted state
+    const mergedEmoji = mergeEmojiData(
+      cur.emojiByDate || {},
+      cur.emojiRecents || [],
+      incomingEmojiByDate,
+      incomingEmojiRecents as string[] | undefined,
+    );
     const updated = {
       // only persist the partial snapshot used by our persist `partialize`
       habits: mergedHabits,
@@ -242,15 +208,9 @@ export function importAllData(txt: string): ImportResult | ImportResultFail {
       showArchived: incomingShowArchived ?? cur.showArchived,
       showAdd: cur.showAdd,
       // include progress when persisting import
-      progress: incomingProgress ?? normalizeProgress(cur.progress) ?? cur.progress,
-      emojiByDate:
-        incomingEmojiByDate ??
-        (cur as typeof cur & { emojiByDate?: Record<string, string> }).emojiByDate ??
-        {},
-      emojiRecents:
-        incomingEmojiRecents ??
-        (cur as typeof cur & { emojiRecents?: string[] }).emojiRecents ??
-        [],
+      progress: mergeProgress(cur.progress, incomingProgress),
+      emojiByDate: mergedEmoji.emojiByDate,
+      emojiRecents: mergedEmoji.emojiRecents,
     };
 
     setWeekStartsOnPreference(updated.weekStart);
