@@ -1,13 +1,16 @@
-/* eslint-disable no-empty */
 import '@/shared/styles/index.css';
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { registerSW } from 'virtual:pwa-register';
 import App from './App';
+import AppErrorBoundary from '@/shared/components/errors/AppErrorBoundary';
+import { installGlobalDiagnostics, reportError } from '@/shared/services/diagnostics';
 // Ensure theme store is initialized early so it can apply the resolved theme and listeners
 import '@/shared/store/theme';
 import initAccentSync from '@/shared/theme/accent';
+
+installGlobalDiagnostics();
 
 // Register service worker
 const updateSW = registerSW({
@@ -28,13 +31,18 @@ const updateSW = registerSW({
   onOfflineReady() {
     console.log('App ready to work offline');
   },
+  onRegisterError(error) {
+    reportError(error, { area: 'service-worker', operation: 'register' });
+  },
 });
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <AppErrorBoundary>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </AppErrorBoundary>
   </StrictMode>,
 );
 
@@ -47,4 +55,6 @@ requestAnimationFrame(() => {
 // Initialize accent sync after hydration kicks off
 try {
   initAccentSync();
-} catch {}
+} catch (error) {
+  reportError(error, { area: 'theme', operation: 'initialize-accent' });
+}

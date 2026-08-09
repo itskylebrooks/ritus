@@ -1,5 +1,6 @@
 import { type ErrorInfo, type ReactNode } from 'react';
 import React from 'react';
+import { reportError } from '@/shared/services/diagnostics';
 
 type AppErrorBoundaryProps = {
   children: ReactNode;
@@ -23,7 +24,11 @@ export default class AppErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Unhandled application error', error, errorInfo);
+    reportError(error, {
+      area: 'react',
+      operation: 'render',
+      details: { componentStack: errorInfo.componentStack },
+    });
   }
 
   render() {

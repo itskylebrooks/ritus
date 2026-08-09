@@ -6,6 +6,7 @@ import {
   importAllData,
   resetApplicationData,
 } from '@/shared/services/applicationData';
+import { reportError } from '@/shared/services/diagnostics';
 import { useHabitStore } from '@/shared/store/store';
 import useThemeStore from '@/shared/store/theme';
 import { ChevronDown, Dot, Linkedin, Share2, SquareArrowOutUpRight, X } from 'lucide-react';
@@ -214,7 +215,8 @@ export default function SettingsModal({
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
-    } catch {
+    } catch (error) {
+      reportError(error, { area: 'data', operation: 'export' });
       alert('Export failed');
     } finally {
       setExporting(false);
@@ -289,7 +291,8 @@ export default function SettingsModal({
           setImportReportOpen(true);
         }
       }
-    } catch {
+    } catch (error) {
+      reportError(error, { area: 'data', operation: 'import' });
       setImportReportTitle('Import failed');
       setImportReportMessage('Import failed');
       setImportReportReload(false);
@@ -707,8 +710,8 @@ export default function SettingsModal({
               setConfirmClearOpen(false);
               // Smoothly close settings so main page shows updated empty state
               beginClose();
-            } catch (e) {
-              console.error('Failed to clear local data', e);
+            } catch (error) {
+              reportError(error, { area: 'data', operation: 'reset' });
               setConfirmClearOpen(false);
             }
           }}
