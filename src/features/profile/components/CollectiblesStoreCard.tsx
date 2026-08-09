@@ -1,6 +1,7 @@
 import type { CollectibleType } from '@/shared/constants/collectibles';
 import { COLLECTIBLES } from '@/shared/constants/collectibles';
 import { useHabitStore } from '@/shared/store/store';
+import fireConfetti from '@/shared/utils/confetti';
 import { useMemo, useState } from 'react';
 
 const COLLECTIBLE_GROUPS: { label: string; type: CollectibleType }[] = [
@@ -114,10 +115,7 @@ export default function CollectiblesStoreCard() {
                               if (!canBuy) return;
                               const ok = buy(item.id);
                               if (ok) {
-                                // Celebrate successful purchase
-                                import('@/shared/utils/confetti').then(({ default: fire }) =>
-                                  fire(),
-                                );
+                                fireConfetti();
                               }
                             }}
                             disabled={!canBuy}

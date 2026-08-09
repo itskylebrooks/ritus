@@ -14,27 +14,25 @@ export default defineConfig(({ command }) => {
         const certPath = './certs/localhost.pem';
         if (fs.existsSync(keyPath) && fs.existsSync(certPath)) {
           return {
-          key: fs.readFileSync(keyPath),
-          cert: fs.readFileSync(certPath),
-        };
-      }
-      // Fallback to built-in (untrusted) TLS if cert files are missing
-      console.warn(
-        '\x1b[33m[dev] HTTPS certs not found in ./certs — falling back to untrusted self-signed HTTPS. Run `pnpm run gen:certs` to create trusted certs.\x1b[0m',
-      );
-      return true;
+            key: fs.readFileSync(keyPath),
+            cert: fs.readFileSync(certPath),
+          };
+        }
+        // Fallback to built-in (untrusted) TLS if cert files are missing
+        console.warn(
+          '\x1b[33m[dev] HTTPS certs not found in ./certs — falling back to untrusted self-signed HTTPS. Run `pnpm run gen:certs` to create trusted certs.\x1b[0m',
+        );
+        return true;
       })(),
     },
     plugins: [
       react(),
       VitePWA({
         registerType: 'prompt',
-        includeAssets: ['icons/*.png', 'icons/*.svg', 'icons/*.ico', 'fonts/*'],
+        includeAssets: ['icons/*.png', 'icons/*.ico', 'fonts/*'],
         manifest: false, // We're using the public/manifest.json file
         workbox: {
-          globPatterns: isDev
-            ? []
-            : ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
+          globPatterns: isDev ? [] : ['**/*.{js,css,html,ico,png,woff,woff2}'],
         },
         devOptions: {
           enabled: true,

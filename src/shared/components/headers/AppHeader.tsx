@@ -1,8 +1,5 @@
 /* eslint-disable no-empty */
 import { desktopDropdownVariants } from '@/shared/animations';
-import EmojiPicker from '@/shared/components/emoji/EmojiPicker';
-import GuideModal from '@/shared/components/modals/GuideModal';
-import SettingsModal from '@/shared/components/modals/SettingsModal';
 import { STORAGE_KEYS } from '@/shared/constants/storageKeys';
 import { useHabitStore } from '@/shared/store/store';
 import { safeGetItem, safeSetItem } from '@/shared/utils/storage';
@@ -22,9 +19,13 @@ import {
   Settings as SettingsIcon,
   Trophy,
 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import MobileTabBar from './MobileTabBar';
+
+const EmojiPicker = lazy(() => import('@/shared/components/emoji/EmojiPicker'));
+const GuideModal = lazy(() => import('@/shared/components/modals/GuideModal'));
+const SettingsModal = lazy(() => import('@/shared/components/modals/SettingsModal'));
 
 function DateDisplay() {
   const dateFormat = useHabitStore((s) => s.dateFormat);
@@ -147,7 +148,9 @@ export default function AppHeader() {
           >
             Ritus
           </Link>
-          <EmojiPicker />
+          <Suspense fallback={<span className="inline-block h-10 w-10" aria-hidden />}>
+            <EmojiPicker />
+          </Suspense>
         </div>
 
         {/* Centered desktop nav with icons only (truly centered to header width) */}
@@ -375,26 +378,34 @@ export default function AppHeader() {
 
       <MobileTabBar />
 
-      <SettingsModal
-        open={settingsOpen}
-        onClose={() => setSettingsOpen(false)}
-        onManageSync={() => {
-          if (location.pathname !== '/sync') navigate('/sync');
-        }}
-        onShowGuide={() => {
-          setGuideOpen(true);
-          setSettingsOpen(false);
-        }}
-      />
-      <GuideModal
-        open={guideOpen}
-        onClose={() => {
-          setGuideOpen(false);
-          try {
-            safeSetItem(STORAGE_KEYS.SEEN_GUIDE, '1');
-          } catch {}
-        }}
-      />
+      {settingsOpen && (
+        <Suspense fallback={null}>
+          <SettingsModal
+            open
+            onClose={() => setSettingsOpen(false)}
+            onManageSync={() => {
+              if (location.pathname !== '/sync') navigate('/sync');
+            }}
+            onShowGuide={() => {
+              setGuideOpen(true);
+              setSettingsOpen(false);
+            }}
+          />
+        </Suspense>
+      )}
+      {guideOpen && (
+        <Suspense fallback={null}>
+          <GuideModal
+            open
+            onClose={() => {
+              setGuideOpen(false);
+              try {
+                safeSetItem(STORAGE_KEYS.SEEN_GUIDE, '1');
+              } catch {}
+            }}
+          />
+        </Suspense>
+      )}
     </>
   );
 }

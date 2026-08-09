@@ -1,20 +1,25 @@
-import Compass from '@/features/compass';
-import Home from '@/features/home';
-import Insight from '@/features/insight';
-import Inspiration from '@/features/inspiration';
-import Profile from '@/features/profile';
-import Sync from '@/features/sync';
 import { createPageMotion } from '@/shared/animations';
 import AppHeader from '@/shared/components/headers/AppHeader';
 import BackupSuggestion from '@/shared/components/modals/BackupSuggestion';
 import { useHabitStore } from '@/shared/store/store';
 import type { TargetAndTransition, Transition } from 'framer-motion';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import React, { useEffect, useState } from 'react';
+import React, { lazy, Suspense, useEffect, useState } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 
 import MistOverlay from '@/shared/components/layout/MistOverlay';
 import useIsSafari from '@/shared/hooks/useIsSafari';
+
+const Home = lazy(() => import('@/features/home'));
+const Insight = lazy(() => import('@/features/insight'));
+const Profile = lazy(() => import('@/features/profile'));
+const Inspiration = lazy(() => import('@/features/inspiration'));
+const Sync = lazy(() => import('@/features/sync'));
+const Compass = lazy(() => import('@/features/compass'));
+
+function RouteFallback() {
+  return <div className="mt-4 h-[180px] rounded-2xl border border-subtle bg-surface" aria-hidden />;
+}
 
 // Define Page component outside of App to avoid recreating during render
 type PageChildProps = { pageTransitioning?: boolean };
@@ -94,69 +99,71 @@ export default function App() {
 
       <main>
         <AnimatePresence mode="wait" initial={false}>
-          {/* include homeRefreshKey in the Routes key when on home so Home remounts when triggered */}
-          <Routes
-            location={location}
-            key={
-              location.pathname === '/'
-                ? `${location.pathname}:${homeRefreshKey || 0}`
-                : location.pathname
-            }
-          >
-            <Route
-              path="/"
-              element={
-                <Page initial={initial} animate={animate} transition={transition}>
-                  <Home />
-                </Page>
+          <Suspense fallback={<RouteFallback />}>
+            {/* include homeRefreshKey in the Routes key when on home so Home remounts when triggered */}
+            <Routes
+              location={location}
+              key={
+                location.pathname === '/'
+                  ? `${location.pathname}:${homeRefreshKey || 0}`
+                  : location.pathname
               }
-            />
-            <Route
-              path="/insight"
-              element={
-                <Page initial={initial} animate={animate} transition={transition}>
-                  <Insight />
-                </Page>
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                <Page
-                  initial={initial}
-                  animate={animate}
-                  transition={transition}
-                  overlay={safariMist ? <MistOverlay /> : undefined}
-                >
-                  <Profile />
-                </Page>
-              }
-            />
-            <Route
-              path="/inspiration"
-              element={
-                <Page initial={initial} animate={animate} transition={transition}>
-                  <Inspiration />
-                </Page>
-              }
-            />
-            <Route
-              path="/sync"
-              element={
-                <Page initial={initial} animate={animate} transition={transition}>
-                  <Sync />
-                </Page>
-              }
-            />
-            <Route
-              path="/compass"
-              element={
-                <Page initial={initial} animate={animate} transition={transition}>
-                  <Compass />
-                </Page>
-              }
-            />
-          </Routes>
+            >
+              <Route
+                path="/"
+                element={
+                  <Page initial={initial} animate={animate} transition={transition}>
+                    <Home />
+                  </Page>
+                }
+              />
+              <Route
+                path="/insight"
+                element={
+                  <Page initial={initial} animate={animate} transition={transition}>
+                    <Insight />
+                  </Page>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <Page
+                    initial={initial}
+                    animate={animate}
+                    transition={transition}
+                    overlay={safariMist ? <MistOverlay /> : undefined}
+                  >
+                    <Profile />
+                  </Page>
+                }
+              />
+              <Route
+                path="/inspiration"
+                element={
+                  <Page initial={initial} animate={animate} transition={transition}>
+                    <Inspiration />
+                  </Page>
+                }
+              />
+              <Route
+                path="/sync"
+                element={
+                  <Page initial={initial} animate={animate} transition={transition}>
+                    <Sync />
+                  </Page>
+                }
+              />
+              <Route
+                path="/compass"
+                element={
+                  <Page initial={initial} animate={animate} transition={transition}>
+                    <Compass />
+                  </Page>
+                }
+              />
+            </Routes>
+          </Suspense>
         </AnimatePresence>
       </main>
     </div>

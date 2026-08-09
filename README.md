@@ -6,45 +6,45 @@ A calm habit tracker focused on simplicity and privacy. Track daily/weekly/month
 
 #### Desktop
 
-![Home view](public/images/home-page.png)
+![Home view](docs/images/home-page.png)
 
 #### Mobile
 
-![Mobile view](public/images/mobile-all.png)
+![Mobile view](docs/images/mobile-all.png)
 
 <details>
 <summary>Pages (Insight &amp; Profile)</summary>
 
-![Insight page](public/images/insight-page.png)
+![Insight page](docs/images/insight-page.png)
 
-![Profile page](public/images/profile-page.png)
+![Profile page](docs/images/profile-page.png)
 
 </details>
 
 <details>
 <summary>Stats Cards &amp; Grid View</summary>
 
-![Stats Cards](public/images/stats-cards.png)
+![Stats Cards](docs/images/stats-cards.png)
 
-![Grid View](public/images/grid-view.png)
+![Grid View](docs/images/grid-view.png)
 
 </details>
 
 <details>
 <summary>Trophy Board</summary>
 
-![Trophy board 1](public/images/trophy-board-1.png)
+![Trophy board 1](docs/images/trophy-board-1.png)
 
-![Trophy board 2](public/images/trophy-board-2.png)
+![Trophy board 2](docs/images/trophy-board-2.png)
 
 </details>
 
 <details>
 <summary>Collectibles Store</summary>
 
-![Store 1](public/images/collectibles-store-1.png)
+![Store 1](docs/images/collectibles-store-1.png)
 
-![Store 2](public/images/collectibles-store-2.png)
+![Store 2](docs/images/collectibles-store-2.png)
 
 </details>
 
@@ -164,7 +164,8 @@ High-level layout:
     - `utils/` — scoring, dates, data transfer (import/export), quotes, confetti
     - `components/` — reusable UI (header, modals, week strip, picker, etc.)
     - `theme/` — accent theme logic
-- `public/` — icons, fonts, manifest, README screenshots
+- `public/` — runtime icons, fonts, and manifest
+- `docs/images/` — README screenshots (excluded from the production build)
 - `dev-dist/` — service worker artifacts (PWA)
 
 ### Persistence details

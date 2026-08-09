@@ -1,16 +1,9 @@
 import { resolveEmojiId } from '@/shared/constants/emojis';
-import {
-  BACKUP_SCHEMA_VERSION,
-  decodeBackup,
-  mergeEmojiData,
-  mergeProgress,
-  normalizeProgress,
-} from '@/shared/persistence/schema';
+import { decodeBackup, mergeEmojiData, mergeProgress } from '@/shared/persistence/schema';
 import { useHabitStore } from '@/shared/store/store';
-import pkg from '../../../package.json';
-import { systemClock } from './clock';
 import { fromISO, iso, setWeekStartsOnPreference, today } from './date';
 import { recalc } from './scoring';
+export { exportAllData } from './dataExport';
 
 export interface ImportResult {
   ok: true;
@@ -32,49 +25,6 @@ export type ImportResultFail = {
   ok: false;
   reason: 'invalid' | 'not_ritus' | 'unsupported_version';
 };
-
-export function exportAllData() {
-  const s = useHabitStore.getState();
-  const habitsForExport = s.habits.map((h) => recalc(h));
-  return {
-    app: 'ritus',
-    version: pkg.version,
-    schemaVersion: BACKUP_SCHEMA_VERSION,
-    exportedAt: systemClock.now().toISOString(),
-    // Ensure exported completions are date-only ISO strings (no time part)
-    habits: habitsForExport.map((h) => ({
-      ...h,
-      completions: (h.completions || []).map((c) => iso(fromISO(c))),
-    })),
-    // export formatting settings so they can be restored on import
-    dateFormat: s.dateFormat,
-    weekStart: s.weekStart,
-    // UI visibility flags
-    showArchived: s.showArchived,
-    // no reminders in export
-    totalPoints: s.totalPoints,
-    totalCompletions: s.totalCompletions,
-    longestStreak: s.longestStreak,
-    // days with ritus (unique days with at least one completion across all habits)
-    daysWithRitus: (() => {
-      const set = new Set<string>();
-      for (const h of habitsForExport)
-        for (const c of h.completions || []) set.add(iso(fromISO(c)));
-      return set.size;
-    })(),
-    // progression state (points + bookkeeping keys)
-    progress:
-      normalizeProgress(s.progress, systemClock.now().toISOString()) ||
-      ({
-        points: 0,
-        weekBonusKeys: {},
-        completionAwardKeys: {},
-      } as const),
-    // emoji data
-    emojiByDate: s.emojiByDate || {},
-    emojiRecents: Array.isArray(s.emojiRecents) ? s.emojiRecents : [],
-  };
-}
 
 export function importAllData(txt: string): ImportResult | ImportResultFail {
   try {

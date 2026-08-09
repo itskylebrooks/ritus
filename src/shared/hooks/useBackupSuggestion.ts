@@ -1,5 +1,5 @@
 import { STORAGE_KEYS } from '@/shared/constants/storageKeys';
-import { exportAllData } from '@/shared/utils/dataTransfer';
+import { exportAllData } from '@/shared/utils/dataExport';
 import { safeGetItem, safeSetItem } from '@/shared/utils/storage';
 import { useCallback, useEffect, useState } from 'react';
 
