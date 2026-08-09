@@ -71,6 +71,13 @@ describe('SettingsModal', () => {
 
   it('resets only ritus storage keys', async () => {
     const user = userEvent.setup();
+    useThemeStore.getState().setMode('dark');
+    useHabitStore.setState({
+      dateFormat: 'DMY',
+      weekStart: 'sunday',
+      showArchived: true,
+      progress: { ...useHabitStore.getState().progress, points: 50 },
+    });
     localStorage.setItem(STORAGE_KEYS.HABITS, '{"state":{}}');
     localStorage.setItem(STORAGE_KEYS.THEME_MODE, 'dark');
     localStorage.setItem('unrelated-key', 'keep-me');
@@ -86,8 +93,15 @@ describe('SettingsModal', () => {
       state?: { habits?: unknown[] };
     };
     expect(habitsState.state?.habits ?? []).toHaveLength(0);
-    expect(localStorage.getItem(STORAGE_KEYS.THEME_MODE)).toBeNull();
+    expect(localStorage.getItem(STORAGE_KEYS.THEME_MODE)).toBe('system');
     expect(localStorage.getItem('unrelated-key')).toBe('keep-me');
-    expect(useHabitStore.getState().habits).toHaveLength(0);
+    expect(useHabitStore.getState()).toMatchObject({
+      habits: [],
+      dateFormat: 'MDY',
+      weekStart: 'monday',
+      showArchived: false,
+      progress: { points: 0 },
+    });
+    expect(useThemeStore.getState().mode).toBe('system');
   });
 });

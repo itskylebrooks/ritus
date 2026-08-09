@@ -1,10 +1,13 @@
 /* eslint-disable no-empty */
 import { useIsMobile } from '@/shared/hooks/useIsMobile';
 import { usePWA } from '@/shared/hooks/usePWA';
+import {
+  exportAllData,
+  importAllData,
+  resetApplicationData,
+} from '@/shared/services/applicationData';
 import { useHabitStore } from '@/shared/store/store';
 import useThemeStore from '@/shared/store/theme';
-import { exportAllData, importAllData } from '@/shared/utils/dataTransfer';
-import { clearRitusStorage } from '@/shared/utils/storage';
 import { ChevronDown, Dot, Linkedin, Share2, SquareArrowOutUpRight, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import pkg from '../../../../package.json';
@@ -32,7 +35,6 @@ export default function SettingsModal({
   const enterRaf = useRef<number | null>(null);
   const pendingRef = useRef<'none' | 'guide'>('none');
   const storeReminders = useHabitStore((s) => s.reminders);
-  const storeSetReminders = useHabitStore((s) => s.setReminders);
   const dateFormat = useHabitStore((s) => s.dateFormat);
   const setDateFormat = useHabitStore((s) => s.setDateFormat);
   const weekStart = useHabitStore((s) => s.weekStart);
@@ -701,36 +703,7 @@ export default function SettingsModal({
           onClose={() => setConfirmClearOpen(false)}
           onConfirm={() => {
             try {
-              // Clear persisted storage and reset in-memory store to defaults
-              clearRitusStorage();
-              try {
-                const st = useHabitStore.getState();
-                st.clearAll();
-                st.resetStats();
-                // reset progression (points and award keys)
-                try {
-                  useHabitStore.setState({
-                    progress: {
-                      points: 0,
-                      weekBonusKeys: {},
-                      completionAwardKeys: {},
-                      unlocked: {},
-                      ownedCollectibles: [],
-                      appliedCollectibles: {},
-                      seenTrophies: {},
-                    },
-                  });
-                } catch {}
-                // restore UI defaults (reset view mode to list and other UI prefs)
-                try {
-                  st.setShowList(true);
-                } catch {}
-                // restore UI defaults
-                try {
-                  st.setShowAdd(true);
-                } catch {}
-                storeSetReminders({ dailyEnabled: false, dailyTime: '21:00' });
-              } catch {}
+              resetApplicationData();
               setConfirmClearOpen(false);
               // Smoothly close settings so main page shows updated empty state
               beginClose();

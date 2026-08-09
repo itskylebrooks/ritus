@@ -112,7 +112,7 @@ export default function CollectiblesStoreCard() {
                           <button
                             onClick={() => {
                               if (!canBuy) return;
-                              const ok = buy(item.id, item.cost);
+                              const ok = buy(item.id);
                               if (ok) {
                                 // Celebrate successful purchase
                                 import('@/shared/utils/confetti').then(({ default: fire }) =>

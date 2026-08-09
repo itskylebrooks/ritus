@@ -17,14 +17,8 @@ export interface HabitState {
   setPoints: (n: number) => void;
   addPoints: (delta: number) => void;
   tryAwardWeeklyBonus: (habitId: string, weekDate: Date, reached: boolean) => void;
-  awardTrophies: (summary: {
-    dailyBuildStreak: number;
-    dailyBreakStreak: number;
-    weeklyStreak: number;
-    totalCompletions: number;
-    emojiStreak?: number;
-  }) => string[];
-  purchaseCollectible: (id: string, cost: number) => boolean;
+  awardTrophies: () => string[];
+  purchaseCollectible: (id: string) => boolean;
   applyCollectible: (id: string) => boolean;
   markTrophiesSeen: (ids: string[]) => void;
   dateFormat: 'MDY' | 'DMY';
@@ -69,4 +63,5 @@ export interface HabitState {
   deleteHabit: (id: string) => void;
   toggleCompletion: (id: string, date: Date) => void;
   clearAll: () => void;
+  resetAllData: () => void;
 }

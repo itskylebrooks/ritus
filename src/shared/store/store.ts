@@ -1,6 +1,5 @@
 import { COLLECTIBLES } from '@/shared/constants/collectibles';
 import { STORAGE_KEYS } from '@/shared/constants/storageKeys';
-import { TROPHIES, type TrophyGroup } from '@/shared/constants/trophies';
 import {
   createHabit,
   setHabitArchived,
@@ -8,18 +7,19 @@ import {
   updateHabit,
 } from '@/shared/domain/habits';
 import { computeHabitStatistics, refreshHabitDerivations } from '@/shared/domain/statistics';
+import { reconcileCompletionReward, reconcileWeeklyTargetReward } from '@/shared/domain/rewards';
+import { evaluateTrophyUnlocks } from '@/shared/domain/trophies';
 import {
   HABIT_STORE_VERSION,
   migrateHabitStoreState,
   normalizeProgress,
 } from '@/shared/persistence/schema';
 import type { HabitState } from '@/shared/store/types';
+import { createDefaultProgress, DEFAULT_REMINDERS } from '@/shared/store/defaults';
 import {
   daysThisWeek,
   fromISO,
   iso,
-  isSameDay,
-  lastNDays,
   setWeekStartsOnPreference,
   startOfWeek,
 } from '@/shared/utils/date';
@@ -27,58 +27,6 @@ import { readPersistedWeekStart } from '@/shared/utils/storage';
 import { systemClock } from '@/shared/utils/clock';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-
-const TROPHIES_BY_GROUP: Record<TrophyGroup, (typeof TROPHIES)[number][]> = {
-  daily_build: [],
-  daily_break: [],
-  weekly: [],
-  monthly: [],
-  totals: [],
-  milestone: [],
-  meta: [],
-  emoji: [],
-};
-
-for (const trophy of TROPHIES) {
-  TROPHIES_BY_GROUP[trophy.group].push(trophy);
-}
-
-const AUTO_META_TROPHY_IDS = new Set([
-  'meta_first_collectible',
-  'meta_10_habits',
-  'meta_balance',
-  'meta_focus',
-  'meta_persistence',
-]);
-
-const computeLongestEmojiStreak = (by: Record<string, string | undefined>): number => {
-  const keys = Object.keys(by || {});
-  if (!keys.length) return 0;
-  const norm = new Set(keys.map((k) => (k.length > 10 ? k.slice(0, 10) : k)));
-  const prevDay = (ds: string) => {
-    const d = new Date(`${ds}T00:00:00Z`);
-    d.setUTCDate(d.getUTCDate() - 1);
-    return d.toISOString().slice(0, 10);
-  };
-  const nextDay = (ds: string) => {
-    const d = new Date(`${ds}T00:00:00Z`);
-    d.setUTCDate(d.getUTCDate() + 1);
-    return d.toISOString().slice(0, 10);
-  };
-  let longest = 0;
-  for (const ds of norm) {
-    const prevKey = prevDay(ds);
-    if (norm.has(prevKey)) continue;
-    let count = 0;
-    let cur = ds;
-    while (norm.has(cur)) {
-      count++;
-      cur = nextDay(cur);
-    }
-    if (count > longest) longest = count;
-  }
-  return longest;
-};
 
 const initialWeekStart = readPersistedWeekStart('monday');
 setWeekStartsOnPreference(initialWeekStart);
@@ -89,15 +37,7 @@ export const useHabitStore = create<HabitState>()(
   persist(
     (set, get) => ({
       habits: [],
-      progress: {
-        points: 0,
-        weekBonusKeys: {},
-        completionAwardKeys: {},
-        unlocked: {},
-        ownedCollectibles: [],
-        appliedCollectibles: {},
-        seenTrophies: {},
-      },
+      progress: createDefaultProgress(),
       dateFormat: 'MDY',
       setDateFormat: (f) => set({ dateFormat: f }),
       weekStart: initialWeekStart,
@@ -131,33 +71,27 @@ export const useHabitStore = create<HabitState>()(
       clearEmojiData: () => set({ emojiByDate: {}, emojiRecents: [] }),
       syncEmojiTrophies: () => {
         const state = get();
-        const unlocked = { ...(state.progress.unlocked || {}) };
-        const emojiTrophies = TROPHIES_BY_GROUP.emoji;
-        const needsEmoji = emojiTrophies.some((t) => !unlocked[t.id]);
-        if (!needsEmoji) return [];
-        const by = (state.emojiByDate || {}) as Record<string, string | undefined>;
-        if (!Object.keys(by).length) return [];
-        const longest = computeLongestEmojiStreak(by);
-        const newly: string[] = [];
-        const unlockedAt = iso(systemClock.now());
-        for (const t of emojiTrophies) {
-          if (!unlocked[t.id] && longest >= t.threshold) {
-            unlocked[t.id] = unlockedAt;
-            newly.push(t.id);
-          }
-        }
-        if (newly.length > 0) {
+        const result = evaluateTrophyUnlocks({
+          habits: state.habits,
+          totalCompletions: state.totalCompletions,
+          emojiByDate: state.emojiByDate || {},
+          ownedCollectibles: state.progress.ownedCollectibles || [],
+          unlocked: state.progress.unlocked || {},
+          now: systemClock.now(),
+          groups: ['emoji'],
+        });
+        if (result.newlyUnlocked.length > 0) {
           set((s) => ({
             progress: {
               ...s.progress,
-              unlocked,
-              lastUnlockedTrophyAt: unlockedAt,
+              unlocked: result.unlocked,
+              lastUnlockedTrophyAt: result.unlockedAt,
             },
           }));
         }
-        return newly;
+        return result.newlyUnlocked;
       },
-      reminders: { dailyEnabled: false, dailyTime: '21:00' },
+      reminders: { ...DEFAULT_REMINDERS },
       setReminders: (r: { dailyEnabled: boolean; dailyTime: string }) => set({ reminders: r }),
       totalPoints: 0,
       totalCompletions: 0,
@@ -172,192 +106,52 @@ export const useHabitStore = create<HabitState>()(
       tryAwardWeeklyBonus: (habitId: string, weekDate: Date, reached: boolean) =>
         set((s) => {
           const weekStartsOn = s.weekStart === 'sunday' ? 0 : 1;
-          // Keyed by habit + week start to avoid double-awards.
           const key = `${habitId}@${startOfWeek(weekDate, { weekStartsOn }).toISOString()}`;
-          const keys = { ...(s.progress.weekBonusKeys || {}) };
-          const has = !!keys[key];
-          // Award
-          if (reached && !has) {
-            const newPoints = Math.max(0, Math.floor(s.progress.points + 10));
-            return {
-              progress: {
-                ...s.progress,
-                points: newPoints,
-                weekBonusKeys: { ...keys, [key]: true },
-              },
-            };
-          }
-          // Revoke
-          if (!reached && has) {
-            const newPoints = Math.max(0, Math.floor(s.progress.points - 10));
-            const nextKeys = { ...keys };
-            delete nextKeys[key];
-            return {
-              progress: {
-                ...s.progress,
-                points: newPoints,
-                weekBonusKeys: nextKeys,
-              },
-            };
-          }
-          return {};
+          const reward = reconcileWeeklyTargetReward(s.progress.weekBonusKeys || {}, key, reached);
+          return {
+            progress: {
+              ...s.progress,
+              points: Math.max(0, Math.floor(s.progress.points + reward.pointsDelta)),
+              weekBonusKeys: reward.keys,
+            },
+          };
         }),
-      // Award trophies idempotently from a stats summary.
-      awardTrophies: (summary) => {
-        const { progress, habits } = get();
-        const newly: string[] = [];
-        const unlocked = { ...(progress.unlocked || {}) };
-        const unlockedAt = iso(systemClock.now());
-
-        // Build a richer summary from either the provided summary or the current habits
-        const allHabits = habits || [];
-        const storedTotalCompletions = get().totalCompletions;
-        const totalCompletions =
-          summary?.totalCompletions ??
-          (typeof storedTotalCompletions === 'number'
-            ? storedTotalCompletions
-            : allHabits.reduce((acc, h) => acc + (h.completions ? h.completions.length : 0), 0));
-        const dailyBuildStreak =
-          summary?.dailyBuildStreak ??
-          Math.max(
-            0,
-            ...allHabits
-              .filter((h) => h.frequency === 'daily' && h.mode === 'build')
-              .map((h) => h.streak || 0),
-          );
-        const dailyBreakStreak =
-          summary?.dailyBreakStreak ??
-          Math.max(
-            0,
-            ...allHabits
-              .filter((h) => h.frequency === 'daily' && h.mode === 'break')
-              .map((h) => h.streak || 0),
-          );
-        const weeklyStreak =
-          summary?.weeklyStreak ??
-          Math.max(
-            0,
-            ...allHabits.filter((h) => h.frequency === 'weekly').map((h) => h.streak || 0),
-          );
-        const monthlyStreak =
-          (summary as { monthlyStreak?: number } | undefined)?.monthlyStreak ??
-          Math.max(
-            0,
-            ...allHabits.filter((h) => h.frequency === 'monthly').map((h) => h.streak || 0),
-          );
-
-        const needsEmoji = TROPHIES_BY_GROUP.emoji.some((t) => !unlocked[t.id]);
-        const emojiStreak =
-          summary?.emojiStreak ??
-          (needsEmoji ? computeLongestEmojiStreak(get().emojiByDate || {}) : 0);
-
-        // compute unique days with at least one completion across all habits
-        const uniqueDays = new Set<string>();
-        for (const h of allHabits) for (const c of h.completions || []) uniqueDays.add(c);
-        const daysUsedCount = uniqueDays.size;
-
-        // helper checks for meta trophies
-        // max streak across build and break habits
-        const maxBuildStreak = Math.max(
-          0,
-          ...allHabits.filter((h) => h.mode === 'build').map((h) => h.streak || 0),
-        );
-        const maxBreakStreak = Math.max(
-          0,
-          ...allHabits.filter((h) => h.mode === 'break').map((h) => h.streak || 0),
-        );
-
-        // daily persistence: at least one completion every day for last N days
-        const hasContinuousDays = (n: number) => {
-          const days = lastNDays(n);
-          for (const d of days)
-            if (![...uniqueDays].some((u) => isSameDay(fromISO(u), d))) return false;
-          return true;
-        };
-
-        const allActiveDailyCompletedN = (n: number) => {
-          const activeDaily = allHabits.filter((h) => !h.archived && h.frequency === 'daily');
-          if (activeDaily.length === 0) return false;
-          const days = lastNDays(n);
-          for (const d of days) {
-            for (const h of activeDaily) {
-              if (!h.completions.some((c) => isSameDay(fromISO(c), d))) return false;
-            }
-          }
-          return true;
-        };
-
-        const meets = (t: (typeof TROPHIES)[number]) => {
-          if (t.group === 'daily_build') return dailyBuildStreak >= t.threshold;
-          if (t.group === 'daily_break') return dailyBreakStreak >= t.threshold;
-          if (t.group === 'weekly') return weeklyStreak >= t.threshold;
-          if (t.group === 'monthly') return monthlyStreak >= t.threshold;
-          if (t.group === 'milestone') return daysUsedCount >= t.threshold;
-          if (t.group === 'emoji') return emojiStreak >= t.threshold;
-          if (t.group === 'meta') {
-            // behavioral/meta trophies with custom logic
-            switch (t.id) {
-              case 'meta_first_collectible':
-                // Awarded when user owns at least 1 collectible
-                return (get().progress.ownedCollectibles || []).length >= t.threshold;
-              case 'meta_10_habits':
-                // Awarded when user has created at least 10 habits
-                return allHabits.length >= t.threshold;
-              case 'meta_balance':
-                // require both a build and a break habit to have a long streak
-                return maxBuildStreak >= t.threshold && maxBreakStreak >= t.threshold;
-              case 'meta_focus':
-                return allActiveDailyCompletedN(t.threshold);
-              case 'meta_persistence':
-                // threshold represents days here
-                return hasContinuousDays(t.threshold);
-              // meta_awareness intentionally not auto-awarded here
-              case 'meta_resilience':
-                // complex to detect from static summary; not auto-awarded here
-                return false;
-              default:
-                return false;
-            }
-          }
-          return totalCompletions >= t.threshold;
-        };
-
-        for (const t of TROPHIES) {
-          if (!unlocked[t.id] && meets(t)) {
-            unlocked[t.id] = unlockedAt;
-            newly.push(t.id);
-          }
-        }
-        if (newly.length === 0) return newly;
+      awardTrophies: () => {
+        const state = get();
+        const result = evaluateTrophyUnlocks({
+          habits: state.habits,
+          totalCompletions: state.totalCompletions,
+          emojiByDate: state.emojiByDate || {},
+          ownedCollectibles: state.progress.ownedCollectibles || [],
+          unlocked: state.progress.unlocked || {},
+          now: systemClock.now(),
+        });
+        if (result.newlyUnlocked.length === 0) return [];
         set((s) => ({
           progress: {
             ...s.progress,
-            unlocked,
-            lastUnlockedTrophyAt: unlockedAt,
+            unlocked: result.unlocked,
+            lastUnlockedTrophyAt: result.unlockedAt,
           },
         }));
-        return newly;
+        return result.newlyUnlocked;
       },
-      purchaseCollectible: (id, cost) => {
+      purchaseCollectible: (id) => {
         const state = get();
+        const collectible = COLLECTIBLES.find((candidate) => candidate.id === id);
+        if (!collectible || collectible.implemented === false) return false;
         const owned = new Set(state.progress.ownedCollectibles || []);
-        if (owned.has(id) || (state.progress.points || 0) < cost) return false;
+        if (owned.has(id) || (state.progress.points || 0) < collectible.cost) return false;
         set((s) => ({
           progress: {
             ...s.progress,
-            points: Math.max(0, Math.floor((s.progress.points || 0) - cost)),
+            points: Math.max(0, Math.floor((s.progress.points || 0) - collectible.cost)),
             ownedCollectibles: [...(s.progress.ownedCollectibles || []), id],
           },
         }));
         // Re-evaluate trophies (e.g. meta_first_collectible) after purchase
         try {
-          // pass a minimal summary so TypeScript accepts the call
-          get().awardTrophies?.({
-            dailyBuildStreak: 0,
-            dailyBreakStreak: 0,
-            weeklyStreak: 0,
-            totalCompletions: get().totalCompletions || 0,
-          });
+          get().awardTrophies();
         } catch {
           // swallow any errors to avoid breaking purchase flow
         }
@@ -493,8 +287,8 @@ export const useHabitStore = create<HabitState>()(
           let pointsDelta = 0; // for totalPoints (habit-level points changes)
           let completionDelta = 0;
           // work on copies of award keys so we can atomically update progress at the end
-          const compKeys = { ...(s.progress.completionAwardKeys || {}) };
-          const weekKeys = { ...(s.progress.weekBonusKeys || {}) };
+          let compKeys = { ...(s.progress.completionAwardKeys || {}) };
+          let weekKeys = { ...(s.progress.weekBonusKeys || {}) };
           let pointsAwardDelta = 0;
 
           const updated = s.habits.map((h) => {
@@ -503,23 +297,14 @@ export const useHabitStore = create<HabitState>()(
             const toggled = toggleHabitCompletion(h, day, systemClock.now());
             const completions = toggled.habit.completions;
             const dayKey = toggled.dayKey;
-            if (toggled.completionDelta < 0) {
-              // user removed a completion
-              completionDelta -= 1;
-              // if we had awarded for this completion previously, revoke it
-              if (compKeys[dayKey]) {
-                pointsAwardDelta -= 5;
-                delete compKeys[dayKey];
-              }
-            } else {
-              // adding a completion
-              completionDelta += 1;
-              // only award if we haven't rewarded this specific day before
-              if (!compKeys[dayKey]) {
-                pointsAwardDelta += 5;
-                compKeys[dayKey] = true;
-              }
-            }
+            completionDelta += toggled.completionDelta;
+            const completionReward = reconcileCompletionReward(
+              compKeys,
+              dayKey,
+              toggled.completionDelta > 0,
+            );
+            compKeys = completionReward.keys;
+            pointsAwardDelta += completionReward.pointsDelta;
 
             const newHabit = toggled.habit;
             const oldPts = h.points || 0;
@@ -535,18 +320,10 @@ export const useHabitStore = create<HabitState>()(
               const count = completions.filter((c) => weekSet.has(c)).length;
               const target = h.weeklyTarget ?? 1;
               const weekKey = `${h.id}@${startOfWeek(day, { weekStartsOn }).toISOString()}`;
-              const hadWeek = !!weekKeys[weekKey];
               const reached = count >= target;
-              if (reached && !hadWeek) {
-                // award weekly bonus
-                pointsAwardDelta += 10;
-                weekKeys[weekKey] = true;
-              }
-              if (!reached && hadWeek) {
-                // revoke weekly bonus
-                pointsAwardDelta -= 10;
-                delete weekKeys[weekKey];
-              }
+              const weeklyReward = reconcileWeeklyTargetReward(weekKeys, weekKey, reached);
+              weekKeys = weeklyReward.keys;
+              pointsAwardDelta += weeklyReward.pointsDelta;
             }
 
             return newHabit;
@@ -570,8 +347,24 @@ export const useHabitStore = create<HabitState>()(
 
           // apply award/revoke deltas to persisted progress
           const newPoints = Math.max(0, Math.floor(s.progress.points + pointsAwardDelta));
-          let lastUnlockedId: string | undefined;
-          const unlockedAt = iso(systemClock.now());
+          const trophyResult = evaluateTrophyUnlocks({
+            habits: updated,
+            totalCompletions: newTotalCompletions,
+            emojiByDate: s.emojiByDate || {},
+            ownedCollectibles: s.progress.ownedCollectibles || [],
+            unlocked: s.progress.unlocked || {},
+            now: systemClock.now(),
+            groups: [
+              'daily_build',
+              'daily_break',
+              'weekly',
+              'monthly',
+              'totals',
+              'milestone',
+              'meta',
+            ],
+            excludedIds: ['meta_first_collectible', 'meta_10_habits'],
+          });
 
           return {
             habits: updated,
@@ -583,146 +376,11 @@ export const useHabitStore = create<HabitState>()(
               points: newPoints,
               weekBonusKeys: weekKeys,
               completionAwardKeys: compKeys,
-              // evaluate trophies idempotently based on updated habits
-              unlocked: (() => {
-                const existing = { ...(s.progress.unlocked || {}) };
-                const allHabits = updated;
-                const totalCompletions = newTotalCompletions;
-                const needs = (group: TrophyGroup) =>
-                  TROPHIES_BY_GROUP[group].some((t) => !existing[t.id]);
-
-                const needsDailyBuild = needs('daily_build');
-                const needsDailyBreak = needs('daily_break');
-                const needsWeekly = needs('weekly');
-                const needsMonthly = needs('monthly');
-                const needsMilestone = needs('milestone');
-
-                const dailyBuildStreak = needsDailyBuild
-                  ? Math.max(
-                      0,
-                      ...allHabits
-                        .filter((hh) => hh.frequency === 'daily' && hh.mode === 'build')
-                        .map((hh) => hh.streak || 0),
-                    )
-                  : 0;
-                const dailyBreakStreak = needsDailyBreak
-                  ? Math.max(
-                      0,
-                      ...allHabits
-                        .filter((hh) => hh.frequency === 'daily' && hh.mode === 'break')
-                        .map((hh) => hh.streak || 0),
-                    )
-                  : 0;
-                const weeklyStreak = needsWeekly
-                  ? Math.max(
-                      0,
-                      ...allHabits
-                        .filter((hh) => hh.frequency === 'weekly')
-                        .map((hh) => hh.streak || 0),
-                    )
-                  : 0;
-                const monthlyStreak = needsMonthly
-                  ? Math.max(
-                      0,
-                      ...allHabits
-                        .filter((hh) => hh.frequency === 'monthly')
-                        .map((hh) => hh.streak || 0),
-                    )
-                  : 0;
-
-                const metaTrophies = TROPHIES_BY_GROUP.meta.filter(
-                  (t) => AUTO_META_TROPHY_IDS.has(t.id) && !existing[t.id],
-                );
-                const needsMetaBalance = metaTrophies.some((t) => t.id === 'meta_balance');
-                const needsMetaFocus = metaTrophies.some((t) => t.id === 'meta_focus');
-                const needsMetaPersistence = metaTrophies.some((t) => t.id === 'meta_persistence');
-
-                const daysUsedCount =
-                  needsMilestone || needsMetaPersistence ? uniqueDaysSet.size : 0;
-                const maxBuildStreak = needsMetaBalance
-                  ? Math.max(
-                      0,
-                      ...allHabits.filter((h) => h.mode === 'build').map((h) => h.streak || 0),
-                    )
-                  : 0;
-                const maxBreakStreak = needsMetaBalance
-                  ? Math.max(
-                      0,
-                      ...allHabits.filter((h) => h.mode === 'break').map((h) => h.streak || 0),
-                    )
-                  : 0;
-
-                const hasContinuousDays = (n: number) => {
-                  if (!needsMetaPersistence) return false;
-                  const days = lastNDays(n);
-                  const daySet = uniqueDaysSet;
-                  for (const d of days) if (!daySet.has(iso(d))) return false;
-                  return true;
-                };
-
-                const allActiveDailyCompletedN = (n: number) => {
-                  if (!needsMetaFocus) return false;
-                  const activeDaily = allHabits.filter(
-                    (h) => !h.archived && h.frequency === 'daily',
-                  );
-                  if (activeDaily.length === 0) return false;
-                  const completionSets = new Map<string, Set<string>>();
-                  for (const h of activeDaily) {
-                    completionSets.set(
-                      h.id,
-                      new Set((h.completions || []).map((c) => iso(fromISO(c)))),
-                    );
-                  }
-                  const days = lastNDays(n);
-                  for (const d of days) {
-                    const key = iso(d);
-                    for (const h of activeDaily) {
-                      if (!completionSets.get(h.id)?.has(key)) return false;
-                    }
-                  }
-                  return true;
-                };
-
-                for (const t of TROPHIES) {
-                  if (existing[t.id]) continue;
-                  if (t.group === 'emoji') continue;
-                  let meets = false;
-                  if (t.group === 'daily_build') meets = dailyBuildStreak >= t.threshold;
-                  else if (t.group === 'daily_break') meets = dailyBreakStreak >= t.threshold;
-                  else if (t.group === 'weekly') meets = weeklyStreak >= t.threshold;
-                  else if (t.group === 'monthly') meets = monthlyStreak >= t.threshold;
-                  else if (t.group === 'milestone') meets = daysUsedCount >= t.threshold;
-                  else if (t.group === 'meta') {
-                    switch (t.id) {
-                      case 'meta_balance':
-                        meets = maxBuildStreak >= t.threshold && maxBreakStreak >= t.threshold;
-                        break;
-                      case 'meta_focus':
-                        meets = allActiveDailyCompletedN(t.threshold);
-                        break;
-                      case 'meta_persistence':
-                        meets = hasContinuousDays(t.threshold);
-                        break;
-                      // meta_awareness intentionally not auto-awarded here
-                      case 'meta_resilience':
-                        meets = false;
-                        break;
-                      default:
-                        meets = false;
-                    }
-                  } else if (t.group === 'totals') {
-                    meets = totalCompletions >= t.threshold;
-                  } else {
-                    meets = false;
-                  }
-                  if (meets) {
-                    existing[t.id] = unlockedAt;
-                    lastUnlockedId = t.id;
-                  }
-                }
-                return existing;
-              })(),
-              lastUnlockedTrophyAt: lastUnlockedId ? unlockedAt : s.progress.lastUnlockedTrophyAt,
+              unlocked: trophyResult.unlocked,
+              lastUnlockedTrophyAt:
+                trophyResult.newlyUnlocked.length > 0
+                  ? trophyResult.unlockedAt
+                  : s.progress.lastUnlockedTrophyAt,
             },
             daysWithRitus,
           };
@@ -730,6 +388,27 @@ export const useHabitStore = create<HabitState>()(
       // clearing current habits resets longest streak so insights reflect empty state (totalPoints handled via resetStats)
       clearAll: () =>
         set({ habits: [], longestStreak: 0, daysWithRitus: 0, emojiByDate: {}, emojiRecents: [] }),
+      resetAllData: () => {
+        setWeekStartsOnPreference('monday');
+        set({
+          habits: [],
+          progress: createDefaultProgress(),
+          dateFormat: 'MDY',
+          weekStart: 'monday',
+          showAdd: true,
+          showHomeCards: true,
+          showArchived: false,
+          showList: true,
+          homeRefreshKey: 0,
+          emojiByDate: {},
+          emojiRecents: [],
+          reminders: { ...DEFAULT_REMINDERS },
+          totalPoints: 0,
+          totalCompletions: 0,
+          longestStreak: 0,
+          daysWithRitus: 0,
+        });
+      },
     }),
     {
       name: STORAGE_KEYS.HABITS,
