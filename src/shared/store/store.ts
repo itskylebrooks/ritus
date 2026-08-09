@@ -1,8 +1,19 @@
 import { COLLECTIBLES } from '@/shared/constants/collectibles';
 import { STORAGE_KEYS } from '@/shared/constants/storageKeys';
 import { TROPHIES, type TrophyGroup } from '@/shared/constants/trophies';
-import { HABIT_STORE_VERSION, migrateHabitStoreState } from '@/shared/persistence/schema';
-import type { Frequency, Habit } from '@/shared/types';
+import {
+  createHabit,
+  setHabitArchived,
+  toggleHabitCompletion,
+  updateHabit,
+} from '@/shared/domain/habits';
+import { computeHabitStatistics, refreshHabitDerivations } from '@/shared/domain/statistics';
+import {
+  HABIT_STORE_VERSION,
+  migrateHabitStoreState,
+  normalizeProgress,
+} from '@/shared/persistence/schema';
+import type { HabitState } from '@/shared/store/types';
 import {
   daysThisWeek,
   fromISO,
@@ -12,7 +23,6 @@ import {
   setWeekStartsOnPreference,
   startOfWeek,
 } from '@/shared/utils/date';
-import { recalc } from '@/shared/utils/scoring';
 import { readPersistedWeekStart } from '@/shared/utils/storage';
 import { systemClock } from '@/shared/utils/clock';
 import { create } from 'zustand';
@@ -40,20 +50,6 @@ const AUTO_META_TROPHY_IDS = new Set([
   'meta_focus',
   'meta_persistence',
 ]);
-
-// Older saves stored booleans; normalize to ISO dates for trophy unlocks.
-const normalizeUnlockedDates = (
-  unlocked: Record<string, string | boolean | undefined> | undefined,
-  fallback: string,
-): Record<string, string> | undefined => {
-  if (!unlocked) return undefined;
-  const next: Record<string, string> = {};
-  for (const [id, value] of Object.entries(unlocked)) {
-    if (!value) continue;
-    next[id] = typeof value === 'string' ? value : fallback;
-  }
-  return next;
-};
 
 const computeLongestEmojiStreak = (by: Record<string, string | undefined>): number => {
   const keys = Object.keys(by || {});
@@ -84,86 +80,10 @@ const computeLongestEmojiStreak = (by: Record<string, string | undefined>): numb
   return longest;
 };
 
-const computeDaysWithRitus = (habits: Habit[]): number => {
-  const uniqueDays = new Set<string>();
-  for (const h of habits) {
-    for (const c of h.completions || []) uniqueDays.add(iso(fromISO(c)));
-  }
-  return uniqueDays.size;
-};
-
 const initialWeekStart = readPersistedWeekStart('monday');
 setWeekStartsOnPreference(initialWeekStart);
 
-export interface HabitState {
-  habits: Habit[];
-  progress: {
-    points: number;
-    weekBonusKeys?: Record<string, true | undefined>;
-    completionAwardKeys?: Record<string, true | undefined>;
-    // trophy id -> ISO date string (start of day)
-    unlocked?: Record<string, string>;
-    ownedCollectibles?: string[];
-    appliedCollectibles?: Record<string, string>;
-    seenTrophies?: Record<string, true | undefined>;
-    lastUnlockedTrophyAt?: string;
-  };
-  setPoints: (n: number) => void;
-  addPoints: (delta: number) => void;
-  tryAwardWeeklyBonus: (habitId: string, weekDate: Date, reached: boolean) => void;
-  awardTrophies: (summary: {
-    dailyBuildStreak: number;
-    dailyBreakStreak: number;
-    weeklyStreak: number;
-    totalCompletions: number;
-    emojiStreak?: number;
-  }) => string[];
-  purchaseCollectible: (id: string, cost: number) => boolean;
-  applyCollectible: (id: string) => boolean;
-  markTrophiesSeen: (ids: string[]) => void;
-  dateFormat: 'MDY' | 'DMY';
-  setDateFormat: (f: 'MDY' | 'DMY') => void;
-  weekStart: 'sunday' | 'monday';
-  setWeekStart: (w: 'sunday' | 'monday') => void;
-  showAdd: boolean;
-  setShowAdd: (v: boolean) => void;
-  showHomeCards: boolean;
-  setShowHomeCards: (v: boolean) => void;
-  showArchived: boolean;
-  setShowArchived: (v: boolean) => void;
-  showList: boolean;
-  setShowList: (v: boolean) => void;
-  homeRefreshKey?: number;
-  triggerHomeRefresh: () => void;
-  emojiByDate?: Record<string, string | undefined>;
-  emojiRecents?: string[];
-  setEmojiForDate?: (dateISO: string, emojiId: string | null) => void;
-  clearEmojiData?: () => void;
-  syncEmojiTrophies: () => string[];
-  archiveHabit: (id: string) => void;
-  unarchiveHabit: (id: string) => void;
-  reminders: { dailyEnabled: boolean; dailyTime: string };
-  setReminders: (r: { dailyEnabled: boolean; dailyTime: string }) => void;
-  totalPoints: number;
-  totalCompletions: number;
-  longestStreak: number;
-  daysWithRitus: number;
-  resetStats: () => void;
-  addHabit: (
-    name: string,
-    frequency: Frequency,
-    weeklyTarget?: number,
-    monthlyTarget?: number,
-    mode?: 'build' | 'break',
-  ) => void;
-  editHabit: (
-    id: string,
-    patch: Partial<Pick<Habit, 'name' | 'frequency' | 'weeklyTarget' | 'monthlyTarget' | 'mode'>>,
-  ) => void;
-  deleteHabit: (id: string) => void;
-  toggleCompletion: (id: string, date: Date) => void;
-  clearAll: () => void;
-}
+export type { HabitState } from '@/shared/store/types';
 
 export const useHabitStore = create<HabitState>()(
   persist(
@@ -521,48 +441,25 @@ export const useHabitStore = create<HabitState>()(
         mode: 'build' | 'break' = 'build',
       ) =>
         set((s) => {
-          const genId = () => {
-            try {
-              // prefer native UUID when available
-              const g = globalThis as unknown as { crypto?: { randomUUID?: () => string } };
-              if (g.crypto?.randomUUID) return g.crypto.randomUUID();
-            } catch {
-              // ignore and fallback
-            }
-            // fallback: reasonably-unique id for local-only storage
-            return `id-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
-          };
-
-          const habit: Habit = {
-            id: genId(),
-            name: name.trim(),
-            frequency,
-            archived: false,
-            mode,
-            createdAt: systemClock.now().toISOString(),
-            completions: [],
-            weeklyTarget: frequency === 'weekly' ? weeklyTarget : undefined,
-            monthlyTarget: frequency === 'monthly' ? monthlyTarget : undefined,
-            streak: 0,
-            points: 0,
-          };
-          const newHabit = recalc(habit);
+          const now = systemClock.now();
+          const newHabit = createHabit({ name, frequency, weeklyTarget, monthlyTarget, mode }, now);
           const newHabits = [newHabit, ...s.habits];
-          // recompute longest streak from current habits so UI reflects live streaks
-          const newLongest = Math.max(0, ...newHabits.map((h) => h.streak || 0));
-          // totalPoints is cumulative lifetime points and should not be recomputed from current habits
-          return { habits: newHabits, longestStreak: newLongest };
+          return {
+            habits: newHabits,
+            longestStreak: computeHabitStatistics(newHabits).longestStreak,
+          };
         }),
       editHabit: (id, patch) =>
         set((s) => {
-          const updated = s.habits.map((h) => (h.id === id ? recalc({ ...h, ...patch }) : h));
-          // recompute longest streak from the edited list so stats stay in sync with the UI
-          const maxStreak = Math.max(0, ...updated.map((h) => h.streak || 0));
-          // Do not recompute/overwrite cumulative totalPoints when editing habit metadata
+          const now = systemClock.now();
+          const updated = s.habits.map((habit) =>
+            habit.id === id ? updateHabit(habit, patch, now) : habit,
+          );
+          const statistics = computeHabitStatistics(updated);
           return {
             habits: updated,
-            longestStreak: maxStreak,
-            daysWithRitus: computeDaysWithRitus(updated),
+            longestStreak: statistics.longestStreak,
+            daysWithRitus: statistics.daysWithRitus,
           };
         }),
 
@@ -570,19 +467,25 @@ export const useHabitStore = create<HabitState>()(
       deleteHabit: (id) =>
         set((s) => {
           const remaining = s.habits.filter((h) => h.id !== id);
-          const nextLongest = Math.max(0, ...remaining.map((h) => h.streak || 0));
+          const statistics = computeHabitStatistics(remaining);
           return {
             habits: remaining,
-            longestStreak: nextLongest,
-            daysWithRitus: computeDaysWithRitus(remaining),
+            longestStreak: statistics.longestStreak,
+            daysWithRitus: statistics.daysWithRitus,
           };
         }),
       // archive/unarchive a habit (archived habits are hidden from default lists)
       archiveHabit: (id: string) =>
-        set((s) => ({ habits: s.habits.map((h) => (h.id === id ? { ...h, archived: true } : h)) })),
+        set((s) => ({
+          habits: s.habits.map((habit) =>
+            habit.id === id ? setHabitArchived(habit, true) : habit,
+          ),
+        })),
       unarchiveHabit: (id: string) =>
         set((s) => ({
-          habits: s.habits.map((h) => (h.id === id ? { ...h, archived: false } : h)),
+          habits: s.habits.map((habit) =>
+            habit.id === id ? setHabitArchived(habit, false) : habit,
+          ),
         })),
       toggleCompletion: (id, date) =>
         set((s) => {
@@ -597,13 +500,11 @@ export const useHabitStore = create<HabitState>()(
           const updated = s.habits.map((h) => {
             if (h.id !== id) return h;
 
-            // Toggle completion for both build and break habits
-            let completions = [...h.completions];
-            const isAlready = completions.some((c) => isSameDay(fromISO(c), day));
-            const dayKey = `${h.id}@${iso(day)}`;
-            if (isAlready) {
+            const toggled = toggleHabitCompletion(h, day, systemClock.now());
+            const completions = toggled.habit.completions;
+            const dayKey = toggled.dayKey;
+            if (toggled.completionDelta < 0) {
               // user removed a completion
-              completions = completions.filter((c) => !isSameDay(fromISO(c), day));
               completionDelta -= 1;
               // if we had awarded for this completion previously, revoke it
               if (compKeys[dayKey]) {
@@ -612,7 +513,6 @@ export const useHabitStore = create<HabitState>()(
               }
             } else {
               // adding a completion
-              completions.push(iso(day));
               completionDelta += 1;
               // only award if we haven't rewarded this specific day before
               if (!compKeys[dayKey]) {
@@ -621,7 +521,7 @@ export const useHabitStore = create<HabitState>()(
               }
             }
 
-            const newHabit = recalc({ ...h, completions });
+            const newHabit = toggled.habit;
             const oldPts = h.points || 0;
             const newPts = newHabit.points || 0;
             const delta = newPts - oldPts;
@@ -653,7 +553,7 @@ export const useHabitStore = create<HabitState>()(
           });
 
           // recompute longest streak from updated habits so insights stay accurate
-          const newLongest = Math.max(0, ...updated.map((h) => h.streak || 0));
+          const newLongest = computeHabitStatistics(updated).longestStreak;
           const uniqueDaysSet = new Set<string>();
           for (const h of updated) {
             for (const c of h.completions || []) uniqueDaysSet.add(iso(fromISO(c)));
@@ -859,21 +759,8 @@ export const useHabitStore = create<HabitState>()(
         const incoming = persistedState as Partial<HabitState> | undefined;
         const merged = { ...currentState, ...(incoming || {}) };
         if (merged.progress) {
-          const cleaned = { ...(merged.progress as Record<string, unknown>) };
-          delete cleaned.essence;
-          delete cleaned.level;
-          const unlockedRaw = cleaned.unlocked as
-            | Record<string, string | boolean | undefined>
-            | undefined;
-          if (unlockedRaw) {
-            const fallback =
-              typeof cleaned.lastUnlockedTrophyAt === 'string'
-                ? cleaned.lastUnlockedTrophyAt
-                : iso(systemClock.now());
-            const normalized = normalizeUnlockedDates(unlockedRaw, fallback);
-            if (normalized) cleaned.unlocked = normalized;
-          }
-          merged.progress = cleaned as HabitState['progress'];
+          merged.progress =
+            normalizeProgress(merged.progress, iso(systemClock.now())) ?? currentState.progress;
 
           // If the user already owned collectibles before this trophy existed,
           // award `meta_first_collectible` once on load so we don't need to
@@ -894,18 +781,22 @@ export const useHabitStore = create<HabitState>()(
             // swallow to avoid breaking merge on unexpected persisted shapes
           }
         }
+        const refreshedHabits = refreshHabitDerivations(
+          Array.isArray(merged.habits) ? merged.habits : [],
+          systemClock.now(),
+        );
+        const refreshedStatistics = computeHabitStatistics(refreshedHabits);
+        merged.habits = refreshedHabits;
+        merged.longestStreak = refreshedStatistics.longestStreak;
         const hasPersistedTotal =
           incoming && Object.prototype.hasOwnProperty.call(incoming, 'totalCompletions');
         if (!hasPersistedTotal) {
-          merged.totalCompletions = (merged.habits || []).reduce(
-            (acc, h) => acc + (h.completions ? h.completions.length : 0),
-            0,
-          );
+          merged.totalCompletions = refreshedStatistics.totalCompletions;
         }
         const hasPersistedDays =
           incoming && Object.prototype.hasOwnProperty.call(incoming, 'daysWithRitus');
         if (!hasPersistedDays) {
-          merged.daysWithRitus = computeDaysWithRitus(merged.habits || []);
+          merged.daysWithRitus = refreshedStatistics.daysWithRitus;
         }
         setWeekStartsOnPreference(merged.weekStart === 'sunday' ? 'sunday' : 'monday');
         return merged;

@@ -1,4 +1,4 @@
-import type { HabitState } from '@/shared/store/store';
+import type { HabitState } from '@/shared/store/types';
 import type { Frequency, Habit } from '@/shared/types';
 import { normalizeLocalDate } from '@/shared/utils/date';
 import { systemClock } from '@/shared/utils/clock';
