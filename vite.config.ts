@@ -4,12 +4,13 @@ import { fileURLToPath, URL } from 'node:url';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
-export default defineConfig(({ command }) => {
+export default defineConfig(({ command, isPreview }) => {
   const isDev = command === 'serve';
   return {
     server: {
       host: true,
-      https: (() => {
+      // Production preview uses loopback HTTP; keep development certificates unchanged.
+      https: isPreview ? undefined : (() => {
         const keyPath = './certs/localhost-key.pem';
         const certPath = './certs/localhost.pem';
         if (fs.existsSync(keyPath) && fs.existsSync(certPath)) {
