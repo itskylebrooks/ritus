@@ -107,6 +107,8 @@ A calm habit tracker focused on simplicity and privacy. Track daily/weekly/month
 
 ## Getting started
 
+[![Launch on PicoRunner](https://picorunner.com/badges/launch.svg)](https://picorunner.com/launch/?repository=https%3A%2F%2Fgithub.com%2Fitskylebrooks%2Fritus)
+
 ```bash
 pnpm install
 pnpm run dev
